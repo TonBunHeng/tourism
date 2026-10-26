@@ -1,0 +1,54 @@
+[
+  {
+    "id": "tech_bakong_khqr_api",
+    "name": "Bakong KHQR API & Developer Integration",
+    "name_km": "ការតភ្ជាប់ប្រព័ន្ធទូទាត់បាគង KHQR សម្រាប់អ្នកអភិវឌ្ឍន៍ (Developer API)",
+    "category": "technology",
+    "topic": "developer_apis",
+    "description": "Bakong KHQR is Cambodia's standardized QR code system compliant with the EMVCo standard. Developers can integrate KHQR payment flows into e-commerce, POS, and mobile applications using the Bakong Open API, Bakong SDK, or partner commercial bank payment gateways (such as ABA PayWay, Acleda E-Shop, or Wing SDK). Integration involves: 1. Generating dynamic or static KHQR string using merchant account credentials; 2. Rendering the QR code for customer scanning via any banking app; 3. Receiving asynchronous webhook notifications or querying transaction status via MD5 transaction hash.",
+    "description_km": "Bakong KHQR គឺជាស្តង់ដារ QR កូដជាតិរបស់កម្ពុជាស្របតាមលក្ខណៈបច្ចេកទេស EMVCo។ អ្នកអភិវឌ្ឍន៍អាចតភ្ជាប់ KHQR ទៅក្នុងគេហទំព័រ ឬកម្មវិធីទូរស័ព្ទតាមរយៈ Bakong Open API ឬ Payment Gateway របស់ធនាគារ (ដូចជា ABA PayWay, Acleda E-Shop, Wing SDK)។ ដំណើរការរួមមាន៖ ១. បង្កើតកូដ KHQR តាមកម្រិតគណនីអាជីវកម្ម ២. បង្ហាញ QR សម្រាប់អតិថិជនស្កេនពីកម្មវិធីធនាគារណាក៏បាន ៣. ទទួលដំណឹងស្វ័យប្រវត្តិ (Webhook) ឬផ្ទៀងផ្ទាត់ស្ថានភាពប្រតិបត្តិការតាមរយៈ Transaction Hash។",
+    "official_portal": "https://bakong.nbc.gov.kh/en/developer",
+    "code_integration_example_python": "import hashlib\n# Generate Bakong KHQR transaction hash check\ndef verify_bakong_tx(md5_hash, secret_key):\n    return hashlib.md5(f'{md5_hash}:{secret_key}'.encode()).hexdigest()",
+    "tags": [
+      "bakong",
+      "khqr",
+      "api",
+      "fintech",
+      "payment gateway",
+      "laravel",
+      "python",
+      "vue",
+      "aba payway",
+      "បាគង",
+      "ទូទាត់ប្រាក់",
+      "សរសេរកូដ"
+    ],
+    "verified": true,
+    "source": "National Bank of Cambodia (NBC) Fintech Working Group",
+    "last_updated": "2026-09-01"
+  },
+  {
+    "id": "tech_startup_ecosystem",
+    "name": "Cambodia Startup Ecosystem & Tech Innovation Hubs",
+    "name_km": "ប្រព័ន្ធអេកូឡូស៊ី Startup និងនវានុវត្តន៍បច្ចេកវិទ្យានៅកម្ពុជា",
+    "category": "technology",
+    "topic": "tech_ecosystem",
+    "description": "Cambodia's digital economy is driven by key public and private tech initiatives under the Cambodia Digital Economy and Society Policy Framework 2021-2035. Major hubs include: Techo Startup Center (TSC), Cambodia Academy of Digital Technology (CADT), Khmer Enterprise (KE), and incubation hubs (Impact Hub Phnom Penh, Raintree, Factory Phnom Penh). Tech startups can leverage the CamDX business platform, cloud hosting, and venture capital financing across e-commerce, fintech, logistics, edtech, and agritech.",
+    "description_km": "សេដ្ឋកិច្ចឌីជីថលនៅកម្ពុជាត្រូវបានជំរុញដោយក្របខណ្ឌគោលនយោបាយសេដ្ឋកិច្ច និងសង្គមឌីជីថលកម្ពុជា ២០២១-២០៣៥។ មជ្ឈមណ្ឌលសំខាន់ៗរួមមាន៖ មជ្ឈមណ្ឌលបណ្តុះធុរកិច្ចថ្មីតេជោ (Techo Startup Center), បណ្ឌិត្យសភាបច្ចេកវិទ្យាឌីជីថលកម្ពុជា (CADT), សហគ្រិនខ្មែរ (Khmer Enterprise) និងមជ្ឈមណ្ឌលច្នៃប្រឌិត (Impact Hub, Factory Phnom Penh)។ ធុរកិច្ចថ្មីបច្ចេកវិទ្យាផ្តោតលើ Fintech, E-commerce, Edtech និង Agritech។",
+    "official_portal": "https://techostartup.gov.kh and https://cadt.edu.kh",
+    "tags": [
+      "startup",
+      "technology",
+      "techo startup center",
+      "cadt",
+      "khmer enterprise",
+      "innovation",
+      "digital economy",
+      "ធុរកិច្ចថ្មី",
+      "បច្ចេកវិទ្យា"
+    ],
+    "verified": true,
+    "source": "Ministry of Post and Telecommunications (MPTC) & Techo Startup Center",
+    "last_updated": "2026-09-01"
+  }
+]

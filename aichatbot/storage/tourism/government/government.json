@@ -1,0 +1,66 @@
+[
+  {
+    "id": "gov_cambodia_passport",
+    "name": "Cambodian Passport Application & Renewal (GDI)",
+    "name_km": "នីតិវិធីធ្វើ និងបន្តសុពលភាពលិខិតឆ្លងដែនកម្ពុជា (GDI)",
+    "category": "government",
+    "topic": "public_services",
+    "description": "Cambodian passports are issued by the General Department of Identification (GDI / អគ្គនាយកដ្ឋានអត្តសញ្ញាណកម្ម) of the Ministry of Interior. Citizens can apply at the GDI Headquarters in Niroth (Chbar Ampov), the GDI Passport Office at Aeon Mall Sen Sok City (2nd floor), or provincial passport branches. Required documents include an original valid Cambodian National ID Card (Khmer ID) and Residency Book (Family Book or Residence Book). Passports for minors under 18 require birth certificate and written parental consent.",
+    "description_km": "លិខិតឆ្លងដែនកម្ពុជាចេញដោយអគ្គនាយកដ្ឋានអត្តសញ្ញាណកម្ម (GDI) នៃក្រសួងមហាផ្ទៃ។ ប្រជាពលរដ្ឋអាចទៅធ្វើនៅទីស្នាក់ការកណ្តាល GDI សង្កាត់និរោធ (ច្បារអំពៅ) សាខាផ្សារទំនើបអ៊ីអនសែនសុខ (ជាន់ទី ២) ឬសាខាតាមបណ្តាខេត្តមួយចំនួន។ ឯកសារតម្រូវរួមមាន អត្តសញ្ញាណប័ណ្ណសញ្ជាតិខ្មែរច្បាប់ដើម (មានសុពលភាព) និងសៀវភៅស្នាក់នៅ ឬសៀវភៅគ្រួសារ។ សម្រាប់អនីតិជនក្រោម ១៨ ឆ្នាំ តម្រូវឱ្យមានសំបុត្រកំណើត និងការយល់ព្រមពីឪពុកម្តាយ។",
+    "official_portal": "https://gdi.gov.kh",
+    "application_locations": [
+      "GDI Headquarters: National Road 1, Sangkat Niroth, Khan Chbar Ampov, Phnom Penh",
+      "GDI Branch Aeon Mall Sen Sok City (2nd Floor), Phnom Penh",
+      "GDI Passport Office Tuol Kork, Phnom Penh",
+      "Provincial Identification Departments (Battambang, Koh Kong, Banteay Meanchey, etc.)"
+    ],
+    "official_disclaimer": "Processing fees, service options (regular vs expedited), and photo capture requirements are set by ministerial joint Prakas. Please check current official fees with GDI directly before your visit.",
+    "tags": ["passport", "gdi", "ministry of interior", "identification", "khmer passport", "public service", "លិខិតឆ្លងដែន", "អត្តសញ្ញាណកម្ម", "ធ្វើប៉ាស្ព័រ"],
+    "verified": true,
+    "source": "General Department of Identification (GDI), Ministry of Interior Cambodia",
+    "last_updated": "2026-09-01"
+  },
+  {
+    "id": "gov_cambodia_visa",
+    "name": "Cambodia Visas & Official E-Visa Portal",
+    "name_km": "ទិដ្ឋាការកម្ពុជា និងប្រព័ន្ធទិដ្ឋាការអេឡិចត្រូនិក e-Visa",
+    "category": "government",
+    "topic": "immigration",
+    "description": "Foreign nationals traveling to Cambodia can obtain visas through the official e-Visa portal (evisa.gov.kh), upon arrival at international airports (SAI, PNH, KOS) and land border checkpoints, or from Cambodian diplomatic missions abroad. Primary visa classes include Tourist Visa (Class T, 30 days single entry, extendable once for 30 days) and Ordinary/Business Visa (Class E, 30 days entry, extendable for 1, 3, 6, or 12 months under EB business, EG job seeker, ER retiree, or ES student categories).",
+    "description_km": "ជនបរទេសដែលធ្វើដំណើរមកកម្ពុជាអាចស្នើសុំទិដ្ឋាការតាមរយៈគេហទំព័រផ្លូវការ e-Visa (evisa.gov.kh) ឬស្នើសុំពេលមកដល់ (Visa on Arrival) នៅអាកាសយានដ្ឋានអន្តរជាតិ (SAI, PNH, KOS) និងច្រកទ្វារព្រំដែនអន្តរជាតិ។ ប្រភេទចម្បងៗរួមមាន ទិដ្ឋាការទេសចរណ៍ (ប្រភេទ T សុពលភាពស្នាក់នៅ ៣០ ថ្ងៃ និងអាចបន្តបានម្តង) និងទិដ្ឋាការធម្មតា/ធុរកិច្ច (ប្រភេទ E ស្នាក់នៅ ៣០ ថ្ងៃ និងអាចបន្តបាន ១, ៣, ៦ ឬ ១២ ខែ ក្រោមប្រភេទ EB ធុរកិច្ច, EG រកការងារ, ER ចូលនិវត្តន៍ ឬ ES សិស្ស/និស្សិត)។",
+    "official_portal": "https://www.evisa.gov.kh",
+    "official_disclaimer": "Only evisa.gov.kh is the official government e-Visa portal. Beware of unofficial third-party duplicate websites charging inflated fees.",
+    "tags": ["visa", "evisa", "immigration", "travel", "tourist visa", "business visa", "entry requirements", "ទិដ្ឋាការ", "អន្តោប្រវេសន៍"],
+    "verified": true,
+    "source": "Ministry of Foreign Affairs and International Cooperation & General Department of Immigration",
+    "last_updated": "2026-09-01"
+  },
+  {
+    "id": "gov_driver_license",
+    "name": "Cambodian Driver's License Issuance & Foreign Conversion (MPWT)",
+    "name_km": "ការធ្វើ និងប្តូរបណ្ណបើកបរយានយន្តកម្ពុជា (ក្រសួងសាធារណការ)",
+    "category": "government",
+    "topic": "public_services",
+    "description": "The Ministry of Public Works and Transport (MPWT / ក្រសួងសាធារណការ និងដឹកជញ្ជូន) issues driver's licenses (Type A for motorcycles, Type B for light passenger cars, Type C/D for commercial vehicles). Citizens apply via the MPWT Driver's License Centers (Aeon Mall 1, Aeon Mall 2, or provincial MPWT offices). Foreigners holding a valid foreign driver's license can convert to a 1-year renewable Cambodian license by providing a passport with valid E-visa, original foreign license with certified translation, residence certificate from Sangkat, health certificate, and photos.",
+    "description_km": "ក្រសួងសាធារណការ និងដឹកជញ្ជូន (MPWT) ទទួលខុសត្រូវចេញបណ្ណបើកបរយានយន្ត (ប្រភេទ ក សម្រាប់ម៉ូតូ, ប្រភេទ ខ សម្រាប់រថយន្តទេសចរណ៍, ប្រភេទ គ/ឃ សម្រាប់រថយន្តដឹកទំនិញ)។ ប្រជាពលរដ្ឋអាចទៅធ្វើនៅមជ្ឈមណ្ឌលបណ្ណបើកបរនៅផ្សារទំនើបអ៊ីអន ១, អ៊ីអន ២ ឬមន្ទីរសាធារណការខេត្ត។ ជនបរទេសដែលមានបណ្ណបើកបរស្របច្បាប់ពីប្រទេសដើម អាចប្តូរយកបណ្ណបើកបរខ្មែរ (សុពលភាព ១ ឆ្នាំ) ដោយភ្ជាប់លិខិតឆ្លងដែនមានទិដ្ឋាការ E ត្រឹមត្រូវ បណ្ណដើមបកប្រែជាផ្លូវការ លិខិតបញ្ជាក់ទីលំនៅពីសង្កាត់ លិខិតពិនិត្យសុខភាព និងរូបថត។",
+    "official_portal": "https://mpwt.gov.kh",
+    "tags": ["driver license", "mpwt", "transport", "license renewal", "foreign license conversion", "បណ្ណបើកបរ", "សាធារណការ"],
+    "verified": true,
+    "source": "Ministry of Public Works and Transport (MPWT) Cambodia",
+    "last_updated": "2026-09-01"
+  },
+  {
+    "id": "gov_sangkat_civil_registry",
+    "name": "Sangkat/Khan Civil Registration & One Window Service (OWSO)",
+    "name_km": "សេវាអត្រានុកូលដ្ឋាន និងការិយាល័យច្រកចេញចូលតែមួយ (OWSO)",
+    "category": "government",
+    "topic": "local_administration",
+    "description": "Local administrative services in Cambodia operate through Sangkat/Commune Councils and Khan/District One Window Service Offices (OWSO / ការិយាល័យច្រកចេញចូលតែមួយ). Common civil registry services include Birth Certificate registration (សំបុត្រកំណើត within 30 days of birth), Marriage Certificate registration (សំបុត្រអាពាហ៍ពិពាហ៍), Certificate of Residence (លិខិតបញ្ជាក់ទីលំនៅ), Legalization of documents, and small local business permits. Procedures are standardized to ensure transparency and eliminate informal fees.",
+    "description_km": "សេវារដ្ឋបាលមូលដ្ឋាននៅកម្ពុជាផ្តល់ជូនតាមរយៈរដ្ឋបាលសង្កាត់/ឃុំ និងការិយាល័យច្រកចេញចូលតែមួយ (OWSO) នៅតាមខណ្ឌ/ស្រុក។ សេវាអត្រានុកូលដ្ឋានរួមមាន ការចុះសំបុត្រកំណើត (ក្នុងរយៈពេល ៣០ ថ្ងៃក្រោយសម្រាល) សំបុត្រអាពាហ៍ពិពាហ៍ លិខិតបញ្ជាក់ទីលំនៅ ការបញ្ជាក់នីត្យានុកូលភាពលើឯកសារ និងលិខិតអនុញ្ញាតអាជីវកម្មខ្នាតតូចក្នុងមូលដ្ឋាន។ នីតិវិធីត្រូវបានកំណត់តម្លៃសេវាច្បាស់លាស់ដើម្បីធានាតម្លាភាព។",
+    "official_portal": "https://owso.interior.gov.kh",
+    "tags": ["sangkat", "owso", "civil registry", "birth certificate", "marriage certificate", "residence", "one window service", "សង្កាត់", "ច្រកចេញចូលតែមួយ", "សំបុត្រកំណើត"],
+    "verified": true,
+    "source": "Ministry of Interior (National Committee for Sub-National Democratic Development - NCDD)",
+    "last_updated": "2026-09-01"
+  }
+]

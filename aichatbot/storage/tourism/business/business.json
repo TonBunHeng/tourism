@@ -1,0 +1,139 @@
+[
+  {
+    "id": "biz_camdx_registration",
+    "name": "Cambodia Business Registration via CamDX Single Portal",
+    "name_km": "ការចុះបញ្ជីអាជីវកម្មតាមប្រព័ន្ធស្វ័យប្រវត្តិកម្ម CamDX",
+    "category": "business",
+    "topic": "business_registration",
+    "description": "The official online platform (registrationservices.gov.kh) for starting a business in Cambodia under the inter-ministerial Single Portal framework. It allows investors to simultaneously register with the Ministry of Commerce (MoC), General Department of Taxation (GDT), and Ministry of Labour and Vocational Training (MLVT) in approximately 8 working days using digital identity through CamDigiKey.",
+    "description_km": "ថ្នាលបច្ចេកវិទ្យាផ្លូវការ (registrationservices.gov.kh) សម្រាប់ចុះបញ្ជីអាជីវកម្មតាមអនឡាញនៅកម្ពុជា។ ប្រព័ន្ធនេះអនុញ្ញាតឱ្យសហគ្រិនចុះបញ្ជីដំណាលគ្នាជាមួយក្រសួងពាណិជ្ជកម្ម (MoC) អគ្គនាយកដ្ឋានពន្ធដារ (GDT) និងក្រសួងការងារ និងបណ្តុះបណ្តាលវិជ្ជាជីវៈ (MLVT) ក្នុងរយៈពេលប្រមាណ ៨ ថ្ងៃនៃថ្ងៃធ្វើការ ដោយប្រើប្រាស់ការផ្ទៀងផ្ទាត់អត្តសញ្ញាណឌីជីថល CamDigiKey។",
+    "official_portal": "https://registrationservices.gov.kh",
+    "participating_institutions": [
+      "Ministry of Commerce (MoC)",
+      "General Department of Taxation (GDT)",
+      "Ministry of Labour and Vocational Training (MLVT)",
+      "Council for the Development of Cambodia (CDC)"
+    ],
+    "required_documents": [
+      "Valid Cambodian National ID card or Foreign Passport of all shareholders/directors",
+      "Lease agreement or land title of the registered business office",
+      "Passport photos (white background) of directors",
+      "Company Articles of Incorporation (Statutes)",
+      "Proof of bank account confirmation letter (within 15-30 days after registration)"
+    ],
+    "official_disclaimer": "Official registration fees and procedures are governed by ministerial sub-decrees. Always confirm requirements directly on registrationservices.gov.kh.",
+    "tags": [
+      "business",
+      "registration",
+      "camdx",
+      "moc",
+      "gdt",
+      "mlvt",
+      "tax",
+      "startup",
+      "invest in cambodia",
+      "អាជីវកម្ម",
+      "ចុះបញ្ជី",
+      "ពន្ធដារ"
+    ],
+    "verified": true,
+    "source": "Council for the Development of Cambodia & Ministry of Economy and Finance",
+    "last_updated": "2026-09-01"
+  },
+  {
+    "id": "biz_tax_structure",
+    "name": "Cambodian Corporate & Small Business Tax System",
+    "name_km": "ប្រព័ន្ធពន្ធដារសម្រាប់សហគ្រាស និងអាជីវកម្មនៅកម្ពុជា",
+    "category": "business",
+    "topic": "taxation",
+    "description": "Cambodia operates a self-assessment tax regime classifying taxpayers into Small, Medium, and Large. Key taxes include Corporate Income Tax (Tax on Profit / ToP at 20% standard rate, or 0% for QIPs), Minimum Tax (1% of annual turnover, subject to conditions), Value Added Tax (VAT 10% standard, 0% on exports), Patent Tax (annual business license tax based on classification and turnover), Withholding Tax (15% for domestic services, 14% for non-residents), and Salary Tax (progressive rates 0% to 20%).",
+    "description_km": "កម្ពុជាអនុវត្តរបបស្វ័យប្រកាសពន្ធ ដោយបែងចែកអ្នកជាប់ពន្ធជា ៣ កម្រិត៖ តូច មធ្យម និងធំ។ ប្រភេទទូទៅរួមមាន ពន្ធលើប្រាក់ចំណេញ (ToP ២០%), ពន្ធអប្បបរមា (១% នៃចំណូលប្រចាំឆ្នាំ), អាករលើតម្លៃបន្ថែម (VAT ១០% ក្នុងស្រុក និង ០% សម្រាប់ការនាំចេញ), ពន្ធលើប៉ាតង់ (បង់ប្រចាំឆ្នាំ), ពន្ធកាត់ទុក (១៥% លើថ្លៃសេវាបុគ្គល និង ១៤% សម្រាប់អ្នកមិនរស់នៅក្នុងស្រុក), និងពន្ធលើប្រាក់បៀវត្ស (តាមអត្រាកើន ០% ដល់ ២០%)។",
+    "official_portal": "https://www.tax.gov.kh",
+    "annual_obligations": [
+      "Patent Tax renewal between January 1 and March 31 annually",
+      "Annual Tax on Income return filing within 3 months after fiscal year end (by March 31)",
+      "Monthly tax declarations submitted through GDT E-Tax portal by the 20th of the following month"
+    ],
+    "official_disclaimer": "Tax rates and exemptions are subject to the Law on Taxation and GDT regulations. Consult a licensed tax agent or the General Department of Taxation for individual tax advice.",
+    "tags": [
+      "tax",
+      "taxation",
+      "gdt",
+      "patent tax",
+      "vat",
+      "tax on profit",
+      "salary tax",
+      "withholding tax",
+      "ពន្ធដារ",
+      "ពន្ធលើប្រាក់ចំណេញ",
+      "ប៉ាតង់"
+    ],
+    "verified": true,
+    "source": "General Department of Taxation (GDT) Cambodia",
+    "last_updated": "2026-09-01"
+  },
+  {
+    "id": "biz_bakong_currency",
+    "name": "Cambodian Currency (KHR/USD) & Bakong KHQR Digital Payment",
+    "name_km": "រូបិយប័ណ្ណប្រាក់រៀល-ដុល្លារ និងប្រព័ន្ធទូទាត់បាគង KHQR",
+    "category": "business",
+    "topic": "currency_and_payments",
+    "description": "Cambodia utilizes a dual-currency financial system where the Cambodian Riel (KHR) and US Dollar (USD) circulate freely. The National Bank of Cambodia (NBC) maintains exchange rate stability around ~4,100 KHR per 1 USD. Project Bakong, developed by the NBC using blockchain technology, powers KHQR, Cambodia's universal QR payment standard accepted nationwide across all major banks (ABA Bank, Acleda, Wing, Canadia, Sathapana). Bakong also enables cross-border QR payments with Thailand, Vietnam, Laos, and other regional partners.",
+    "description_km": "ប្រទេសកម្ពុជាប្រើប្រាស់ប្រព័ន្ធរូបិយវត្ថុចម្រុះរវាងប្រាក់រៀល (KHR) និងប្រាក់ដុល្លារអាមេរិក (USD)។ ធនាគារជាតិនៃកម្ពុជា (NBC) គ្រប់គ្រងស្ថិរភាពអត្រាប្តូរប្រាក់នៅចន្លោះប្រមាណ ៤,១០០ រៀលក្នុង ១ ដុល្លារ។ ប្រព័ន្ធបាគង (Bakong) បង្កើតដោយធនាគារជាតិនៃកម្ពុជា ផ្តល់នូវស្តង់ដារទូទាត់ KHQR តែមួយគត់ដែលប្រើប្រាស់បានទូទាំងប្រទេសតាមធនាគារធំៗ (ABA, Acleda, Wing, Canadia, Sathapana) ព្រមទាំងគាំទ្រការទូទាត់ឆ្លងដែនជាមួយប្រទេសថៃ វៀតណាម និងឡាវ។",
+    "official_portal": "https://www.nbc.gov.kh and https://bakong.nbc.org.kh",
+    "currency_tips": [
+      "Cambodian Riel is essential for small daily transactions, street food, and change under 1 USD",
+      "US Dollar bills must be clean, crisp, and without tears or stamps",
+      "KHQR payments via local bank apps are universally accepted at restaurants, hotels, convenience stores, and tuk-tuks"
+    ],
+    "tags": [
+      "bakong",
+      "khqr",
+      "nbc",
+      "currency",
+      "riel",
+      "usd",
+      "exchange rate",
+      "banking",
+      "aba",
+      "wing",
+      "acleda",
+      "ប្រាក់រៀល",
+      "បាគង",
+      "អត្រាប្តូរប្រាក់"
+    ],
+    "verified": true,
+    "source": "National Bank of Cambodia (NBC)",
+    "last_updated": "2026-09-01"
+  },
+  {
+    "id": "biz_qip_investment",
+    "name": "Qualified Investment Projects (QIP) & CDC Incentives",
+    "name_km": "គម្រោងវិនិយោគមានលក្ខណៈសម្បត្តិគ្រប់គ្រាន់ (QIP) និងការលើកទឹកចិត្តរបស់ CDC",
+    "category": "business",
+    "topic": "investment_law",
+    "description": "Under Cambodia's 2021 Law on Investment, investors registered as Qualified Investment Projects (QIP) through the Council for the Development of Cambodia (CDC) qualify for substantial incentives: income tax holidays between 3 to 9 years, exemption from import customs duties on production equipment, building materials, and raw materials, and the ability to register 100% foreign-owned enterprises without mandatory local equity participation.",
+    "description_km": "យោងតាមច្បាប់ស្តីពីការវិនិយោគឆ្នាំ ២០២១ វិនិយោគិនដែលចុះបញ្ជីជាគម្រោងវិនិយោគមានលក្ខណៈសម្បត្តិគ្រប់គ្រាន់ (QIP) តាមរយៈក្រុមប្រឹក្សាអភិវឌ្ឍន៍កម្ពុជា (CDC) ទទួលបានការលើកទឹកចិត្តជាច្រើន៖ ការលើកលែងពន្ធលើប្រាក់ចំណូលពី ៣ ទៅ ៩ ឆ្នាំ ការលើកលែងពន្ធគយលើការនាំចូលសម្ភារបរិក្ខារផលិតកម្ម និងវត្ថុធាតុដើម ព្រមទាំងសិទ្ធិកាន់កាប់សហគ្រាសបរទេស ១០០% ដោយមិនតម្រូវឱ្យមានភាគទុនិកខ្មែរឡើយ។",
+    "official_portal": "https://www.cdc.gov.kh",
+    "eligible_sectors": [
+      "High-tech industries, digital technology, science, and AI",
+      "Agriculture and agro-industrial processing for export",
+      "Green energy, solar, environmental infrastructure, and waste management",
+      "Special Economic Zones (SEZs) and manufacturing clusters"
+    ],
+    "tags": [
+      "qip",
+      "cdc",
+      "investment",
+      "incentives",
+      "tax holiday",
+      "foreign investment",
+      "sez",
+      "វិនិយោគ",
+      "ច្បាប់វិនិយោគ"
+    ],
+    "verified": true,
+    "source": "Council for the Development of Cambodia (CDC)",
+    "last_updated": "2026-09-01"
+  }
+]

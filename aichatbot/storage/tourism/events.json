@@ -1,0 +1,67 @@
+[
+  {
+    "id": "evt_bonomtouk",
+    "name": "Water Festival (Bon Om Touk)",
+    "name_km": "ព្រះរាជពិធីបុណ្យអុំទូក បណ្តែតប្រទីប និងសំពះព្រះខែ អកអំបុក",
+    "location": "Phnom Penh (Tonle Sap Riverfront) & Siem Reap",
+    "province": "Phnom Penh",
+    "typical_period": "November (Full Moon of Khmer lunar month Kadek)",
+    "description": "Cambodia's grandest national festival celebrating the unique reversing flow of the Tonle Sap River and the end of rainy season, featuring massive dragon boat races with thousands of rowers, illuminated floating barges (Bandaet Pratip), and moonlit fireworks.",
+    "description_km": "ពិធីបុណ្យជាតិដ៏ធំបំផុតប្រចាំឆ្នាំ ដើម្បីអបអរសាទរការផ្លាស់ប្តូរទិសដៅទឹកទន្លេសាប និងការប្រណាំងទូកងខ្នាតយក្ស អមដោយការបណ្តែតប្រទីប និងកាំជ្រួចដ៏អធិកអធម។",
+    "tags": ["culture", "festival", "boats", "fireworks", "tradition", "national holiday"],
+    "verified_source": "National Committee for Organizing National and International Festivals Cambodia",
+    "last_verified_at": "2026-08-01"
+  },
+  {
+    "id": "evt_choulchnamthmey",
+    "name": "Khmer New Year (Choul Chnam Thmey)",
+    "name_km": "ពិធីបុណ្យចូលឆ្នាំថ្មីប្រពៃណីជាតិខ្មែរ (សង្ក្រាន្ត)",
+    "location": "Nationwide (Angkor Sankranta in Siem Reap, Wat Phnom in Phnom Penh)",
+    "province": "Nationwide",
+    "typical_period": "April 13 - 16 every year",
+    "description": "The traditional Cambodian New Year marking the end of harvest season with vibrant 3-day temple ceremonies (Moha Songkran, Virak Vanabat, Virak Loeurng Sak), classical games, cultural dance, water splashing, and the famous Angkor Sankranta festival.",
+    "description_km": "បុណ្យប្រពៃណីជាតិដ៏ធំរយៈពេល ៣ ថ្ងៃ (មហាសង្ក្រាន្ត វារៈវ័នបត វារៈឡើងស័ក) ដែលមានការលេងល្បែងប្រជាប្រិយ ពិធីស្រង់ព្រះ និងព្រឹត្តិការណ៍អង្គរសង្ក្រាន្ត។",
+    "tags": ["culture", "new year", "angkor sankranta", "tradition", "games", "national holiday"],
+    "verified_source": "Ministry of Cults and Religions / Ministry of Tourism Cambodia",
+    "last_verified_at": "2026-08-01"
+  },
+  {
+    "id": "evt_pchumben",
+    "name": "Pchum Ben (Ancestors' Day)",
+    "name_km": "ពិធីបុណ្យភ្ជុំបិណ្ឌ",
+    "location": "Nationwide (All Buddhist Pagodas across Cambodia)",
+    "province": "Nationwide",
+    "typical_period": "September / October (15 days culminating on the 15th day of the 10th lunar month Phutrobot)",
+    "description": "Deeply spiritual 15-day Buddhist festival where Cambodians visit 7 pagodas wearing traditional white clothes to offer food and prayers (Bay Ben) dedicated to departed ancestors and spirits.",
+    "description_km": "ពិធីបុណ្យសាសនាព្រះពុទ្ធដ៏សំខាន់រយៈពេល ១៥ ថ្ងៃ (កាន់បិណ្ឌ ១ ដល់ភ្ជុំធំ) ដើម្បីឧទ្ទិសកុសលផលបុណ្យជូនដល់បុព្វការីជន និងញាតិសន្តានដែលបានចែកឋាន។",
+    "tags": ["culture", "buddhism", "pagoda", "tradition", "ancestors", "national holiday"],
+    "verified_source": "Ministry of Cults and Religion Cambodia",
+    "last_verified_at": "2026-08-01"
+  },
+  {
+    "id": "evt_angkor_marathon",
+    "name": "Angkor Wat International Half Marathon",
+    "name_km": "ការរត់ពាក់កណ្តាលម៉ារ៉ាតុងអន្តរជាតិអង្គរវត្ត",
+    "location": "Angkor Archaeological Park (Siem Reap)",
+    "province": "Siem Reap",
+    "typical_period": "First Sunday of December every year",
+    "description": "World-famous charity marathon course running directly through the ancient temple ruins of Angkor Wat, Bayon, and Ta Prohm, attracting thousands of runners from over 80 countries.",
+    "description_km": "ព្រឹត្តិការណ៍កីឡារត់ប្រណាំងសប្បុរសធម៌កម្រិតអន្តរជាតិ កាត់តាមប្រាសាទបុរាណអង្គរវត្ត បាយ័ន និងតាព្រហ្ម ដ៏ល្បីល្បាញទូទាំងពិភពលោក។",
+    "tags": ["sports", "marathon", "charity", "siem reap", "angkor wat", "running"],
+    "verified_source": "National Olympic Committee of Cambodia (NOCC)",
+    "last_verified_at": "2026-08-01"
+  },
+  {
+    "id": "evt_seafestival",
+    "name": "Cambodia Sea Festival (Bonn Samot)",
+    "name_km": "ពិធីបុណ្យសមុទ្រកម្ពុជា",
+    "location": "Rotating between Coastal Provinces (Preah Sihanouk, Kep, Kampot, Koh Kong)",
+    "province": "Coastal Provinces",
+    "typical_period": "December every year",
+    "description": "Annual marine festival celebrating Cambodia's entry into the Club of the Most Beautiful Bays in the World, featuring coastal water sports, international food fairs, and live concerts.",
+    "description_km": "ពិធីបុណ្យប្រចាំឆ្នាំនៅតំបន់ឆ្នេរ ដើម្បីអបអរសាទរឆ្នេរសមុទ្រកម្ពុជាដែលជាសមាជិកក្លឹបឆ្នេរសមុទ្រដែលស្អាតបំផុតលើសកលលោក។",
+    "tags": ["beach", "festival", "seafood", "watersports", "concerts", "coastal"],
+    "verified_source": "Ministry of Tourism Cambodia",
+    "last_verified_at": "2026-08-01"
+  }
+]

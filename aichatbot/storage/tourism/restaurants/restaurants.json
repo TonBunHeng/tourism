@@ -1,0 +1,292 @@
+[
+  {
+    "id": "rest_sugarpalm_sr",
+    "name": "The Sugar Palm Siem Reap",
+    "name_km": "ភោជនីយដ្ឋាន ដើមត្នោត (សៀមរាប)",
+    "province": "Siem Reap",
+    "province_km": "សៀមរាប",
+    "category": "restaurant",
+    "cuisine": "Traditional Khmer",
+    "description": "Celebrated traditional Cambodian restaurant by Chef Kethana Dunnet, universally renowned for serving the finest, authentic steamed Fish Amok (Amok Trei) in Cambodia.",
+    "description_km": "ភោជនីយដ្ឋានខ្មែរប្រពៃណីដ៏ល្បីល្បាញរបស់មេចុងភៅ ខេថាណា ដាណែត ដែលល្បីទូទាំងពិភពលោកខាងស្នាដៃចម្អិនអាម៉ុកត្រីចំហុយស្លឹកចេកដ៏ឈ្ងុយឆ្ងាញ់ពិតៗ។",
+    "latitude": 13.3547,
+    "longitude": 103.8562,
+    "estimated_visit_minutes": 80,
+    "price": "$8 - $20 USD per person",
+    "opening_hours": "11:30 AM - 03:00 PM, 05:30 PM - 10:00 PM (Monday to Saturday)",
+    "best_time": "Dinner or Lunch",
+    "specialty_dishes": [
+      "Fish Amok (Amok Trei)",
+      "Pomelo Salad",
+      "Smoked Fish with Eggplant"
+    ],
+    "tags": [
+      "restaurant",
+      "food",
+      "fish amok",
+      "khmer cuisine",
+      "siem reap",
+      "authentic"
+    ],
+    "verified": true,
+    "source": "Cambodia Tourism Federation / Chef Kethana",
+    "last_updated": "2026-08-31"
+  },
+  {
+    "id": "rest_watdamnak",
+    "name": "Cuisine Wat Damnak",
+    "name_km": "ភោជនីយដ្ឋាន វត្តដំណាក់",
+    "province": "Siem Reap",
+    "province_km": "សៀមរាប",
+    "category": "restaurant",
+    "cuisine": "Modern Khmer Gourmet",
+    "description": "Award-winning restaurant voted among Asia's 50 Best, blending traditional Cambodian recipes with French culinary techniques using hyper-local seasonal ingredients.",
+    "description_km": "ភោជនីយដ្ឋានលំដាប់អន្តរជាតិនៅសៀមរាប ជាប់ចំណាត់ថ្នាក់ Asia's 50 Best Restaurants ដែលច្នៃប្រឌិតម្ហូបខ្មែរតាមរដូវកាលយ៉ាងឆ្ងាញ់ពិសា។",
+    "latitude": 13.3512,
+    "longitude": 103.8611,
+    "estimated_visit_minutes": 120,
+    "price": "$38 - $50 USD per tasting menu",
+    "opening_hours": "06:30 PM - 11:00 PM (Tuesday to Sunday)",
+    "best_time": "Dinner (Reservation recommended)",
+    "specialty_dishes": [
+      "Mekong Langoustine",
+      "Braised Duck with Star Anise",
+      "Siem Reap Rice Wine Desserts"
+    ],
+    "tags": [
+      "restaurant",
+      "food",
+      "tasting menu",
+      "siem reap",
+      "gourmet"
+    ],
+    "verified": true,
+    "source": "Asia's 50 Best / Cuisine Wat Damnak",
+    "last_updated": "2026-08-31"
+  },
+  {
+    "id": "rest_haven_sr",
+    "name": "Haven Training Restaurant",
+    "name_km": "ភោជនីយដ្ឋាន ហេវិន (សៀមរាប)",
+    "province": "Siem Reap",
+    "province_km": "សៀមរាប",
+    "category": "restaurant",
+    "cuisine": "Khmer & Asian Fusion",
+    "description": "Social enterprise and vocational training restaurant set in a lush tropical garden, famous for outstanding Beef Lok Lak, Chicken Curry, and vegetarian Fish Amok.",
+    "description_km": "ភោជនីយដ្ឋានបណ្តុះបណ្តាលវិជ្ជាជីវៈកុមារកំព្រា និងយុវជនងាយរងគ្រោះ ដែលមានបម្រើម្ហូបខ្មែរឆ្ងាញ់ពិសា ដូចជាឡុកឡាក់សាច់គោ អាម៉ុក និងការីខ្មែរ ក្នុងសួនធម្មជាតិ។",
+    "latitude": 13.3482,
+    "longitude": 103.8594,
+    "estimated_visit_minutes": 85,
+    "price": "$6 - $15 USD per person",
+    "opening_hours": "11:30 AM - 02:30 PM, 05:30 PM - 09:30 PM (Closed Tuesday & Wednesday)",
+    "best_time": "Lunch or Dinner",
+    "specialty_dishes": [
+      "Lok Lak",
+      "Khmer Coconut Curry",
+      "Fresh Spring Rolls"
+    ],
+    "tags": [
+      "restaurant",
+      "food",
+      "social enterprise",
+      "lok lak",
+      "siem reap"
+    ],
+    "verified": true,
+    "source": "Haven Foundation Cambodia",
+    "last_updated": "2026-08-31"
+  },
+  {
+    "id": "rest_malis_pp",
+    "name": "Malis Restaurant Phnom Penh",
+    "name_km": "ភោជនីយដ្ឋាន ម្លិះ (ភ្នំពេញ)",
+    "province": "Phnom Penh",
+    "province_km": "ភ្នំពេញ",
+    "category": "restaurant",
+    "cuisine": "Living Cambodian Fine Dining",
+    "description": "Master Chef Luu Meng's flagship fine-dining restaurant celebrating Living Cambodian Cuisine in a tranquil courtyard with water gardens.",
+    "description_km": "ភោជនីយដ្ឋានប្រណីតរបស់មេចុងភៅឆ្នើម លូ ម៉េង ដែលលើកកម្ពស់ម្ហូបខ្មែរបុរាណបែបទំនើប ក្នុងបរិយាកាសសួនមាត់ទឹកដ៏ស្ងប់ស្ងាត់។",
+    "latitude": 11.5532,
+    "longitude": 104.9284,
+    "estimated_visit_minutes": 90,
+    "price": "$15 - $40 USD per person",
+    "opening_hours": "06:00 AM - 10:00 PM (Daily)",
+    "best_time": "Dinner or breakfast",
+    "specialty_dishes": [
+      "Royal Fish Amok",
+      "Siem Reap Sausages",
+      "Kuy Teav Malis"
+    ],
+    "tags": [
+      "restaurant",
+      "food",
+      "khmer cuisine",
+      "fine dining",
+      "phnom penh"
+    ],
+    "verified": true,
+    "source": "Cambodia Tourism Federation / Malis Official",
+    "last_updated": "2026-08-31"
+  },
+  {
+    "id": "rest_romdeng",
+    "name": "Romdeng Restaurant (Tree Alliance)",
+    "name_km": "ភោជនីយដ្ឋាន រំដេង",
+    "province": "Phnom Penh",
+    "province_km": "ភ្នំពេញ",
+    "category": "restaurant",
+    "cuisine": "Regional Khmer & Heritage",
+    "description": "Social enterprise vocational restaurant set in a colonial villa, famous for authentic regional Khmer dishes (including deep-fried tarantula, beef lok lak, and fish amok).",
+    "description_km": "ភោជនីយដ្ឋានសប្បុរសធម៌បណ្តុះបណ្តាលយុវជន ដែលមានបម្រើម្ហូបខ្មែរគ្រប់តំបន់ និងម្ហូបប្លែកៗដូចជាអាម៉ុកត្រី ឡុកឡាក់ និងអាពីងបំពង។",
+    "latitude": 11.5645,
+    "longitude": 104.9221,
+    "estimated_visit_minutes": 90,
+    "price": "$8 - $18 USD per person",
+    "opening_hours": "11:00 AM - 10:00 PM (Daily)",
+    "best_time": "Lunch or dinner",
+    "specialty_dishes": [
+      "Fish Amok",
+      "Beef Lok Lak with Kampot Pepper",
+      "Crispy Tarantula"
+    ],
+    "tags": [
+      "restaurant",
+      "food",
+      "social enterprise",
+      "khmer cuisine",
+      "phnom penh"
+    ],
+    "verified": true,
+    "source": "Friends-International Tree Alliance",
+    "last_updated": "2026-08-31"
+  },
+  {
+    "id": "rest_elevenone_pp",
+    "name": "Eleven One Kitchen",
+    "name_km": "ភោជនីយដ្ឋាន អ៊ីឡេវិន វ័ន ឃីតឆិន (ភ្នំពេញ)",
+    "province": "Phnom Penh",
+    "province_km": "ភ្នំពេញ",
+    "category": "restaurant",
+    "cuisine": "Eco-Friendly Khmer Homemade",
+    "description": "Eco-friendly restaurant in BKK1 and Tuol Tom Poung committed to plastic-free dining and wholesome homemade Khmer food with organic local ingredients.",
+    "description_km": "ភោជនីយដ្ឋានមិនប្រើប្លាស្ទិកដែលបម្រើម្ហូបខ្មែរឆ្ងាញ់ដូចស្នាដៃម្ដាយចម្អិន ដោយប្រើបន្លែសរីរាង្គក្នុងស្រុក និងគ្មានប៊ីចេង។",
+    "latitude": 11.5478,
+    "longitude": 104.9214,
+    "estimated_visit_minutes": 75,
+    "price": "$4 - $9 USD per person",
+    "opening_hours": "07:00 AM - 09:30 PM (Daily)",
+    "best_time": "Breakfast, Lunch, or Dinner",
+    "specialty_dishes": [
+      "Fish Amok Burger",
+      "Beef Lok Lak Rice",
+      "Khmer Chicken Curry"
+    ],
+    "tags": [
+      "restaurant",
+      "food",
+      "eco-friendly",
+      "phnom penh",
+      "lok lak"
+    ],
+    "verified": true,
+    "source": "Eleven One Kitchen Phnom Penh",
+    "last_updated": "2026-08-31"
+  },
+  {
+    "id": "rest_kep_crab_market",
+    "name": "Kep Crab Market Seafood Stalls",
+    "name_km": "តូបអាហារសមុទ្រផ្សារក្តាមកែប",
+    "province": "Kep",
+    "province_km": "កែប",
+    "category": "restaurant",
+    "cuisine": "Fresh Seafood & Green Pepper",
+    "description": "Authentic oceanfront seafood stalls where live swimming blue swimmer crabs are caught fresh from wooden cages and stir-fried with fresh green Kampot peppercorns right before your eyes.",
+    "description_km": "តូបអាហារសមុទ្រមាត់ទឹកដ៏ល្បីល្បាញ ដែលមានស្រង់ក្តាមសេះរស់ៗពីកន្ត្រកសមុទ្រ មកឆាភ្លាមៗជាមួយម្រេចខ្ចីកំពតដ៏ឈ្ងុយឆ្ងាញ់។",
+    "latitude": 10.4828,
+    "longitude": 104.2944,
+    "estimated_visit_minutes": 75,
+    "price": "$8 - $15 USD per kg with cooking",
+    "opening_hours": "07:00 AM - 08:00 PM (Daily)",
+    "best_time": "Lunch (11:00 AM - 02:00 PM)",
+    "specialty_dishes": [
+      "Stir-Fried Crab with Green Kampot Pepper",
+      "Grilled Squid",
+      "Shrimp in Tamarind Sauce"
+    ],
+    "tags": [
+      "restaurant",
+      "food",
+      "seafood",
+      "kep",
+      "crab",
+      "kampot pepper"
+    ],
+    "verified": true,
+    "source": "Kep Provincial Tourism Department",
+    "last_updated": "2026-08-31"
+  },
+  {
+    "id": "rest_rikitikitavi_kp",
+    "name": "Rikitikitavi Riverside Bistro",
+    "name_km": "រីឃីធីឃីថាវី ប៊ីស្រ្តូ (កំពត)",
+    "province": "Kampot",
+    "province_km": "កំពត",
+    "category": "restaurant",
+    "cuisine": "Khmer & International Seafood",
+    "description": "Charming second-floor open-air riverside restaurant overlooking the Kampot river and Bokor mountain sunset, famous for Kampot pepper specialties and local Khmer curries.",
+    "description_km": "ភោជនីយដ្ឋានមាត់ព្រែកកំពតដែលមានទេសភាពថ្ងៃលិចដ៏ស្រស់ស្អាតលើភ្នំបូកគោ និងល្បីល្បាញដោយសារមុខម្ហូបម្រេចកំពត និងការីខ្មែរ។",
+    "latitude": 10.5925,
+    "longitude": 104.1782,
+    "estimated_visit_minutes": 90,
+    "price": "$6 - $16 USD per person",
+    "opening_hours": "07:00 AM - 10:00 PM (Daily)",
+    "best_time": "Sunset Dinner (05:00 PM - 08:00 PM)",
+    "specialty_dishes": [
+      "Kampot Pepper Squid",
+      "Khmer Fish Amok",
+      "Mango Sticky Rice"
+    ],
+    "tags": [
+      "restaurant",
+      "food",
+      "kampot",
+      "riverside",
+      "pepper"
+    ],
+    "verified": true,
+    "source": "Kampot Tourism Association",
+    "last_updated": "2026-08-31"
+  },
+  {
+    "id": "rest_treehouse_kr",
+    "name": "Treehouse Bungalows Beach Restaurant",
+    "name_km": "ភោជនីយដ្ឋាន ត្រីហៅស៍ កោះរ៉ុង",
+    "province": "Preah Sihanouk",
+    "province_km": "ព្រះសីហនុ",
+    "category": "restaurant",
+    "cuisine": "Beachfront Seafood & Khmer",
+    "description": "Iconic tranquil beachfront dining venue on Koh Rong Island serving fresh catch of the day, wood-fired seafood, authentic Fish Amok, and cold fruit shakes on the white sand.",
+    "description_km": "ភោជនីយដ្ឋានមាត់ឆ្នេរខ្សាច់សលើកោះរ៉ុង ដែលមានបម្រើត្រីសមុទ្រស្រស់ៗអាំង អាម៉ុកត្រីសមុទ្រ និងទឹកផ្លែឈើស្រស់ក្រោមម្លប់ដើមឈើធម្មជាតិ។",
+    "latitude": 10.7025,
+    "longitude": 103.2488,
+    "estimated_visit_minutes": 80,
+    "price": "$5 - $14 USD per person",
+    "opening_hours": "07:30 AM - 10:00 PM (Daily)",
+    "best_time": "Lunch or Sunset BBQ",
+    "specialty_dishes": [
+      "Grilled Red Snapper",
+      "Seafood Amok",
+      "Khmer Lok Lak"
+    ],
+    "tags": [
+      "restaurant",
+      "food",
+      "koh rong",
+      "beachfront",
+      "seafood"
+    ],
+    "verified": true,
+    "source": "Koh Rong Island Community Tourism",
+    "last_updated": "2026-08-31"
+  }
+]

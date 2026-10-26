@@ -1,0 +1,741 @@
+# AngkorVerses Backend API
+
+A comprehensive, production-ready central RESTful API backend for the **AngkorVerses System**, built with Laravel, MySQL, and Laravel Sanctum.
+
+This unified backend powers both the **Admin Management Web (`tourism-admin`)** and the **Travel/User Client Applications (`tourism-travel` Tourist Web and the Tourist Android Mobile App)**.
+
+---
+
+## Architecture Overview
+
+```text
+                                Laravel Backend API
+                                tourism-backend-api
+                                         │
+                 ┌──────────────────────┴──────────────────────┐
+                 │                                             │
+                 ▼                                             ▼
+            Admin API                                      Travel API
+           `/api/*`                                     `/api/travel/*`
+                 │                                             │
+                 ▼                                     ┌───────┴───────┐
+          tourism-admin                                │               │
+           Admin Web App                               ▼               ▼
+                                                tourism-travel     Android App
+                                                  Tourist Web    Tourist Mobile
+```
+
+---
+
+## Table of Contents
+- [Tech Stack](#tech-stack)
+- [Roles & Permissions](#roles--permissions)
+- [Travel / User API Reference (`/api/travel/*`)](#travel--user-api-reference-apitravel)
+  - [1. Authentication](#1-authentication)
+  - [2. Tourist Destinations (Places)](#2-tourist-destinations-places)
+  - [3. Businesses & Local Directory](#3-businesses--local-directory)
+  - [4. Provinces & Locations](#4-provinces--locations)
+  - [5. Categories](#5-categories)
+  - [6. Events & Festivals](#6-events--festivals)
+  - [7. Curated Tour Packages](#7-curated-tour-packages)
+  - [8. Accredited Tour Guides](#8-accredited-tour-guides)
+  - [9. Media Gallery](#9-media-gallery)
+  - [10. Reviews & Ratings](#10-reviews--ratings)
+  - [11. Favorites & Wishlist](#11-favorites--wishlist)
+  - [12. Customer Bookings & Reservations](#12-customer-bookings--reservations)
+  - [13. Trip Planner & Itineraries](#13-trip-planner--itineraries)
+  - [14. Gamification & Achievements](#14-gamification--achievements)
+  - [15. Privacy & Deletion Requests](#15-privacy--deletion-requests)
+  - [16. Push Notifications & Notification Center](#16-push-notifications--notification-center)
+  - [17. Public App Settings & Emergency Hotlines](#17-public-app-settings--emergency-hotlines)
+  - [18. Contact & Public Inquiries](#18-contact--public-inquiries)
+  - [19. AI Assistant & Tourism Intelligence](#19-ai-assistant--tourism-intelligence)
+- [Business Owner REST API (`/api/business/*`)](#business-owner-bookings-reports--financial-analytics-api)
+- [Guide / Editor REST API (`/api/guide/*`)](#guide--content-editor-rest-api-apiguide)
+- [Admin Management API Reference (`/api/*`)](#admin-management-api-reference-api)
+  - [Security Alerts & IP Defense](#security-alerts--ip-defense)
+  - [Real-Time Activity Tracking](#real-time-admin--super-admin-system-monitoring-tourism-admin---tourism-travel)
+- [Standard API Response Format](#standard-api-response-format)
+- [Installation & Setup](#installation--setup)
+- [Testing](#testing)
+- [Default Seeded Accounts](#default-seeded-accounts)
+- [Project Directory Structure](#project-directory-structure)
+
+---
+
+## Tech Stack
+
+- **Framework:** Laravel 12.x / 13.x (PHP 8.3+ / PHP 8.4 Docker)
+- **Database:** MySQL 8.0+ / SQLite for testing
+- **Authentication:** Laravel Sanctum (Bearer Tokens)
+- **OAuth Providers:** Google OAuth 2.0 (Socialite)
+- **Architecture:** Form Requests, API Resources, Role Middleware (`admin.role`, `role:admin,super_admin`, `role:business_owner`), Standard `ApiResponse` Trait
+
+---
+
+## Roles & Permissions
+
+| Role | Target Client | Capabilities |
+|---|---|---|
+| `User` | Tourist Web (`tourism-travel`) & Mobile App | Browse destinations, post reviews, save wishlist, AI travel assistant, submit deletion requests |
+| `Business Owner` | Tourist Web (`tourism-travel` at `/business/dashboard`) | Full CRUD over owned Business Profiles (Images, Services, Hours, Promotions, Events & Review Replies) |
+| `Tourism Content Editor` | Admin Portal (`tourism-admin`) | Manage destination content, events, media gallery, categories, and provinces |
+| `Admin` | Admin Portal (`tourism-admin`) | Review moderation, analytics, user management, support moderation (deletion requests restricted to Super Admin) |
+| `Super Admin` | Admin Portal (`tourism-admin`) | Full administrative access, system configuration, user deletion requests moderation & approval, security & IP blocking |
+
+> **Security Rule:** Administrative and Staff accounts (`Super Admin`, `Admin`, `Tourism Content Editor`) work exclusively on **`tourism-admin`**. Public accounts (`User`, `Business Owner`) work exclusively on **`tourism-travel`**.
+
+---
+
+## Travel / User API Reference (`/api/travel/*`)
+
+All Travel endpoints share the `/api/travel` prefix and are consumed identically by **`tourism-travel`** and the **Android Mobile App**.
+
+### 1. Authentication
+
+#### Register Tourist Account
+- **Endpoint:** `POST /api/travel/auth/register`
+- **Auth:** Public
+- **Request Body:**
+  ```json
+  {
+    "name": "Sophea Traveler",
+    "email": "sophea@example.com",
+    "password": "password123",
+    "password_confirmation": "password123",
+    "phone": "+855 12 345 678",
+    "location": "Phnom Penh",
+    "bio": "Passionate travel photographer."
+  }
+  ```
+- **Response (201 Created):**
+  ```json
+  {
+    "success": true,
+    "message": "Registration successful.",
+    "data": {
+      "user": {
+        "id": 1,
+        "name": "Sophea Traveler",
+        "email": "sophea@example.com",
+        "phone": "+855 12 345 678",
+        "role": "User",
+        "status": "Active",
+        "location": "Phnom Penh",
+        "bio": "Passionate travel photographer.",
+        "verified": false
+      },
+      "token": "1|sanctum_token_string...",
+      "token_type": "Bearer"
+    }
+  }
+  ```
+
+#### Email & Password Login
+- **Endpoint:** `POST /api/travel/auth/login`
+- **Auth:** Public
+- **Request Body:**
+  ```json
+  {
+    "email": "sophea@example.com",
+    "password": "password123"
+  }
+  ```
+
+#### Google OAuth Login
+- **Endpoint:** `POST /api/travel/auth/google`
+- **Auth:** Public
+- **Request Body:**
+  ```json
+  {
+    "id_token": "google_oauth_id_token...",
+    "email": "sophea.traveler@gmail.com",
+    "name": "Sophea Traveler",
+    "avatar": "https://lh3.googleusercontent.com/..."
+  }
+  ```
+
+
+#### Get Current Authenticated Tourist
+- **Endpoint:** `GET /api/travel/auth/me`
+- **Auth:** `Bearer Token` (`auth:sanctum`)
+
+#### Update Profile
+- **Endpoint:** `PUT /api/travel/auth/profile`
+- **Auth:** `Bearer Token`
+- **Request Body:**
+  ```json
+  {
+    "name": "Sophea Traveler Updated",
+    "phone": "+855 88 999 000",
+    "location": "Siem Reap",
+    "bio": "Heritage enthusiast exploring Angkor."
+  }
+  ```
+
+#### Change Password
+- **Endpoint:** `PUT /api/travel/auth/password`
+- **Auth:** `Bearer Token`
+- **Request Body:**
+  ```json
+  {
+    "current_password": "password123",
+    "password": "newpassword456",
+    "password_confirmation": "newpassword456"
+  }
+  ```
+
+#### Upload Avatar
+- **Endpoint:** `POST /api/travel/auth/avatar`
+- **Auth:** `Bearer Token`
+- **Content-Type:** `multipart/form-data`
+- **Body:** `avatar` (Image file: jpeg, png, jpg, webp - Max 5MB)
+
+#### Logout
+- **Endpoint:** `POST /api/travel/auth/logout`
+- **Auth:** `Bearer Token`
+
+---
+
+### 2. Tourist Destinations (Places)
+
+#### Browse & Search Destinations
+- **Endpoint:** `GET /api/travel/places`
+- **Auth:** Public
+- **Query Parameters:**
+  - `search`: Search name, description, address in English & Khmer
+  - `province_id` / `province`: Filter by province
+  - `category_id` / `category`: Filter by category
+  - `min_rating` / `rating`: Filter by minimum rating (e.g., `4.5`)
+  - `price`: Filter by price tier (`Free`, `$5`, etc.)
+  - `featured`: Filter featured (`true`/`false`)
+  - `sort_by`: `popular`, `rating`, `reviews`, `name`, `newest`
+  - `per_page`: Number of results (default `12`)
+  - `page`: Page number
+
+#### Destination Details
+- **Endpoint:** `GET /api/travel/places/{id}`
+- **Auth:** Public
+- **Returns:** Full destination details with category, province, opening hours, coordinates, entrance fee, approved reviews, and media gallery.
+
+---
+
+### 3. Businesses & Local Directory
+
+- `GET /api/travel/businesses`: List verified businesses with search and filters (`category_id`, `province_id`, `search`, `featured`).
+- `GET /api/travel/businesses/{id}`: Detailed business profile with opening hours, services, gallery, promotions, and approved reviews.
+- `GET /api/travel/businesses/{id}/services`: List offered services with pricing and duration.
+- `GET /api/travel/businesses/{id}/hours`: Weekly operating hours and holiday schedules.
+- `GET /api/travel/businesses/{id}/gallery`: Business photo and media showcase.
+- `GET /api/travel/businesses/{id}/promotions`: Active seasonal discounts and specials.
+- `GET /api/travel/businesses/{id}/events`: Events hosted by the business.
+- `GET /api/travel/businesses/{id}/reviews`: Approved customer reviews and owner replies.
+- `POST /api/travel/businesses/{id}/reviews` (`Bearer Token`): Post a review for a business.
+
+---
+
+### 4. Provinces & Locations
+
+- `GET /api/travel/provinces`: List all active Cambodian provinces with attraction and event counts.
+- `GET /api/travel/provinces/{id}`: Detailed view of a province with associated tourist destinations and cultural events.
+
+---
+
+### 5. Categories
+
+- `GET /api/travel/categories`: List tourism categories (Temples, Eco-Tourism, Beaches, Cultural Heritage, Cuisine).
+- `GET /api/travel/categories/{id}`: Category details with associated attractions.
+
+---
+
+### 6. Events & Festivals
+
+- `GET /api/travel/events`: List events filterable by `status` (`Upcoming`, `Ongoing`, `Past`), `province_id`, `category`, `search`, and date range.
+- `GET /api/travel/events/{id}`: Event details with venue, organizer, dates, and tags.
+
+---
+
+### 7. Curated Tour Packages
+
+- `GET /api/travel/tours`: Browse curated travel tour packages (filterable by `destination`, `duration_days`, `price`, `search`).
+- `GET /api/travel/tours/{id}`: Complete tour itinerary breakdown, included amenities, departure dates, and pricing.
+
+---
+
+### 8. Accredited Tour Guides
+
+- `GET /api/travel/guides`: List licensed tour guides filterable by `location`, `language`, and rating.
+- `GET /api/travel/guides/{id}`: Guide profile with license number, spoken languages, daily rate, specialties, and tourist reviews.
+
+---
+
+### 9. Media Gallery
+
+- `GET /api/travel/galleries`: Browse photo & video galleries (filterable by `place_id`, `media_type` [`image`, `video`], `tag`, `search`).
+- `GET /api/travel/galleries/{id}`: View single gallery media item with view counter.
+- `POST /api/travel/galleries/{id}/view`: Increment verified view counter.
+- `POST /api/travel/galleries/{id}/comments` (`Bearer Token`): Post a comment on a gallery item.
+- `POST /api/travel/galleries/{id}/like` (`Bearer Token`): Toggle like on a media item.
+
+---
+
+### 10. Reviews & Ratings
+
+- `GET /api/travel/reviews`: List approved destination reviews (filter by `place_id`, `rating`).
+- `GET /api/travel/reviews/{id}`: View review details with attached images and guide replies.
+- `POST /api/travel/reviews` (`Bearer Token`): Post a review for a destination.
+  ```json
+  {
+    "place_id": 1,
+    "rating": 5,
+    "cleanliness": 5,
+    "value": 4,
+    "accessibility": 5,
+    "hospitality": 5,
+    "title": "Breathtaking experience at sunrise",
+    "comment": "Angkor Wat at dawn is unforgettable. Highly recommend hiring an official guide.",
+    "images": ["https://example.com/photo1.jpg"]
+  }
+  ```
+- `PUT /api/travel/reviews/{id}` (`Bearer Token`): Edit own review.
+- `DELETE /api/travel/reviews/{id}` (`Bearer Token`): Delete own review.
+
+---
+
+### 11. Favorites & Wishlist
+
+- `GET /api/travel/favorites` (`Bearer Token`): Retrieve user's saved wishlist destinations.
+- `POST /api/travel/favorites` (`Bearer Token`): Save place to wishlist.
+- `POST /api/travel/favorites/toggle` (`Bearer Token`): Toggle favorite status.
+- `DELETE /api/travel/favorites/{placeId}` (`Bearer Token`): Remove destination from wishlist.
+- `PATCH /api/travel/favorites/{id}/toggle-visited` (`Bearer Token`): Toggle visited status.
+
+---
+
+### 12. Customer Bookings & Reservations
+
+- `POST /api/travel/bookings`: Submit reservation inquiry for tours, businesses, or experiences (supports authenticated users and guest bookings).
+- `POST /api/travel/businesses/{id}/bookings`: Direct booking inquiry for a specific business establishment.
+- `GET /api/travel/bookings` (`Bearer Token`): Retrieve authenticated tourist's booking history and statuses (`pending`, `confirmed`, `completed`, `cancelled`).
+- `GET /api/travel/bookings/{id}` (`Bearer Token`): View specific booking details and confirmation notes.
+- `POST /api/travel/bookings/{id}/cancel` (`Bearer Token`): Cancel booking reservation.
+
+---
+
+### 13. Trip Planner & Itineraries
+
+- `GET /api/travel/trips` (`Bearer Token`): List current user's travel plans with activity count.
+- `POST /api/travel/trips` (`Bearer Token`): Create new trip plan with day-by-day activities.
+  ```json
+  {
+    "title": "Siem Reap 3-Day Explorer",
+    "destination": "Siem Reap",
+    "start_date": "2026-10-15",
+    "end_date": "2026-10-18",
+    "budget": 250,
+    "travelers": 2,
+    "status": "planning",
+    "notes": "Bring wide angle lens and light cotton clothes",
+    "itineraries": [
+      {
+        "day_number": 1,
+        "time_slot": "05:30 AM",
+        "activity": "Sunrise at Angkor Wat reflecting pool",
+        "place_id": 1,
+        "estimated_cost": 37
+      }
+    ]
+  }
+  ```
+- `GET /api/travel/trips/{id}` (`Bearer Token`): Get full trip details with all activities ordered by day.
+- `PUT /api/travel/trips/{id}` (`Bearer Token`): Update trip metadata and sync itinerary activities.
+- `DELETE /api/travel/trips/{id}` (`Bearer Token`): Delete trip.
+- `POST /api/travel/trips/{id}/duplicate` (`Bearer Token`): Duplicate an existing trip.
+- `POST /api/travel/trips/{id}/itineraries` (`Bearer Token`): Add activity to a specific day.
+- `DELETE /api/travel/trips/{id}/itineraries/{itineraryId}` (`Bearer Token`): Remove single activity.
+- `POST /api/travel/trips/{id}/reorder` (`Bearer Token`): Batch reorder schedule order.
+
+---
+
+### 14. Gamification & Achievements
+
+- `GET /api/travel/achievements`: List available badges (*Angkor Explorer*, *Heritage Master*, *Wanderlust Explorer*, *Trip Planner Pioneer*, *Gallery Contributor*, *Cambodia Heritage Champion*).
+- `GET /api/travel/achievements/my` (`Bearer Token`): Retrieve user's unlocked badges and automatically calculate new achievements.
+
+---
+
+### 15. Privacy & Deletion Requests
+
+- `GET /api/travel/deletion-requests` (`Bearer Token`): View status of submitted deletion requests.
+- `POST /api/travel/deletion-requests` (`Bearer Token`): Submit account or item deletion request for admin review.
+  ```json
+  {
+    "request_type": "account",
+    "reason": "I have completed my journey and would like to close my account."
+  }
+  ```
+
+---
+
+### 16. Push Notifications & Notification Center
+
+- `GET /api/travel/notifications` (`Bearer Token`): Fetch notifications with optional filters (`category`, `unread_only`, `search`).
+- `GET /api/travel/notifications/unread-count` (`Bearer Token`): Get current unread notification count badge.
+- `PATCH /api/travel/notifications/{id}/read` (`Bearer Token`): Mark single notification as read.
+- `PATCH /api/travel/notifications/read-all` (`Bearer Token`): Mark all notifications as read.
+- `POST /api/travel/notifications/subscribe` (`Bearer Token`): Subscribe browser/device to Web Push notifications (`endpoint`, `keys.p256dh`, `keys.auth`).
+- `DELETE /api/travel/notifications/subscribe` (`Bearer Token`): Unsubscribe browser/device from Web Push notifications.
+- `GET /api/travel/notifications/settings` (`Bearer Token`): Retrieve user's notification preferences (`push_enabled`, `events_enabled`, `messages_enabled`, `system_enabled`, `promotions_enabled`).
+- `PUT /api/travel/notifications/settings` (`Bearer Token`): Update notification preferences.
+- `GET /api/travel/notifications/vapid-key` (`Bearer Token`): Get public VAPID key for web push registration.
+
+---
+
+### 17. Public App Settings & Emergency Hotlines
+
+- `GET /api/travel/settings`: Public application configuration, emergency contacts (Tourist Police: `117`, Ambulance: `119`, Fire: `118`), support emails, and privacy URLs.
+
+---
+
+### 18. Contact & Public Inquiries
+
+- `POST /api/travel/contact`: Submit general travel inquiry, support request, or feedback.
+  ```json
+  {
+    "name": "Alex Morgan",
+    "email": "alex@example.com",
+    "subject": "Private Guided Angkor Sunrise Tour",
+    "message": "Looking for certified English speaking guide for 3 people."
+  }
+  ```
+
+---
+
+### 19. AI Assistant & Tourism Intelligence
+
+Powered by the local **Angkor Verse AI Microservice** (`aichatbot` on `http://127.0.0.1:8001`).
+
+#### AI Tourism Chat Assistant
+- **Endpoint:** `POST /api/travel/ai/chat` (or `POST /api/travel/ai-chat`)
+- **Auth:** Public / Bearer Token
+- **Request Body:**
+  ```json
+  {
+    "message": "What are the best temples to visit for sunrise in Siem Reap?",
+    "session_id": "optional_session_id",
+    "province": "Siem Reap",
+    "category": "Temples & Heritage",
+    "language": "en"
+  }
+  ```
+- **Returns:** Intelligent response powered by Gemini AI with verified Cambodian landmarks, local practical tips, and suggested follow-up questions.
+
+#### Smart Recommendations
+- **Endpoint:** `POST /api/travel/ai/recommendations` (or `POST /api/travel/recommendations`)
+- **Request Body:**
+  ```json
+  {
+    "province": "Siem Reap",
+    "category": "Historical",
+    "budget": "moderate",
+    "travel_style": "cultural",
+    "interests": ["temples", "history", "photography"]
+  }
+  ```
+
+#### Day-by-Day Smart Itinerary Generator
+- **Endpoint:** `POST /api/travel/ai/itineraries` (or `POST /api/travel/itineraries`)
+- **Request Body:**
+  ```json
+  {
+    "province": "Siem Reap",
+    "days": 3,
+    "budget": "moderate",
+    "travel_style": "cultural"
+  }
+  ```
+
+#### Live Weather & Travel Suitability Advice
+- **Endpoint:** `GET /api/travel/ai/weather?province=Siem+Reap&days=3`
+- **Returns:** Real-time temperature, precipitation risk, forecast, and tailored travel advice in both English and Khmer.
+
+#### Currency Reference & Converter
+- **Get Rate:** `GET /api/travel/ai/currency`
+- **Convert:** `POST /api/travel/ai/currency/convert`
+  ```json
+  {
+    "amount": 25,
+    "from_currency": "USD",
+    "to_currency": "KHR"
+  }
+  ```
+
+#### Transit & Transport Estimator
+- **Endpoint:** `GET /api/travel/ai/transport?origin=Phnom+Penh&destination=Siem+Reap&travelers=2`
+
+#### AI System Status
+- **Endpoint:** `GET /api/travel/ai/status` (or `GET /api/ai/status`)
+
+---
+
+## Admin Management API Reference (`/api/*`)
+
+| Method | Endpoint | Description | Guard / Role |
+|---|---|---|---|
+| `GET` | `/api/dashboard` | Dashboard statistical summary & pending queue counters | `admin.role` |
+| `GET` | `/api/users` | List and search all users | `admin.role` (`Super Admin`, `Admin`) |
+| `POST` | `/api/users` | Create user with assigned role | `admin.role` (`Super Admin`, `Admin`) |
+| `PUT` | `/api/users/{id}/status` | Update user status (`Active`/`Suspended`) | `admin.role` (`Super Admin`, `Admin`) |
+| `DELETE` | `/api/users/{id}` | Permanently delete user | `role:super_admin` |
+| `GET` | `/api/places` | List destinations for management & status review | `admin.role` |
+| `POST` | `/api/places` | Create new tourist destination draft | `admin.role` |
+| `PUT` | `/api/places/{id}` | Update destination details | `admin.role` |
+| `POST` | `/api/places/{id}/approve` | Approve destination draft (`status = Active`) | `admin.role` (`Super Admin`, `Admin`) |
+| `POST` | `/api/places/{id}/reject` | Reject destination draft (`status = Inactive`) | `admin.role` (`Super Admin`, `Admin`) |
+| `DELETE` | `/api/places/{id}` | Permanently delete destination | `role:super_admin` |
+| `GET` | `/api/businesses` | List all registered businesses with verification status | `admin.role` (`Super Admin`, `Admin`) |
+| `POST` | `/api/businesses/{id}/approve` | Approve business verification application | `admin.role` (`Super Admin`, `Admin`) |
+| `POST` | `/api/businesses/{id}/reject` | Reject business verification application | `admin.role` (`Super Admin`, `Admin`) |
+| `POST` | `/api/businesses/{id}/suspend` | Suspend business operations | `admin.role` (`Super Admin`, `Admin`) |
+| `POST` | `/api/businesses/{id}/activate` | Re-activate suspended business | `admin.role` (`Super Admin`, `Admin`) |
+| `DELETE` | `/api/businesses/{id}` | Permanently delete business listing | `role:super_admin` |
+| `GET` | `/api/bookings` | View and filter all system customer bookings | `admin.role` (`Super Admin`, `Admin`) |
+| `PUT` | `/api/bookings/{id}/status` | Update booking status (`confirmed`, `completed`, `cancelled`) | `admin.role` (`Super Admin`, `Admin`) |
+| `DELETE` | `/api/bookings/{id}` | Permanently delete booking record | `role:super_admin` |
+| `GET` | `/api/tours` | List curated tour packages | `admin.role` |
+| `POST` | `/api/tours` | Create new tour package | `admin.role` |
+| `PUT` | `/api/tours/{id}` | Update tour package | `admin.role` |
+| `POST` | `/api/tours/{id}/toggle-status` | Toggle active/inactive tour status | `admin.role` |
+| `DELETE` | `/api/tours/{id}` | Permanently delete tour package | `role:super_admin` |
+| `GET` | `/api/guides` | List accredited tour guides | `admin.role` (`Super Admin`, `Admin`) |
+| `POST` | `/api/guides` | Register new certified guide profile | `admin.role` (`Super Admin`, `Admin`) |
+| `PUT` | `/api/guides/{id}` | Update tour guide details | `admin.role` (`Super Admin`, `Admin`) |
+| `DELETE` | `/api/guides/{id}` | Permanently delete guide record | `role:super_admin` |
+| `POST` | `/api/events` | Create cultural event schedule | `admin.role` |
+| `PUT` | `/api/events/{id}` | Update cultural event details | `admin.role` |
+| `DELETE` | `/api/events/{id}` | Permanently delete cultural event | `role:super_admin` |
+| `GET` | `/api/galleries` | Curate media gallery items | `admin.role` |
+| `POST` | `/api/galleries` | Upload new photo or video asset | `admin.role` |
+| `DELETE` | `/api/galleries/{id}` | Permanently delete gallery asset | `role:super_admin` |
+| `PUT` | `/api/reviews/{id}/status` | Moderate review status (`Approved`/`Rejected`) | `admin.role` (`Super Admin`, `Admin`) |
+| `POST` | `/api/reviews/{id}/replies` | Official administrative reply to review | `admin.role` |
+| `DELETE` | `/api/reviews/{id}` | Permanently delete abusive review | `role:super_admin` |
+| `GET` | `/api/reports/analytics` | Statistical analytics data for charts | `admin.role` |
+| `GET` | `/api/security-alerts` | View rate limits, failed logins & intrusion alarms | `admin.role` (`Super Admin`, `Admin`) |
+| `POST` | `/api/security-alerts/block-ip` | Manually block abusive IP | `admin.role` (`Super Admin`, `Admin`) |
+| `POST` | `/api/security-alerts/unblock-ip` | Remove IP address from blocklist | `admin.role` (`Super Admin`, `Admin`) |
+| `GET` | `/api/user-tracking` | Real-time user online tracking & chronological audit logs | `admin.role` (`Super Admin`, `Admin`) |
+| `GET` | `/api/user-tracking/export` | Export audit trail logs (CSV / JSON) | `admin.role` (`Super Admin`, `Admin`) |
+| `GET` | `/api/deletion-requests` | View user account & content deletion requests queue | `role:super_admin` |
+| `PUT` | `/api/deletion-requests/{id}/status` | Process and approve/reject deletion requests | `role:super_admin` |
+| `PUT` | `/api/settings` | Update system-wide configurations & emergency contacts | `admin.role` (`Super Admin`) |
+| `POST` | `/api/upload` | Upload media image/video file | `admin.role` |
+
+---
+
+## Standard API Response Format
+
+```json
+{
+  "success": true,
+  "message": "Operation completed successfully.",
+  "data": {},
+  "meta": {
+    "total": 50,
+    "per_page": 12,
+    "current_page": 1,
+    "last_page": 5
+  }
+}
+```
+
+Error response:
+```json
+{
+  "success": false,
+  "message": "Validation failed.",
+  "errors": {
+    "email": ["The email field is required."]
+  }
+}
+```
+
+---
+
+## Installation & Setup
+
+### Prerequisites
+- **PHP**: ^8.2 or ^8.3 with `pdo`, `mbstring`, `openssl`, `bcmath`, `curl` extensions enabled
+- **Composer**: ^2.0+
+- **Database**: SQLite (default for development) or MySQL ^8.0 / PostgreSQL
+
+### Step-by-Step Backend Setup
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/TonBunHeng/tourism-backend-api.git
+cd tourism-backend-api
+
+# 2. Install PHP dependencies
+composer install
+
+# 3. Create environment file & generate application key
+cp .env.example .env
+php artisan key:generate
+
+# 4. Create SQLite database file (if using default SQLite connection)
+touch database/database.sqlite
+
+# 5. Run database migrations & seed default data (admin user, categories, places, events)
+php artisan migrate --seed
+
+# Note: If resetting an existing database and re-seeding default accounts:
+php artisan migrate:fresh --seed
+
+# 6. Start the local backend development server
+# For local machine only (http://127.0.0.1:8000):
+php artisan serve
+
+# For Local LAN access (accessible by mobile devices & other computers using your IP):
+php artisan serve --host=0.0.0.0 --port=8000
+# or:
+composer run serve
+```
+
+> **Note:** Serving with `--host=0.0.0.0` allows both **Admin Web App (`tourism-admin`)** and **Travel Client Apps (`tourism-travel` / Mobile App)** on your Local LAN IP (e.g. `http://192.168.x.x:8000`) to connect with identical data and CORS permissions.
+
+---
+
+## Testing
+
+Run the automated PHPUnit test suite covering authentication, destinations, reviews, favorites, AI assistance, deletion requests, and role authorization:
+
+```bash
+php artisan test
+```
+
+---
+
+## Default Seeded Accounts
+
+| Name | Role | Email | Password | Frontend Access |
+|---|---|---|---|---|
+| **Ton Bunheng** | **Super Admin** (`super_admin`) | `admin@tourism.gov.kh` | `password123` | `tourism-admin` (Admin Panel) |
+| **Kosal Visal** | **Admin** (`admin`) | `staff.admin@tourism.gov.kh` | `password123` | `tourism-admin` (Admin Panel) |
+| **Sophal Sopheaktra** | **Tourism Content Editor** (`guide_editor`) | `sopheaktra@tourism.gov.kh` | `password123` | `tourism-admin` (Admin Panel) |
+| **Sokha Chanthou** | **Business Owner** (`business_owner`) | `owner@angkor-restaurant.com` | `password123` | `tourism-travel` (Travel Web / Mobile) |
+| **VIT Vong** | **Tourist (User)** (`user`) | `vit.vong@example.com` | `password123` | `tourism-travel` (Travel Web / Mobile) |
+| **Ou Sreylin** | **Tourist (User)** (`user`) | `ou.sreylin@example.com` | `password123` | `tourism-travel` (Travel Web / Mobile) |
+
+## Guide / Content Editor REST API (`/api/guide/*`)
+
+Certified Tour Guides and Tourism Content Editors (`guide_editor`, `admin`, `super_admin`) can manage heritage content drafts via the following endpoints:
+
+- `GET /api/guide/dashboard`: Guide dashboard overview, place draft metrics, and inquiries count.
+- `GET /api/guide/places`: List destinations authored or submitted by the guide.
+- `POST /api/guide/places`: Submit new destination draft for admin review (`status` defaults to `Pending`).
+- `GET /api/guide/places/{id}`: View single authored destination details.
+- `PUT /api/guide/places/{id}`: Update authored destination information.
+- `DELETE /api/guide/places/{id}`: Delete authored draft destination.
+- `GET /api/guide/events`: List authored cultural events.
+- `POST /api/guide/events`: Submit new cultural festival or event.
+- `PUT /api/guide/events/{id}`: Update event schedule and venue.
+- `DELETE /api/guide/events/{id}`: Remove event schedule.
+- `GET /api/guide/galleries`: Browse uploaded photography and video assets.
+- `POST /api/guide/galleries`: Upload media assets to public gallery.
+- `DELETE /api/guide/galleries/{id}`: Remove media asset.
+- `GET /api/guide/reviews`: View reviews on authored destinations and tour packages.
+- `POST /api/guide/reviews/{id}/reply`: Post verified guide reply to tourist review.
+
+---
+
+## Pending Review & Verification Workflow
+
+The system provides a complete **Pending Review -> Approved & Active** request moderation pipeline for **Business Owners** and **Tourism Content Editors**:
+
+### 1. Business Registration Requests (from Business Owners)
+* **Submit Request**: When a Business Owner registers a new business listing via `POST /api/business/businesses`, `verification_status` is set to `pending` (*Awaiting Admin Verification*).
+* **Owner Dashboard**: Displays `PENDING` badge and increments *Pending Review* count in the Business Owner Dashboard.
+* **Admin Moderation Endpoints**:
+  * `POST /api/businesses/{id}/approve` (or `/api/admin/businesses/{id}/approve`): Approves the business, sets `verification_status` to `approved` and `status` to `active`, records `verified_at` & `verified_by`, and sends an in-app notification to the owner.
+  * `POST /api/businesses/{id}/reject` (or `/api/admin/businesses/{id}/reject`): Rejects the business, records `rejection_reason`, and notifies the owner.
+  * `POST /api/businesses/{id}/suspend` & `POST /api/businesses/{id}/activate`: Administrative state toggles.
+
+### 2. Destination / Place Upload Requests (from Tourism Content Editors)
+* **Submit Request**: When a Tourism Content Editor uploads a new destination via `POST /api/guide/places` (or via `tourism-admin`), `status` defaults to `Pending` (*Pending Admin Review*).
+* **Admin Moderation Endpoints**:
+  * `POST /api/places/{id}/approve`: Approves and activates the destination (`status` = `Active`).
+  * `POST /api/places/{id}/reject`: Rejects the destination (`status` = `Inactive`).
+
+### 3. Unified Admin Dashboard Request Queue (`/api/dashboard`)
+* `GET /api/dashboard` includes `pending_verifications_count`, `pending_businesses`, `pending_places`, and a `pending_requests` list containing pending applications from Business Owners & Tourism Content Editors with direct approve/reject URLs.
+
+### 4. Account & Item Deletion Workflow (Super Admin Approval Pipeline)
+* **Tourist (User) & Business Owner Account Deletion (`tourism-travel`)**:
+  * Tourists and Business Owners can submit an official account deletion / GDPR erasure request via `/deletion-request` (`POST /api/travel/deletion-requests`).
+  * Submissions default to `request_type: account` with `status: pending` and trigger an alert notification to the Super Administrator.
+* **Staff Item Deletion (`tourism-admin`)**:
+  * When an **Admin** or **Tourism Content Editor** deletes an item (Place, Event, Gallery, Category, Province) in `tourism-admin`, it submits a deletion ticket via `POST /api/deletion-requests` with `status: pending`.
+* **Super Admin Moderation & Approval (`tourism-admin` at `/deletion-requests`)**:
+  * Only the **Super Administrator** has access to the `/deletion-requests` dashboard and moderation endpoints (`/api/deletion-requests/*`) to:
+    * **Approve**: Permanently deletes the requested target user account, business, or item from the database.
+    * **Reject**: Declines the deletion request, records notes, and preserves the account or content intact.
+  * **Direct Deletions**: Super Administrators possess direct immediate deletion privileges across all modules (`DELETE /api/events/{id}`, `DELETE /api/places/{id}`, etc.).
+
+---
+
+## Role-Based Access Control & Profile CRUD Matrix
+
+| Role | Scope & Permissions | Frontend Access | Managed Profile CRUD |
+|---|---|---|---|
+| **Super Admin** (`super_admin`) | **Full System Authority**: Complete CRUD over all Business Profiles, Places, Events, Media, Reviews, Users, System Settings, Deletion Requests approval/erasure & IP Blocking | `tourism-admin` (Admin Panel) | **Full Global Access** (Any Profile) |
+| **Admin** (`admin`) | **Full Administrative Access**: Manage Business Profiles, Places, Events, Media, Reviews & Users (Deletion Requests restricted to Super Admin) | `tourism-admin` (Admin Panel) | **Full Global Access** (Any Profile) |
+| **Tourism Content Editor** (`guide_editor`) | **Content Management**: Full CRUD over Places, Events, Media Galleries, Categories & Provinces | `tourism-admin` (Admin Panel) | **Content Editor Scope** |
+| **Business Owner** (`business_owner`) | **Business Owner Dashboard**: Full CRUD over owned Business Profiles (Images, Services, Hours, Promotions, Events & Review Replies), Bookings Management & Financial Reports Export | `tourism-travel` (`/business/dashboard`) | **Owned Profiles Only** |
+| **Tourist / User** (`user`) | **Public Explorer**: View destinations, search businesses, save favorites, write reviews, plan trips, AI assistant | `tourism-travel` | **Read-Only / User Content** |
+
+---
+
+## Business Owner Bookings, Reports & Financial Analytics API
+
+Business Owners can manage customer reservations and generate detailed performance reports for their businesses via the following protected endpoints (`role: business_owner, admin, super_admin`):
+
+### 1. Bookings Management (`/api/business/bookings`)
+* `GET /api/business/bookings`: List bookings for owned businesses with filters (`business_id`, `status`, `payment_status`, `date_from`, `date_to`, `search`, `sort`).
+* `GET /api/business/bookings/statistics`: Summary statistics across all owned bookings (counts, pending, confirmed, completed, cancelled, upcoming, total revenue).
+* `GET /api/business/businesses/{id}/bookings`: Bookings for a specific owned business.
+* `GET /api/business/bookings/{id}`: Booking details with customer contact information and requested service.
+* `POST /api/business/bookings/{id}/confirm`: Confirm reservation and trigger traveler push/in-app notification.
+* `POST /api/business/bookings/{id}/reject`: Decline reservation with recorded rejection reason.
+* `POST /api/business/bookings/{id}/complete`: Conclude reservation, mark payment paid, and trigger review invitation.
+
+### 2. Business Performance Reports & Analytics (`/api/business/reports`)
+* `GET /api/business/reports`: Comprehensive business performance report including:
+  * **Summary**: Total gross revenue, completed revenue, pipeline pending revenue, total bookings, guests served, average booking value, average party size, cancellation rate, and completion rate.
+  * **Time-Series Trends**: Daily or monthly breakdown (bookings count, revenue, visitors, completed vs cancelled) supporting timeframes (`today`, `yesterday`, `this_week`, `last_week`, `this_month`, `last_month`, `this_year`, `last_year`, `all_time`) or custom `date_from`/`date_to`.
+  * **Top Services**: Ranking of services by bookings, revenue, and revenue share percentage.
+  * **Customer Insights**: Unique customers count, repeat customer count, repeat rate, and top customer leaderboard.
+  * **Ratings & Quality**: Star rating breakdown (1-5 stars), approved reviews count, and owner reply response rate.
+  * **Payment Breakdown**: Paid, unpaid, and refunded volumes.
+* `GET /api/business/businesses/{id}/reports`: Performance report filtered to a specific business.
+* `GET /api/business/reports/export`: Export bookings and revenue data as downloadable UTF-8 CSV spreadsheet (`format=csv`) or JSON (`format=json`).
+* `GET /api/business/businesses/{id}/reports/export`: Export statement for a specific owned business.
+
+---
+
+## Real-Time Admin & Super Admin System Monitoring (`tourism-admin` -> `tourism-travel`)
+
+Administrators (`admin`) and Super Administrators (`super_admin`) operating via **`tourism-admin`** possess monitoring and administrative capabilities over activity on **`tourism-travel`**:
+
+### 1. User & Staff Activity Tracking (`/api/users` & `/api/users/active-status`)
+* **Real-time Online Tracking**: Every API request made on `tourism-travel` automatically updates `last_active_at` via `UpdateUserActivity` middleware.
+* **Status & Live Filters**: Track live online users (`online=true`), active vs suspended accounts, user activity levels, and role metrics.
+
+### 2. Security & Brute-Force Defense (`/api/security-alerts`)
+* **Login Attempt Monitoring**: Tracks successful vs failed login attempts (`/api/security-alerts/login-attempts`).
+* **IP Blocking & Protection**: Monitor security alerts, view active blocked IPs (`/api/security-alerts/blocked-ips`), and enforce manual or threshold-based IP blocks (`/api/security-alerts/block-ip`).
+
+### 3. Verification Queue & Request Moderation (`/api/dashboard`)
+* **Pending Requests Tracking**: Track pending business registrations (`verification_status = pending`) from Business Owners and pending place uploads (`status = Pending`) from Guides with direct approval (`/approve`) and rejection (`/reject`) triggers.
+
+---

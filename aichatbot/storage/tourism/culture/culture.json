@@ -1,0 +1,131 @@
+[
+  {
+    "id": "cult_apsara",
+    "name": "Royal Ballet & Khmer Apsara Classical Dance",
+    "name_km": "របាំព្រះរាជទ្រព្យ និង របាំអប្សរា",
+    "province": "Nationwide",
+    "province_km": "ទូទាំងប្រទេស",
+    "category": "culture",
+    "description": "UNESCO Intangible Cultural Heritage of Humanity since 2003, featuring sacred, highly stylized hand gestures (kbach) and ornate gold headpieces reflecting Khmer spiritual cosmology.",
+    "description_km": "បេតិកភណ្ឌវប្បធម៌អរូបីនៃមនុស្សជាតិរបស់យូណេស្កូ តាំងពីឆ្នាំ២០០៣ ជាសិល្បៈរបាំបុរាណខ្មែរដ៏ពិសិដ្ឋ មានកាយវិការដៃទន់ភ្លន់ និងម្កុដមាសតំណាងទេវតា។",
+    "tags": [
+      "culture",
+      "dance",
+      "apsara",
+      "unesco",
+      "heritage",
+      "tradition"
+    ],
+    "verified": true,
+    "source": "UNESCO / Ministry of Culture and Fine Arts Cambodia",
+    "last_updated": "2026-08-31"
+  },
+  {
+    "id": "cult_sbekthom",
+    "name": "Sbek Thom (Khmer Shadow Theatre)",
+    "name_km": "ល្ខោនស្រមោលស្បែកធំ",
+    "province": "Nationwide",
+    "province_km": "ទូទាំងប្រទេស",
+    "category": "culture",
+    "description": "Ancient sacred performance art using large, intricately carved cowhide leather puppets projected against a fire-lit white screen, depicting scenes from the Reamker (Khmer Ramayana).",
+    "description_km": "សិល្បៈល្ខោនស្រមោលស្បែកធំខ្មែរបុរាណ ដែលឆ្លាក់ផ្ទាំងស្បែកគោជាក្បាច់រឿងរាមកេរ្តិ៍ និងសម្តែងជាមួយភ្លើងភ្លឺចាំងពីក្រោយផ្ទាំងសំពត់ស។",
+    "tags": [
+      "culture",
+      "theatre",
+      "puppet",
+      "unesco",
+      "reamker"
+    ],
+    "verified": true,
+    "source": "UNESCO / Ministry of Culture and Fine Arts Cambodia",
+    "last_updated": "2026-08-31"
+  },
+  {
+    "id": "cult_chapei",
+    "name": "Chapei Dang Veng (Traditional Two-Stringed Long-Necked Lute)",
+    "name_km": "ចាប៉ីដងវែង",
+    "province": "Nationwide",
+    "province_km": "ទូទាំងប្រទេស",
+    "category": "culture",
+    "description": "Cambodian musical tradition featuring a two-stringed lute accompanied by sung poetry touching upon moral teachings, folklore, and spontaneous comedic storytelling.",
+    "description_km": "ឧបករណ៍តន្ត្រីបុរាណខ្មែរខ្សែពីរដងវែង ដែលអ្នកចម្រៀងប្រគំអមដោយកំណាព្យអប់រំទូន្មាន និងរឿងកំប្លែងប្រជាប្រិយ។",
+    "tags": [
+      "culture",
+      "music",
+      "chapei",
+      "unesco",
+      "tradition"
+    ],
+    "verified": true,
+    "source": "UNESCO / Ministry of Culture and Fine Arts Cambodia",
+    "last_updated": "2026-08-31"
+  },
+  {
+    "id": "cult_sompeah",
+    "name": "The Sampeah (Traditional Khmer Greeting & Respect)",
+    "name_km": "ការសំពះ (ទំនៀមទម្លាប់ស្វាគមន៍ខ្មែរ)",
+    "province": "Nationwide",
+    "province_km": "ទូទាំងប្រទេស",
+    "category": "culture",
+    "description": "The traditional Cambodian gesture of respect and greeting performed by pressing palms together in a lotus prayer pose with a slight bow, with 5 levels corresponding to social status and age.",
+    "description_km": "កាយវិការគួរសម និងការគោរពតាមបែបប្រពៃណីខ្មែរ ដោយការផ្គុំបាតដៃទាំងពីរបែបផ្កាឈូក និងអោនក្បាលបន្តិច (មាន ៥ កម្រិតតាមឋានៈ និងវ័យ)។",
+    "tags": [
+      "culture",
+      "etiquette",
+      "greeting",
+      "tradition",
+      "respect"
+    ],
+    "verified": true,
+    "source": "Ministry of Cults and Religions Cambodia",
+    "last_updated": "2026-08-31"
+  },
+  {
+    "id": "cult_kun_bokator",
+    "name": "Kun Bokator (Traditional Khmer Martial Art)",
+    "name_km": "គុនល្បុក្កតោ (ក្បាច់គុនបុរាណខ្មែរ)",
+    "province": "Nationwide",
+    "province_km": "ទូទាំងប្រទេស",
+    "category": "culture",
+    "description": "One of the oldest surviving martial arts in Southeast Asia, inscribed on the UNESCO Representative List of the Intangible Cultural Heritage of Humanity in 2022. It features techniques imitating animal movements (lion, horse, bird, monkey, serpent), weapons mastery (krama, short sticks), and deep spiritual philosophy.",
+    "description_km": "ក្បាច់គុនបុរាណខ្មែរចំណាស់ជាងគេមួយនៅអាស៊ីអាគ្នេយ៍ បានចុះក្នុងបញ្ជីបេតិកភណ្ឌវប្បធម៌អរូបីនៃមនុស្សជាតិរបស់យូណេស្កូក្នុងឆ្នាំ ២០២២។ រួមបញ្ចូលក្បាច់ប្រយុទ្ធតាមកាយវិការសត្វ (តោ សេះ ឥន្ទ្រី ស្វា ពស់) និងការប្រើអាវុធបុរាណ (ក្រមា ដំបងខ្លី) ព្រមទាំងទស្សនវិជ្ជាសីលធម៌ខ្ពង់ខ្ពស់។",
+    "tags": [
+      "culture",
+      "martial art",
+      "kun bokator",
+      "unesco",
+      "heritage",
+      "history",
+      "គុនល្បុក្កតោ"
+    ],
+    "verified": true,
+    "source": "UNESCO / Ministry of Culture and Fine Arts Cambodia",
+    "last_updated": "2026-09-01"
+  },
+  {
+    "id": "cult_khmer_history_eras",
+    "name": "Chronology of Cambodian History & The Khmer Empire",
+    "name_km": "កាលប្បវត្តិប្រវត្តិសាស្ត្រកម្ពុជា និងអាណាចក្រខ្មែរ",
+    "province": "Nationwide",
+    "province_km": "ទូទាំងប្រទេស",
+    "category": "culture",
+    "description": "Cambodia's monumental history spans: 1. Prehistoric & Early States: Funan (1st-6th century CE, centered at Vyadhapura and Oc Eo) and Chenla (6th-8th century CE, Bhavapura and Isanapura); 2. The Khmer Empire (802-1431 CE): Unified on Mount Kulen by Jayavarman II in 802, leading to the Golden Age of Angkor under Suryavarman II (builder of Angkor Wat) and Jayavarman VII (builder of Bayon and Angkor Thom); 3. Post-Angkor Period: Chaktomuk, Longvek, and Oudong capitals; 4. French Protectorate (1863-1953) and National Independence achieved on November 9, 1953 under King Father Norodom Sihanouk; 5. Modern Constitutional Monarchy under His Majesty King Norodom Sihamoni.",
+    "description_km": "ប្រវត្តិសាស្ត្រដ៏រុងរឿងរបស់កម្ពុជារួមមាន៖ ១. សម័យមុនអង្គរ៖ នគរភ្នំ (ហ្វូណន ស.វ.ទី១ ដល់ទី៦) និងនគរចេនឡា (ស.វ.ទី៦ ដល់ទី៨) ២. សម័យអង្គរ (ឆ្នាំ ៨០២-១៤៣១)៖ បង្រួបបង្រួមជាតិដោយព្រះបាទជ័យវរ្ម័នទី ២ នៅភ្នំគូលែនក្នុងឆ្នាំ ៨០២ ឈានដល់យុគសម័យមាសក្រោមស្នាព្រះហស្តព្រះបាទសូរ្យវរ្ម័នទី ២ (កសាងអង្គរវត្ត) និងព្រះបាទជ័យវរ្ម័នទី ៧ (កសាងប្រាសាទបាយ័ន និងអង្គរធំ) ៣. សម័យក្រោយអង្គរ៖ ចតុមុខ លង្វែក និងឧដុង្គ ៤. សម័យអាណានិគមបារាំង (១៨៦៣-១៩៥៣) និងទិវាបុណ្យឯករាជ្យជាតិ ៩ វិច្ឆិកា ១៩៥៣ ក្រោមការដឹកនាំរបស់ព្រះបរមរតនកោដ្ឋ នរោត្តម សីហនុ ៥. ព្រះរាជាណាចក្រកម្ពុជាទី ២ បច្ចុប្បន្ន ក្រោមម្លប់ព្រះករុណា ព្រះបាទសម្តេច ព្រះបរមនាថ នរោត្តម សីហមុនី។",
+    "tags": [
+      "history",
+      "khmer empire",
+      "angkor",
+      "jayavarman vii",
+      "suryavarman ii",
+      "funan",
+      "chenla",
+      "independence day",
+      "ប្រវត្តិសាស្ត្រខ្មែរ",
+      "អង្គរ",
+      "ឯករាជ្យជាតិ"
+    ],
+    "verified": true,
+    "source": "Royal Academy of Cambodia (Institute of National History)",
+    "last_updated": "2026-09-01"
+  }
+]

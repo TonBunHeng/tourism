@@ -1,0 +1,58 @@
+[
+  {
+    "id": "food_amok",
+    "name": "Fish Amok (Amok Trey)",
+    "name_km": "អាម៉ុកត្រី",
+    "category": "Authentic Khmer Cuisine",
+    "province": "Nationwide (Siem Reap, Phnom Penh, Battambang)",
+    "province_km": "ទូទាំងប្រទេស",
+    "description": "Cambodia's signature national culinary masterpiece. Fresh river fish fillets (snakehead or catfish) coated in rich coconut cream, fragrant freshly pounded lemongrass kroeung paste, noni leaves (sluk ngor), and egg, gently steamed in traditional banana leaf cups until silky custard texture.",
+    "description_km": "ម្ហូបតំណាងជាតិកម្ពុជាដ៏ល្បីល្បាញ ធ្វើអំពីសាច់ត្រីរ៉ស់ស្រស់លាយគ្រឿងខ្ទិះដូង គ្រឿងបុកខ្មែរ (ស្លឹកគ្រៃ រមៀត រំដេង) និងស្លឹកញ រួចចំហុយក្នុងកន្ទោងស្លឹកចេក។",
+    "estimated_cost_usd": "4.00 - 8.00 per dish",
+    "tags": ["traditional", "must try", "khmer food", "curry", "signature dish", "coconut"],
+    "family_friendly": true,
+    "best_places_to_try": ["Kravanh Restaurant (Phnom Penh)", "Chanrey Tree (Siem Reap)", "Haven Restaurant (Siem Reap)", "Romdeng (Phnom Penh)"]
+  },
+  {
+    "id": "food_nombanhchok",
+    "name": "Nom Banh Chok (Khmer Noodles)",
+    "name_km": "នំបញ្ចុកសម្លប្រហើរ / ការី",
+    "category": "Authentic Khmer Cuisine",
+    "province": "Nationwide (Famous in Siem Reap Preah Dak Village)",
+    "province_km": "ទូទាំងប្រទេស (ល្បីខ្លាំងនៅភូមិព្រះដាក់ សៀមរាប)",
+    "description": "Beloved traditional breakfast dish of fresh fermented rice noodles topped with light green curry broth made from freshwater fish, lemongrass, kaffir lime, and turmeric, accompanied by raw shaved banana blossoms, water lily stems, cucumber, and herbs.",
+    "description_km": "អាហារពេលព្រឹកបែបប្រពៃណីខ្មែរដ៏ពេញនិយម នំបញ្ចុកស្រស់ស្រោចទឹកសម្លប្រហើរត្រីក្រអូបឈ្ងុយ ឬសម្លការី ទទួលទានជាមួយត្រយូងចេក ផ្កាកំប្លោក ត្រសក់ និងបន្លែស្រស់។",
+    "estimated_cost_usd": "1.00 - 2.50 per bowl",
+    "tags": ["noodles", "breakfast", "street food", "traditional", "local culture"],
+    "family_friendly": true,
+    "best_places_to_try": ["Preah Dak Village (Siem Reap)", "Local Morning Markets (Phsar Chas, Phsar Kandal)", "Madam Chorn (Phnom Penh)"]
+  },
+  {
+    "id": "food_loklak",
+    "name": "Beef Lok Lak (Lok Lak Sach Ko)",
+    "name_km": "ឡុកឡាក់សាច់គោ",
+    "category": "Authentic Khmer Cuisine",
+    "province": "Nationwide",
+    "province_km": "ទូទាំងប្រទេស",
+    "description": "Tender marinated beef stir-fried quickly in a wok with garlic, oyster sauce, and palm sugar, served on a bed of crisp lettuce, ripe tomatoes, and onions, paired with Cambodia's famous lime and black Kampot pepper dipping sauce (Tuk Trey Koh Kong / Lime-Pepper).",
+    "description_km": "សាច់គោបំពងឆាគ្រឿងបែបខ្មែរ រៀបចំលើបន្លែស្រស់ ប៉េងប៉ោះ ត្រសក់ ញ៉ាំជាមួយទឹកជ្រលក់ក្រូចឆ្មារម្រេចកំពតដ៏ឈ្ងុយឆ្ងាញ់។",
+    "estimated_cost_usd": "3.50 - 7.00 per dish",
+    "tags": ["beef", "popular", "dinner", "kampot pepper", "stir-fry"],
+    "family_friendly": true,
+    "best_places_to_try": ["Friends the Restaurant (Phnom Penh)", "Khmer Kitchen (Siem Reap)", "Viroth's Restaurant (Siem Reap)"]
+  },
+  {
+    "id": "food_kdamchaa",
+    "name": "Kep Crab Fried with Green Kampot Pepper (Kdam Chaa)",
+    "name_km": "ក្តាមឆាម្រេចខ្ចីកំពត",
+    "category": "Seafood Specialty",
+    "province": "Kep / Kampot",
+    "province_km": "កែប / កំពត",
+    "description": "Cambodia's coastal signature dish: freshly caught blue swimming crab straight from the sea, stir-fried with fragrant clusters of young green GI Kampot peppercorns, garlic, and scallions.",
+    "description_km": "មុខម្ហូបឆ្នេរសមុទ្រដ៏ល្បីល្បាញ៖ ក្តាមសេះស្រស់ៗពីសមុទ្រកែប ឆាជាមួយចង្កោមម្រេចខ្ចីកំពតដ៏ក្រអូបប្រហើរ។",
+    "estimated_cost_usd": "8.00 - 15.00 per kg",
+    "tags": ["seafood", "kep crab", "kampot pepper", "coastal", "must try"],
+    "family_friendly": true,
+    "best_places_to_try": ["Kep Crab Market (Kimly Restaurant, Holy Crab)", "La Baraka (Kep)", "Rusty Keyhole (Kampot)"]
+  }
+]

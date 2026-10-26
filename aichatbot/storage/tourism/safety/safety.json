@@ -1,0 +1,20 @@
+[
+  {
+    "id": "tip_currency",
+    "name": "Currency & Payments",
+    "name_km": "រូបិយវត្ថុ និងការទូទាត់",
+    "category": "Travel Tip",
+    "province": "Nationwide",
+    "description": "US Dollars (USD) and Cambodian Riel (KHR) are both accepted nationwide. $1 USD = ~4,100 KHR. Bakong KHQR digital payments are widely used.",
+    "description_km": "ប្រាក់ដុល្លារអាមេរិក (USD) និងប្រាក់រៀល (KHR) ត្រូវបានប្រើប្រាស់ទូទាំងប្រទេស។ $1 USD = ៤,១០០ រៀល។ ការទូទាត់តាម KHQR មានប្រជាប្រិយភាពខ្លាំង។"
+  },
+  {
+    "id": "tip_weather",
+    "name": "Weather & Clothing",
+    "name_km": "អាកាសធាតុ និងការស្លៀកពាក់",
+    "category": "Travel Tip",
+    "province": "Nationwide",
+    "description": "Tropical climate. Best time to visit is November to February (cool & dry). Dress respectfully (cover shoulders and knees) when visiting temples.",
+    "description_km": "អាកាសធាតុក្តៅសើម។ រដូវល្អបំផុតគឺខែវិច្ឆិកា ដល់កុម្ភៈ។ សូមស្លៀកពាក់រៀបរយ (គ្របស្មា និងជង្គង់) ពេលចូលទស្សនាប្រាសាទ។"
+  }
+]

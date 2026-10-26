@@ -1,0 +1,22 @@
+[
+  {
+    "id": "trans_tuk_tuk",
+    "name": "Tuk Tuk (Remork)",
+    "name_km": "រ៉ឺម៉កកង់បី (Tuk Tuk)",
+    "category": "Transportation",
+    "province": "Nationwide",
+    "description": "Most common mode of local transport in Cambodia. PassApp and Grab allow easy booking.",
+    "description_km": "មធ្យោបាយធ្វើដំណើរបែបប្រពៃណី និងពេញនិយមបំផុត អាចកក់តាមកម្មវិធី PassApp ឬ Grab។",
+    "average_cost": "$1 - $5 for city rides"
+  },
+  {
+    "id": "trans_bus",
+    "name": "Inter-City Express Bus",
+    "name_km": "រថយន្តក្រុងអន្តរខេត្ត",
+    "category": "Transportation",
+    "province": "Nationwide",
+    "description": "Buses and minivans connecting Phnom Penh, Siem Reap, Sihanoukville, Kampot, and Battambang.",
+    "description_km": "រថយន្តក្រុង និងរថយន្តឈ្នួលតភ្ជាប់ភ្នំពេញ សៀមរាប ព្រះសីហនុ កំពត និងបាត់ដំបង។",
+    "average_cost": "$8 - $15 per ticket"
+  }
+]

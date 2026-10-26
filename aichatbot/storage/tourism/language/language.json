@@ -1,0 +1,55 @@
+[
+  {
+    "id": "lang_khmer_formal_letter",
+    "name": "Standard Khmer Official & Business Letter Structure",
+    "name_km": "ទម្រង់លិខិតរដ្ឋបាល និងលិខិតផ្លូវការជាភាសាខ្មែរ",
+    "category": "language",
+    "topic": "formal_writing",
+    "description": "Formal Khmer administrative and corporate correspondence adheres to an official structure: 1. Motto Header centered at the top: 'ព្រះរាជាណាចក្រកម្ពុជា ជាតិ សាសនា ព្រះមហាក្សត្រ'; 2. Date and Location right-aligned: 'រាជធានីភ្នំពេញ ថ្ងៃទី... ខែ... ឆ្នាំ...'; 3. Hierarchical Salutation: 'សូមគោរពជូន... (To respected leader/official)' or 'សូមជម្រាបជូន... (To peer/business partner)'; 4. Subject and Reference: 'កម្មវត្ថុ៖ ស្តីពី...' and 'យោង៖ ...'; 5. Main Body paragraphs explaining context and formal request; 6. Respectful Conclusion: 'អាស្រ័យហេតុនេះ សូម... មេត្តាពិនិត្យ និងសម្រេចដោយក្តីអនុគ្រោះ។ សូម... មេត្តាទទួលនូវការគោរពដ៏ខ្ពង់ខ្ពស់អំពីខ្ញុំបាទ/នាងខ្ញុំ។'; 7. Signature, full name, and optional stamp.",
+    "description_km": "ការសរសេរលិខិតផ្លូវការ និងលិខិតរដ្ឋបាលខ្មែរត្រូវអនុវត្តតាមទម្រង់បទដ្ឋានជាតិ៖ ១. ពាក្យស្លោកជាតិនៅចំកណ្តាលផ្នែកលើ៖ «ព្រះរាជាណាចក្រកម្ពុជា ជាតិ សាសនា ព្រះមហាក្សត្រ» ២. កាលបរិច្ឆេទនៅខាងស្តាំ៖ «រាជធានីភ្នំពេញ ថ្ងៃទី... ខែ... ឆ្នាំ...» ៣. ការគួរសមតាមឋានានុក្រម៖ «សូមគោរពជូន...» (ថ្នាក់ដឹកនាំ/អ្នកមានឋានៈខ្ពស់) ឬ «សូមជម្រាបជូន...» (ដៃគូពាណិជ្ជកម្ម/ស្មើឋានៈ) ៤. កម្មវត្ថុ និងយោង៖ «កម្មវត្ថុ៖ ស្តីពី...» និង «យោង៖ ...» ៥. ខ្លឹមសារលិខិត (បញ្ជាក់ហេតុផល និងសំណូមពរ) ៦. ពាក្យបញ្ចប់ការគោរព៖ «អាស្រ័យហេតុនេះ សូម... មេត្តាពិនិត្យ និងសម្រេចដោយក្តីអនុគ្រោះ។ សូម... មេត្តាទទួលនូវការគោរពដ៏ខ្ពង់ខ្ពស់អំពីខ្ញុំបាទ/នាងខ្ញុំ។» ៧. ហត្ថលេខា និងឈ្មោះពេញ។",
+    "templates": {
+      "leave_request": "ពាក្យសុំច្បាប់ឈប់សម្រាក (Leave Request)",
+      "job_application": "ពាក្យសុំបម្រើការងារ (Job Application)",
+      "proposal": "លិខិតស្នើសុំកិច្ចសហការ ឬជំនួយឧបត្ថម្ភ (Partnership/Sponsorship Proposal)"
+    },
+    "tags": [
+      "khmer writing",
+      "formal letter",
+      "administrative letter",
+      "khmer grammar",
+      "translation",
+      "letter format",
+      "លិខិតផ្លូវការ",
+      "ពាក្យសុំច្បាប់",
+      "របៀបសរសេរលិខិត"
+    ],
+    "verified": true,
+    "source": "Royal Academy of Cambodia (National Language Institute)",
+    "last_updated": "2026-09-01"
+  },
+  {
+    "id": "lang_khmer_orthography_grammar",
+    "name": "Khmer Orthography, Unicode Rules & Diacritical Marks",
+    "name_km": "អក្ខរាវិរុទ្ធ វេយ្យាករណ៍ និងសញ្ញាសម្គាល់ក្នុងភាសាខ្មែរ",
+    "category": "language",
+    "topic": "grammar_and_orthography",
+    "description": "The Khmer script is an abugida consisting of 33 consonants divided into two phonetic series: First Series /a/ (អ៊ុកសរពួក អ) and Second Series /o/ (អក្សរពួក អ៊). Vowels shift pronunciation depending on the consonant's series. Vowels are classified as 24 Dependent Vowels (ស្រៈនិស្ស័យ) and 14 Independent Vowels (ស្រៈពេញតួ). Consonants can form subscripts (ជើងអក្សរ) beneath base letters. Important diacritical marks include: Bantak (បន្តក់ - shortens vowel), Samyok Sanna (សំយោគសញ្ញា), Rebat (របាទ), Treisap (ត្រីស័ព្ទ - shifts o-series to a-series), Thmey Kandal (ធ្មេញកណ្តុរ - shifts a-series to o-series), and Kakabat (កាកបាទ).",
+    "description_km": "អក្សរខ្មែរមានព្យញ្ជនៈ ៣៣ តួ ចែកជាពីរពួក៖ ពួក អ (អឃោសៈ) និងពួក អ៊ (ឃោសៈ)។ ស្រៈនិស្ស័យមាន ២៤ តួ និងស្រៈពេញតួមាន ១៤ តួ។ ព្យញ្ជនៈអាចប្រែក្លាយជាជើងអក្សរនៅក្រោមព្យញ្ជនៈដើម។ សញ្ញាវណ្ណយុត្តិសំខាន់ៗរួមមាន៖ បន្តក់ (់), សំយោគសញ្ញា (័), របាទ (៌), ត្រីស័ព្ទ (៊), ធ្មេញកណ្តុរ ឬមូសិកទន្ត (៉), វិសជ៌នី (ះ), អស្តា (៏), និងយុគលពិន្ទុ (៖)។ វចនានុក្រមសម្តេចព្រះសង្ឃរាជ ជួន ណាត គឺជាមូលដ្ឋានគ្រឹះនៃអក្ខរាវិរុទ្ធជាតិ។",
+    "source_reference": "Chuon Nath Khmer Dictionary & Royal Academy of Cambodia",
+    "tags": [
+      "khmer grammar",
+      "orthography",
+      "chuon nath",
+      "unicode",
+      "vowels",
+      "consonants",
+      "diacritics",
+      "អក្ខរាវិរុទ្ធ",
+      "ជួន ណាត",
+      "វេយ្យាករណ៍ខ្មែរ"
+    ],
+    "verified": true,
+    "source": "Royal Academy of Cambodia (RAC)",
+    "last_updated": "2026-09-01"
+  }
+]
