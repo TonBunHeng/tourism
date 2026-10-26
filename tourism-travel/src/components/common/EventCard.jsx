@@ -1,38 +1,35 @@
-import { MapPin, ArrowRight } from 'lucide-react';
+import { Clock, MapPin, Users, Check, ArrowRight } from 'lucide-react';
 
 export default function EventCard({ event, onViewDetails }) {
-  const imageUrl = event.image_url || 'https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&w=800&q=80';
-  const status = event.status || event.computed_status || 'Upcoming';
+  if (!event) return null;
 
-  const isOngoing = status.toLowerCase() === 'ongoing';
-  const isUpcoming = status.toLowerCase() === 'upcoming';
+  const imageUrl =
+    event.image_url ||
+    event.image ||
+    'https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&w=800&q=80';
+  const status = event.status || event.computed_status || 'UPCOMING';
+  const locationLabel = event.location || event.province || 'Cambodia';
+  const priceVal = event.price ? (String(event.price).startsWith('$') ? event.price : `$${event.price}`) : 'Free';
+
+  // Format date
+  const formatDateRange = () => {
+    if (!event.start_date) return 'Annual Festival';
+    try {
+      const d = new Date(event.start_date);
+      return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    } catch {
+      return event.start_date;
+    }
+  };
 
   const handleClick = () => {
-    if (onViewDetails) {
-      onViewDetails(event);
-    }
+    if (onViewDetails) onViewDetails(event);
   };
-
-  // Format date helper for calendar badge
-  const parseDateParts = (dateStr) => {
-    if (!dateStr) return { month: 'EVENT', day: '2026' };
-    try {
-      const d = new Date(dateStr);
-      if (isNaN(d.getTime())) return { month: 'DATE', day: dateStr.slice(0, 5) };
-      const month = d.toLocaleDateString('en-US', { month: 'short' }).toUpperCase();
-      const day = d.getDate();
-      return { month, day };
-    } catch {
-      return { month: 'EVENT', day: '2026' };
-    }
-  };
-
-  const dateParts = parseDateParts(event.start_date);
 
   return (
     <div
       onClick={handleClick}
-      className="group modern-card bg-white dark:bg-zinc-900 border border-gray-200/80 dark:border-zinc-800 rounded-3xl overflow-hidden shadow-xs hover:border-blue-300 dark:hover:border-blue-500/50 flex flex-col justify-between cursor-pointer transition-all h-full"
+      className="group bg-white dark:bg-zinc-900 border border-gray-200/90 dark:border-zinc-800 rounded-3xl overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col justify-between h-full cursor-pointer"
     >
       <div>
         {/* Cover Photo Frame */}
@@ -47,76 +44,102 @@ export default function EventCard({ event, onViewDetails }) {
               e.target.src = 'https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&w=800&q=80';
             }}
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent pointer-events-none" />
 
-          {/* Calendar Date Block */}
-          <div className="absolute top-3 left-3 z-10 overflow-hidden rounded-2xl bg-white/95 dark:bg-zinc-900/95 shadow-md backdrop-blur-md border border-white/40 dark:border-zinc-700 text-center min-w-[50px]">
-            <div className="bg-[#003E83] dark:bg-blue-600 text-[10px] font-bold text-white uppercase px-2 py-0.5 tracking-wider">
-              {dateParts.month}
-            </div>
-            <div className="text-sm font-extrabold text-gray-900 dark:text-white py-1 px-2">
-              {dateParts.day}
-            </div>
-          </div>
-
-          {/* Status Badge */}
-          <div className="absolute top-3 right-3 z-10">
-            <span
-              className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold backdrop-blur-md shadow-sm border ${
-                isOngoing
-                  ? 'bg-emerald-500/90 text-white border-emerald-400'
-                  : isUpcoming
-                  ? 'bg-blue-600/90 text-white border-blue-400'
-                  : 'bg-zinc-800/85 text-zinc-300 border-zinc-700'
-              }`}
-            >
-              {isOngoing && <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping" />}
+          {/* Badge Top Left */}
+          <div className="absolute top-3.5 left-3.5 z-10">
+            <span className="px-3.5 py-1 text-[11px] font-black uppercase tracking-wider rounded-full bg-[#2563eb] text-white shadow-sm">
               {status}
             </span>
           </div>
 
-          {/* Location on image overlay */}
-          <div className="absolute bottom-2.5 left-3.5 z-10 text-white flex items-center gap-1.5 text-xs font-semibold drop-shadow-sm">
-            <MapPin size={13} className="text-amber-400 shrink-0" />
-            <span className="truncate max-w-[220px]">
-              {event.location || event.province || 'Cambodia'}
+          {/* Duration Top Right */}
+          <div className="absolute top-3.5 right-3.5 z-10">
+            <span className="px-3 py-1 text-xs font-bold rounded-full bg-white text-gray-900 shadow-sm flex items-center gap-1.5 border border-white/20">
+              <Clock size={14} className="text-[#2563eb]" />
+              <span>{formatDateRange()}</span>
+            </span>
+          </div>
+
+          {/* Location & Guests on Image */}
+          <div className="absolute bottom-3 left-4 right-4 z-10 flex items-center justify-between text-white text-xs font-bold drop-shadow-sm">
+            <span className="flex items-center gap-1.5 truncate max-w-[200px]">
+              <MapPin size={14} className="text-amber-400 shrink-0 fill-amber-400/20" />
+              <span>{locationLabel}</span>
+            </span>
+            <span className="flex items-center gap-1.5 text-white/90 font-medium shrink-0">
+              <Users size={14} className="text-white/80" />
+              <span>Open to Public</span>
             </span>
           </div>
         </div>
 
-        {/* Content Body */}
-        <div className="p-5 space-y-2">
-          <h3 className="text-base font-bold text-gray-900 dark:text-white line-clamp-1 group-hover:text-[#003E83] dark:group-hover:text-blue-400 transition-colors">
+        {/* Card Body */}
+        <div className="p-5 sm:p-6 space-y-3">
+          {/* Review Rating Badge + Free Cancellation / Entry Tag */}
+          <div className="flex items-center justify-between text-xs">
+            <div className="flex items-center gap-2">
+              <span className="px-2 py-0.5 rounded-md bg-[#0f294d] text-white text-xs font-black">
+                5.0
+              </span>
+              <span className="font-bold text-[#0f294d] dark:text-white text-sm">
+                Excellent
+              </span>
+              <span className="text-xs text-gray-400 font-normal">
+                (260)
+              </span>
+            </div>
+            <span className="px-2.5 py-0.5 rounded-md bg-[#ecfdf5] dark:bg-emerald-950/50 text-[#059669] dark:text-emerald-400 text-xs font-bold">
+              Free Cancellation
+            </span>
+          </div>
+
+          {/* Title */}
+          <h3 className="text-lg font-black text-[#0f294d] dark:text-white group-hover:text-[#2563eb] transition-colors line-clamp-1 leading-snug">
             {event.title}
           </h3>
 
-          {event.description ? (
-            <p className="text-xs text-gray-500 dark:text-zinc-400 line-clamp-2 leading-relaxed">
-              {event.description}
-            </p>
-          ) : (
-            <p className="text-xs text-gray-400 dark:text-zinc-500 italic">
-              Explore authentic Khmer traditions and festivities.
-            </p>
-          )}
+          {/* Description */}
+          <p className="text-xs sm:text-[13px] text-gray-500 dark:text-zinc-400 line-clamp-2 leading-relaxed">
+            {event.description || 'Celebrate Cambodian cultural festivals, spiritual parades, and traditional Khmer celebrations.'}
+          </p>
+
+          {/* Highlights Mini-list with 2 Green Checkmarks */}
+          <div className="space-y-1.5 pt-1">
+            <div className="flex items-start gap-2 text-xs sm:text-[13px] text-gray-600 dark:text-zinc-300">
+              <Check size={14} className="text-emerald-500 shrink-0 mt-0.5 stroke-[2.5]" />
+              <span className="truncate">Authentic Cambodian cultural traditions and festivities</span>
+            </div>
+            <div className="flex items-start gap-2 text-xs sm:text-[13px] text-gray-600 dark:text-zinc-300">
+              <Check size={14} className="text-emerald-500 shrink-0 mt-0.5 stroke-[2.5]" />
+              <span className="truncate">Official national festival program with visitor assistance</span>
+            </div>
+          </div>
         </div>
       </div>
 
       {/* Card Footer */}
-      <div className="px-5 py-3.5 border-t border-gray-100 dark:border-zinc-800/80 flex items-center justify-between text-xs bg-gray-50/70 dark:bg-zinc-800/40">
-        <span className="text-gray-400 dark:text-zinc-500 truncate max-w-[150px] font-medium">
-          {event.organizer || 'Tourism Festival'}
-        </span>
+      <div className="px-5 sm:px-6 py-4 border-t border-gray-100 dark:border-zinc-800/80 flex items-center justify-between bg-white dark:bg-zinc-900 rounded-b-3xl">
+        <div>
+          <span className="text-[10px] font-extrabold uppercase tracking-wider text-gray-400 block leading-none mb-1">
+            FROM
+          </span>
+          <div className="flex items-baseline">
+            <span className="text-2xl font-black text-[#2563eb] dark:text-blue-400">
+              {priceVal}
+            </span>
+            <span className="text-xs font-normal text-gray-500 ml-1">
+              / entry
+            </span>
+          </div>
+        </div>
+
         <button
           type="button"
-          onClick={(e) => {
-            e.stopPropagation();
-            if (onViewDetails) onViewDetails(event);
-          }}
-          className="inline-flex items-center gap-1.5 font-bold text-[#003E83] dark:text-blue-400 hover:underline cursor-pointer group-hover:translate-x-1 transition-transform"
+          className="px-5 py-2.5 rounded-full bg-[#2563eb] hover:bg-[#1d4ed8] text-white font-bold text-xs sm:text-sm flex items-center gap-1.5 shadow-md shadow-blue-500/20 active:scale-95 transition-all"
         >
-          <span>View Details</span>
-          <ArrowRight className="w-3.5 h-3.5" />
+          <span>Event Details</span>
+          <ArrowRight size={15} />
         </button>
       </div>
     </div>

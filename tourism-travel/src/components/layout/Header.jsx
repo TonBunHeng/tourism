@@ -1,83 +1,71 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { 
-  Compass, 
-  Sparkles, 
-  Calendar,
-  CalendarCheck, 
-  Image as ImageIcon, 
-  Heart, 
-  Award, 
-  User, 
-  LogOut, 
-  Menu, 
-  X, 
-  MessageSquare, 
-  ShieldAlert, 
-  Settings,
-  ChevronDown,
+import {
+  Menu,
+  X,
+  Search,
+  Smartphone,
+  Building,
+  Globe,
+  Headphones,
+  CalendarCheck,
+  User,
+  LogOut,
+  Bell,
   Sun,
   Moon,
   Monitor,
   Check,
-  Bell,
-  CheckCheck,
-  ArrowRight,
-  Briefcase,
-  LayoutDashboard,
-  FileSpreadsheet,
-  Info,
-  PhoneCall
+  ChevronDown,
+  Sparkles,
+  Coins,
+  Heart,
+  Settings,
+  ArrowRight
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useTravel } from '../../context/TravelContext';
 import { useAlert } from '../../context/AlertContext';
 import { getInitialTheme, applyTheme, THEME_CHANGE_EVENT, isDarkTheme } from '../../utils/Theme';
 import notificationService from '../../services/notificationService';
-import logoImg from '../../assets/tourism_logo.png';
 
-export default function Header() {
+export default function Header({
+  onToggleSidebar = () => {},
+  isSidebarExpanded = true,
+  onToggleMobileSidebar = () => {},
+  onOpenAppModal = () => {},
+  onOpenSupportModal = () => {}
+}) {
   const { user, isAuthenticated, logout, openAuthModal, isBusinessOwner } = useAuth();
   const { showConfirm } = useAlert();
-  const { wishlistCount, toggleChat } = useTravel();
-  const [menuOpen, setMenuOpen] = useState(false);
+  const { wishlistCount } = useTravel();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  // Header Search Input State
+  const [headerSearch, setHeaderSearch] = useState('');
+
+  // Dropdown States
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [notifDropdownOpen, setNotifDropdownOpen] = useState(false);
+  const [currencyDropdownOpen, setCurrencyDropdownOpen] = useState(false);
   const [themeDropdownOpen, setThemeDropdownOpen] = useState(false);
 
+  // Currency Selection
+  const [currency, setCurrency] = useState('USD');
+
+  // Theme State
   const [currentTheme, setCurrentTheme] = useState(() => getInitialTheme());
   const [, setIsDarkMode] = useState(() => isDarkTheme(getInitialTheme()));
 
+  // Notifications
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
 
   const dropdownRef = useRef(null);
   const notifDropdownRef = useRef(null);
+  const currencyDropdownRef = useRef(null);
   const themeDropdownRef = useRef(null);
-  const mobileMenuRef = useRef(null);
-  const navigate = useNavigate();
-  const location = useLocation();
-
-  const formatTimeAgo = (dateString) => {
-    if (!dateString) return 'Recent';
-    try {
-      const now = new Date();
-      const date = new Date(dateString);
-      const diffSec = Math.floor((now - date) / 1000);
-
-      if (diffSec < 60) return 'Just now';
-      const diffMin = Math.floor(diffSec / 60);
-      if (diffMin < 60) return `${diffMin}m ago`;
-      const diffHour = Math.floor(diffMin / 60);
-      if (diffHour < 24) return `${diffHour}h ago`;
-      const diffDays = Math.floor(diffHour / 24);
-      if (diffDays === 1) return 'Yesterday';
-      if (diffDays < 7) return `${diffDays}d ago`;
-      return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
-    } catch {
-      return dateString;
-    }
-  };
 
   const fetchTravelNotifications = useCallback(async () => {
     if (!isAuthenticated) {
@@ -103,13 +91,9 @@ export default function Header() {
 
   useEffect(() => {
     let isMounted = true;
-    const loadNotifs = async () => {
-      if (isMounted) {
-        await fetchTravelNotifications();
-      }
-    };
-    loadNotifs();
-
+    if (isMounted) {
+      fetchTravelNotifications();
+    }
     const handleUpdate = () => fetchTravelNotifications();
     window.addEventListener('travel-notifications-updated', handleUpdate);
     const interval = setInterval(fetchTravelNotifications, 45000);
@@ -120,31 +104,11 @@ export default function Header() {
     };
   }, [fetchTravelNotifications]);
 
-  const handleLogout = async () => {
-    const confirmed = await showConfirm({
-      title: 'Logout Confirmation',
-      message: 'Are you sure you want to log out of your account?',
-      confirmText: 'Sign Out',
-      type: 'logout'
-    });
-    if (confirmed) {
-      logout();
-      setDropdownOpen(false);
-      setNotifDropdownOpen(false);
-      setMenuOpen(false);
-      navigate('/', { replace: true });
-    }
-  };
-
   useEffect(() => {
     const handleThemeChange = (e) => {
       if (e.detail) {
-        if (e.detail.theme) {
-          setCurrentTheme(e.detail.theme);
-        }
-        if (typeof e.detail.isDark === 'boolean') {
-          setIsDarkMode(e.detail.isDark);
-        }
+        if (e.detail.theme) setCurrentTheme(e.detail.theme);
+        if (typeof e.detail.isDark === 'boolean') setIsDarkMode(e.detail.isDark);
       }
     };
     window.addEventListener(THEME_CHANGE_EVENT, handleThemeChange);
@@ -166,11 +130,11 @@ export default function Header() {
       if (notifDropdownRef.current && !notifDropdownRef.current.contains(event.target)) {
         setNotifDropdownOpen(false);
       }
+      if (currencyDropdownRef.current && !currencyDropdownRef.current.contains(event.target)) {
+        setCurrencyDropdownOpen(false);
+      }
       if (themeDropdownRef.current && !themeDropdownRef.current.contains(event.target)) {
         setThemeDropdownOpen(false);
-      }
-      if (mobileMenuRef.current && !mobileMenuRef.current.contains(event.target)) {
-        setMenuOpen(false);
       }
     };
 
@@ -179,23 +143,30 @@ export default function Header() {
   }, []);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setMenuOpen(false);
     setDropdownOpen(false);
     setNotifDropdownOpen(false);
+    setCurrencyDropdownOpen(false);
     setThemeDropdownOpen(false);
   }, [location.pathname]);
 
+  const handleHeaderSearchSubmit = (e) => {
+    e.preventDefault();
+    if (headerSearch.trim()) {
+      navigate(`/places?search=${encodeURIComponent(headerSearch.trim())}`);
+    }
+  };
 
-
-  const markSingleRead = async (id, e) => {
-    if (e) e.stopPropagation();
-    try {
-      await notificationService.markAsRead(id);
-      setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
-      setUnreadCount(prev => Math.max(0, prev - 1));
-    } catch (err) {
-      console.error(err);
+  const handleLogout = async () => {
+    const confirmed = await showConfirm({
+      title: 'Sign Out',
+      message: 'Are you sure you want to sign out of your Trip.com account?',
+      confirmText: 'Sign Out',
+      type: 'logout'
+    });
+    if (confirmed) {
+      logout();
+      setDropdownOpen(false);
+      navigate('/', { replace: true });
     }
   };
 
@@ -209,209 +180,207 @@ export default function Header() {
     }
   };
 
-  const handleNotificationClick = async (notif) => {
-    setNotifDropdownOpen(false);
-    if (!notif.read) {
-      try {
-        await notificationService.markAsRead(notif.id);
-        setNotifications(prev => prev.map(n => n.id === notif.id ? { ...n, read: true } : n));
-        setUnreadCount(prev => Math.max(0, prev - 1));
-      } catch (err) {
-        console.error(err);
-      }
-    }
-    if (notif.link) {
-      navigate(notif.link);
-    }
-  };
-
-  const normRole = (user?.role || '').toLowerCase().trim().replace(/[\s/-]+/g, '_');
-  const isTourGuide = ['tour_guide', 'guide_editor', 'content_editor', 'guide'].includes(normRole);
-
-  const navLinks = [
-    { name: 'Destinations', path: '/places', icon: Compass },
-    { name: 'Tours', path: '/tours', icon: Sparkles },
-    { name: 'Guides', path: '/guides', icon: User },
-    { name: 'Businesses', path: '/businesses', icon: Briefcase },
-    { name: 'Events', path: '/events', icon: Calendar },
-    { name: 'Gallery', path: '/gallery', icon: ImageIcon },
-    { name: 'Reviews', path: '/reviews', icon: MessageSquare },
-    { name: 'About', path: '/about', icon: Info },
-    { name: 'Contact', path: '/contact', icon: PhoneCall },
-  ];
-
-  const isLinkActive = (path) => {
-    if (path === '/') return location.pathname === '/';
-    return location.pathname === path || location.pathname.startsWith(`${path}/`);
-  };
-
-  const getDashboardPath = () => {
-    if (isBusinessOwner) return '/business/dashboard';
-    if (isTourGuide) return '/guide/dashboard';
-    return '/profile';
-  };
-
   return (
-    <header className="sticky top-0 z-40 w-full bg-white/90 dark:bg-zinc-900/90 backdrop-blur-xl border-b border-gray-200/80 dark:border-zinc-800 transition-colors shadow-2xs">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 gap-2 xl:gap-3">
+    <header className="sticky top-0 z-50 w-full bg-white dark:bg-zinc-900 border-b border-gray-200/90 dark:border-zinc-800 transition-colors shadow-xs">
+      <div className="w-full px-3 sm:px-6">
+        <div className="flex items-center justify-between h-16 gap-3">
           
-          {/* Brand Logo */}
-          <Link to="/" className="flex items-center gap-2.5 shrink-0 group">
-            <div className="w-9 h-9 rounded-xl overflow-hidden bg-[#003E83]/10 dark:bg-blue-900/30 flex items-center justify-center p-1.5 border border-blue-200/60 dark:border-blue-900/50 shadow-2xs group-hover:scale-105 transition-transform">
-              <img
-                src={logoImg}
-                alt="AngkorVerses"
-                className="w-full h-full object-contain"
-              />
-            </div>
-            <div>
-              <span className="text-base font-extrabold text-gray-900 dark:text-white tracking-tight leading-tight block group-hover:text-[#003E83] dark:group-hover:text-blue-400 transition-colors">
-                Angkor<span className="text-[#003E83] dark:text-blue-400">Verses</span>
-              </span>
-              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">
-                Travel & Culture
-              </span>
-            </div>
-          </Link>
-
-          {/* Desktop Navigation Links */}
-          <nav className="hidden lg:flex items-center gap-1 xl:gap-1.5 shrink-0">
-            {navLinks.map((link) => {
-              const active = isLinkActive(link.path);
-              const Icon = link.icon;
-              return (
-                <Link
-                  key={link.name}
-                  to={link.path}
-                  onClick={() => setMenuOpen(false)}
-                  className={`flex items-center gap-1 xl:gap-1.5 px-2 xl:px-2.5 py-1.5 rounded-xl text-[11px] xl:text-xs font-bold transition-all whitespace-nowrap ${
-                    active
-                      ? 'bg-blue-50 dark:bg-blue-950/60 text-[#003E83] dark:text-blue-400 shadow-2xs'
-                      : 'text-gray-600 dark:text-zinc-300 hover:text-[#003E83] dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-zinc-800/70'
-                  }`}
-                >
-                  <Icon className={`w-3.5 h-3.5 ${active ? 'text-[#003E83] dark:text-blue-400' : 'text-gray-400 dark:text-zinc-500'}`} />
-                  <span>{link.name}</span>
-                </Link>
-              );
-            })}
-          </nav>
-
-          {/* Search Bar & Action Utilities */}
-          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
-
-
-
-
-
-            {/* Wishlist Icon */}
-            <Link
-              to="/wishlist"
-              className="relative p-2 text-gray-600 dark:text-zinc-300 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-lg transition-colors shrink-0"
-              title="Saved Wishlist"
+          {/* Left: Sidebar Toggle + Trip.com Logo */}
+          <div className="flex items-center gap-3 shrink-0">
+            {/* Desktop Hamburger Toggle */}
+            <button
+              type="button"
+              onClick={onToggleSidebar}
+              className="hidden lg:flex p-2 rounded-xl text-gray-600 dark:text-zinc-300 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+              title={isSidebarExpanded ? 'Collapse menu' : 'Expand menu'}
+              aria-label="Toggle sidebar menu"
             >
-              <Heart className="w-4 h-4 text-rose-500" />
-              {wishlistCount > 0 && (
-                <span className="absolute top-1 right-1 w-4 h-4 bg-rose-500 text-white rounded-full text-[9px] font-extrabold flex items-center justify-center shadow-xs">
-                  {wishlistCount}
-                </span>
-              )}
+              <Menu size={20} />
+            </button>
+
+            {/* Mobile Drawer Hamburger */}
+            <button
+              type="button"
+              onClick={onToggleMobileSidebar}
+              className="lg:hidden p-2 rounded-xl text-gray-600 dark:text-zinc-300 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+              aria-label="Open mobile menu"
+            >
+              <Menu size={20} />
+            </button>
+
+            {/* Trip.com Iconic Wordmark */}
+            <Link to="/" className="flex items-center gap-2 group select-none">
+              <span className="text-2xl sm:text-[26px] font-black tracking-tight text-[#0f294d] dark:text-white transition-colors">
+                Trip<span className="text-[#287dfa]">.com</span>
+              </span>
+              <span className="hidden sm:inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-blue-50 text-[#287dfa] dark:bg-blue-950/60 dark:text-blue-400 border border-blue-200/60 dark:border-blue-900/40">
+                Cambodia
+              </span>
+            </Link>
+          </div>
+
+          {/* Middle: Trip.com Global Search Input Bar */}
+          <div className="hidden md:flex flex-1 max-w-md lg:max-w-lg mx-2 lg:mx-6">
+            <form onSubmit={handleHeaderSearchSubmit} className="relative w-full">
+              <input
+                type="text"
+                placeholder="Destination, attraction, hotel, etc."
+                value={headerSearch}
+                onChange={(e) => setHeaderSearch(e.target.value)}
+                className="w-full h-10 pl-4 pr-11 bg-gray-100/90 dark:bg-zinc-800/90 hover:bg-gray-100 focus:bg-white dark:focus:bg-zinc-900 text-gray-900 dark:text-white text-xs sm:text-[13px] rounded-full border border-transparent focus:border-[#287dfa] focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-950/50 outline-none transition-all placeholder:text-gray-400"
+              />
+              <button
+                type="submit"
+                className="absolute right-1 top-1 bottom-1 w-8 h-8 rounded-full bg-[#287dfa] hover:bg-[#1a6de8] text-white flex items-center justify-center transition-transform active:scale-90 cursor-pointer shadow-xs"
+                title="Search"
+              >
+                <Search size={14} />
+              </button>
+            </form>
+          </div>
+
+          {/* Right: Trip Utilities Bar */}
+          <div className="flex items-center gap-1 sm:gap-2 lg:gap-3 text-xs font-semibold text-[#0f294d] dark:text-zinc-200 shrink-0">
+            
+            {/* App Promotion Trigger */}
+            <button
+              type="button"
+              onClick={onOpenAppModal}
+              className="hidden xl:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer text-gray-700 dark:text-zinc-300"
+              title="Get Trip.com Mobile App"
+            >
+              <Smartphone size={16} className="text-gray-500" />
+              <span>App</span>
+            </button>
+
+            {/* List Your Property / Business */}
+            <Link
+              to={isBusinessOwner ? '/business/dashboard' : '/businesses'}
+              className="hidden lg:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors text-gray-700 dark:text-zinc-300"
+            >
+              <Building size={16} className="text-gray-500" />
+              <span>List your property</span>
             </Link>
 
-            {/* Notifications Dropdown */}
+            {/* Currency & Language Selector */}
+            <div className="relative" ref={currencyDropdownRef}>
+              <button
+                type="button"
+                onClick={() => setCurrencyDropdownOpen(!currencyDropdownOpen)}
+                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer text-gray-700 dark:text-zinc-300"
+                title="Select Currency"
+              >
+                <Globe size={16} className="text-[#287dfa]" />
+                <span className="font-bold">{currency}</span>
+                <ChevronDown size={13} className="text-gray-400" />
+              </button>
+
+              {currencyDropdownOpen && (
+                <div className="absolute right-0 mt-2 w-44 bg-white dark:bg-zinc-900 rounded-2xl shadow-xl border border-gray-100 dark:border-zinc-800 py-1.5 z-50 animate-in fade-in">
+                  <div className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-gray-400">
+                    Select Currency
+                  </div>
+                  {[
+                    { code: 'USD', label: 'USD ($) - US Dollar' },
+                    { code: 'KHR', label: 'KHR (៛) - Khmer Riel' },
+                    { code: 'EUR', label: 'EUR (€) - Euro' },
+                    { code: 'GBP', label: 'GBP (£) - British Pound' }
+                  ].map((cur) => (
+                    <button
+                      key={cur.code}
+                      type="button"
+                      onClick={() => {
+                        setCurrency(cur.code);
+                        setCurrencyDropdownOpen(false);
+                      }}
+                      className="w-full flex items-center justify-between px-3.5 py-2 text-xs font-semibold text-gray-700 dark:text-zinc-200 hover:bg-blue-50 dark:hover:bg-zinc-800 hover:text-[#287dfa]"
+                    >
+                      <span>{cur.label}</span>
+                      {currency === cur.code && <Check size={14} className="text-[#287dfa]" />}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Customer Support 24/7 */}
+            <button
+              type="button"
+              onClick={onOpenSupportModal}
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer text-gray-700 dark:text-zinc-300"
+              title="24/7 Customer Support"
+            >
+              <Headphones size={16} className="text-gray-500" />
+              <span className="hidden sm:inline">Customer support</span>
+            </button>
+
+            {/* Find Bookings */}
+            <Link
+              to="/bookings"
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors text-gray-700 dark:text-zinc-300"
+              title="My Bookings"
+            >
+              <CalendarCheck size={16} className="text-gray-500" />
+              <span className="hidden sm:inline">Find bookings</span>
+            </Link>
+
+            {/* Notifications Bell */}
             {isAuthenticated && (
-              <div className="relative shrink-0" ref={notifDropdownRef}>
+              <div className="relative" ref={notifDropdownRef}>
                 <button
+                  type="button"
                   onClick={() => setNotifDropdownOpen(!notifDropdownOpen)}
-                  className={`relative p-2 rounded-lg transition-colors cursor-pointer ${
-                    notifDropdownOpen
-                      ? 'bg-blue-50 dark:bg-zinc-800 text-[#003E83] dark:text-blue-400'
-                      : 'text-gray-600 dark:text-zinc-300 hover:bg-gray-100 dark:hover:bg-zinc-800'
-                  }`}
+                  className="relative p-2 rounded-xl text-gray-600 dark:text-zinc-300 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
                   title="Notifications"
                 >
-                  <Bell className="w-4 h-4" />
+                  <Bell size={18} />
                   {unreadCount > 0 && (
-                    <span className="absolute top-1 right-1 w-4 h-4 bg-red-500 text-white rounded-full text-[9px] font-extrabold flex items-center justify-center shadow-xs animate-pulse">
+                    <span className="absolute top-1 right-1 w-4 h-4 rounded-full bg-rose-500 text-white text-[9px] font-extrabold flex items-center justify-center animate-pulse">
                       {unreadCount > 9 ? '9+' : unreadCount}
                     </span>
                   )}
                 </button>
 
                 {notifDropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-white dark:bg-zinc-900 rounded-lg shadow-lg border border-gray-200 dark:border-zinc-800 py-2 z-50 animate-smooth-pop text-xs">
-                    <div className="px-4 py-2 border-b border-gray-100 dark:border-zinc-800 flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <span className="font-bold text-gray-900 dark:text-white">Notifications</span>
-                        {unreadCount > 0 && (
-                          <span className="px-2 py-0.5 bg-red-100 dark:bg-red-950 text-red-600 dark:text-red-400 rounded-full font-bold text-[10px]">
-                            {unreadCount} new
-                          </span>
-                        )}
-                      </div>
+                  <div className="absolute right-0 mt-2 w-80 bg-white dark:bg-zinc-900 rounded-2xl shadow-xl border border-gray-100 dark:border-zinc-800 py-2 z-50 animate-in fade-in">
+                    <div className="flex items-center justify-between px-4 py-2 border-b border-gray-100 dark:border-zinc-800">
+                      <span className="text-xs font-bold text-gray-900 dark:text-white">Trip Alerts</span>
                       {unreadCount > 0 && (
                         <button
+                          type="button"
                           onClick={markAllRead}
-                          className="text-[11px] text-[#003E83] dark:text-[#60a5fa] hover:underline font-semibold flex items-center gap-1 cursor-pointer"
+                          className="text-[11px] font-semibold text-[#287dfa] hover:underline"
                         >
-                          <CheckCheck className="w-3.5 h-3.5" />
                           Mark all as read
                         </button>
                       )}
                     </div>
-
-                    <div className="max-h-80 overflow-y-auto divide-y divide-gray-100 dark:divide-zinc-800/60">
-                      {notifications.length > 0 ? (
+                    <div className="max-h-60 overflow-y-auto divide-y divide-gray-100 dark:divide-zinc-800">
+                      {notifications.length === 0 ? (
+                        <div className="p-4 text-center text-xs text-gray-400">
+                          No new trip notifications
+                        </div>
+                      ) : (
                         notifications.map((n) => (
                           <div
                             key={n.id}
-                            onClick={() => handleNotificationClick(n)}
-                            className={`p-3 transition-colors cursor-pointer flex items-start gap-3 ${
-                              !n.read 
-                                ? 'bg-blue-50/50 dark:bg-blue-950/20' 
-                                : 'hover:bg-gray-50 dark:hover:bg-zinc-800/50'
+                            className={`p-3 text-xs hover:bg-gray-50 dark:hover:bg-zinc-800/50 cursor-pointer ${
+                              !n.read ? 'bg-blue-50/40 dark:bg-blue-950/20 font-bold' : ''
                             }`}
                           >
-                            <div className={`w-2 h-2 rounded-full mt-1.5 shrink-0 ${!n.read ? 'bg-[#003E83] dark:bg-blue-400' : 'bg-transparent'}`} />
-                            <div className="flex-1 min-w-0">
-                              <p className={`font-semibold truncate ${!n.read ? 'text-gray-900 dark:text-white' : 'text-gray-600 dark:text-zinc-400'}`}>
-                                {n.title || n.data?.title || 'Notification'}
-                              </p>
-                              <p className="text-gray-500 dark:text-zinc-400 text-[11px] line-clamp-2 mt-0.5">
-                                {n.description || n.data?.description || n.message || ''}
-                              </p>
-                              <span className="text-[10px] text-gray-400 dark:text-zinc-500 mt-1 block">
-                                {formatTimeAgo(n.created_at)}
-                              </span>
-                            </div>
-                            {!n.read && (
-                              <button
-                                onClick={(e) => markSingleRead(n.id, e)}
-                                className="text-gray-400 hover:text-[#003E83] p-1 cursor-pointer"
-                                title="Mark as read"
-                              >
-                                <CheckCheck className="w-3.5 h-3.5" />
-                              </button>
-                            )}
+                            <p className="text-gray-900 dark:text-zinc-200 line-clamp-2">{n.message || n.title}</p>
+                            <span className="text-[10px] text-gray-400 mt-1 block">Just now</span>
                           </div>
                         ))
-                      ) : (
-                        <div className="py-8 text-center text-gray-500 dark:text-zinc-400">
-                          <Bell className="w-8 h-8 mx-auto text-gray-300 dark:text-zinc-600 mb-2 opacity-50" />
-                          <p className="text-xs font-medium">No notifications yet</p>
-                        </div>
                       )}
                     </div>
-
-                    <div className="px-4 py-2 border-t border-gray-100 dark:border-zinc-800 text-center">
+                    <div className="p-2 border-t border-gray-100 dark:border-zinc-800 text-center">
                       <Link
                         to="/notifications"
                         onClick={() => setNotifDropdownOpen(false)}
-                        className="text-xs text-[#003E83] dark:text-[#60a5fa] hover:underline font-bold flex items-center justify-center gap-1"
+                        className="text-xs font-bold text-[#287dfa] hover:underline"
                       >
-                        <span>View all in Notifications Center</span>
-                        <ArrowRight className="w-3 h-3" />
+                        View all notifications
                       </Link>
                     </div>
                   </div>
@@ -419,618 +388,155 @@ export default function Header() {
               </div>
             )}
 
-            {/* Theme Selector Dropdown (Light / Dark / Device) */}
-            <div className="relative shrink-0" ref={themeDropdownRef}>
+            {/* Theme Toggle Dropdown */}
+            <div className="relative" ref={themeDropdownRef}>
               <button
                 type="button"
                 onClick={() => setThemeDropdownOpen(!themeDropdownOpen)}
-                className={`p-2 rounded-lg transition-colors shrink-0 cursor-pointer ${
-                  themeDropdownOpen
-                    ? 'bg-blue-50 dark:bg-zinc-800 text-[#003E83] dark:text-[#60a5fa]'
-                    : 'text-gray-600 dark:text-zinc-300 hover:bg-gray-100 dark:hover:bg-zinc-800'
-                }`}
-                title={`Theme: ${currentTheme === 'system' ? 'Device' : currentTheme.charAt(0).toUpperCase() + currentTheme.slice(1)}`}
-                aria-label="Select color theme"
+                className="p-2 rounded-xl text-gray-600 dark:text-zinc-300 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+                title="Appearance"
               >
-                {currentTheme === 'light' ? (
-                  <Sun className="w-4 h-4 text-amber-500" />
-                ) : currentTheme === 'dark' ? (
-                  <Moon className="w-4 h-4 text-blue-400" />
-                ) : (
-                  <Monitor className="w-4 h-4 text-gray-600 dark:text-zinc-300" />
-                )}
+                {currentTheme === 'dark' ? <Moon size={18} /> : currentTheme === 'light' ? <Sun size={18} /> : <Monitor size={18} />}
               </button>
 
               {themeDropdownOpen && (
-                <div className="absolute right-0 mt-2 w-36 bg-white dark:bg-zinc-900 rounded-xl shadow-lg border border-gray-200 dark:border-zinc-800 py-1.5 z-50 animate-smooth-pop text-xs">
-                  <div className="px-3 py-1 text-[10px] font-bold text-gray-400 dark:text-zinc-500 uppercase tracking-wider">
-                    Theme
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={() => handleSelectTheme('light')}
-                    className={`w-full flex items-center justify-between px-3 py-2 text-left transition-colors cursor-pointer ${
-                      currentTheme === 'light'
-                        ? 'bg-blue-50/80 dark:bg-blue-950/50 text-[#003E83] dark:text-[#60a5fa] font-bold'
-                        : 'text-gray-700 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-800'
-                    }`}
-                  >
-                    <div className="flex items-center gap-2.5">
-                      <Sun className="w-3.5 h-3.5 text-amber-500" />
-                      <span>Light</span>
-                    </div>
-                    {currentTheme === 'light' && <Check className="w-3.5 h-3.5 text-[#003E83] dark:text-[#60a5fa]" />}
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => handleSelectTheme('dark')}
-                    className={`w-full flex items-center justify-between px-3 py-2 text-left transition-colors cursor-pointer ${
-                      currentTheme === 'dark'
-                        ? 'bg-blue-50/80 dark:bg-blue-950/50 text-[#003E83] dark:text-[#60a5fa] font-bold'
-                        : 'text-gray-700 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-800'
-                    }`}
-                  >
-                    <div className="flex items-center gap-2.5">
-                      <Moon className="w-3.5 h-3.5 text-blue-400" />
-                      <span>Dark</span>
-                    </div>
-                    {currentTheme === 'dark' && <Check className="w-3.5 h-3.5 text-[#003E83] dark:text-[#60a5fa]" />}
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => handleSelectTheme('system')}
-                    className={`w-full flex items-center justify-between px-3 py-2 text-left transition-colors cursor-pointer ${
-                      currentTheme === 'system'
-                        ? 'bg-blue-50/80 dark:bg-blue-950/50 text-[#003E83] dark:text-[#60a5fa] font-bold'
-                        : 'text-gray-700 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-800'
-                    }`}
-                  >
-                    <div className="flex items-center gap-2.5">
-                      <Monitor className="w-3.5 h-3.5 text-gray-500 dark:text-zinc-400" />
-                      <span>Device</span>
-                    </div>
-                    {currentTheme === 'system' && <Check className="w-3.5 h-3.5 text-[#003E83] dark:text-[#60a5fa]" />}
-                  </button>
+                <div className="absolute right-0 mt-2 w-36 bg-white dark:bg-zinc-900 rounded-2xl shadow-xl border border-gray-100 dark:border-zinc-800 py-1.5 z-50 animate-in fade-in">
+                  {[
+                    { id: 'light', label: 'Light', icon: Sun },
+                    { id: 'dark', label: 'Dark', icon: Moon },
+                    { id: 'system', label: 'System', icon: Monitor }
+                  ].map((t) => {
+                    const TIcon = t.icon;
+                    return (
+                      <button
+                        key={t.id}
+                        type="button"
+                        onClick={() => handleSelectTheme(t.id)}
+                        className="w-full flex items-center justify-between px-3 py-1.5 text-xs font-medium text-gray-700 dark:text-zinc-300 hover:bg-gray-100 dark:hover:bg-zinc-800"
+                      >
+                        <span className="flex items-center gap-2">
+                          <TIcon size={14} />
+                          {t.label}
+                        </span>
+                        {currentTheme === t.id && <Check size={14} className="text-[#287dfa]" />}
+                      </button>
+                    );
+                  })}
                 </div>
               )}
             </div>
 
-            {/* User Profile or Sign In / Register */}
+            {/* User Account / Sign In & Register */}
             {isAuthenticated ? (
-              <div className="relative shrink-0" ref={dropdownRef}>
+              <div className="relative" ref={dropdownRef}>
                 <button
+                  type="button"
                   onClick={() => setDropdownOpen(!dropdownOpen)}
-                  className={`flex items-center gap-2 pl-1.5 pr-2.5 py-1 rounded-full border transition-all cursor-pointer ${
-                    dropdownOpen
-                      ? 'border-[#003E83] dark:border-blue-400 bg-blue-50/50 dark:bg-zinc-800'
-                      : 'border-gray-200 dark:border-zinc-700 bg-gray-50/80 dark:bg-zinc-800/80 hover:bg-gray-100 dark:hover:bg-zinc-700'
-                  }`}
+                  className="flex items-center gap-2 p-1 pl-2 rounded-full border border-gray-200 dark:border-zinc-700 hover:border-[#287dfa] transition-all cursor-pointer bg-gray-50/50 dark:bg-zinc-800/40"
                 >
-                  {user?.avatar ? (
-                    <img
-                      src={user.avatar}
-                      alt={user.name}
-                      className="w-6 h-6 rounded-full object-cover ring-1 ring-white dark:ring-zinc-900"
-                    />
-                  ) : (
-                    <div className="w-6 h-6 rounded-full bg-[#003E83] text-white font-bold text-[11px] flex items-center justify-center shadow-xs">
-                      {user?.name?.charAt(0) || 'U'}
-                    </div>
-                  )}
-                  <span className="max-w-[85px] lg:max-w-[110px] truncate text-xs font-semibold text-gray-800 dark:text-zinc-200">
-                    {user?.name}
+                  <div className="w-7 h-7 rounded-full bg-[#287dfa] text-white flex items-center justify-center font-bold text-xs uppercase overflow-hidden">
+                    {user?.avatar ? (
+                      <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
+                    ) : (
+                      user?.name?.[0] || 'T'
+                    )}
+                  </div>
+                  <span className="hidden md:inline font-bold text-xs truncate max-w-[100px] text-gray-800 dark:text-zinc-200">
+                    {user?.name || 'Traveler'}
                   </span>
-                  <ChevronDown className={`w-3.5 h-3.5 text-gray-400 transition-transform ${dropdownOpen ? 'rotate-180' : ''}`} />
+                  <ChevronDown size={13} className="text-gray-400 mr-1" />
                 </button>
 
                 {dropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-zinc-900 rounded-lg shadow-lg border border-gray-200 dark:border-zinc-800 py-1.5 z-50 animate-smooth-pop text-xs">
-                    <div className="px-3.5 py-2.5 border-b border-gray-100 dark:border-zinc-800/80">
-                      <div className="flex items-center justify-between gap-1">
-                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Account</span>
-                        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded capitalize bg-blue-100 dark:bg-blue-950/80 text-blue-800 dark:text-blue-300">
-                          {(user?.role || 'tourist').replace('_', ' ')}
+                  <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-zinc-900 rounded-3xl shadow-2xl border border-gray-100 dark:border-zinc-800 p-2 z-50 animate-in fade-in space-y-1">
+                    {/* Member Tier Card */}
+                    <div className="p-3 rounded-2xl bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-zinc-800 dark:to-zinc-800/80 mb-2 border border-blue-100 dark:border-zinc-700">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-black text-[#0f294d] dark:text-white">Diamond Member</span>
+                        <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-amber-400 text-gray-900">
+                          Tier 4
                         </span>
                       </div>
-                      <p className="font-bold text-gray-900 dark:text-white truncate text-xs mt-0.5">{user?.name}</p>
-                      <p className="text-gray-500 dark:text-zinc-400 truncate text-[11px]">{user?.email}</p>
+                      <div className="flex items-center gap-1.5 mt-2 text-xs font-bold text-[#287dfa]">
+                        <Coins size={14} className="text-amber-500" />
+                        <span>1,250 Trip Coins ($12.50)</span>
+                      </div>
                     </div>
 
-                    <div className="py-1">
-                      {/* Role Dashboard Link inside dropdown */}
-                      {isBusinessOwner && (
-                        <>
-                          <Link
-                          to={getDashboardPath()}
-                          onClick={() => setDropdownOpen(false)}
-                          className={`flex items-center gap-2.5 px-3.5 py-2 transition-colors ${
-                            isLinkActive(getDashboardPath())
-                              ? 'bg-blue-50/60 dark:bg-blue-950/40 text-[#003E83] dark:text-[#60a5fa] font-bold'
-                              : 'text-gray-700 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-800 hover:text-[#003E83] dark:hover:text-[#60a5fa] font-medium'
-                          }`}
-                        >
-                          <LayoutDashboard className={`w-3.5 h-3.5 ${
-                            isLinkActive(getDashboardPath())
-                              ? 'text-[#003E83] dark:text-[#60a5fa]'
-                              : 'text-gray-400 dark:text-zinc-500'
-                          }`} /> 
-                          <span>Business Dashboard</span>
-                        </Link>
-                        <Link
-                          to="/business/bookings"
-                          onClick={() => setDropdownOpen(false)}
-                          className={`flex items-center gap-2.5 px-3.5 py-2 transition-colors ${
-                            isLinkActive('/business/bookings')
-                              ? 'bg-blue-50/60 dark:bg-blue-950/40 text-[#003E83] dark:text-[#60a5fa] font-bold'
-                              : 'text-gray-700 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-800 hover:text-[#003E83] dark:hover:text-[#60a5fa] font-medium'
-                          }`}
-                        >
-                          <CalendarCheck className={`w-3.5 h-3.5 ${
-                            isLinkActive('/business/bookings') ? 'text-[#003E83] dark:text-[#60a5fa]' : 'text-gray-400 dark:text-zinc-500'
-                          }`} />
-                          <span>Customer Bookings</span>
-                        </Link>
-                        <Link
-                          to="/business/reports"
-                          onClick={() => setDropdownOpen(false)}
-                          className={`flex items-center gap-2.5 px-3.5 py-2 transition-colors ${
-                            isLinkActive('/business/reports')
-                              ? 'bg-blue-50/60 dark:bg-blue-950/40 text-[#003E83] dark:text-[#60a5fa] font-bold'
-                              : 'text-gray-700 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-800 hover:text-[#003E83] dark:hover:text-[#60a5fa] font-medium'
-                          }`}
-                        >
-                          <FileSpreadsheet className={`w-3.5 h-3.5 ${
-                            isLinkActive('/business/reports') ? 'text-[#003E83] dark:text-[#60a5fa]' : 'text-gray-400 dark:text-zinc-500'
-                          }`} />
-                          <span>Business Reports</span>
-                        </Link>
-                        </>
-                      )}
+                    <Link
+                      to="/travel-user"
+                      className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-gray-700 dark:text-zinc-200 hover:bg-blue-50 dark:hover:bg-zinc-800 hover:text-[#287dfa]"
+                    >
+                      <User size={15} />
+                      <span>Traveler Space</span>
+                    </Link>
 
-                      {isTourGuide && (
-                        <>
-                          <Link
-                            to="/guide/dashboard"
-                            onClick={() => setDropdownOpen(false)}
-                            className={`flex items-center gap-2.5 px-3.5 py-2 transition-colors ${
-                              isLinkActive('/guide/dashboard')
-                                ? 'bg-blue-50/60 dark:bg-blue-950/40 text-[#003E83] dark:text-[#60a5fa] font-bold'
-                                : 'text-gray-700 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-800 hover:text-[#003E83] dark:hover:text-[#60a5fa] font-medium'
-                            }`}
-                          >
-                            <LayoutDashboard className={`w-3.5 h-3.5 ${
-                              isLinkActive('/guide/dashboard')
-                                ? 'text-[#003E83] dark:text-[#60a5fa]'
-                                : 'text-gray-400 dark:text-zinc-500'
-                            }`} />
-                            <span>Guide Portal</span>
-                          </Link>
-                          <Link
-                            to="/guide/places"
-                            onClick={() => setDropdownOpen(false)}
-                            className={`flex items-center gap-2.5 px-3.5 py-2 transition-colors ${
-                              isLinkActive('/guide/places')
-                                ? 'bg-blue-50/60 dark:bg-blue-950/40 text-[#003E83] dark:text-[#60a5fa] font-bold'
-                                : 'text-gray-700 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-800 hover:text-[#003E83] dark:hover:text-[#60a5fa] font-medium'
-                            }`}
-                          >
-                            <Compass className={`w-3.5 h-3.5 ${
-                              isLinkActive('/guide/places') ? 'text-[#003E83] dark:text-[#60a5fa]' : 'text-gray-400 dark:text-zinc-500'
-                            }`} />
-                            <span>Curate Places</span>
-                          </Link>
-                        </>
-                      )}
+                    <Link
+                      to="/bookings"
+                      className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-gray-700 dark:text-zinc-200 hover:bg-blue-50 dark:hover:bg-zinc-800 hover:text-[#287dfa]"
+                    >
+                      <CalendarCheck size={15} />
+                      <span>My Bookings</span>
+                    </Link>
 
-                      <Link
-                        to="/travel-user"
-                        onClick={() => setDropdownOpen(false)}
-                        className={`flex items-center gap-2.5 px-3.5 py-2 transition-colors ${
-                          isLinkActive('/travel-user')
-                            ? 'bg-blue-50/60 dark:bg-blue-950/40 text-[#003E83] dark:text-[#60a5fa] font-bold'
-                            : 'text-gray-700 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-800 hover:text-[#003E83] dark:hover:text-[#60a5fa] font-medium'
-                        }`}
-                      >
-                        <Sparkles className={`w-3.5 h-3.5 ${isLinkActive('/travel-user') ? 'text-[#003E83] dark:text-[#60a5fa]' : 'text-amber-500'}`} />
-                        <span className="font-bold text-[#003E83] dark:text-blue-300">Traveler Space</span>
-                      </Link>
-
-                      <Link
-                        to="/profile"
-                        onClick={() => setDropdownOpen(false)}
-                        className={`flex items-center gap-2.5 px-3.5 py-2 transition-colors ${
-                          isLinkActive('/profile')
-                            ? 'bg-blue-50/60 dark:bg-blue-950/40 text-[#003E83] dark:text-[#60a5fa] font-bold'
-                            : 'text-gray-700 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-800 hover:text-[#003E83] dark:hover:text-[#60a5fa] font-medium'
-                        }`}
-                      >
-                        <User className={`w-3.5 h-3.5 ${isLinkActive('/profile') ? 'text-[#003E83] dark:text-[#60a5fa]' : 'text-gray-400 dark:text-zinc-500'}`} />
-                        <span>My Profile</span>
-                      </Link>
-
-                      <Link
-                        to="/trips"
-                        onClick={() => setDropdownOpen(false)}
-                        className={`flex items-center gap-2.5 px-3.5 py-2 transition-colors ${
-                          isLinkActive('/trips')
-                            ? 'bg-blue-50/60 dark:bg-blue-950/40 text-[#003E83] dark:text-[#60a5fa] font-bold'
-                            : 'text-gray-700 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-800 hover:text-[#003E83] dark:hover:text-[#60a5fa] font-medium'
-                        }`}
-                      >
-                        <Compass className={`w-3.5 h-3.5 ${isLinkActive('/trips') ? 'text-[#003E83] dark:text-[#60a5fa]' : 'text-gray-400 dark:text-zinc-500'}`} />
-                        <span>My Trips & Plans</span>
-                      </Link>
-
-                      <Link
-                        to="/bookings"
-                        onClick={() => setDropdownOpen(false)}
-                        className={`flex items-center gap-2.5 px-3.5 py-2 transition-colors ${
-                          isLinkActive('/bookings')
-                            ? 'bg-blue-50/60 dark:bg-blue-950/40 text-[#003E83] dark:text-[#60a5fa] font-bold'
-                            : 'text-gray-700 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-800 hover:text-[#003E83] dark:hover:text-[#60a5fa] font-medium'
-                        }`}
-                      >
-                        <CalendarCheck className={`w-3.5 h-3.5 ${isLinkActive('/bookings') ? 'text-[#003E83] dark:text-[#60a5fa]' : 'text-gray-400 dark:text-zinc-500'}`} />
-                        <span>My Bookings</span>
-                      </Link>
-
-                      <Link
-                        to="/tours"
-                        onClick={() => setDropdownOpen(false)}
-                        className={`flex items-center gap-2.5 px-3.5 py-2 transition-colors ${
-                          isLinkActive('/tours')
-                            ? 'bg-blue-50/60 dark:bg-blue-950/40 text-[#003E83] dark:text-[#60a5fa] font-bold'
-                            : 'text-gray-700 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-800 hover:text-[#003E83] dark:hover:text-[#60a5fa] font-medium'
-                        }`}
-                      >
-                        <Sparkles className={`w-3.5 h-3.5 ${isLinkActive('/tours') ? 'text-[#003E83] dark:text-[#60a5fa]' : 'text-amber-500'}`} />
-                        <span>Recommended Tours</span>
-                      </Link>
-
-                      <Link
-                        to="/notifications"
-                        onClick={() => setDropdownOpen(false)}
-                        className={`flex items-center justify-between px-3.5 py-2 transition-colors ${
-                          isLinkActive('/notifications')
-                            ? 'bg-blue-50/60 dark:bg-blue-950/40 text-[#003E83] dark:text-[#60a5fa] font-bold'
-                            : 'text-gray-700 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-800 hover:text-[#003E83] dark:hover:text-[#60a5fa] font-medium'
-                        }`}
-                      >
-                        <div className="flex items-center gap-2.5">
-                          <Bell className={`w-3.5 h-3.5 ${isLinkActive('/notifications') ? 'text-[#003E83] dark:text-[#60a5fa]' : 'text-gray-400 dark:text-zinc-500'}`} />
-                          <span>Notifications</span>
-                        </div>
-                        {unreadCount > 0 && (
-                          <span className="px-1.5 py-0.2 bg-red-100 dark:bg-red-950 text-red-600 dark:text-red-400 rounded-full font-bold text-[10px]">
-                            {unreadCount}
+                    <Link
+                      to="/favorites"
+                      className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-gray-700 dark:text-zinc-200 hover:bg-blue-50 dark:hover:bg-zinc-800 hover:text-[#287dfa]"
+                    >
+                      <Heart size={15} />
+                      <div className="flex items-center justify-between flex-1">
+                        <span>Wishlist</span>
+                        {wishlistCount > 0 && (
+                          <span className="text-[10px] font-bold px-1.5 py-0.2 bg-rose-100 text-rose-600 rounded-full">
+                            {wishlistCount}
                           </span>
                         )}
-                      </Link>
+                      </div>
+                    </Link>
 
+                    <Link
+                      to="/achievements"
+                      className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-gray-700 dark:text-zinc-200 hover:bg-blue-50 dark:hover:bg-zinc-800 hover:text-[#287dfa]"
+                    >
+                      <Coins size={15} />
+                      <span>Trip Coins & Badges</span>
+                    </Link>
 
-                      <Link
-                        to="/achievements"
-                        onClick={() => setDropdownOpen(false)}
-                        className={`flex items-center gap-2.5 px-3.5 py-2 transition-colors ${
-                          isLinkActive('/achievements')
-                            ? 'bg-blue-50/60 dark:bg-blue-950/40 text-[#003E83] dark:text-[#60a5fa] font-bold'
-                            : 'text-gray-700 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-800 hover:text-[#003E83] dark:hover:text-[#60a5fa] font-medium'
-                        }`}
+                    <Link
+                      to="/settings"
+                      className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-gray-700 dark:text-zinc-200 hover:bg-blue-50 dark:hover:bg-zinc-800 hover:text-[#287dfa]"
+                    >
+                      <Settings size={15} />
+                      <span>Account Settings</span>
+                    </Link>
+
+                    <div className="pt-1 border-t border-gray-100 dark:border-zinc-800">
+                      <button
+                        type="button"
+                        onClick={handleLogout}
+                        className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 text-left"
                       >
-                        <Award className={`w-3.5 h-3.5 ${isLinkActive('/achievements') ? 'text-[#003E83] dark:text-[#60a5fa]' : 'text-gray-400 dark:text-zinc-500'}`} />
-                        <span>Badges & Points</span>
-                      </Link>
-
-                      <button 
-                        onClick={() => { setDropdownOpen(false); toggleChat(); }} 
-                        className="w-full flex items-center gap-2.5 px-3.5 py-2 text-gray-700 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-800 hover:text-[#003E83] dark:hover:text-[#60a5fa] text-left font-medium transition-colors cursor-pointer"
-                      >
-                        <MessageSquare className="w-3.5 h-3.5 text-gray-400 dark:text-zinc-500" />
-                        <span>AI Support Chat</span>
-                      </button>
-                    </div>
-
-                    <div className="border-t border-gray-100 dark:border-zinc-800/80 py-1">
-                      <Link
-                        to="/settings"
-                        onClick={() => setDropdownOpen(false)}
-                        className={`flex items-center gap-2.5 px-3.5 py-2 transition-colors ${
-                          isLinkActive('/settings')
-                            ? 'bg-blue-50/60 dark:bg-blue-950/40 text-[#003E83] dark:text-[#60a5fa] font-bold'
-                            : 'text-gray-700 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-800 hover:text-[#003E83] dark:hover:text-[#60a5fa] font-medium'
-                        }`}
-                      >
-                        <Settings className={`w-3.5 h-3.5 ${isLinkActive('/settings') ? 'text-[#003E83] dark:text-[#60a5fa]' : 'text-gray-400 dark:text-zinc-500'}`} />
-                        <span>Emergency & Help</span>
-                      </Link>
-
-                      <Link
-                        to="/deletion-request"
-                        className={`flex items-center gap-2.5 px-3.5 py-2 transition-colors ${
-                          isLinkActive('/deletion-request') || isLinkActive('/delete')
-                            ? 'bg-blue-50/60 dark:bg-blue-950/40 text-[#003E83] dark:text-[#60a5fa] font-bold'
-                            : 'text-gray-700 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-800 hover:text-[#003E83] dark:hover:text-[#60a5fa] font-medium'
-                        }`}
-                      >
-                        <ShieldAlert className={`w-3.5 h-3.5 ${isLinkActive('/deletion-request') || isLinkActive('/delete') ? 'text-[#003E83] dark:text-[#60a5fa]' : 'text-gray-400 dark:text-zinc-500'}`} />
-                        <span>Privacy & Data</span>
-                      </Link>
-                    </div>
-
-                    <div className="border-t border-gray-100 dark:border-zinc-800/80 pt-1">
-                      <button 
-                        onClick={handleLogout} 
-                        className="w-full flex items-center gap-2.5 px-3.5 py-2 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 text-left font-bold transition-colors cursor-pointer"
-                      >
-                        <LogOut className="w-3.5 h-3.5" /> Sign Out
+                        <LogOut size={15} />
+                        <span>Sign Out</span>
                       </button>
                     </div>
                   </div>
                 )}
               </div>
             ) : (
-              <div className="hidden sm:flex items-center gap-1.5 sm:gap-2 shrink-0">
-                <button
-                  onClick={() => openAuthModal('login')}
-                  className="px-3 py-1.5 text-xs font-semibold whitespace-nowrap shrink-0 text-gray-700 dark:text-zinc-300 hover:text-[#003E83] dark:hover:text-[#60a5fa] hover:bg-gray-100/70 dark:hover:bg-zinc-800 rounded-lg transition-colors cursor-pointer"
-                >
-                  Sign In
-                </button>
-                <button
-                  onClick={() => openAuthModal('register')}
-                  className="px-3.5 py-1.5 text-xs font-semibold whitespace-nowrap shrink-0 text-white bg-[#003E83] hover:bg-[#002e62] dark:bg-blue-600 dark:hover:bg-blue-700 rounded-lg shadow-xs transition-all cursor-pointer active:scale-98"
-                >
-                  Register
-                </button>
-              </div>
+              <button
+                type="button"
+                onClick={openAuthModal}
+                className="px-4 py-2 rounded-xl bg-[#287dfa] hover:bg-[#1a6de8] text-white text-xs font-bold transition-all shadow-sm active:scale-95 cursor-pointer whitespace-nowrap"
+              >
+                Sign in / Register
+              </button>
             )}
 
-            {/* Mobile Menu Toggle Button */}
-            <button
-              onClick={() => setMenuOpen(!menuOpen)}
-              className="p-2 rounded-lg text-gray-600 dark:text-zinc-300 hover:bg-gray-100 dark:hover:bg-zinc-800 lg:hidden transition-colors cursor-pointer"
-              aria-label="Toggle mobile menu"
-            >
-              {menuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-            </button>
-
           </div>
+
         </div>
       </div>
-
-      {/* Mobile Drawer Menu */}
-      {menuOpen && (
-        <div 
-          ref={mobileMenuRef}
-          className="lg:hidden border-t border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-4 py-4 pb-24 space-y-3 animate-smooth-pop text-xs shadow-md relative z-50 max-h-[85vh] overflow-y-auto"
-        >
-
-
-          {/* Mobile Navigation Links */}
-          <div className="space-y-1 pt-1">
-            {navLinks.map((link) => {
-              const active = isLinkActive(link.path);
-              const Icon = link.icon;
-              return (
-                <Link
-                  key={link.name}
-                  to={link.path}
-                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg font-semibold transition-colors ${
-                    active
-                      ? 'bg-blue-50 dark:bg-blue-950/60 text-[#003E83] dark:text-[#60a5fa]'
-                      : 'text-gray-700 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-800'
-                  }`}
-                >
-                  <Icon className={`w-4 h-4 ${active ? 'text-[#003E83] dark:text-[#60a5fa]' : 'text-gray-400'}`} />
-                  <span>{link.name}</span>
-                </Link>
-              );
-            })}
-          </div>
-
-          {/* Quick Access Badges/Links */}
-          <div className="border-t border-gray-100 dark:border-zinc-800 pt-2 space-y-1">
-            {(isBusinessOwner) && (
-              <Link
-                to={getDashboardPath()}
-                onClick={() => setMenuOpen(false)}
-                className="flex items-center gap-3 px-3 py-2 rounded-lg font-bold text-[#003E83] dark:text-blue-400 bg-blue-50 dark:bg-blue-950/50"
-              >
-                <LayoutDashboard className="w-4 h-4 text-[#003E83] dark:text-blue-400" />
-                <span>Business Owner Dashboard</span>
-              </Link>
-            )}
-            {(isBusinessOwner) && (
-              <Link
-                to="/business/bookings"
-                onClick={() => setMenuOpen(false)}
-                className="flex items-center gap-3 px-3 py-2 rounded-lg font-bold text-gray-700 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-800"
-              >
-                <CalendarCheck className="w-4 h-4 text-[#003E83] dark:text-[#60a5fa]" />
-                <span>Customer Bookings</span>
-              </Link>
-            )}
-            {(isBusinessOwner) && (
-              <Link
-                to="/business/reports"
-                onClick={() => setMenuOpen(false)}
-                className="flex items-center gap-3 px-3 py-2 rounded-lg font-bold text-gray-700 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-800"
-              >
-                <FileSpreadsheet className="w-4 h-4 text-[#003E83] dark:text-[#60a5fa]" />
-                <span>Business Reports</span>
-              </Link>
-            )}
-            {(isTourGuide) && (
-              <>
-                <Link
-                  to="/guide/dashboard"
-                  onClick={() => setMenuOpen(false)}
-                  className="flex items-center gap-3 px-3 py-2 rounded-lg font-bold text-[#003E83] dark:text-blue-400 bg-blue-50 dark:bg-blue-950/50"
-                >
-                  <LayoutDashboard className="w-4 h-4 text-[#003E83] dark:text-blue-400" />
-                  <span>Tour Guide Portal</span>
-                </Link>
-                <Link
-                  to="/guide/places"
-                  onClick={() => setMenuOpen(false)}
-                  className="flex items-center gap-3 px-3 py-2 rounded-lg font-bold text-gray-700 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-800"
-                >
-                  <Compass className="w-4 h-4 text-[#003E83] dark:text-[#60a5fa]" />
-                  <span>Curate Destinations</span>
-                </Link>
-              </>
-            )}
-            {isAuthenticated && (
-              <>
-                <Link
-                  to="/trips"
-                  onClick={() => setMenuOpen(false)}
-                  className="flex items-center gap-3 px-3 py-2 rounded-lg font-medium text-gray-700 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-800"
-                >
-                  <Compass className="w-4 h-4 text-[#003E83] dark:text-blue-400" />
-                  <span>My Trips & Itineraries</span>
-                </Link>
-                <Link
-                  to="/bookings"
-                  onClick={() => setMenuOpen(false)}
-                  className="flex items-center gap-3 px-3 py-2 rounded-lg font-medium text-gray-700 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-800"
-                >
-                  <CalendarCheck className="w-4 h-4 text-emerald-500" />
-                  <span>My Bookings</span>
-                </Link>
-              </>
-            )}
-
-
-            <Link
-              to="/achievements"
-              onClick={() => setMenuOpen(false)}
-              className="flex items-center gap-3 px-3 py-2 rounded-lg font-medium text-gray-700 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-800"
-            >
-              <Award className="w-4 h-4 text-amber-500" />
-              <span>Badges & Achievements</span>
-            </Link>
-
-            <button
-              onClick={() => {
-                setMenuOpen(false);
-                toggleChat();
-              }}
-              className="w-full flex items-center gap-3 px-3 py-2 rounded-lg font-medium text-gray-700 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-800 text-left"
-            >
-              <MessageSquare className="w-4 h-4 text-blue-500" />
-              <span>AI Support Assistant</span>
-            </button>
-
-            <Link
-              to="/settings"
-              onClick={() => setMenuOpen(false)}
-              className="flex items-center gap-3 px-3 py-2 rounded-lg font-medium text-gray-700 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-800"
-            >
-              <ShieldAlert className="w-4 h-4 text-emerald-500" />
-              <span>Emergency Guidelines</span>
-            </Link>
-
-            {/* Appearance Toggle (Mobile) */}
-            <div className="px-3 py-2.5 rounded-lg bg-gray-50 dark:bg-zinc-800/60 border border-gray-200/80 dark:border-zinc-800">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold text-gray-700 dark:text-zinc-300">Theme</span>
-                <span className="text-[10px] font-bold uppercase tracking-wider text-[#003E83] dark:text-[#60a5fa]">
-                  {currentTheme === 'system' ? 'Device' : currentTheme}
-                </span>
-              </div>
-              <div className="grid grid-cols-3 gap-1 bg-gray-200/70 dark:bg-zinc-900 p-1 rounded-lg">
-                <button
-                  type="button"
-                  onClick={() => handleSelectTheme('light')}
-                  className={`flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-semibold transition-all cursor-pointer ${
-                    currentTheme === 'light'
-                      ? 'bg-white dark:bg-zinc-800 text-gray-900 dark:text-white shadow-xs'
-                      : 'text-gray-500 dark:text-zinc-400 hover:text-gray-800 dark:hover:text-zinc-200'
-                  }`}
-                >
-                  <Sun className="w-3.5 h-3.5 text-amber-500" />
-                  <span>Light</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleSelectTheme('dark')}
-                  className={`flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-semibold transition-all cursor-pointer ${
-                    currentTheme === 'dark'
-                      ? 'bg-white dark:bg-zinc-800 text-gray-900 dark:text-white shadow-xs'
-                      : 'text-gray-500 dark:text-zinc-400 hover:text-gray-800 dark:hover:text-zinc-200'
-                  }`}
-                >
-                  <Moon className="w-3.5 h-3.5 text-blue-400" />
-                  <span>Dark</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleSelectTheme('system')}
-                  className={`flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-semibold transition-all cursor-pointer ${
-                    currentTheme === 'system'
-                      ? 'bg-white dark:bg-zinc-800 text-gray-900 dark:text-white shadow-xs'
-                      : 'text-gray-500 dark:text-zinc-400 hover:text-gray-800 dark:hover:text-zinc-200'
-                  }`}
-                >
-                  <Monitor className="w-3.5 h-3.5 text-gray-500 dark:text-zinc-400" />
-                  <span>Device</span>
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Auth Section in Mobile Menu */}
-          <div className="border-t border-gray-100 dark:border-zinc-800 pt-3 pb-8">
-            {isAuthenticated ? (
-              <div className="space-y-2">
-                <div className="flex items-center gap-2.5 px-3 py-1">
-                  {user?.avatar ? (
-                    <img
-                      src={user.avatar}
-                      alt={user.name}
-                      className="w-8 h-8 rounded-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-8 h-8 rounded-full bg-[#003E83] text-white font-bold text-xs flex items-center justify-center">
-                      {user?.name?.charAt(0) || 'U'}
-                    </div>
-                  )}
-                  <div className="overflow-hidden">
-                    <p className="font-bold text-gray-900 dark:text-white truncate">{user?.name}</p>
-                    <p className="text-gray-500 dark:text-zinc-400 text-[11px] truncate">{user?.email}</p>
-                  </div>
-                </div>
-                <button
-                  onClick={handleLogout}
-                  className="w-full flex items-center justify-center gap-2 px-3 py-2 font-bold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded-lg transition-colors cursor-pointer"
-                >
-                  <LogOut className="w-4 h-4" />
-                  Sign Out
-                </button>
-              </div>
-            ) : (
-              <div className="grid grid-cols-2 gap-2 pr-12 sm:pr-0">
-                <button
-                  onClick={() => openAuthModal('login')}
-                  className="py-2 text-center font-bold rounded-lg border border-gray-300 dark:border-zinc-700 text-gray-700 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-800 transition-colors"
-                >
-                  Sign In
-                </button>
-                <button
-                  onClick={() => openAuthModal('register')}
-                  className="py-2 text-center font-bold rounded-lg bg-[#003E83] hover:bg-[#002e62] text-white transition-colors shadow-xs"
-                >
-                  Register
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
     </header>
   );
 }

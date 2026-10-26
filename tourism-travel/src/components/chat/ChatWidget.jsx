@@ -395,21 +395,34 @@ export default function ChatWidget() {
           <ChevronUp className="w-6 h-6 stroke-[2.8]" />
         </button>
 
-        {/* Floating Action Button - Animated AI Genie Mascot */}
-        <button
-          ref={toggleButtonRef}
-          onClick={toggleChat}
-          className="w-14 h-14 sm:w-15 sm:h-15 rounded-full p-0 flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer shadow-xl animate-genie-pulse group overflow-visible relative"
-          title="Open Angkor Verse AI Genie"
-          aria-label="Open AI Travel Chat"
-        >
-          <GenieBotIcon className="w-full h-full" animate={true} />
-          {/* Online green indicator dot */}
-          <span className="absolute top-0 right-0 sm:top-0.5 sm:right-0.5 flex h-3.5 w-3.5">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-emerald-500 border-2 border-white dark:border-zinc-900"></span>
-          </span>
-        </button>
+        {/* Floating Action Button - Animated AI TripGenie Mascot with Speech Bubble */}
+        <div className="relative flex items-center gap-2">
+          {/* TripGenie Speech Bubble matching Trip.com */}
+          <div
+            onClick={toggleChat}
+            className="hidden sm:flex flex-col items-start px-3 py-1.5 rounded-xl bg-[#0f294d] text-white text-[11px] font-bold shadow-lg cursor-pointer hover:bg-[#1a3860] transition-all relative border border-blue-400/20 group"
+          >
+            <span className="leading-tight">Hi! TripGenie is here.</span>
+            <span className="text-[10px] text-blue-200 font-normal">Chat with me</span>
+            {/* Arrow pointing right */}
+            <div className="absolute top-1/2 -right-1 -translate-y-1/2 w-2 h-2 bg-[#0f294d] rotate-45 border-r border-t border-blue-400/20 pointer-events-none" />
+          </div>
+
+          <button
+            ref={toggleButtonRef}
+            onClick={toggleChat}
+            className="w-14 h-14 sm:w-15 sm:h-15 rounded-full p-0 flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer shadow-xl animate-genie-pulse group overflow-visible relative"
+            title="Open TripGenie AI Guide"
+            aria-label="Open AI Travel Chat"
+          >
+            <GenieBotIcon className="w-full h-full" animate={true} />
+            {/* Online green indicator dot */}
+            <span className="absolute top-0 right-0 sm:top-0.5 sm:right-0.5 flex h-3.5 w-3.5">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-emerald-500 border-2 border-white dark:border-zinc-900"></span>
+            </span>
+          </button>
+        </div>
       </div>
 
       {/* Backdrop Overlay (closes chat smoothly on click outside) */}
@@ -432,7 +445,7 @@ export default function ChatWidget() {
         }`}
       >
           {/* Header */}
-          <div className="px-4 sm:px-6 py-3.5 bg-[#003E83] text-white flex items-center justify-between border-b border-[#002e62] shrink-0 shadow-sm">
+          <div className="px-4 sm:px-6 py-3.5 bg-[#0f294d] text-white flex items-center justify-between border-b border-blue-900/60 shrink-0 shadow-sm">
             <div className="flex items-center gap-3">
               <div className="w-9 h-9 rounded-full overflow-hidden flex items-center justify-center shrink-0 border border-white/20 shadow-xs">
                 <GenieBotIcon className="w-full h-full" animate={true} />
@@ -440,7 +453,7 @@ export default function ChatWidget() {
               <div>
                 <div className="flex items-center gap-2">
                   <h3 className="text-sm font-bold leading-tight tracking-tight text-white flex items-center gap-1.5">
-                    Angkor Verse AI Guide
+                    TripGenie AI Guide
                     <Sparkles className="w-3.5 h-3.5 text-amber-300" />
                   </h3>
                   <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-500/25 text-emerald-200 border border-emerald-400/30 flex items-center gap-1">

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { MapPin, ArrowRight, ExternalLink, Map as MapIcon, Image as ImageIcon, Users, Maximize2 } from 'lucide-react';
+import { MapPin, ArrowRight, ExternalLink, Map as MapIcon, Image as ImageIcon, Users, Clock, Check } from 'lucide-react';
 
 const PROVINCE_IMAGES = {
   'Siem Reap': 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80',
@@ -37,14 +37,14 @@ export default function ProvinceCard({ province }) {
 
   const mapQuery = encodeURIComponent(`${province.name}, Cambodia`);
   const embedMapUrl = `https://maps.google.com/maps?q=${mapQuery}&t=&z=10&ie=UTF8&iwloc=&output=embed`;
-  const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${mapQuery}`;
 
   const imageSrc = province.image_url || province.image || PROVINCE_IMAGES[province.name] || DEFAULT_IMAGE;
+  const attractionsCount = province.places_count || 12;
 
   return (
-    <div className="group modern-card bg-white dark:bg-zinc-900 border border-gray-200/80 dark:border-zinc-800 rounded-3xl overflow-hidden shadow-xs hover:border-blue-300 dark:hover:border-blue-500/50 flex flex-col justify-between h-full transition-all">
+    <div className="group bg-white dark:bg-zinc-900 border border-gray-200/90 dark:border-zinc-800 rounded-3xl overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col justify-between h-full">
       <div>
-        {/* Cover Media Frame with Live Map Toggle */}
+        {/* Cover Media Frame */}
         <div className="relative aspect-16/10 w-full overflow-hidden bg-gray-100 dark:bg-zinc-800">
           {showLiveMap ? (
             <iframe
@@ -68,100 +68,114 @@ export default function ProvinceCard({ province }) {
                   e.target.src = DEFAULT_IMAGE;
                 }}
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent pointer-events-none" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent pointer-events-none" />
             </>
           )}
 
-          {/* Top Badges */}
-          <div className="absolute top-3 left-3 z-10">
-            <span className="px-2.5 py-1 text-[11px] font-bold rounded-full bg-white/90 dark:bg-zinc-900/90 text-gray-800 dark:text-zinc-200 shadow-sm backdrop-blur-md border border-white/20 dark:border-zinc-700">
-              {province.type || 'Province'}
+          {/* Badge Top Left */}
+          <div className="absolute top-3.5 left-3.5 z-10">
+            <span className="px-3.5 py-1 text-[11px] font-black uppercase tracking-wider rounded-full bg-[#2563eb] text-white shadow-sm">
+              CAMBODIA PROVINCE
             </span>
           </div>
 
-          {/* Control Switchers: Map / Photo Toggle & External Google Maps Link */}
-          <div className="absolute top-3 right-3 z-10 flex items-center gap-1.5">
+          {/* Duration / Map Switcher Top Right */}
+          <div className="absolute top-3.5 right-3.5 z-10 flex items-center gap-1.5">
             <button
               type="button"
               onClick={(e) => {
                 e.preventDefault();
                 setShowLiveMap(!showLiveMap);
               }}
-              className="px-2 py-1 rounded-full bg-black/60 hover:bg-black/80 text-white text-[10px] font-semibold backdrop-blur-md transition-colors flex items-center gap-1 cursor-pointer"
+              className="px-3 py-1 text-xs font-bold rounded-full bg-white text-gray-900 shadow-sm flex items-center gap-1.5 border border-white/20 cursor-pointer"
               title={showLiveMap ? 'View Photo' : 'Interactive Map'}
             >
-              {showLiveMap ? <ImageIcon size={11} /> : <MapIcon size={11} />}
+              {showLiveMap ? <ImageIcon size={13} className="text-[#2563eb]" /> : <MapIcon size={13} className="text-[#2563eb]" />}
               <span>{showLiveMap ? 'Photo' : 'Map'}</span>
             </button>
-
-            <a
-              href={googleMapsUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="p-1 rounded-full bg-black/60 hover:bg-black/80 text-white text-[10px] backdrop-blur-md transition-colors"
-              title="Open in Google Maps"
-            >
-              <ExternalLink size={12} />
-            </a>
           </div>
 
-          {/* Bottom Title on Image */}
-          {!showLiveMap && (
-            <div className="absolute bottom-2.5 left-3 z-10 text-white">
-              <span className="text-[10px] uppercase font-bold tracking-wider text-blue-200 flex items-center gap-1">
-                <MapPin size={10} /> Cambodia
-              </span>
-            </div>
-          )}
+          {/* Location & Attractions on Image */}
+          <div className="absolute bottom-3 left-4 right-4 z-10 flex items-center justify-between text-white text-xs font-bold drop-shadow-sm">
+            <span className="flex items-center gap-1.5 truncate max-w-[200px]">
+              <MapPin size={14} className="text-amber-400 shrink-0 fill-amber-400/20" />
+              <span>{province.name}</span>
+            </span>
+            <span className="flex items-center gap-1.5 text-white/90 font-medium shrink-0">
+              <Users size={14} className="text-white/80" />
+              <span>{attractionsCount} Attractions</span>
+            </span>
+          </div>
         </div>
 
-        {/* Province Information Body */}
-        <div className="p-5 space-y-2">
+        {/* Card Body */}
+        <div className="p-5 sm:p-6 space-y-3">
+          {/* Review Rating Badge + Free Cancellation Tag */}
+          <div className="flex items-center justify-between text-xs">
+            <div className="flex items-center gap-2">
+              <span className="px-2 py-0.5 rounded-md bg-[#0f294d] text-white text-xs font-black">
+                5.0
+              </span>
+              <span className="font-bold text-[#0f294d] dark:text-white text-sm">
+                Excellent
+              </span>
+              <span className="text-xs text-gray-400 font-normal">
+                (450)
+              </span>
+            </div>
+            <span className="px-2.5 py-0.5 rounded-md bg-[#ecfdf5] dark:bg-emerald-950/50 text-[#059669] dark:text-emerald-400 text-xs font-bold">
+              Free Cancellation
+            </span>
+          </div>
+
+          {/* Title */}
           <Link to={`/provinces/${province.id}`} className="block">
-            <h3 className="text-base font-bold text-gray-900 dark:text-white group-hover:text-[#003E83] dark:group-hover:text-blue-400 transition-colors">
-              {province.name}
+            <h3 className="text-lg font-black text-[#0f294d] dark:text-white group-hover:text-[#2563eb] transition-colors line-clamp-1 leading-snug">
+              {province.name} Province Attractions
             </h3>
           </Link>
 
-          {province.description ? (
-            <p className="text-xs text-gray-500 dark:text-zinc-400 line-clamp-2 leading-relaxed">
-              {province.description}
-            </p>
-          ) : (
-            <p className="text-xs text-gray-400 dark:text-zinc-500 italic">
-              Discover historical landmarks, national parks, and local culture.
-            </p>
-          )}
+          {/* Description */}
+          <p className="text-xs sm:text-[13px] text-gray-500 dark:text-zinc-400 line-clamp-2 leading-relaxed">
+            {province.description || `Explore historical temples, cultural communities, and untouched nature in ${province.name}.`}
+          </p>
 
-          {/* Micro Stats Pills */}
-          <div className="grid grid-cols-2 gap-2 pt-3 border-t border-gray-100 dark:border-zinc-800 text-[11px] text-gray-600 dark:text-zinc-400">
-            <div className="flex items-center gap-1.5 p-1.5 rounded-lg bg-gray-50 dark:bg-zinc-800/60">
-              <Users size={12} className="text-blue-500 shrink-0" />
-              <span className="truncate">
-                {province.population ? province.population : 'Major Pop.'}
-              </span>
+          {/* Highlights Mini-list with 2 Green Checkmarks */}
+          <div className="space-y-1.5 pt-1">
+            <div className="flex items-start gap-2 text-xs sm:text-[13px] text-gray-600 dark:text-zinc-300">
+              <Check size={14} className="text-emerald-500 shrink-0 mt-0.5 stroke-[2.5]" />
+              <span className="truncate">Top-rated historical landmarks & ecotourism sights</span>
             </div>
-            <div className="flex items-center gap-1.5 p-1.5 rounded-lg bg-gray-50 dark:bg-zinc-800/60">
-              <Maximize2 size={12} className="text-amber-500 shrink-0" />
-              <span className="truncate">
-                {province.area ? province.area : 'Landmark'}
-              </span>
+            <div className="flex items-start gap-2 text-xs sm:text-[13px] text-gray-600 dark:text-zinc-300">
+              <Check size={14} className="text-emerald-500 shrink-0 mt-0.5 stroke-[2.5]" />
+              <span className="truncate">Local tour operators with verified guest reviews</span>
             </div>
           </div>
         </div>
       </div>
 
       {/* Card Footer */}
-      <div className="px-5 py-3.5 border-t border-gray-100 dark:border-zinc-800/80 flex items-center justify-between text-xs font-medium bg-gray-50/70 dark:bg-zinc-800/40">
-        <span className="text-gray-500 dark:text-zinc-400 font-semibold">
-          {province.places_count || 0} Attractions
-        </span>
+      <div className="px-5 sm:px-6 py-4 border-t border-gray-100 dark:border-zinc-800/80 flex items-center justify-between bg-white dark:bg-zinc-900 rounded-b-3xl">
+        <div>
+          <span className="text-[10px] font-extrabold uppercase tracking-wider text-gray-400 block leading-none mb-1">
+            FROM
+          </span>
+          <div className="flex items-baseline">
+            <span className="text-2xl font-black text-[#2563eb] dark:text-blue-400">
+              Free
+            </span>
+            <span className="text-xs font-normal text-gray-500 ml-1">
+              / explore
+            </span>
+          </div>
+        </div>
+
         <Link
           to={`/provinces/${province.id}`}
-          className="inline-flex items-center gap-1.5 font-bold text-[#003E83] dark:text-blue-400 hover:underline group-hover:translate-x-1 transition-transform"
+          className="px-5 py-2.5 rounded-full bg-[#2563eb] hover:bg-[#1d4ed8] text-white font-bold text-xs sm:text-sm flex items-center gap-1.5 shadow-md shadow-blue-500/20 active:scale-95 transition-all"
         >
           <span>Explore</span>
-          <ArrowRight className="w-3.5 h-3.5" />
+          <ArrowRight size={15} />
         </Link>
       </div>
     </div>
