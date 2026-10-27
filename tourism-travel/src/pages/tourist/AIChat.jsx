@@ -36,7 +36,7 @@ export default function AIChat() {
     {
       id: 'welcome',
       role: 'assistant',
-      content: `Hello ${user?.name ? user.name : 'there'}! 🇰🇭 Welcome to the **AngkorVerses AI Tourism Assistant**.\n\nI can help you discover ancient Khmer temples, local cuisines, Tuk-Tuk transportation tips, weather forecasts, or generate a tailored travel itinerary for your trip to Cambodia. How can I assist your journey today?`,
+      content: `Hello ${user?.name ? user.name : 'there'}! Welcome to the **AngkorVerses AI Tourism Assistant**.\n\nI can help you discover ancient Khmer temples, local cuisines, Tuk-Tuk transportation tips, weather forecasts, or generate a tailored travel itinerary for your trip to Cambodia. How can I assist your journey today?`,
       time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     }
   ]);
@@ -188,7 +188,7 @@ export default function AIChat() {
       {
         id: 'welcome_new',
         role: 'assistant',
-        content: `New conversation started! 🇰🇭 How can I help you plan your journey in Cambodia today?`,
+        content: `New conversation started! How can I help you plan your journey in Cambodia today?`,
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       }
     ]);

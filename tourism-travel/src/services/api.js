@@ -6,6 +6,9 @@ export const ROOT_API_URL = RAW_API_URL.replace(/\/travel\/?$/, ''); // e.g. htt
 export const TRAVEL_API_URL = `${ROOT_API_URL}/travel`;
 export const BUSINESS_API_URL = `${ROOT_API_URL}/business`;
 export const AI_CHAT_SERVICE_URL = import.meta.env.VITE_AI_CHAT_URL || 'http://127.0.0.1:8001';
+export const GOOGLE_AUTH_URL = `${TRAVEL_API_URL}/auth/google`;
+export const GOOGLE_REDIRECT_URL = `${TRAVEL_API_URL}/auth/google/redirect`;
+export const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || '992178086409-a9j45bl7piu53vlfbihe1c9sgpv0itsb.apps.googleusercontent.com';
 
 const api = axios.create({
   baseURL: TRAVEL_API_URL,

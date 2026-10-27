@@ -1,18 +1,15 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { 
   Mail, 
   Lock, 
   ArrowRight, 
   Loader2, 
-  AlertCircle, 
-  Briefcase, 
-  UserCheck,
-  ExternalLink 
+  AlertCircle 
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { normalizeRole } from '../../services/authService';
-import logoImg from '../../assets/images/tourism_logo.png';
+import GoogleButton from '../../components/common/GoogleButton';
 
 export default function Login() {
   const { login } = useAuth();
@@ -25,6 +22,14 @@ export default function Login() {
   const [errorMessage, setErrorMessage] = useState('');
 
   const from = location.state?.from?.pathname;
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const err = params.get('error');
+    if (err) {
+      setErrorMessage(decodeURIComponent(err));
+    }
+  }, [location.search]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -55,30 +60,9 @@ export default function Login() {
     }
   };
 
-  const handleAutofill = (demoEmail, demoPassword) => {
-    setEmail(demoEmail);
-    setPassword(demoPassword);
-    setErrorMessage('');
-  };
-
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-[#09090b] flex flex-col justify-center py-12 sm:px-6 lg:px-8 font-sans selection:bg-[#003E83] selection:text-white">
       <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
-        <Link to="/" className="inline-flex items-center gap-3 mb-3 group">
-          <img 
-            src={logoImg} 
-            alt="AngkorVerses Logo" 
-            className="w-12 h-12 object-contain drop-shadow-md group-hover:scale-105 transition-transform" 
-          />
-          <div className="text-left">
-            <span className="block font-black text-2xl tracking-tight bg-gradient-to-r from-[#003E83] to-blue-600 dark:from-blue-400 dark:to-indigo-300 bg-clip-text text-transparent">
-              AngkorVerses
-            </span>
-            <span className="block text-[10px] uppercase font-bold tracking-widest text-slate-500 dark:text-zinc-400">
-              Tourist & Business Portal
-            </span>
-          </div>
-        </Link>
         <h2 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">
           Sign in to your account
         </h2>
@@ -95,6 +79,19 @@ export default function Login() {
               <div className="flex-1 leading-relaxed">{errorMessage}</div>
             </div>
           )}
+
+          {/* Google Sign-In */}
+          <div className="space-y-4 mb-6">
+            <GoogleButton text="Sign in with Google" />
+
+            <div className="relative flex items-center justify-center">
+              <div className="border-t border-slate-200 dark:border-zinc-800 w-full" />
+              <span className="bg-white dark:bg-zinc-900 px-3 text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-zinc-500 shrink-0">
+                Or sign in with email
+              </span>
+              <div className="border-t border-slate-200 dark:border-zinc-800 w-full" />
+            </div>
+          </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
@@ -154,42 +151,6 @@ export default function Login() {
             </button>
           </form>
 
-          {/* Quick Demo Accounts */}
-          <div className="mt-6 pt-5 border-t border-slate-100 dark:border-zinc-800">
-            <div className="text-[11px] font-semibold text-slate-400 dark:text-zinc-500 uppercase tracking-wider mb-2.5 text-center">
-              Quick Sign-in Presets
-            </div>
-            <div className="grid grid-cols-2 gap-2 text-xs">
-              <button
-                type="button"
-                onClick={() => handleAutofill('vit.vong@example.com', 'password123')}
-                className="p-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 hover:border-blue-400 dark:hover:border-blue-500 bg-slate-50 dark:bg-zinc-800/50 text-slate-700 dark:text-zinc-300 text-left transition cursor-pointer"
-              >
-                <div className="flex items-center gap-1 font-bold text-[#003E83] dark:text-blue-400">
-                  <UserCheck size={13} />
-                  <span>Tourist User</span>
-                </div>
-                <div className="text-[10px] text-slate-500 dark:text-zinc-400 mt-0.5 truncate">
-                  vit.vong@example.com
-                </div>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => handleAutofill('owner@angkor-restaurant.com', 'password123')}
-                className="p-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 hover:border-amber-400 dark:hover:border-amber-500 bg-slate-50 dark:bg-zinc-800/50 text-slate-700 dark:text-zinc-300 text-left transition cursor-pointer"
-              >
-                <div className="flex items-center gap-1 font-bold text-amber-600 dark:text-amber-400">
-                  <Briefcase size={13} />
-                  <span>Business Owner</span>
-                </div>
-                <div className="text-[10px] text-slate-500 dark:text-zinc-400 mt-0.5 truncate">
-                  owner@angkor-restaurant.com
-                </div>
-              </button>
-            </div>
-          </div>
-
           {/* Registration link */}
           <div className="mt-5 text-center text-xs text-slate-500 dark:text-zinc-400">
             Don't have an account yet?{' '}
@@ -197,20 +158,6 @@ export default function Login() {
               Create an Account
             </Link>
           </div>
-        </div>
-
-        {/* Staff note */}
-        <div className="mt-6 text-center text-xs text-slate-500 dark:text-zinc-500">
-          Ministry Admins & Guides:{' '}
-          <a 
-            href="http://localhost:5174" 
-            target="_blank" 
-            rel="noreferrer"
-            className="text-slate-700 dark:text-zinc-300 hover:underline font-semibold inline-flex items-center gap-1"
-          >
-            <span>Sign in at Admin Portal (Port 5174)</span>
-            <ExternalLink size={12} />
-          </a>
         </div>
       </div>
     </div>

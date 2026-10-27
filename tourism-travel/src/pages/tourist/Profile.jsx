@@ -5,12 +5,14 @@ import {
   Save, 
   Camera, 
   Loader2, 
-  LogOut 
+  LogOut,
+  CheckCircle2 
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useAlert } from '../../context/AlertContext';
 import authService from '../../services/authService';
 import travelService from '../../services/travelService';
+import GoogleButton, { GoogleIcon } from '../../components/common/GoogleButton';
 
 export default function Profile() {
   const { user, refreshUser, logout } = useAuth();
@@ -93,6 +95,25 @@ export default function Profile() {
       showError(err.message || 'Failed to update password.');
     } finally {
       setIsUpdatingPassword(false);
+    }
+  };
+
+  const handleDisconnectGoogle = async () => {
+    const confirmed = await showConfirm({
+      title: 'Disconnect Google Account',
+      message: 'Are you sure you wish to disconnect your Google account? You will need your email and password to log in.',
+      confirmText: 'Disconnect Google',
+      type: 'danger',
+    });
+
+    if (!confirmed) return;
+
+    try {
+      await authService.disconnectGoogle();
+      showSuccess('Google account disconnected successfully.');
+      refreshUser();
+    } catch (err) {
+      showError(err.message || 'Failed to disconnect Google account.');
     }
   };
 
@@ -349,7 +370,65 @@ export default function Profile() {
 
       {/* Tab 2: Security & Password */}
       {activeTab === 'security' && (
-        <form onSubmit={handlePasswordSubmit} className="p-6 sm:p-8 rounded-3xl bg-white dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800 shadow-sm space-y-4 max-w-lg">
+        <div className="space-y-6 max-w-lg">
+          {/* Google Account Connection Card */}
+          <div className="p-6 sm:p-7 rounded-3xl bg-white dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800 shadow-sm space-y-4">
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 flex items-center justify-center shrink-0">
+                  <GoogleIcon className="w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                    <span>Google Account</span>
+                    {user?.provider === 'google' ? (
+                      <span className="px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 text-[10px] font-extrabold flex items-center gap-1">
+                        <CheckCircle2 size={11} />
+                        Connected
+                      </span>
+                    ) : (
+                      <span className="px-2 py-0.5 rounded-full bg-slate-100 dark:bg-zinc-800 text-slate-500 dark:text-zinc-400 text-[10px] font-bold">
+                        Not Connected
+                      </span>
+                    )}
+                  </h3>
+                  <p className="text-xs text-slate-500 dark:text-zinc-400 mt-0.5">
+                    {user?.provider === 'google'
+                      ? `Linked with ${user?.provider_email || user?.email}`
+                      : 'Connect your Google account for single-click sign-in and avatar sync.'}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {user?.provider === 'google' ? (
+              <div className="pt-2 flex items-center justify-between gap-3 text-xs border-t border-slate-100 dark:border-zinc-800">
+                <span className="text-slate-500 dark:text-zinc-400 text-[11px]">
+                  Google ID: <code className="font-mono text-slate-700 dark:text-zinc-300">{user.provider_id || 'Linked'}</code>
+                </span>
+                <button
+                  type="button"
+                  onClick={handleDisconnectGoogle}
+                  className="px-3.5 py-1.5 rounded-xl border border-rose-200 dark:border-rose-900/60 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 text-xs font-semibold transition cursor-pointer"
+                >
+                  Disconnect Google
+                </button>
+              </div>
+            ) : (
+              <div className="pt-2">
+                <GoogleButton
+                  text="Connect with Google Account"
+                  role="user"
+                />
+              </div>
+            )}
+          </div>
+
+          <form onSubmit={handlePasswordSubmit} className="p-6 sm:p-8 rounded-3xl bg-white dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800 shadow-sm space-y-4">
+            <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              <Lock size={16} className="text-[#003E83] dark:text-blue-400" />
+              <span>Change Account Password</span>
+            </h3>
           <div>
             <label className="block text-xs font-semibold text-slate-700 dark:text-zinc-300 mb-1">
               Current Password
@@ -400,6 +479,7 @@ export default function Profile() {
             </button>
           </div>
         </form>
+      </div>
       )}
 
       {/* Tab 3: Privacy & Account Erasure */}

@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { normalizeRole } from '../../services/authService';
-import logoImg from '../../assets/images/tourism_logo.png';
+import GoogleButton from '../../components/common/GoogleButton';
 
 export default function Register() {
   const { register } = useAuth();
@@ -84,21 +84,6 @@ export default function Register() {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-[#09090b] flex flex-col justify-center py-12 sm:px-6 lg:px-8 font-sans selection:bg-[#003E83] selection:text-white">
       <div className="sm:mx-auto sm:w-full sm:max-w-xl text-center">
-        <Link to="/" className="inline-flex items-center gap-3 mb-3 group">
-          <img 
-            src={logoImg} 
-            alt="AngkorVerses Logo" 
-            className="w-12 h-12 object-contain drop-shadow-md group-hover:scale-105 transition-transform" 
-          />
-          <div className="text-left">
-            <span className="block font-black text-2xl tracking-tight bg-gradient-to-r from-[#003E83] to-blue-600 dark:from-blue-400 dark:to-indigo-300 bg-clip-text text-transparent">
-              AngkorVerses
-            </span>
-            <span className="block text-[10px] uppercase font-bold tracking-widest text-slate-500 dark:text-zinc-400">
-              Join the Kingdom of Wonder
-            </span>
-          </div>
-        </Link>
         <h2 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">
           Create your account
         </h2>
@@ -169,6 +154,22 @@ export default function Register() {
               <div className="flex-1 leading-relaxed">{errorMessage}</div>
             </div>
           )}
+
+          {/* Google Quick Registration */}
+          <div className="space-y-4 mb-6">
+            <GoogleButton 
+              text={`Continue with Google as ${role === 'business_owner' ? 'Business Owner' : 'Tourist'}`} 
+              role={role} 
+            />
+
+            <div className="relative flex items-center justify-center">
+              <div className="border-t border-slate-200 dark:border-zinc-800 w-full" />
+              <span className="bg-white dark:bg-zinc-900 px-3 text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-zinc-500 shrink-0">
+                Or register with email
+              </span>
+              <div className="border-t border-slate-200 dark:border-zinc-800 w-full" />
+            </div>
+          </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

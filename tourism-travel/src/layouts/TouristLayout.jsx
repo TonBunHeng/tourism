@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
+  Compass,
   Sparkles, 
   Heart, 
   Calendar, 
@@ -65,7 +66,10 @@ export default function TouristLayout() {
       <div className="bg-[#003E83] text-white text-xs py-1.5 px-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="font-semibold tracking-wide">🇰🇭 Kingdom of Wonder</span>
+            <span className="font-semibold tracking-wide flex items-center gap-1.5">
+              <Compass size={13} className="text-amber-300 shrink-0" />
+              <span>Kingdom of Wonder</span>
+            </span>
             <span className="hidden sm:inline text-blue-200">— Official Cambodia Tourism Portal</span>
           </div>
           <div className="flex items-center gap-4 text-[11px] text-blue-100">

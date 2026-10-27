@@ -131,13 +131,20 @@ export default function BusinessReviews() {
               key={star}
               type="button"
               onClick={() => setSelectedRating(star)}
-              className={`px-3 py-1.5 rounded-xl border transition cursor-pointer ${
+              className={`px-3 py-1.5 rounded-xl border transition cursor-pointer flex items-center gap-1 ${
                 selectedRating === star
                   ? 'bg-[#003E83] text-white border-[#003E83]'
                   : 'bg-white dark:bg-zinc-800 border-slate-200 dark:border-zinc-700 text-slate-600 dark:text-zinc-300 hover:bg-slate-50'
               }`}
             >
-              {star === 'all' ? 'All Ratings' : `${star} Star ★`}
+              {star === 'all' ? (
+                'All Ratings'
+              ) : (
+                <span className="flex items-center gap-1">
+                  <span>{star} Star</span>
+                  <Star size={11} className="fill-amber-400 text-amber-400 shrink-0" />
+                </span>
+              )}
             </button>
           ))}
         </div>

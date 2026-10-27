@@ -251,7 +251,14 @@ export default function Destinations() {
                     : 'border-slate-200 dark:border-zinc-700 text-slate-600 dark:text-zinc-400 hover:bg-slate-100 dark:hover:bg-zinc-800'
                 }`}
               >
-                {r ? `${r}+ ★` : 'All Ratings'}
+                {r ? (
+                  <span className="flex items-center gap-1">
+                    <span>{r}+</span>
+                    <Star size={11} className="fill-amber-400 text-amber-400 shrink-0" />
+                  </span>
+                ) : (
+                  'All Ratings'
+                )}
               </button>
             ))}
           </div>

@@ -1,4 +1,4 @@
-import api from './api';
+import api, { GOOGLE_REDIRECT_URL } from './api';
 
 export const normalizeRole = (role) => {
   if (!role) return 'user';
@@ -72,11 +72,32 @@ export const authService = {
     return res;
   },
 
+  redirectToGoogle(desiredRole = null) {
+    if (desiredRole) {
+      localStorage.setItem('pending_oauth_role', desiredRole);
+    }
+    window.location.href = GOOGLE_REDIRECT_URL;
+  },
+
   async googleLogin(payload) {
     const res = await api.post('/auth/google', payload);
     if (res.success && res.data?.token) {
       const user = res.data.user;
       this.setSession(user, res.data.token);
+    }
+    return res;
+  },
+
+  async disconnectGoogle() {
+    const res = await api.put('/auth/profile', {
+      provider: null,
+      provider_id: null,
+      provider_email: null,
+    });
+    if (res.success && res.data) {
+      const user = res.data.user || res.data;
+      localStorage.setItem('user', JSON.stringify(user));
+      window.dispatchEvent(new Event('user-profile-updated'));
     }
     return res;
   },

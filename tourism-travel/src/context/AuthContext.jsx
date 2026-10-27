@@ -71,6 +71,39 @@ export const AuthProvider = ({ children }) => {
     return res;
   };
 
+  const googleLogin = async (payload) => {
+    const res = await authService.googleLogin(payload);
+    if (res?.success && res.data) {
+      setToken(res.data.token);
+      setUser(res.data.user);
+    }
+    return res;
+  };
+
+  const redirectToGoogle = (desiredRole = null) => {
+    authService.redirectToGoogle(desiredRole);
+  };
+
+  const handleOAuthCallback = useCallback((rawToken, rawUser) => {
+    if (!rawToken) return false;
+    let parsedUser = rawUser;
+    if (typeof rawUser === 'string') {
+      try {
+        parsedUser = JSON.parse(decodeURIComponent(rawUser));
+      } catch {
+        try {
+          parsedUser = JSON.parse(rawUser);
+        } catch {
+          parsedUser = null;
+        }
+      }
+    }
+    authService.setSession(parsedUser, rawToken);
+    setToken(rawToken);
+    setUser(parsedUser);
+    return true;
+  }, []);
+
   const logout = async () => {
     await authService.logout();
     setToken(null);
@@ -96,6 +129,9 @@ export const AuthProvider = ({ children }) => {
         isAdmin,
         login,
         register,
+        googleLogin,
+        redirectToGoogle,
+        handleOAuthCallback,
         logout,
         refreshUser,
         setUser,

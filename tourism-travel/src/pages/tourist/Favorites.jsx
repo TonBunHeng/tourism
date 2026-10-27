@@ -114,19 +114,20 @@ export default function Favorites() {
         {[
           { key: 'all', label: `All (${favorites.length})` },
           { key: 'unvisited', label: 'Wishlist (To Visit)' },
-          { key: 'visited', label: 'Visited ✓' },
+          { key: 'visited', label: 'Visited', icon: CheckCircle },
         ].map((tab) => (
           <button
             key={tab.key}
             type="button"
             onClick={() => setFilterVisited(tab.key)}
-            className={`px-4 py-2 rounded-xl transition cursor-pointer ${
+            className={`px-4 py-2 rounded-xl transition cursor-pointer flex items-center gap-1.5 ${
               filterVisited === tab.key
                 ? 'bg-[#003E83] text-white shadow-xs'
                 : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900 hover:bg-slate-100 dark:hover:bg-zinc-800'
             }`}
           >
-            {tab.label}
+            {tab.icon && <tab.icon size={13} />}
+            <span>{tab.label}</span>
           </button>
         ))}
       </div>

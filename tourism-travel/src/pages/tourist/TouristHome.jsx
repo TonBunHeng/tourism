@@ -9,7 +9,8 @@ import {
   ArrowRight, 
   ChevronRight,
   Compass,
-  Heart
+  Heart,
+  Users
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import travelService from '../../services/travelService';
@@ -306,8 +307,14 @@ export default function TouristHome() {
                     {b.service?.name || b.business?.name || b.tour?.title || 'Tour Reservation'}
                   </h4>
                   <div className="text-[11px] text-slate-500 dark:text-zinc-400 mt-1 flex items-center gap-3">
-                    <span>📅 {b.booking_date}</span>
-                    <span>👥 {b.guests_count || 1} guest(s)</span>
+                    <span className="flex items-center gap-1">
+                      <Calendar size={12} className="text-slate-400 shrink-0" />
+                      <span>{b.booking_date}</span>
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <Users size={12} className="text-slate-400 shrink-0" />
+                      <span>{b.guests_count || 1} guest(s)</span>
+                    </span>
                   </div>
                 </div>
               ))}

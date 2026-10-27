@@ -39,13 +39,18 @@ import BusinessReviews from '../pages/business-owner/Reviews';
 import BusinessReports from '../pages/business-owner/Reports';
 import BusinessNotifications from '../pages/business-owner/Notifications';
 import BusinessSettings from '../pages/business-owner/Settings';
+import OAuthCallbackHandler from '../components/common/OAuthCallbackHandler';
 
 export default function AppRoutes() {
   return (
     <BrowserRouter>
       <AuthProvider>
         <AlertProvider>
+          <OAuthCallbackHandler />
           <Routes>
+            {/* Google OAuth Callback Redirection Endpoint */}
+            <Route path="/auth/google/callback" element={<Navigate to="/" replace />} />
+
             {/* Guest / Public Routes (redirect if already logged in) */}
             <Route element={<PublicRoute />}>
               <Route path="/login" element={<Login />} />
