@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   Compass,
-  Sparkles, 
   Heart, 
   Calendar, 
   User, 
@@ -21,6 +20,7 @@ import { useAuth } from '../context/AuthContext';
 import { toggleTheme, isDarkTheme, getInitialTheme } from '../utils/Theme';
 import notificationService from '../services/notificationService';
 import logoImg from '../assets/images/tourism_logo.png';
+import AngkorGenieFloatingWidget from '../components/common/AngkorGenieFloatingWidget';
 
 export default function TouristLayout() {
   const { user, isAuthenticated, logout, isBusinessOwner } = useAuth();
@@ -52,7 +52,6 @@ export default function TouristLayout() {
   const navLinks = [
     { label: 'Explore', path: '/' },
     { label: 'Destinations', path: '/destinations' },
-    { label: 'AI Assistant', path: '/ai-chat', icon: Sparkles, badge: 'AI' },
     { label: 'Bookings', path: '/bookings', authRequired: true },
     { label: 'Favorites', path: '/favorites', authRequired: true },
     { label: 'Support & FAQs', path: '/support' },
@@ -420,6 +419,9 @@ export default function TouristLayout() {
           </div>
         </div>
       </footer>
+
+      {/* AngkorGenie Floating Widget (FAB & Chat Drawer) */}
+      <AngkorGenieFloatingWidget />
     </div>
   );
 }

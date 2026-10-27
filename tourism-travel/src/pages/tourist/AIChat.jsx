@@ -1,49 +1,44 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { useSearchParams, Link } from 'react-router-dom';
+import { useSearchParams, Link, useNavigate, useLocation } from 'react-router-dom';
 import { 
-  Sparkles, 
   Send, 
-  User, 
-  Plus, 
+  RotateCcw, 
   Copy, 
   Check, 
   CloudSun, 
   DollarSign, 
+  Loader2,
+  Landmark,
   ArrowRight,
-  Loader2
+  ArrowLeft,
+  MoreHorizontal,
+  X,
+  Minimize2
 } from 'lucide-react';
+import GenieAvatar from '../../components/common/GenieAvatar';
 import aiChatService from '../../services/aiChatService';
 import { useAuth } from '../../context/AuthContext';
 import { useAlert } from '../../context/AlertContext';
-import LoadingSpinner from '../../components/common/LoadingSpinner';
-
-const SUGGESTED_QUESTIONS = [
-  'What are the best temples to visit for sunrise in Siem Reap?',
-  'Recommend a 3-day cultural itinerary for first-time visitors in Cambodia.',
-  'What traditional Khmer foods and street dishes should I not miss?',
-  'What is the current currency exchange rate between USD and Cambodian Riel (KHR)?',
-  'What is the dress code required when visiting ancient Angkor temples?',
-  'How do local Tuk-Tuk transport rates and PassApp work in Phnom Penh?'
-];
+import { 
+  TRIP_GENIE_SUGGESTIONS, 
+  generateSessionId, 
+  createChatMessage 
+} from '../../utils/chatUtils';
 
 export default function AIChat() {
   const { user } = useAuth();
   const { showSuccess } = useAlert();
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const location = useLocation();
 
-  const [activeTab, setActiveTab] = useState('chat'); // 'chat', 'itinerary', 'weather'
-  const [messages, setMessages] = useState([
-    {
-      id: 'welcome',
-      role: 'assistant',
-      content: `Hello ${user?.name ? user.name : 'there'}! Welcome to the **AngkorVerses AI Tourism Assistant**.\n\nI can help you discover ancient Khmer temples, local cuisines, Tuk-Tuk transportation tips, weather forecasts, or generate a tailored travel itinerary for your trip to Cambodia. How can I assist your journey today?`,
-      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-    }
-  ]);
+  const [activeTab, setActiveTab] = useState('chat'); // 'chat' or 'tools'
+  const [messages, setMessages] = useState(() => location.state?.messages || []);
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [sessionId, setSessionId] = useState(() => 'sess_' + Date.now().toString(36));
+  const [sessionId, setSessionId] = useState(() => location.state?.sessionId || generateSessionId());
   const [copiedIndex, setCopiedIndex] = useState(null);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   // Weather & Currency Widget States
   const [weatherData, setWeatherData] = useState(null);
@@ -54,6 +49,7 @@ export default function AIChat() {
   const [khrResult, setKhrResult] = useState(102500);
 
   const messagesEndRef = useRef(null);
+  const menuRef = useRef(null);
 
   const fetchWeather = useCallback(async (province) => {
     setIsLoadingWeather(true);
@@ -75,7 +71,6 @@ export default function AIChat() {
     }
   }, []);
 
-  // Auto-scroll to bottom of chat
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
@@ -84,11 +79,10 @@ export default function AIChat() {
     scrollToBottom();
   }, [messages, isLoading]);
 
-  // Handle URL query parameters for direct prompts or tabs
   useEffect(() => {
     const tabParam = searchParams.get('tab');
-    if (tabParam === 'itinerary' || tabParam === 'weather') {
-      setActiveTab(tabParam);
+    if (tabParam === 'weather' || tabParam === 'tools') {
+      setActiveTab('tools');
     }
     const initialPrompt = searchParams.get('prompt');
     if (initialPrompt) {
@@ -96,12 +90,24 @@ export default function AIChat() {
     }
   }, [searchParams]);
 
-  // Fetch Weather when Weather tab opens
   useEffect(() => {
-    if (activeTab === 'weather' && !weatherData) {
+    if (activeTab === 'tools' && !weatherData) {
       fetchWeather(weatherProvince);
     }
   }, [activeTab, weatherData, weatherProvince, fetchWeather]);
+
+  // Close menu on outside click
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
+        setIsMenuOpen(false);
+      }
+    };
+    if (isMenuOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isMenuOpen]);
 
   const handleConvertCurrency = async (val) => {
     setUsdAmount(val);
@@ -121,12 +127,10 @@ export default function AIChat() {
     const textToSend = customText || inputValue;
     if (!textToSend.trim() || isLoading) return;
 
-    const userMsg = {
-      id: 'usr_' + Date.now(),
+    const userMsg = createChatMessage({
       role: 'user',
       content: textToSend.trim(),
-      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-    };
+    });
 
     setMessages((prev) => [...prev, userMsg]);
     if (!customText) setInputValue('');
@@ -151,22 +155,18 @@ export default function AIChat() {
         replyContent = "Thank you for asking! Cambodia offers breathtaking heritage, especially in Siem Reap and Phnom Penh. Feel free to ask more specific questions or explore our destinations catalog.";
       }
 
-      const botMsg = {
-        id: 'bot_' + Date.now(),
+      const botMsg = createChatMessage({
         role: 'assistant',
         content: replyContent,
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      };
+      });
 
       setMessages((prev) => [...prev, botMsg]);
     } catch (err) {
-      const errorMsg = {
-        id: 'err_' + Date.now(),
+      const errorMsg = createChatMessage({
         role: 'assistant',
         isError: true,
         content: err.message || 'I am currently unable to reach the travel intelligence service. Please check your connection or retry in a moment.',
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      };
+      });
       setMessages((prev) => [...prev, errorMsg]);
     } finally {
       setIsLoading(false);
@@ -183,301 +183,404 @@ export default function AIChat() {
   };
 
   const handleNewConversation = () => {
-    setSessionId('sess_' + Date.now().toString(36));
-    setMessages([
-      {
-        id: 'welcome_new',
-        role: 'assistant',
-        content: `New conversation started! How can I help you plan your journey in Cambodia today?`,
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      }
-    ]);
+    setSessionId(generateSessionId());
+    setMessages([]);
+    setIsMenuOpen(false);
+  };
+
+  const handleExit = () => {
+    if (window.history.length > 1) {
+      navigate(-1);
+    } else {
+      navigate('/');
+    }
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
-      {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span className="text-xs font-bold text-[#003E83] dark:text-blue-400 uppercase tracking-wider">
-              Cambodia Tourism Intelligence
-            </span>
+    <div className="h-screen w-screen flex flex-col overflow-hidden bg-slate-50 dark:bg-[#09090b] font-sans selection:bg-blue-600 selection:text-white">
+      {/* Full-Screen Top Header (No layout header/footer) */}
+      <header className="px-4 sm:px-8 py-3.5 border-b border-slate-200/90 dark:border-zinc-800 flex items-center justify-between bg-white dark:bg-zinc-900 shrink-0 z-10 shadow-xs">
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={handleExit}
+            className="p-2 -ml-1.5 rounded-xl text-slate-500 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-zinc-800 transition cursor-pointer"
+            title="Exit Full Screen"
+          >
+            <ArrowLeft size={19} />
+          </button>
+
+          <GenieAvatar size={38} showBadge={false} />
+          <div>
+            <div className="font-extrabold text-base sm:text-lg text-slate-900 dark:text-white tracking-tight flex items-center gap-2 leading-none">
+              <span>AngkorGenie</span>
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block animate-pulse" />
+            </div>
+            <div className="text-[11px] uppercase font-bold tracking-wider text-blue-600 dark:text-blue-400 mt-1">
+              Cambodia Tourism AI Assistant
+            </div>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
-            <span>AngkorVerses AI Assistant</span>
-            <Sparkles size={22} className="text-amber-500 fill-amber-400" />
-          </h1>
         </div>
 
-        {/* Navigation Tabs & Actions */}
         <div className="flex items-center gap-2">
-          <div className="p-1 rounded-xl bg-slate-200/80 dark:bg-zinc-800 flex items-center text-xs font-semibold">
+          {/* View Toggle Tabs */}
+          <div className="p-1 rounded-xl bg-slate-100 dark:bg-zinc-800 flex items-center text-xs font-semibold">
             <button
               type="button"
               onClick={() => setActiveTab('chat')}
               className={`px-3 py-1.5 rounded-lg transition cursor-pointer ${
                 activeTab === 'chat'
-                  ? 'bg-white dark:bg-zinc-900 text-[#003E83] dark:text-white shadow-xs'
+                  ? 'bg-white dark:bg-zinc-900 text-blue-600 dark:text-white shadow-xs'
                   : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900'
               }`}
             >
-              Chat Assistant
+              Chat
             </button>
             <button
               type="button"
-              onClick={() => setActiveTab('weather')}
-              className={`px-3 py-1.5 rounded-lg transition cursor-pointer ${
-                activeTab === 'weather'
-                  ? 'bg-white dark:bg-zinc-900 text-[#003E83] dark:text-white shadow-xs'
+              onClick={() => setActiveTab('tools')}
+              className={`px-3 py-1.5 rounded-lg transition cursor-pointer flex items-center gap-1.5 ${
+                activeTab === 'tools'
+                  ? 'bg-white dark:bg-zinc-900 text-blue-600 dark:text-white shadow-xs'
                   : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900'
               }`}
             >
-              Weather & Currency
+              <CloudSun size={13} />
+              <span className="hidden sm:inline">Weather & Currency</span>
             </button>
           </div>
 
           <button
             type="button"
             onClick={handleNewConversation}
-            className="p-2 sm:px-3 sm:py-1.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-slate-700 dark:text-zinc-300 hover:bg-slate-50 dark:hover:bg-zinc-800 text-xs font-semibold transition flex items-center gap-1.5 cursor-pointer"
-            title="Start New Conversation"
+            className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-slate-700 dark:text-zinc-300 hover:bg-slate-50 dark:hover:bg-zinc-800 text-xs font-semibold transition cursor-pointer"
+            title="Start New Chat"
           >
-            <Plus size={15} />
-            <span className="hidden sm:inline">New Chat</span>
+            <RotateCcw size={13} />
+            <span>New Chat</span>
+          </button>
+
+          {/* Options Dropdown Menu */}
+          <div className="relative" ref={menuRef}>
+            <button
+              type="button"
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-zinc-200 hover:bg-slate-100 dark:hover:bg-zinc-800 transition cursor-pointer"
+              title="Options"
+            >
+              <MoreHorizontal size={18} />
+            </button>
+
+            {isMenuOpen && (
+              <div className="absolute right-0 mt-2 w-48 rounded-2xl bg-white dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 shadow-xl py-1.5 z-20 text-xs">
+                <button
+                  type="button"
+                  onClick={handleNewConversation}
+                  className="w-full text-left px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-zinc-700/60 flex items-center gap-2 text-slate-700 dark:text-zinc-200 font-semibold cursor-pointer"
+                >
+                  <RotateCcw size={14} />
+                  <span>Start New Chat</span>
+                </button>
+                <Link
+                  to="/destinations"
+                  className="w-full text-left px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-zinc-700/60 flex items-center gap-2 text-slate-700 dark:text-zinc-200 font-semibold cursor-pointer"
+                >
+                  <Landmark size={14} />
+                  <span>Browse Destinations</span>
+                </Link>
+                <button
+                  type="button"
+                  onClick={handleExit}
+                  className="w-full text-left px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-zinc-700/60 flex items-center gap-2 text-rose-600 dark:text-rose-400 font-semibold cursor-pointer border-t border-slate-100 dark:border-zinc-700/60"
+                >
+                  <Minimize2 size={14} />
+                  <span>Exit Full Screen</span>
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Exit Fullscreen Close Button */}
+          <button
+            type="button"
+            onClick={handleExit}
+            className="p-2 rounded-xl text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-zinc-800 transition cursor-pointer ml-1"
+            title="Exit Full Screen"
+          >
+            <X size={20} />
           </button>
         </div>
-      </div>
+      </header>
 
-      {activeTab === 'chat' ? (
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          {/* Main Chat Interface */}
-          <div className="lg:col-span-3 rounded-3xl bg-white dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800 shadow-sm flex flex-col h-[650px] overflow-hidden">
-            {/* Chat Messages Log */}
-            <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-5">
-              {messages.map((msg, idx) => {
-                const isUser = msg.role === 'user';
+      {/* Main Full-Screen Body */}
+      <div className="flex-1 flex flex-col overflow-hidden bg-slate-50 dark:bg-[#09090b]">
 
-                return (
-                  <div
-                    key={msg.id}
-                    className={`flex items-start gap-3 ${isUser ? 'flex-row-reverse' : ''}`}
-                  >
-                    {/* Avatar */}
-                    <div
-                      className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 shadow-xs ${
-                        isUser
-                          ? 'bg-[#003E83] text-white'
-                          : 'bg-gradient-to-tr from-indigo-600 to-purple-600 text-white'
-                      }`}
-                    >
-                      {isUser ? <User size={16} /> : <Sparkles size={16} />}
-                    </div>
+        {/* Tab Content */}
+        {activeTab === 'chat' ? (
+          <>
+            {/* Messages Body */}
+            <div className="flex-1 overflow-y-auto p-5 sm:p-8 space-y-6">
+              {/* If no user messages sent yet, show the full TripGenie Get Started Hero */}
+              {messages.length === 0 ? (
+                <div className="space-y-6 max-w-2xl mx-auto py-2">
+                  {/* Hero Title */}
+                  <div>
+                    <h1 className="text-3xl sm:text-4xl font-extrabold bg-gradient-to-r from-sky-400 to-blue-600 bg-clip-text text-transparent tracking-tight">
+                      Hi there!
+                    </h1>
+                    <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white mt-1">
+                      Get Started With AngkorGenie
+                    </h2>
+                  </div>
 
-                    {/* Chat Bubble */}
-                    <div
-                      className={`max-w-[85%] sm:max-w-[75%] rounded-2xl p-4 text-xs sm:text-sm leading-relaxed ${
-                        isUser
-                          ? 'bg-[#003E83] text-white rounded-tr-none'
-                          : msg.isError
-                          ? 'bg-rose-50 dark:bg-rose-950/40 text-rose-800 dark:text-rose-200 border border-rose-200 dark:border-rose-800 rounded-tl-none'
-                          : 'bg-slate-50 dark:bg-zinc-800/70 text-slate-800 dark:text-zinc-100 border border-slate-100 dark:border-zinc-700/60 rounded-tl-none shadow-xs'
-                      }`}
-                    >
-                      <div className="whitespace-pre-wrap">{msg.content}</div>
+                  {/* Introductory speech balloon */}
+                  <div className="p-5 rounded-2xl bg-blue-50/70 dark:bg-zinc-800/60 border border-blue-100 dark:border-zinc-700/50 text-sm text-slate-700 dark:text-zinc-300 leading-relaxed shadow-xs">
+                    I'm your one-stop travel assistant. I can help you make travel plans, find top temples, hotels, local cuisine, and book tours across Cambodia! Of course, you can ask me anything about travel! If you don't know what to ask, simply try the recommended questions below.
+                  </div>
 
-                      <div className={`mt-2 flex items-center justify-between text-[10px] ${isUser ? 'text-blue-200' : 'text-slate-400 dark:text-zinc-500'}`}>
-                        <span>{msg.time}</span>
-                        {!isUser && !msg.isError && (
-                          <button
-                            type="button"
-                            onClick={() => handleCopyText(msg.content, idx)}
-                            className="p-1 hover:text-slate-700 dark:hover:text-zinc-200 transition cursor-pointer"
-                            title="Copy response"
-                          >
-                            {copiedIndex === idx ? <Check size={12} className="text-emerald-500" /> : <Copy size={12} />}
-                          </button>
+                  {/* 2-Column Recommended Questions Grid (Screenshot 1) */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-2">
+                    {TRIP_GENIE_SUGGESTIONS.map((item, idx) => {
+                      const IconComponent = item.icon;
+                      return (
+                        <button
+                          key={idx}
+                          type="button"
+                          onClick={() => handleSendMessage(item.question)}
+                          className="text-left p-4 rounded-2xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-800/60 hover:border-blue-500 hover:shadow-md hover:bg-blue-50/30 dark:hover:bg-zinc-800 transition-all duration-200 cursor-pointer flex flex-col justify-between group"
+                        >
+                          <div className="flex items-center gap-1.5 mb-2.5">
+                            <IconComponent size={14} className={item.color} />
+                            <span className={`text-xs font-bold ${item.color}`}>
+                              {item.category}
+                            </span>
+                          </div>
+                          <p className="text-sm font-semibold text-slate-800 dark:text-zinc-200 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors leading-snug">
+                            {item.question}
+                          </p>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              ) : (
+                /* Message Thread */
+                <div className="space-y-5 max-w-3xl mx-auto">
+                  {messages.map((msg, idx) => {
+                    const isUser = msg.role === 'user';
+                    return (
+                      <div
+                        key={msg.id}
+                        className={`flex items-start gap-3 ${isUser ? 'flex-row-reverse' : ''}`}
+                      >
+                        {/* Avatar */}
+                        {!isUser ? (
+                          <GenieAvatar size={32} showBadge={false} className="mt-1" />
+                        ) : (
+                          <div className="w-8 h-8 rounded-full bg-[#003E83] dark:bg-blue-600 text-white flex items-center justify-center text-xs font-bold shrink-0 mt-1 shadow-xs">
+                            {user?.name ? user.name[0].toUpperCase() : 'U'}
+                          </div>
                         )}
+
+                        {/* Bubble */}
+                        <div
+                          className={`max-w-[85%] sm:max-w-[78%] rounded-2xl p-4 text-sm leading-relaxed ${
+                            isUser
+                              ? 'bg-[#003E83] dark:bg-blue-600 text-white rounded-tr-xs shadow-xs'
+                              : msg.isError
+                              ? 'bg-rose-50 dark:bg-rose-950/40 text-rose-800 dark:text-rose-200 border border-rose-200 dark:border-rose-800 rounded-tl-xs'
+                              : 'bg-slate-50 dark:bg-zinc-800/90 text-slate-800 dark:text-zinc-100 border border-slate-100 dark:border-zinc-700/60 rounded-tl-xs shadow-xs'
+                          }`}
+                        >
+                          <div className="whitespace-pre-wrap">{msg.content}</div>
+
+                          <div className={`mt-2.5 flex items-center justify-between text-[11px] ${isUser ? 'text-blue-200' : 'text-slate-400 dark:text-zinc-500'}`}>
+                            <span>{msg.time}</span>
+                            {!isUser && !msg.isError && (
+                              <button
+                                type="button"
+                                onClick={() => handleCopyText(msg.content, idx)}
+                                className="p-1 hover:text-slate-700 dark:hover:text-zinc-200 transition cursor-pointer"
+                                title="Copy response"
+                              >
+                                {copiedIndex === idx ? <Check size={13} className="text-emerald-500" /> : <Copy size={13} />}
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+
+                  {isLoading && (
+                    <div className="flex items-start gap-3">
+                      <GenieAvatar size={32} showBadge={false} className="mt-1 animate-pulse" />
+                      <div className="p-4 rounded-2xl bg-slate-50 dark:bg-zinc-800/90 border border-slate-100 dark:border-zinc-700/60 text-xs text-slate-500 dark:text-zinc-400 flex items-center gap-2.5 rounded-tl-xs">
+                        <Loader2 size={15} className="animate-spin text-blue-600 dark:text-blue-400" />
+                        <span>AngkorGenie is querying Cambodian travel knowledge...</span>
                       </div>
                     </div>
-                  </div>
-                );
-              })}
-
-              {isLoading && (
-                <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-600 to-purple-600 text-white flex items-center justify-center shrink-0">
-                    <Sparkles size={16} className="animate-spin" />
-                  </div>
-                  <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-zinc-800/70 border border-slate-100 dark:border-zinc-700/60 text-xs text-slate-500 dark:text-zinc-400 flex items-center gap-2">
-                    <Loader2 size={14} className="animate-spin text-[#003E83] dark:text-blue-400" />
-                    <span>Searching Cambodian heritage datasets and compiling response...</span>
-                  </div>
+                  )}
                 </div>
               )}
 
               <div ref={messagesEndRef} />
             </div>
 
-            {/* Chat Input Bar */}
-            <div className="p-3 sm:p-4 border-t border-slate-200 dark:border-zinc-800 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xs">
+            {/* Quick suggested chips when messages are present */}
+            {messages.length > 0 && (
+              <div className="px-6 py-2 border-t border-slate-100 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-900 flex items-center gap-2 overflow-x-auto no-scrollbar shrink-0 text-xs">
+                <span className="text-[10px] font-bold text-slate-400 uppercase shrink-0">Suggestions:</span>
+                {TRIP_GENIE_SUGGESTIONS.map((item, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => handleSendMessage(item.question)}
+                    className="px-3 py-1 rounded-full bg-white dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 hover:border-blue-400 text-slate-700 dark:text-zinc-300 text-xs whitespace-nowrap transition cursor-pointer shrink-0"
+                  >
+                    {item.category}: {item.question.slice(0, 32)}...
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {/* Bottom Input Bar (Screenshot 1) */}
+            <div className="p-4 sm:p-5 border-t border-slate-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 shrink-0">
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
                   handleSendMessage();
                 }}
-                className="flex items-center gap-2"
+                className="max-w-3xl mx-auto flex items-center gap-2 p-1.5 pl-5 pr-2 rounded-2xl border border-blue-400/80 dark:border-blue-500/60 bg-white dark:bg-zinc-800 shadow-xs focus-within:ring-2 focus-within:ring-blue-500/20 transition"
               >
                 <input
                   type="text"
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
-                  placeholder="Ask anything about Cambodia (e.g. Angkor sunrise, food, dress codes)..."
-                  className="flex-1 px-4 py-3 rounded-2xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800 text-xs sm:text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#003E83]"
+                  placeholder="Ask me anything about travel"
+                  className="flex-1 py-2 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-zinc-500 bg-transparent focus:outline-none"
                 />
                 <button
                   type="submit"
                   disabled={isLoading || !inputValue.trim()}
-                  className="px-5 py-3 rounded-2xl bg-[#003E83] hover:bg-[#002e62] disabled:opacity-40 text-white font-semibold text-xs sm:text-sm shadow-md transition flex items-center gap-1.5 cursor-pointer shrink-0"
+                  aria-label="Send Message"
+                  className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer shrink-0 ${
+                    inputValue.trim() && !isLoading
+                      ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-md shadow-blue-600/30'
+                      : 'text-slate-300 dark:text-zinc-600 cursor-not-allowed'
+                  }`}
                 >
-                  <Send size={15} />
-                  <span className="hidden sm:inline">Send</span>
+                  <Send size={16} />
                 </button>
               </form>
             </div>
-          </div>
-
-          {/* Right Column: Suggested Questions & Destination Shortcuts */}
-          <div className="space-y-4">
-            <div className="p-5 rounded-3xl bg-white dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800 shadow-sm space-y-3">
-              <div className="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
-                <Sparkles size={14} className="text-amber-500" />
-                <span>Suggested Questions</span>
+          </>
+        ) : (
+          /* Weather & Currency Tools Tab */
+          <div className="flex-1 overflow-y-auto p-6 sm:p-8 space-y-6">
+            <div className="max-w-2xl mx-auto space-y-6">
+              <div>
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                  <CloudSun className="text-amber-500" />
+                  <span>Real-Time Weather Intelligence</span>
+                </h3>
+                <p className="text-xs text-slate-500 dark:text-zinc-400 mt-1">
+                  Live meteorological conditions across Cambodian tourism regions
+                </p>
               </div>
-              <div className="space-y-2">
-                {SUGGESTED_QUESTIONS.map((q, idx) => (
+
+              {/* City selector buttons */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                {['Siem Reap', 'Phnom Penh', 'Sihanoukville', 'Battambang'].map((province) => (
                   <button
-                    key={idx}
+                    key={province}
                     type="button"
-                    onClick={() => handleSendMessage(q)}
-                    className="w-full text-left p-2.5 rounded-xl border border-slate-200/70 dark:border-zinc-800 hover:border-blue-400 dark:hover:border-blue-600 bg-slate-50/70 dark:bg-zinc-800/40 text-xs text-slate-700 dark:text-zinc-300 hover:text-[#003E83] dark:hover:text-blue-400 transition cursor-pointer"
+                    onClick={() => {
+                      setWeatherProvince(province);
+                      fetchWeather(province);
+                    }}
+                    className={`py-2 px-3 rounded-xl border text-xs font-semibold transition cursor-pointer ${
+                      weatherProvince === province
+                        ? 'border-blue-500 bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400'
+                        : 'border-slate-200 dark:border-zinc-800 text-slate-600 dark:text-zinc-400 hover:border-slate-300'
+                    }`}
                   >
-                    {q}
+                    {province}
                   </button>
                 ))}
               </div>
-            </div>
 
-            <div className="p-5 rounded-3xl bg-gradient-to-br from-blue-50 to-indigo-50/40 dark:from-zinc-900 dark:to-zinc-800/40 border border-blue-200/80 dark:border-zinc-800 space-y-2 text-xs">
-              <span className="font-bold text-[#003E83] dark:text-blue-400 block">Verified Landmark Links</span>
-              <p className="text-slate-600 dark:text-zinc-400 leading-relaxed">
-                When you discover an attraction in your conversation, visit our destination catalog to check official opening hours and book tours.
-              </p>
-              <Link to="/destinations" className="font-bold text-[#003E83] dark:text-blue-400 hover:underline flex items-center gap-1 pt-1">
-                <span>Browse All Places</span>
-                <ArrowRight size={13} />
-              </Link>
-            </div>
-          </div>
-        </div>
-      ) : (
-        /* Weather & Currency Tab */
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Weather Widget */}
-          <div className="p-6 rounded-3xl bg-white dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800 shadow-sm space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <CloudSun size={20} className="text-amber-500" />
-                <h3 className="text-base font-bold text-slate-900 dark:text-white">
-                  Live Tourism Weather Advisory
-                </h3>
-              </div>
-              <select
-                value={weatherProvince}
-                onChange={(e) => {
-                  setWeatherProvince(e.target.value);
-                  fetchWeather(e.target.value);
-                }}
-                className="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800 text-xs text-slate-800 dark:text-white"
-              >
-                <option value="Siem Reap">Siem Reap (Angkor)</option>
-                <option value="Phnom Penh">Phnom Penh</option>
-                <option value="Kampot">Kampot</option>
-                <option value="Preah Sihanouk">Koh Rong / Sihanouk</option>
-                <option value="Battambang">Battambang</option>
-                <option value="Mondulkiri">Mondulkiri</option>
-              </select>
-            </div>
-
-            {isLoadingWeather ? (
-              <LoadingSpinner text="Fetching weather satellite data..." />
-            ) : weatherData ? (
-              <div className="p-5 rounded-2xl bg-gradient-to-tr from-sky-50 to-blue-50 dark:from-zinc-800 dark:to-zinc-800/50 border border-sky-200 dark:border-zinc-700 space-y-3">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="text-xs text-slate-500 dark:text-zinc-400">Province</div>
-                    <div className="text-xl font-black text-slate-900 dark:text-white">
-                      {weatherData.province || weatherProvince}
+              {/* Weather Card */}
+              {isLoadingWeather ? (
+                <div className="p-8 rounded-2xl bg-slate-50 dark:bg-zinc-800/60 border border-slate-200 dark:border-zinc-700 flex items-center justify-center gap-2 text-xs text-slate-500">
+                  <Loader2 size={16} className="animate-spin text-blue-600" />
+                  <span>Retrieving weather radar data...</span>
+                </div>
+              ) : weatherData ? (
+                <div className="p-5 rounded-2xl bg-gradient-to-br from-blue-50/70 to-indigo-50/40 dark:from-zinc-800/80 dark:to-zinc-800/40 border border-blue-200/80 dark:border-zinc-700 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <span className="text-base font-bold text-slate-900 dark:text-white">{weatherData.province}</span>
+                      <span className="block text-xs text-slate-500 dark:text-zinc-400">{weatherData.condition}</span>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-3xl font-black text-amber-500">{weatherData.temperature}</span>
+                      <span className="block text-xs text-slate-500">Humidity: {weatherData.humidity}</span>
                     </div>
                   </div>
-                  <div className="text-3xl font-black text-[#003E83] dark:text-blue-400">
-                    {weatherData.temperature || '31°C'}
+                  {weatherData.advice && (
+                    <div className="text-xs text-slate-600 dark:text-zinc-300 bg-white/70 dark:bg-zinc-900/70 p-3 rounded-xl">
+                      <strong>Travel Advisory:</strong> {weatherData.advice}
+                    </div>
+                  )}
+                </div>
+              ) : null}
+
+              {/* Currency Converter */}
+              <div className="pt-4 border-t border-slate-200 dark:border-zinc-800 space-y-3">
+                <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                  <DollarSign className="text-emerald-500" />
+                  <span>Currency Calculator (USD &harr; KHR)</span>
+                </h3>
+                <div className="flex items-center gap-3">
+                  <div className="relative flex-1">
+                    <span className="absolute left-3.5 top-2.5 text-xs text-slate-400 font-bold">$</span>
+                    <input
+                      type="number"
+                      value={usdAmount}
+                      onChange={(e) => handleConvertCurrency(Number(e.target.value) || 0)}
+                      className="w-full pl-8 pr-4 py-2 rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-sm font-bold text-slate-900 dark:text-white"
+                      placeholder="Amount in USD"
+                    />
+                  </div>
+                  <span className="text-sm font-bold text-slate-400">=</span>
+                  <div className="flex-1 py-2 px-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800/50 text-right text-sm font-black text-emerald-600 dark:text-emerald-400">
+                    {khrResult.toLocaleString()} ៛ KHR
                   </div>
                 </div>
-
-                <div className="grid grid-cols-2 gap-2 text-xs text-slate-600 dark:text-zinc-300 pt-2 border-t border-sky-100 dark:border-zinc-700">
-                  <div><strong>Condition:</strong> {weatherData.condition || 'Sunny with light clouds'}</div>
-                  <div><strong>Humidity:</strong> {weatherData.humidity || '68%'}</div>
-                </div>
-
-                <div className="p-3 rounded-xl bg-white/80 dark:bg-zinc-900/80 text-xs text-slate-700 dark:text-zinc-300 leading-relaxed">
-                  <strong className="block text-[#003E83] dark:text-blue-400 mb-0.5">Practical Travel Advice:</strong>
-                  {weatherData.advice || 'Early morning sunrise viewing at Angkor Wat has clear visibility. Use sunscreen and light cotton clothing.'}
-                </div>
-              </div>
-            ) : null}
-          </div>
-
-          {/* Currency Converter */}
-          <div className="p-6 rounded-3xl bg-white dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800 shadow-sm space-y-4">
-            <div className="flex items-center gap-2">
-              <DollarSign size={20} className="text-emerald-600 dark:text-emerald-400" />
-              <h3 className="text-base font-bold text-slate-900 dark:text-white">
-                Cambodia Currency Converter (USD / KHR)
-              </h3>
-            </div>
-            <p className="text-xs text-slate-500 dark:text-zinc-400 leading-relaxed">
-              Both US Dollars ($) and Cambodian Riel (៛) are widely accepted across the country. Standard rate is approximately 1 USD ≈ 4,100 KHR.
-            </p>
-
-            <div className="space-y-4 pt-2">
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 dark:text-zinc-300 mb-1">
-                  Amount in USD ($)
-                </label>
-                <input
-                  type="number"
-                  min="1"
-                  step="1"
-                  value={usdAmount}
-                  onChange={(e) => handleConvertCurrency(Number(e.target.value))}
-                  className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800 text-sm font-bold text-slate-900 dark:text-white"
-                />
+                <p className="text-[11px] text-slate-400">
+                  Fixed official exchange rate benchmark: 1 USD ≈ 4,100 KHR. Most merchants accept USD cash.
+                </p>
               </div>
 
-              <div className="p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-center">
-                <div className="text-[11px] font-semibold text-emerald-800 dark:text-emerald-300 uppercase">
-                  Equivalent Cambodian Riel
+              {/* Link to destinations */}
+              <div className="p-4 rounded-2xl bg-slate-50 dark:bg-zinc-800/60 border border-slate-200 dark:border-zinc-700 flex items-center justify-between">
+                <div>
+                  <h4 className="text-xs font-bold text-slate-900 dark:text-white">Explore Verified Destinations</h4>
+                  <p className="text-[11px] text-slate-500 dark:text-zinc-400">Find entrance fees, tour packages, and operating hours</p>
                 </div>
-                <div className="text-2xl font-black text-emerald-700 dark:text-emerald-400 mt-1">
-                  {khrResult.toLocaleString()} ៛ KHR
-                </div>
+                <Link
+                  to="/destinations"
+                  className="px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold flex items-center gap-1 transition"
+                >
+                  <span>Catalog</span>
+                  <ArrowRight size={13} />
+                </Link>
               </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }

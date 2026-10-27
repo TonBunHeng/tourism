@@ -60,12 +60,14 @@ export default function AppRoutes() {
             {/* Error Pages */}
             <Route path="/forbidden" element={<Forbidden />} />
 
+            {/* Standalone Full-Screen AI Chat (No Header, No Footer) */}
+            <Route path="/ai-chat" element={<AIChat />} />
+
             {/* 1. Tourist Portal (Public & Authenticated Routes under TouristLayout) */}
             <Route element={<TouristLayout />}>
               <Route path="/" element={<TouristHome />} />
               <Route path="/destinations" element={<Destinations />} />
               <Route path="/destinations/:id" element={<DestinationDetails />} />
-              <Route path="/ai-chat" element={<AIChat />} />
               <Route path="/support" element={<Support />} />
 
               {/* Protected Tourist Actions */}
