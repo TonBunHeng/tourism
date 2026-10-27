@@ -189,6 +189,99 @@
   animation: fadeIn 0.15s ease-in reverse both;
 }
 
+/* Branded transition shown while moving between admin pages. */
+@keyframes routeLoadingSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes routeLoadingReveal {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.route-loading-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(5px);
+  animation: fadeIn 0.16s ease-out both;
+}
+
+.dark .route-loading-overlay {
+  background: rgba(9, 9, 11, 0.96);
+}
+
+.route-loading-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 14px;
+  border: 1px solid #e5e7eb;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 10px 30px rgba(0, 62, 131, 0.12);
+  text-align: center;
+  animation: routeLoadingReveal 0.28s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.dark .route-loading-content {
+  border-color: #3f3f46;
+  background: #18181b;
+}
+
+.route-loading-ring {
+  position: relative;
+  display: grid;
+  width: 58px;
+  height: 58px;
+  place-items: center;
+}
+
+.route-loading-ring::before {
+  position: absolute;
+  inset: 0;
+  border: 3px solid #e5e7eb;
+  border-top-color: #168bd1;
+  border-right-color: #55b8e8;
+  border-radius: 50%;
+  content: '';
+  animation: routeLoadingSpin 1.05s linear infinite;
+}
+
+.dark .route-loading-ring::before {
+  border-color: #3f3f46;
+  border-top-color: #38bdf8;
+  border-right-color: #7dd3fc;
+}
+
+.route-loading-logo {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  object-fit: contain;
+  background: #fff;
+  box-shadow: 0 4px 14px rgba(0, 62, 131, 0.14);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .route-loading-overlay,
+  .route-loading-content,
+  .route-loading-ring::before {
+    animation: none;
+  }
+}
+
 /* Smooth Dropdown Animation for Header Navigation */
 @keyframes dropdownFadeSlideDown {
   0% {

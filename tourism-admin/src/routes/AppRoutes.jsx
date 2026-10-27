@@ -37,6 +37,7 @@ import Guides from '../pages/guides/Guides';
 import UsersTracking from '../pages/tracking/UsersTracking';
 
 import { SearchProvider } from '../context/SearchContext';
+import RouteLoadingOverlay from '../components/common/RouteLoadingOverlay';
 
 // Role Groups
 const ALL_ADMIN_ROLES = ['super_admin', 'admin', 'guide_editor', 'Super Admin', 'Admin', 'Guide / Editor', 'Tourism Content Editor'];
@@ -105,6 +106,7 @@ const AppRoutes = () => {
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
 
       </Routes>
+        <RouteLoadingOverlay />
       </SearchProvider>
     </BrowserRouter>
   );
