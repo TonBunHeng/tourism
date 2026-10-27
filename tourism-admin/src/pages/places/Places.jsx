@@ -1,15 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
-import {
-  Eye,
-  Edit,
-  Trash2,
-  MapPin,
-  Star,
-  Clock,
-  Landmark,
-  ExternalLink
-} from 'lucide-react';
 import SimplePagination from '../../components/common/SimplePagination';
 import PlacesHeader from './PlacesHeader';
 import PlacesStats from './PlacesStats';
@@ -23,10 +13,12 @@ import deletionRequestService from '../../services/deletionRequestService';
 import authService, { isSuperAdminRole } from '../../services/authService';
 import { useAlert } from '../../context/AlertContext';
 import { useSearch } from '../../context/SearchContext';
+import { useLanguage } from '../../i18n';
 import { getPageCache, setPageCache } from '../../utils/pageCache';
 
 export default function Places() {
   const location = useLocation();
+  const { t } = useLanguage();
   const { showConfirm, showSuccess, showError } = useAlert();
   const { searchTerm, setSearchTerm } = useSearch();
   const currentUser = authService.getCurrentUser();
@@ -83,7 +75,7 @@ export default function Places() {
     }
   };
 
-  const loadPlaces = async () => {
+  const loadPlaces = useCallback(async () => {
     if (!getPageCache('places_data')) setIsLoading(true);
     try {
       const params = {
@@ -135,7 +127,7 @@ export default function Places() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [currentPage, itemsPerPage, searchTerm, selectedCategory]);
 
   useEffect(() => {
     loadCategories();
@@ -147,12 +139,7 @@ export default function Places() {
 
   useEffect(() => {
     loadPlaces();
-  }, [currentPage, searchTerm, selectedCategory]);
-
-  const handleSearchChange = (val) => {
-    setSearchTerm(val);
-    setCurrentPage(1);
-  };
+  }, [loadPlaces]);
 
   const handleCategoryChange = (val) => {
     setSelectedCategory(val);
@@ -189,9 +176,9 @@ export default function Places() {
 
     if (isSuperAdmin) {
       const confirmed = await showConfirm({
-        title: 'Delete Destination',
-        message: `Are you sure you want to permanently delete "${placeName}"?\n\nThis action cannot be undone.`,
-        confirmText: 'Delete Permanently',
+        title: t('places.deleteTitle', 'Delete Destination'),
+        message: t('places.deletePermanentConfirm', 'Are you sure you want to permanently delete "{name}"?\n\nThis action cannot be undone.').replace('{name}', placeName),
+        confirmText: t('places.deletePermanentBtn', 'Delete Permanently'),
         type: 'danger'
       });
 
@@ -199,18 +186,21 @@ export default function Places() {
 
       try {
         await placeService.deletePlace(id);
-        showSuccess(`Destination "${placeName}" has been permanently deleted.`, 'Destination Deleted');
+        showSuccess(
+          t('places.deleteSuccess', 'Destination "{name}" has been permanently deleted.').replace('{name}', placeName),
+          t('places.deleteSuccessTitle', 'Destination Deleted')
+        );
         loadPlaces();
       } catch (e) {
-        showError(e.message || 'Failed to delete destination.', 'Delete Failed');
+        showError(e.message || t('places.deleteFailed', 'Failed to delete destination.'), t('places.deleteFailedTitle', 'Delete Failed'));
       }
       return;
     }
 
     const confirmed = await showConfirm({
-      title: 'Submit Deletion Request',
-      message: `Are you sure you want to submit a deletion request for "${placeName}"?\n\nThis will be submitted to the Super Administrator for review and approval.`,
-      confirmText: 'Submit Deletion',
+      title: t('places.deletionRequestTitle', 'Submit Deletion Request'),
+      message: t('places.deletionRequestMessage', 'Are you sure you want to submit a deletion request for "{name}"?\n\nThis will be submitted to the Super Administrator for review and approval.').replace('{name}', placeName),
+      confirmText: t('places.submitDeletionBtn', 'Submit Deletion'),
       type: 'danger'
     });
 
@@ -219,7 +209,7 @@ export default function Places() {
     try {
       await deletionRequestService.createRequest({
         request_type: 'item',
-        reason: `Request to delete destination: ${placeName}`,
+        reason: t('places.deletionRequestReason', 'Request to delete destination: {name}').replace('{name}', placeName),
         urgency: 'medium',
         items: [{
           item_type: 'place',
@@ -228,9 +218,12 @@ export default function Places() {
           category: place?.category || 'Place',
         }]
       });
-      showSuccess(`Deletion request for "${placeName}" has been submitted to Super Admin for approval.`, 'Request Submitted');
+      showSuccess(
+        t('places.deletionRequestSuccess', 'Deletion request for "{name}" has been submitted to Super Admin for approval.').replace('{name}', placeName),
+        t('places.requestSubmittedTitle', 'Request Submitted')
+      );
     } catch (e) {
-      showError(e.message || 'Failed to submit deletion request.', 'Submission Failed');
+      showError(e.message || t('places.submissionFailed', 'Failed to submit deletion request.'), t('places.submissionFailedTitle', 'Submission Failed'));
     }
   };
 
@@ -304,15 +297,21 @@ export default function Places() {
 
       if (editingPlace) {
         await placeService.updatePlace(editingPlace.id, payload);
-        showSuccess(`Place "${formData.name}" has been updated successfully.`, 'Place Updated');
+        showSuccess(
+          t('places.placeUpdatedSuccess', 'Place "{name}" has been updated successfully.').replace('{name}', formData.name),
+          t('places.placeUpdatedTitle', 'Place Updated')
+        );
       } else {
         await placeService.createPlace(payload);
-        showSuccess(`Place "${formData.name}" has been created successfully.`, 'Place Created');
+        showSuccess(
+          t('places.placeCreatedSuccess', 'Place "{name}" has been created successfully.').replace('{name}', formData.name),
+          t('places.placeCreatedTitle', 'Place Created')
+        );
       }
       closeModal();
       loadPlaces();
     } catch (e) {
-      showError(e.message || 'Failed to save place.', 'Save Failed');
+      showError(e.message || t('places.saveFailed', 'Failed to save place.'), t('places.saveFailedTitle', 'Save Failed'));
     }
   };
 
@@ -344,7 +343,7 @@ export default function Places() {
         {/* Places List View */}
         {isLoading ? (
           <div className="p-12 text-center text-slate-500 dark:text-zinc-400 font-medium">
-            Loading places from database...
+            {t('places.loadingPlaces', 'Loading places from database...')}
           </div>
         ) : (
           <PlacesList
@@ -364,7 +363,7 @@ export default function Places() {
           startIndex={startIndex}
           endIndex={endIndex}
           totalRecords={totalRecords}
-          label="places"
+          label={t('places.placeCountPlural', 'places')}
         />
       </div>
 

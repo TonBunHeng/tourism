@@ -1,6 +1,9 @@
+import React from 'react';
 import { Plus } from 'lucide-react';
+import { useLanguage } from '../../i18n';
 
 export default function ProvincesHeader({ onOpenAddModal, onAddProvince, onAddClick }) {
+  const { t } = useLanguage();
   const handleClick = onOpenAddModal || onAddProvince || onAddClick || (() => {});
 
   return (
@@ -8,10 +11,10 @@ export default function ProvincesHeader({ onOpenAddModal, onAddProvince, onAddCl
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
           <h1 className="text-xl sm:text-2xl font-bold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] tracking-tight">
-            Provinces & Cities
+            {t('provinces.title', 'Provinces')}
           </h1>
           <p className="text-xs sm:text-sm text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mt-1">
-            Manage administrative regions and urban areas
+            {t('provinces.subtitle', 'Manage administrative regions and urban areas')}
           </p>
         </div>
         <button
@@ -20,7 +23,7 @@ export default function ProvincesHeader({ onOpenAddModal, onAddProvince, onAddCl
           className="flex items-center justify-center gap-1.5 md:gap-2 px-4 py-2 text-xs md:text-sm font-medium rounded-md bg-[#003E83] hover:bg-[#002e62] active:scale-[0.98] text-white transition-all shrink-0 w-full sm:w-auto cursor-pointer shadow-xs"
         >
           <Plus className="w-4 h-4 shrink-0" />
-          <span>Add New Province</span>
+          <span>{t('provinces.addProvinceBtn', 'Add New Province')}</span>
         </button>
       </div>
     </div>

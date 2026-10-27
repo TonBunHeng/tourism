@@ -1,5 +1,6 @@
-import { useRef, useEffect } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { ChevronDown, Building, MapPin, Users, Maximize2, Layers, Landmark, Compass, FileText, Plus, Check } from 'lucide-react';
+import { useLanguage } from '../../i18n';
 
 export default function ProvinceModal({
   isOpen,
@@ -11,6 +12,7 @@ export default function ProvinceModal({
   onFormChange,
   provinceTypes = ['Capital City', 'Province', 'Municipality']
 }) {
+  const { t } = useLanguage();
   const formRef = useRef(null);
 
   useEffect(() => {
@@ -32,6 +34,15 @@ export default function ProvinceModal({
   const safeTypes = (provinceTypes && provinceTypes.length > 0)
     ? provinceTypes.filter(t => t !== 'All')
     : ['Capital City', 'Province', 'Municipality'];
+
+  const getTypeOptionLabel = (type) => {
+    switch (type) {
+      case 'Capital City': return t('provinces.typeCapitalCity', 'Capital City');
+      case 'Province': return t('provinces.typeProvince', 'Province');
+      case 'Municipality': return t('provinces.typeMunicipality', 'Municipality');
+      default: return type;
+    }
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -73,10 +84,10 @@ export default function ProvinceModal({
             </div>
             <div>
               <h3 className="text-base font-bold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">
-                {editingProvince ? 'Edit Province' : 'Add New Province'}
+                {editingProvince ? t('provinces.titleEdit', 'Edit Province') : t('provinces.titleAdd', 'Add New Province')}
               </h3>
               <p className="text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mt-0.5">
-                {editingProvince ? 'Update region information' : 'Create a new administrative region or municipality'}
+                {editingProvince ? t('provinces.subtitleEdit', 'Update region information') : t('provinces.subtitleAdd', 'Create a new administrative region or municipality')}
               </p>
             </div>
           </div>
@@ -87,7 +98,7 @@ export default function ProvinceModal({
           <div className="p-6 space-y-4 overflow-y-auto flex-1">
             <div>
               <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">
-                Province Name *
+                {t('provinces.labelName', 'Province Name *')}
               </label>
               <div className="relative">
                 <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
@@ -96,7 +107,7 @@ export default function ProvinceModal({
                   type="text"
                   value={propFormData?.name ?? (editingProvince?.name || '')}
                   onChange={(e) => onFormChange && onFormChange('name', e.target.value)}
-                  placeholder="Enter province name (e.g. Siem Reap, Kampot)"
+                  placeholder={t('provinces.placeholderName', 'Enter province name (e.g. Siem Reap, Kampot)')}
                   className="w-full pl-9 pr-4 py-2.5 bg-[var(--color-bg-light)] dark:bg-[var(--color-input-dark-bg)] border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]/70 rounded-md text-sm text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] placeholder-[var(--color-text-muted-light)] focus:outline-none focus:ring-2 focus:ring-[var(--color-input)] transition-all"
                   required
                 />
@@ -105,7 +116,7 @@ export default function ProvinceModal({
 
             <div>
               <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">
-                Type *
+                {t('provinces.labelTypeSelect', 'Type *')}
               </label>
               <div className="relative">
                 <Layers className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
@@ -117,7 +128,7 @@ export default function ProvinceModal({
                   required
                 >
                   {safeTypes.map(type => (
-                    <option key={type} value={type}>{type}</option>
+                    <option key={type} value={type}>{getTypeOptionLabel(type)}</option>
                   ))}
                 </select>
                 <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
@@ -127,7 +138,7 @@ export default function ProvinceModal({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">
-                  Population
+                  {t('provinces.labelPopulationInput', 'Population')}
                 </label>
                 <div className="relative">
                   <Users className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
@@ -136,7 +147,7 @@ export default function ProvinceModal({
                     type="text"
                     value={propFormData?.population ?? (editingProvince?.population || '')}
                     onChange={(e) => onFormChange && onFormChange('population', e.target.value)}
-                    placeholder="e.g., 2,129,371"
+                    placeholder={t('provinces.placeholderPopulation', 'e.g., 2,129,371')}
                     className="w-full pl-9 pr-4 py-2.5 bg-[var(--color-bg-light)] dark:bg-[var(--color-input-dark-bg)] border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]/70 rounded-md text-sm text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] placeholder-[var(--color-text-muted-light)] focus:outline-none focus:ring-2 focus:ring-[var(--color-input)] transition-all"
                     required
                   />
@@ -144,7 +155,7 @@ export default function ProvinceModal({
               </div>
               <div>
                 <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">
-                  Area
+                  {t('provinces.labelAreaInput', 'Area')}
                 </label>
                 <div className="relative">
                   <Maximize2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
@@ -153,7 +164,7 @@ export default function ProvinceModal({
                     type="text"
                     value={propFormData?.area ?? (editingProvince?.area || '')}
                     onChange={(e) => onFormChange && onFormChange('area', e.target.value)}
-                    placeholder="e.g., 678.46 km²"
+                    placeholder={t('provinces.placeholderArea', 'e.g., 678.46 km²')}
                     className="w-full pl-9 pr-4 py-2.5 bg-[var(--color-bg-light)] dark:bg-[var(--color-input-dark-bg)] border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]/70 rounded-md text-sm text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] placeholder-[var(--color-text-muted-light)] focus:outline-none focus:ring-2 focus:ring-[var(--color-input)] transition-all"
                     required
                   />
@@ -164,7 +175,7 @@ export default function ProvinceModal({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">
-                  Districts
+                  {t('provinces.labelDistrictsInput', 'Districts')}
                 </label>
                 <div className="relative">
                   <Landmark className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
@@ -173,7 +184,7 @@ export default function ProvinceModal({
                     type="number"
                     value={propFormData?.districts_count ?? (editingProvince?.districts || '')}
                     onChange={(e) => onFormChange && onFormChange('districts_count', e.target.value)}
-                    placeholder="Number of districts"
+                    placeholder={t('provinces.placeholderDistricts', 'Number of districts')}
                     className="w-full pl-9 pr-4 py-2.5 bg-[var(--color-bg-light)] dark:bg-[var(--color-input-dark-bg)] border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]/70 rounded-md text-sm text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] placeholder-[var(--color-text-muted-light)] focus:outline-none focus:ring-2 focus:ring-[var(--color-input)] transition-all"
                     required
                   />
@@ -181,7 +192,7 @@ export default function ProvinceModal({
               </div>
               <div>
                 <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">
-                  Communes
+                  {t('provinces.labelCommunesInput', 'Communes')}
                 </label>
                 <div className="relative">
                   <Compass className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
@@ -190,7 +201,7 @@ export default function ProvinceModal({
                     type="number"
                     value={propFormData?.communes_count ?? (editingProvince?.communes || '')}
                     onChange={(e) => onFormChange && onFormChange('communes_count', e.target.value)}
-                    placeholder="Number of communes"
+                    placeholder={t('provinces.placeholderCommunes', 'Number of communes')}
                     className="w-full pl-9 pr-4 py-2.5 bg-[var(--color-bg-light)] dark:bg-[var(--color-input-dark-bg)] border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]/70 rounded-md text-sm text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] placeholder-[var(--color-text-muted-light)] focus:outline-none focus:ring-2 focus:ring-[var(--color-input)] transition-all"
                     required
                   />
@@ -200,7 +211,7 @@ export default function ProvinceModal({
 
             <div>
               <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">
-                Description
+                {t('provinces.labelDescriptionInput', 'Description')}
               </label>
               <div className="relative">
                 <FileText className="absolute left-3 top-3 w-4 h-4 text-gray-400 pointer-events-none" />
@@ -208,7 +219,7 @@ export default function ProvinceModal({
                   name="description"
                   value={propFormData?.description ?? (editingProvince?.description || '')}
                   onChange={(e) => onFormChange && onFormChange('description', e.target.value)}
-                  placeholder="Enter province description and regional attractions..."
+                  placeholder={t('provinces.placeholderDescription', 'Enter province description and regional attractions...')}
                   rows="3"
                   className="w-full pl-9 pr-4 py-2.5 bg-[var(--color-bg-light)] dark:bg-[var(--color-input-dark-bg)] border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]/70 rounded-md text-sm text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] placeholder-[var(--color-text-muted-light)] focus:outline-none focus:ring-2 focus:ring-[var(--color-input)] resize-none transition-all"
                   required
@@ -224,7 +235,7 @@ export default function ProvinceModal({
               onClick={onClose}
               className="flex-1 py-2.5 px-4 rounded-md border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] hover:bg-[var(--color-surface-hover-light)] dark:hover:bg-[var(--color-surface-hover-dark)] font-medium text-sm transition-colors text-center cursor-pointer"
             >
-              Cancel
+              {t('provinces.cancelBtn', 'Cancel')}
             </button>
             <button
               type="submit"
@@ -233,12 +244,12 @@ export default function ProvinceModal({
               {editingProvince ? (
                 <>
                   <Check className="w-4 h-4" />
-                  <span>Update Province</span>
+                  <span>{t('provinces.updateSubmitBtn', 'Update Province')}</span>
                 </>
               ) : (
                 <>
                   <Plus className="w-4 h-4" />
-                  <span>Add Province</span>
+                  <span>{t('provinces.addSubmitBtn', 'Add Province')}</span>
                 </>
               )}
             </button>

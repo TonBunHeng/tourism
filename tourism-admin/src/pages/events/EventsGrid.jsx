@@ -1,5 +1,7 @@
+import React from 'react';
 import { Eye, Edit, Trash2, Calendar, Clock, MapPin, Users, Star } from 'lucide-react';
 import { getEventStatusColor as getStatusColor, getCategoryColor } from '../../utils/StatusUtils';
+import { useLanguage } from '../../i18n';
 
 export default function EventsGrid({
   events = [],
@@ -10,11 +12,35 @@ export default function EventsGrid({
   onEditEvent,
   onDeleteEvent
 }) {
+  const { t } = useLanguage();
   const handleView = onViewDetails || onViewEvent || (() => {});
   const handleEdit = onEdit || onEditEvent || (() => {});
   const handleDeleteItem = onDelete || onDeleteEvent || (() => {});
 
   const safeEvents = events || [];
+
+  const getCategoryLabel = (cat) => {
+    switch (cat) {
+      case 'Cultural': return t('events.catCultural', 'Cultural');
+      case 'Festival': return t('events.catFestival', 'Festival');
+      case 'Sports': return t('events.catSports', 'Sports');
+      case 'Food': return t('events.catFood', 'Food');
+      case 'Music': return t('events.catMusic', 'Music');
+      case 'Exhibition': return t('events.catExhibition', 'Exhibition');
+      default: return cat;
+    }
+  };
+
+  const getStatusLabel = (status) => {
+    switch (status) {
+      case 'Upcoming': return t('events.statusUpcoming', 'Upcoming');
+      case 'Ongoing': return t('events.statusOngoing', 'Ongoing');
+      case 'Completed': return t('events.statusCompleted', 'Completed');
+      case 'Cancelled': return t('events.statusCancelled', 'Cancelled');
+      case 'Scheduled': return t('events.statusScheduled', 'Scheduled');
+      default: return status;
+    }
+  };
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4 sm:p-6">
@@ -38,7 +64,7 @@ export default function EventsGrid({
                 {event.featured && (
                   <div className="absolute top-2.5 right-2.5 z-10">
                     <span className="px-2 py-0.5 bg-[var(--color-warning-text)] text-[var(--color-white)] text-xs font-medium rounded-md">
-                      Featured
+                      {t('events.featuredBadge', 'Featured')}
                     </span>
                   </div>
                 )}
@@ -48,7 +74,7 @@ export default function EventsGrid({
                 <div className="min-w-0">
                   <h3 className="font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] text-sm line-clamp-1">{event.title}</h3>
                   <span className={`inline-block text-xs font-medium px-2 py-0.5 rounded-md border ${getCategoryColor(event.category)}`}>
-                    {event.category}
+                    {getCategoryLabel(event.category)}
                   </span>
                 </div>
                 <div className="flex gap-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity shrink-0" onClick={(e) => e.stopPropagation()}>
@@ -56,7 +82,7 @@ export default function EventsGrid({
                     type="button"
                     onClick={(e) => { e.stopPropagation(); handleView(event); }}
                     className="p-1.5 text-[var(--color-purple-badge-text)] dark:text-[var(--color-purple-badge-dark-text)] hover:bg-[var(--color-purple-badge-bg)] dark:hover:bg-[var(--color-purple-badge-dark-bg)] rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
-                    title="View Details"
+                    title={t('events.tooltipViewDetails', 'View Details')}
                   >
                     <Eye className="w-3.5 h-3.5" />
                   </button>
@@ -64,14 +90,15 @@ export default function EventsGrid({
                     type="button"
                     onClick={(e) => { e.stopPropagation(); handleEdit(event); }}
                     className="p-1.5 text-[var(--color-info-text)] dark:text-[var(--color-info-dark-text)] hover:bg-[var(--color-info-bg)] dark:hover:bg-[var(--color-info-dark-bg)] rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
-                    title="Edit"
+                    title={t('events.tooltipEditEvent', 'Edit')}
                   >
                     <Edit className="w-3.5 h-3.5" />
                   </button>
                   <button
-                    onClick={() => handleDeleteItem(event.id)}
+                    type="button"
+                    onClick={(e) => { e.stopPropagation(); handleDeleteItem(event.id); }}
                     className="p-1.5 text-[var(--color-danger-text)] dark:text-[var(--color-danger-dark-text)] hover:bg-[var(--color-danger-bg)] dark:hover:bg-[var(--color-danger-dark-bg)] rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
-                    title="Delete"
+                    title={t('events.tooltipDeleteEvent', 'Delete')}
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>
@@ -103,7 +130,7 @@ export default function EventsGrid({
                 <div className="flex items-center gap-2">
                   <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 text-xs font-medium rounded-md border ${getStatusColor(event.status)}`}>
                     <Clock className="w-3 h-3" />
-                    {event.status}
+                    {getStatusLabel(event.status)}
                   </span>
                   <span className="text-sm font-semibold text-[var(--color-info-text)] dark:text-[var(--color-info-dark-text)]">{event.price}</span>
                 </div>
@@ -117,8 +144,12 @@ export default function EventsGrid({
         })
       ) : (
         <div className="col-span-full text-center py-12">
-          <h3 className="text-lg font-medium text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] mb-1">No events found</h3>
-          <p className="text-sm text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">Try adjusting your search or filter criteria</p>
+          <h3 className="text-lg font-medium text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] mb-1">
+            {t('events.noEventsFound', 'No events found')}
+          </h3>
+          <p className="text-sm text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
+            {t('events.tryAdjustingFilter', 'Try adjusting your search or filter criteria')}
+          </p>
         </div>
       )}
     </div>

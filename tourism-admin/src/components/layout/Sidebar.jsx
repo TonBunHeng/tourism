@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import LogoutAlert from './LogoutAlert';
 import { isFullAdminRole, normalizeRole } from '../../services/authService';
+import { useLanguage } from '../../i18n';
 
 /* -------------------------------------------------------------------------- */
 /*  Navigation config                                                         */
@@ -20,71 +21,77 @@ import { isFullAdminRole, normalizeRole } from '../../services/authService';
 const NAV_SECTIONS = [
   {
     title: 'Management',
+    titleKey: 'sidebar.management',
     items: [
-      { name: 'Dashboard', icon: LayoutGrid, path: '/dashboard' },
+      { name: 'Dashboard', key: 'sidebar.dashboard', icon: LayoutGrid, path: '/dashboard' },
       {
         name: 'Tours & Bookings',
+        key: 'sidebar.toursBookings',
         icon: Compass,
         children: [
-          { name: 'Businesses', icon: Building2, path: '/businesses', match: ['/businesses', '/business'], requires: 'privileged' },
-          { name: 'Bookings', icon: CalendarCheck, path: '/bookings' },
-          { name: 'Tour Packages', icon: Sparkles, path: '/tours' },
-          { name: 'Tour Guides', icon: UserCheck, path: '/guides' },
+          { name: 'Businesses', key: 'sidebar.businesses', icon: Building2, path: '/businesses', match: ['/businesses', '/business'], requires: 'privileged' },
+          { name: 'Bookings', key: 'sidebar.bookings', icon: CalendarCheck, path: '/bookings' },
+          { name: 'Tour Packages', key: 'sidebar.tourPackages', icon: Sparkles, path: '/tours' },
+          { name: 'Tour Guides', key: 'sidebar.tourGuides', icon: UserCheck, path: '/guides' },
         ],
       },
       {
         name: 'Destinations',
+        key: 'sidebar.destinations',
         icon: MapPinned,
         children: [
-          { name: 'Places', icon: MapPinned, path: '/place', match: ['/place', '/places'] },
-          { name: 'Categories', icon: Tags, path: '/categories' },
-          { name: 'Provinces', icon: Globe, path: '/provinces' },
-          { name: 'Galleries', icon: Images, path: '/galleries' },
-          { name: 'Events', icon: CalendarDays, path: '/events' },
-
+          { name: 'Categories', key: 'sidebar.categories', icon: Tags, path: '/categories' },
+          { name: 'Places', key: 'sidebar.places', icon: MapPinned, path: '/place', match: ['/place', '/places'] },
+          { name: 'Provinces', key: 'sidebar.provinces', icon: Globe, path: '/provinces' },
+          { name: 'Galleries', key: 'sidebar.galleries', icon: Images, path: '/galleries' },
+          { name: 'Events', key: 'sidebar.events', icon: CalendarDays, path: '/events' },
         ],
       },
     ],
   },
   {
     title: 'Engagement',
+    titleKey: 'sidebar.engagement',
     items: [
       {
         name: 'Reviews & Feedback',
+        key: 'sidebar.reviewsFeedback',
         icon: Star,
         children: [
-          { name: 'Ratings & Reviews', icon: Star, path: '/ratings', match: ['/ratings', '/reviews'] },
-          { name: 'Favorites', icon: Heart, path: '/favorites' },
+          { name: 'Ratings & Reviews', key: 'sidebar.ratingsReviews', icon: Star, path: '/ratings', match: ['/ratings', '/reviews'] },
+          { name: 'Favorites', key: 'sidebar.favorites', icon: Heart, path: '/favorites' },
         ],
       },
-      { name: 'Notifications', icon: Bell, path: '/notifications' },
+      { name: 'Notifications', key: 'sidebar.notifications', icon: Bell, path: '/notifications' },
     ],
   },
   {
     title: 'Preferences',
+    titleKey: 'sidebar.preferences',
     items: [
       {
         name: 'Administration',
+        key: 'sidebar.administration',
         icon: ShieldCheck,
         children: [
-          { name: 'Users', icon: Users, path: '/users', match: ['/users', '/user'], requires: 'privileged' },
-          { name: 'Users Tracking', icon: Activity, path: '/tracking-users', requires: 'privileged' },
-          { name: 'Security Alerts', icon: ShieldCheck, path: '/security', requires: 'privileged' },
-          { name: 'Deletion Requests', icon: Trash2, path: '/deletion-requests', requires: 'super_admin' },
-
+          { name: 'Users', key: 'sidebar.users', icon: Users, path: '/users', match: ['/users', '/user'], requires: 'privileged' },
+          { name: 'Users Tracking', key: 'sidebar.userTracking', icon: Activity, path: '/tracking-users', requires: 'privileged' },
+          { name: 'Security Alerts', key: 'sidebar.securityAlerts', icon: ShieldCheck, path: '/security', requires: 'privileged' },
+          { name: 'Deletion Requests', key: 'sidebar.deletionRequests', icon: Trash2, path: '/deletion-requests', requires: 'super_admin' },
         ],
       },
       {
         name: 'Reports & Analytics',
+        key: 'sidebar.reportsAnalytics',
         icon: FileText,
         requires: 'privileged',
         children: [
-          { name: 'Reports', icon: FileText, path: '/reports', match: ['/reports'] },
+          { name: 'Reports', key: 'sidebar.reports', icon: FileText, path: '/reports', match: ['/reports'] },
         ],
       },
-      { name: 'Profile', icon: User, path: '/profile' },
-      { name: 'Settings', icon: Settings, path: '/settings' },
-      { name: 'Logout', icon: LogOut, action: 'logout' },
+      { name: 'Profile', key: 'sidebar.profile', icon: User, path: '/profile' },
+      { name: 'Settings', key: 'sidebar.settings', icon: Settings, path: '/settings' },
+      { name: 'Logout', key: 'sidebar.logout', icon: LogOut, action: 'logout' },
     ],
   },
 ];
@@ -266,7 +273,10 @@ const labelClass = (isExpanded, maxW = 'max-w-[160px]') =>
   }`;
 
 function SubLink({ child, active }) {
+  const { t } = useLanguage();
   const ChildIcon = child.icon;
+  const label = child.key ? t(child.key, child.name) : child.name;
+
   return (
     <Link
       to={child.path}
@@ -289,22 +299,25 @@ function SubLink({ child, active }) {
             }`}
         />
       )}
-      <span className="truncate">{child.name}</span>
+      <span className="truncate">{label}</span>
     </Link>
   );
 }
 
 function NavLeaf({ item, active, isExpanded }) {
+  const { t } = useLanguage();
   const Icon = item.icon;
+  const label = item.key ? t(item.key, item.name) : item.name;
+
   return (
     <Flyout
       enabled={!isExpanded}
       className="my-0.5"
-      panel={<TooltipBubble>{item.name}</TooltipBubble>}
+      panel={<TooltipBubble>{label}</TooltipBubble>}
     >
       <Link
         to={item.path || '#'}
-        aria-label={item.name}
+        aria-label={label}
         aria-current={active ? 'page' : undefined}
         className={`flex items-center px-3 py-1.5 rounded-md cursor-pointer transition-colors duration-150 ${active
           ? 'bg-blue-50 dark:bg-blue-600/15 text-[#003E83] dark:text-blue-400 font-semibold shadow-xs'
@@ -315,7 +328,7 @@ function NavLeaf({ item, active, isExpanded }) {
           <div className="flex items-center justify-center w-5 h-5 shrink-0">
             <Icon size={18} aria-hidden="true" />
           </div>
-          <span className={labelClass(isExpanded)}>{item.name}</span>
+          <span className={labelClass(isExpanded)}>{label}</span>
         </div>
       </Link>
     </Flyout>
@@ -323,24 +336,27 @@ function NavLeaf({ item, active, isExpanded }) {
 }
 
 function LogoutButton({ item, isExpanded, onClick }) {
+  const { t } = useLanguage();
   const Icon = item.icon;
+  const label = item.key ? t(item.key, item.name) : item.name;
+
   return (
     <Flyout
       enabled={!isExpanded}
       className="my-0.5"
-      panel={<TooltipBubble>{item.name}</TooltipBubble>}
+      panel={<TooltipBubble>{label}</TooltipBubble>}
     >
       <button
         type="button"
         onClick={onClick}
-        aria-label="Log out"
+        aria-label={label}
         className="flex items-center w-full px-3 py-1.5 rounded-md cursor-pointer transition-colors duration-150 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 hover:text-red-700 dark:hover:text-red-300"
       >
         <div className="flex items-center w-full min-w-0">
           <div className="flex items-center justify-center w-5 h-5 shrink-0">
             <Icon size={18} aria-hidden="true" />
           </div>
-          <span className={`${labelClass(isExpanded)} font-medium`}>{item.name}</span>
+          <span className={`${labelClass(isExpanded)} font-medium`}>{label}</span>
         </div>
       </button>
     </Flyout>
@@ -348,7 +364,9 @@ function LogoutButton({ item, isExpanded, onClick }) {
 }
 
 function NavGroup({ item, pathname, isExpanded, isMenuOpen, onToggle, onExpandAndOpen }) {
+  const { t } = useLanguage();
   const Icon = item.icon;
+  const label = item.key ? t(item.key, item.name) : item.name;
   const isChildActive = item.children.some((c) => isItemActive(c, pathname));
 
   return (
@@ -359,7 +377,7 @@ function NavGroup({ item, pathname, isExpanded, isMenuOpen, onToggle, onExpandAn
       panel={
         <div className="w-48 py-2 px-1.5 rounded-lg shadow-xl bg-white dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800 text-gray-800 dark:text-zinc-200">
           <div className="px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider text-gray-400 dark:text-zinc-500 border-b border-gray-100 dark:border-zinc-800/80 mb-1">
-            {item.name}
+            {label}
           </div>
           <div className="flex flex-col space-y-0.5">
             {item.children.map((child) => (
@@ -372,7 +390,7 @@ function NavGroup({ item, pathname, isExpanded, isMenuOpen, onToggle, onExpandAn
       <button
         type="button"
         onClick={() => (isExpanded ? onToggle(item.name) : onExpandAndOpen(item.name))}
-        aria-label={item.name}
+        aria-label={label}
         aria-expanded={isExpanded ? isMenuOpen : undefined}
         aria-haspopup={isExpanded ? undefined : 'menu'}
         className={`flex items-center justify-between w-full px-3 py-1.5 rounded-md cursor-pointer transition-colors duration-150 ${isChildActive
@@ -385,7 +403,7 @@ function NavGroup({ item, pathname, isExpanded, isMenuOpen, onToggle, onExpandAn
             <Icon size={18} aria-hidden="true" />
           </div>
           <span className={`${labelClass(isExpanded, 'max-w-[130px]')} ${isExpanded ? 'truncate' : ''}`}>
-            {item.name}
+            {label}
           </span>
         </div>
 
@@ -426,6 +444,7 @@ function NavGroup({ item, pathname, isExpanded, isMenuOpen, onToggle, onExpandAn
 /* -------------------------------------------------------------------------- */
 
 export default function Sidebar({ isOpen, setIsOpen, isExpanded, setIsExpanded }) {
+  const { t } = useLanguage();
   const [showLogoutAlert, setShowLogoutAlert] = useState(false);
   const [openMenus, setOpenMenus] = useState({});
   const sidebarRef = useRef(null);
@@ -548,8 +567,8 @@ export default function Sidebar({ isOpen, setIsOpen, isExpanded, setIsExpanded }
               className={`flex flex-col whitespace-nowrap transition-all duration-200 ${isExpanded ? 'opacity-100 max-w-[160px]' : 'opacity-100 md:opacity-0 md:max-w-0 md:overflow-hidden'
                 }`}
             >
-              <span className="font-bold text-sm leading-tight text-gray-900 dark:text-white">AngkorVerses</span>
-              <span className="text-[10px] font-normal text-gray-500 dark:text-zinc-400">Admin Portal</span>
+              <span className="font-bold text-sm leading-tight text-gray-900 dark:text-white">{t('common.appName', 'AngkorVerses')}</span>
+              <span className="text-[10px] font-normal text-gray-500 dark:text-zinc-400">{t('common.adminPortal', 'Admin Portal')}</span>
             </div>
           </div>
 
@@ -574,7 +593,7 @@ export default function Sidebar({ isOpen, setIsOpen, isExpanded, setIsExpanded }
                 className={`px-3 text-[10px] font-semibold uppercase tracking-wider text-gray-400 dark:text-zinc-500 transition-colors ${isExpanded ? 'opacity-100 mb-1' : 'opacity-100 md:opacity-0 md:h-0 md:overflow-hidden'
                   }`}
               >
-                {section.title}
+                {section.titleKey ? t(section.titleKey, section.title) : section.title}
               </h3>
               <div className="flex flex-col">{section.items.map(renderItem)}</div>
             </div>

@@ -5,6 +5,7 @@ import {
   AlertCircle, XCircle, ShieldAlert, Star, Calendar, Globe, FileText,
   Edit, RefreshCw, AlertTriangle, ExternalLink
 } from 'lucide-react';
+import { useLanguage } from '../../i18n';
 
 export default function BusinessDetailsModal({
   business,
@@ -15,6 +16,7 @@ export default function BusinessDetailsModal({
   onActivate,
   onEdit
 }) {
+  const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState('overview');
 
   useEffect(() => {
@@ -49,26 +51,26 @@ export default function BusinessDetailsModal({
       case 'approved':
         return (
           <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-xs font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
-            <CheckCircle2 size={14} /> Approved & Active
+            <CheckCircle2 size={14} /> {t('businesses.statusApprovedActive', 'Approved & Active')}
           </span>
         );
       case 'suspended':
         return (
           <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-xs font-semibold bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
-            <AlertTriangle size={14} /> Suspended
+            <AlertTriangle size={14} /> {t('businesses.statusSuspended', 'Suspended')}
           </span>
         );
       case 'rejected':
         return (
           <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-xs font-semibold bg-red-50 text-red-700 dark:bg-red-950/60 dark:text-red-300 border border-red-200 dark:border-red-800">
-            <XCircle size={14} /> Rejected
+            <XCircle size={14} /> {t('businesses.statusRejected', 'Rejected')}
           </span>
         );
       case 'pending':
       default:
         return (
           <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-xs font-semibold bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
-            <AlertCircle size={14} /> Pending Review
+            <AlertCircle size={14} /> {t('businesses.statusPending', 'Pending Review')}
           </span>
         );
     }
@@ -111,7 +113,7 @@ export default function BusinessDetailsModal({
               <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
                 <span className="flex items-center gap-1 font-medium text-[#003E83] dark:text-blue-400">
                   <Building2 size={14} />
-                  {business.category?.name || business.category_name || business.category || 'Hospitality'}
+                  {business.category?.name || business.category_name || business.category || t('businesses.defaultCategory', 'Hospitality')}
                 </span>
                 <span className="flex items-center gap-1">
                   <MapPin size={14} />
@@ -124,9 +126,9 @@ export default function BusinessDetailsModal({
           {/* Navigation Tabs */}
           <div className="flex items-center gap-2 mt-4 border-t border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] pt-3">
             {[
-              { id: 'overview', label: 'Business Profile' },
-              { id: 'owner', label: 'Owner & Contact' },
-              { id: 'verification', label: 'Verification & License' },
+              { id: 'overview', label: t('businesses.tabOverview', 'Business Profile') },
+              { id: 'owner', label: t('businesses.tabOwner', 'Owner & Contact') },
+              { id: 'verification', label: t('businesses.tabVerification', 'Verification & License') },
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -160,34 +162,34 @@ export default function BusinessDetailsModal({
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-70 pointer-events-none" />
                 <div className="absolute bottom-2.5 left-3 text-white">
                   <span className="text-[10px] font-semibold uppercase tracking-wider bg-black/60 backdrop-blur-xs px-2.5 py-1 rounded-md text-white/90">
-                    Cover Picture
+                    {t('businesses.coverPicture', 'Cover Picture')}
                   </span>
                 </div>
               </div>
 
               <div className="bg-[var(--color-surface-hover-light)] dark:bg-[var(--color-surface-hover-dark)]/50 p-4 rounded-md border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]">
                 <h4 className="font-bold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] uppercase tracking-wider text-[11px] mb-1.5">
-                  About Business Profile
+                  {t('businesses.aboutBusiness', 'About Business Profile')}
                 </h4>
                 <p className="text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] leading-relaxed">
-                  {business.description || 'No detailed business description available for this profile.'}
+                  {business.description || t('businesses.noDescription', 'No detailed business description available for this profile.')}
                 </p>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="p-3 bg-[var(--color-surface-hover-light)] dark:bg-[var(--color-surface-hover-dark)]/50 rounded-md border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] space-y-1">
-                  <span className="text-[var(--color-text-muted-light)] text-[10px] uppercase font-semibold">Address / Location</span>
+                  <span className="text-[var(--color-text-muted-light)] text-[10px] uppercase font-semibold">{t('businesses.addressLocation', 'Address / Location')}</span>
                   <p className="font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">{business.address || 'National Road 6, Siem Reap'}</p>
                 </div>
 
                 <div className="p-3 bg-[var(--color-surface-hover-light)] dark:bg-[var(--color-surface-hover-dark)]/50 rounded-md border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] space-y-1">
-                  <span className="text-[var(--color-text-muted-light)] text-[10px] uppercase font-semibold">Province / Region</span>
+                  <span className="text-[var(--color-text-muted-light)] text-[10px] uppercase font-semibold">{t('businesses.provinceRegion', 'Province / Region')}</span>
                   <p className="font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">{business.province?.name || business.province || 'Siem Reap'}</p>
                 </div>
 
                 {business.price_tier && (
                   <div className="p-3 bg-[var(--color-surface-hover-light)] dark:bg-[var(--color-surface-hover-dark)]/50 rounded-md border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] space-y-1">
-                    <span className="text-[var(--color-text-muted-light)] text-[10px] uppercase font-semibold">Price Tier</span>
+                    <span className="text-[var(--color-text-muted-light)] text-[10px] uppercase font-semibold">{t('businesses.priceTier', 'Price Tier')}</span>
                     <p className="font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">
                       {business.price_tier}
                     </p>
@@ -196,7 +198,7 @@ export default function BusinessDetailsModal({
 
                 {(business.latitude || business.longitude) && (
                   <div className="p-3 bg-[var(--color-surface-hover-light)] dark:bg-[var(--color-surface-hover-dark)]/50 rounded-md border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] space-y-1">
-                    <span className="text-[var(--color-text-muted-light)] text-[10px] uppercase font-semibold">Geo Coordinates</span>
+                    <span className="text-[var(--color-text-muted-light)] text-[10px] uppercase font-semibold">{t('businesses.geoCoordinates', 'Geo Coordinates')}</span>
                     <p className="font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">
                       {business.latitude || '0'}, {business.longitude || '0'}
                     </p>
@@ -204,12 +206,12 @@ export default function BusinessDetailsModal({
                 )}
 
                 <div className="p-3 bg-[var(--color-surface-hover-light)] dark:bg-[var(--color-surface-hover-dark)]/50 rounded-md border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] space-y-1">
-                  <span className="text-[var(--color-text-muted-light)] text-[10px] uppercase font-semibold">Operating Hours</span>
+                  <span className="text-[var(--color-text-muted-light)] text-[10px] uppercase font-semibold">{t('businesses.operatingHours', 'Operating Hours')}</span>
                   <p className="font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">{business.operating_hours || '8:00 AM - 10:00 PM Daily'}</p>
                 </div>
 
                 <div className="p-3 bg-[var(--color-surface-hover-light)] dark:bg-[var(--color-surface-hover-dark)]/50 rounded-md border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] space-y-1">
-                  <span className="text-[var(--color-text-muted-light)] text-[10px] uppercase font-semibold">Website / Link</span>
+                  <span className="text-[var(--color-text-muted-light)] text-[10px] uppercase font-semibold">{t('businesses.websiteLink', 'Website / Link')}</span>
                   <p className="font-semibold text-[#003E83] dark:text-blue-400 flex items-center gap-1 truncate">
                     <Globe size={13} />
                     {business.website ? (
@@ -233,9 +235,9 @@ export default function BusinessDetailsModal({
                 </div>
                 <div>
                   <h4 className="text-sm font-bold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">
-                    {business.owner?.name || business.owner_name || 'Business Owner'}
+                    {business.owner?.name || business.owner_name || t('businesses.defaultOwner', 'Business Owner')}
                   </h4>
-                  <p className="text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] text-xs">Registered Commercial Owner</p>
+                  <p className="text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] text-xs">{t('businesses.registeredCommercialOwner', 'Registered Commercial Owner')}</p>
                 </div>
               </div>
 
@@ -243,7 +245,7 @@ export default function BusinessDetailsModal({
                 <div className="p-3 bg-[var(--color-surface-hover-light)] dark:bg-[var(--color-surface-hover-dark)]/50 rounded-md border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] flex items-center gap-3">
                   <Mail className="w-4 h-4 text-[#003E83] dark:text-blue-400 shrink-0" />
                   <div>
-                    <span className="text-[var(--color-text-muted-light)] text-[10px] uppercase font-semibold block">Email Address</span>
+                    <span className="text-[var(--color-text-muted-light)] text-[10px] uppercase font-semibold block">{t('businesses.emailAddress', 'Email Address')}</span>
                     <span className="font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">{business.owner?.email || business.email || 'owner@business.com'}</span>
                   </div>
                 </div>
@@ -251,7 +253,7 @@ export default function BusinessDetailsModal({
                 <div className="p-3 bg-[var(--color-surface-hover-light)] dark:bg-[var(--color-surface-hover-dark)]/50 rounded-md border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] flex items-center gap-3">
                   <Phone className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
                   <div>
-                    <span className="text-[var(--color-text-muted-light)] text-[10px] uppercase font-semibold block">Phone Contact</span>
+                    <span className="text-[var(--color-text-muted-light)] text-[10px] uppercase font-semibold block">{t('businesses.phoneContact', 'Phone Contact')}</span>
                     <span className="font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">{business.owner?.phone || business.phone || '+855 12 345 678'}</span>
                   </div>
                 </div>
@@ -259,7 +261,7 @@ export default function BusinessDetailsModal({
                 <div className="p-3 bg-[var(--color-surface-hover-light)] dark:bg-[var(--color-surface-hover-dark)]/50 rounded-md border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] flex items-center gap-3">
                   <Calendar className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
                   <div>
-                    <span className="text-[var(--color-text-muted-light)] text-[10px] uppercase font-semibold block">Registration Date</span>
+                    <span className="text-[var(--color-text-muted-light)] text-[10px] uppercase font-semibold block">{t('businesses.registrationDate', 'Registration Date')}</span>
                     <span className="font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">
                       {business.created_at ? business.created_at.split('T')[0] : '2024-03-15'}
                     </span>
@@ -269,7 +271,7 @@ export default function BusinessDetailsModal({
                 <div className="p-3 bg-[var(--color-surface-hover-light)] dark:bg-[var(--color-surface-hover-dark)]/50 rounded-md border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] flex items-center gap-3">
                   <FileCheck className="w-4 h-4 text-purple-600 dark:text-purple-400 shrink-0" />
                   <div>
-                    <span className="text-[var(--color-text-muted-light)] text-[10px] uppercase font-semibold block">Tax Identification</span>
+                    <span className="text-[var(--color-text-muted-light)] text-[10px] uppercase font-semibold block">{t('businesses.taxIdentification', 'Tax Identification')}</span>
                     <span className="font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">{business.tax_id || business.license_number || 'MOT-2024-REG'}</span>
                   </div>
                 </div>
@@ -282,21 +284,21 @@ export default function BusinessDetailsModal({
               <div className="p-4 bg-[var(--color-surface-hover-light)] dark:bg-[var(--color-surface-hover-dark)]/50 rounded-md border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]">
                 <div className="flex justify-between items-center mb-2">
                   <span className="font-bold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] flex items-center gap-2">
-                    <FileText className="w-4 h-4 text-[#003E83]" /> Ministry Tourism Operating License
+                    <FileText className="w-4 h-4 text-[#003E83]" /> {t('businesses.ministryTourismLicense', 'Ministry Tourism Operating License')}
                   </span>
                   <span className="text-[10px] bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 px-2 py-0.5 rounded-md font-semibold">
-                    Attached
+                    {t('businesses.attached', 'Attached')}
                   </span>
                 </div>
                 <p className="text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] text-[11px]">
-                  Commercial License Number: <strong className="text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">{business.license_number || 'MOT-2024-REG'}</strong>
+                  {t('businesses.commercialLicenseNumber', 'Commercial License Number:')} <strong className="text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">{business.license_number || 'MOT-2024-REG'}</strong>
                 </p>
               </div>
 
               {business.rejection_reason && (
                 <div className="p-4 bg-red-50 dark:bg-red-950/30 rounded-md border border-red-200 dark:border-red-800/50 text-red-700 dark:text-red-300">
                   <h5 className="font-bold mb-1 flex items-center gap-1.5">
-                    <XCircle size={15} /> Rejection / Action Note
+                    <XCircle size={15} /> {t('businesses.rejectionActionNote', 'Rejection / Action Note')}
                   </h5>
                   <p className="text-xs">{business.rejection_reason}</p>
                 </div>
@@ -305,7 +307,7 @@ export default function BusinessDetailsModal({
               {business.suspension_reason && (
                 <div className="p-4 bg-amber-50 dark:bg-amber-950/30 rounded-md border border-amber-200 dark:border-amber-800/50 text-amber-700 dark:text-amber-300">
                   <h5 className="font-bold mb-1 flex items-center gap-1.5">
-                    <AlertTriangle size={15} /> Suspension Justification
+                    <AlertTriangle size={15} /> {t('businesses.suspensionJustification', 'Suspension Justification')}
                   </h5>
                   <p className="text-xs">{business.suspension_reason}</p>
                 </div>
@@ -322,14 +324,14 @@ export default function BusinessDetailsModal({
               onClick={onClose}
               className="py-2 px-4 rounded-md border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] hover:bg-[var(--color-surface-hover-light)] dark:hover:bg-[var(--color-surface-hover-dark)] font-medium text-xs sm:text-sm transition-colors text-center cursor-pointer"
             >
-              Close
+              {t('common.close', 'Close')}
             </button>
             <button
               type="button"
               onClick={() => onEdit?.(business)}
               className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-md text-xs sm:text-sm font-medium border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] hover:bg-[var(--color-surface-hover-light)] dark:hover:bg-[var(--color-surface-hover-dark)] text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] transition-colors cursor-pointer"
             >
-              <Edit size={14} /> Edit Profile
+              <Edit size={14} /> {t('businesses.editProfile', 'Edit Profile')}
             </button>
             <a
               href={(() => {
@@ -342,7 +344,7 @@ export default function BusinessDetailsModal({
               className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-md text-xs sm:text-sm font-medium border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] hover:bg-[var(--color-surface-hover-light)] dark:hover:bg-[var(--color-surface-hover-dark)] text-[#003E83] dark:text-blue-400 transition-colors cursor-pointer"
             >
               <ExternalLink size={14} />
-              <span>Visit Page</span>
+              <span>{t('businesses.visitPage', 'Visit Page')}</span>
             </a>
           </div>
 
@@ -353,7 +355,7 @@ export default function BusinessDetailsModal({
                 onClick={() => onApprove(business)}
                 className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-md text-xs sm:text-sm font-medium bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs transition-colors cursor-pointer"
               >
-                <CheckCircle2 size={14} /> Approve Profile
+                <CheckCircle2 size={14} /> {t('businesses.approveProfile', 'Approve Profile')}
               </button>
             )}
 
@@ -363,7 +365,7 @@ export default function BusinessDetailsModal({
                 onClick={() => onSuspend(business)}
                 className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-md text-xs sm:text-sm font-medium bg-amber-600 hover:bg-amber-700 text-white shadow-xs transition-colors cursor-pointer"
               >
-                <AlertTriangle size={14} /> Suspend
+                <AlertTriangle size={14} /> {t('businesses.suspend', 'Suspend')}
               </button>
             )}
 
@@ -373,7 +375,7 @@ export default function BusinessDetailsModal({
                 onClick={() => onReject(business)}
                 className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-md text-xs sm:text-sm font-medium bg-red-600 hover:bg-red-700 text-white shadow-xs transition-colors cursor-pointer"
               >
-                <XCircle size={14} /> Reject
+                <XCircle size={14} /> {t('businesses.reject', 'Reject')}
               </button>
             )}
 
@@ -383,7 +385,7 @@ export default function BusinessDetailsModal({
                 onClick={() => onActivate(business)}
                 className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-md text-xs sm:text-sm font-medium bg-[#003E83] hover:bg-[#002e62] text-white shadow-xs transition-colors cursor-pointer"
               >
-                <RefreshCw size={14} /> Reactivate
+                <RefreshCw size={14} /> {t('businesses.reactivate', 'Reactivate')}
               </button>
             )}
           </div>

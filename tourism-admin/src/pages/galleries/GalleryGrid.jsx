@@ -1,4 +1,6 @@
-import { Video, Eye, Edit, Trash2, Clock, Heart, HardDrive, Calendar } from 'lucide-react';
+import React from 'react';
+import { Video, Eye, Edit, Trash2, HardDrive, Calendar } from 'lucide-react';
+import { useLanguage } from '../../i18n';
 
 const getStatusColor = (status) => {
   return status === 'Published'
@@ -7,7 +9,14 @@ const getStatusColor = (status) => {
 };
 
 export default function GalleryGrid({ media, mediaItems, onPreview, onEdit, onDelete }) {
+  const { t } = useLanguage();
   const items = Array.isArray(media) ? media : (Array.isArray(mediaItems) ? mediaItems : []);
+
+  const getStatusLabel = (status) => {
+    if (status === 'Published') return t('gallery.statusPublished', 'Published');
+    if (status === 'Draft') return t('gallery.statusDraft', 'Draft');
+    return status;
+  };
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4 sm:p-6">
@@ -35,7 +44,7 @@ export default function GalleryGrid({ media, mediaItems, onPreview, onEdit, onDe
 
               {/* Status Badge */}
               <span className={`absolute top-2 right-2 px-2 py-0.5 text-[10px] font-medium rounded-md border ${getStatusColor(item.status)}`}>
-                {item.status}
+                {getStatusLabel(item.status)}
               </span>
             </div>
 
@@ -79,7 +88,7 @@ export default function GalleryGrid({ media, mediaItems, onPreview, onEdit, onDe
             <div className="flex items-center justify-between pt-2.5 border-t border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]">
               <div className="flex items-center gap-2 text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
                 <span className="font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">
-                  {(item.views || 0).toLocaleString()} views
+                  {t('gallery.viewsCount', '{count} views').replace('{count}', (item.views || 0).toLocaleString())}
                 </span>
               </div>
 
@@ -89,7 +98,7 @@ export default function GalleryGrid({ media, mediaItems, onPreview, onEdit, onDe
                   type="button"
                   onClick={() => onPreview(item)}
                   className="p-1.5 text-[var(--color-purple-badge-text)] dark:text-[var(--color-purple-badge-dark-text)] hover:bg-[var(--color-purple-badge-bg)] dark:hover:bg-[var(--color-purple-badge-dark-bg)] rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
-                  title="View Details"
+                  title={t('gallery.tooltipViewDetails', 'View Details')}
                 >
                   <Eye className="w-3.5 h-3.5" />
                 </button>
@@ -97,7 +106,7 @@ export default function GalleryGrid({ media, mediaItems, onPreview, onEdit, onDe
                   type="button"
                   onClick={() => onEdit(item)}
                   className="p-1.5 text-[var(--color-info-text)] dark:text-[var(--color-info-dark-text)] hover:bg-[var(--color-info-bg)] dark:hover:bg-[var(--color-info-dark-bg)] rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
-                  title="Edit Media"
+                  title={t('gallery.tooltipEditMedia', 'Edit')}
                 >
                   <Edit className="w-3.5 h-3.5" />
                 </button>
@@ -105,7 +114,7 @@ export default function GalleryGrid({ media, mediaItems, onPreview, onEdit, onDe
                   type="button"
                   onClick={() => onDelete(item.id)}
                   className="p-1.5 text-[var(--color-danger-text)] dark:text-[var(--color-danger-dark-text)] hover:bg-[var(--color-danger-bg)] dark:hover:bg-[var(--color-danger-dark-bg)] rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
-                  title="Delete Media"
+                  title={t('gallery.tooltipDeleteMedia', 'Delete')}
                 >
                   <Trash2 className="w-3.5 h-3.5" />
                 </button>
@@ -115,8 +124,12 @@ export default function GalleryGrid({ media, mediaItems, onPreview, onEdit, onDe
         ))
       ) : (
         <div className="col-span-full text-center py-12">
-          <h3 className="text-lg font-medium text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] mb-1">No media found</h3>
-          <p className="text-sm text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">Try adjusting your search or filter criteria</p>
+          <h3 className="text-lg font-medium text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] mb-1">
+            {t('gallery.noMediaFound', 'No media found')}
+          </h3>
+          <p className="text-sm text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
+            {t('gallery.tryAdjustingFilter', 'Try adjusting your search or filter criteria')}
+          </p>
         </div>
       )}
     </div>

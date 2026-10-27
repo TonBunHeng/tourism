@@ -1,6 +1,7 @@
 import React from 'react';
-import { Clock, Eye, Edit, Trash2, MapPin, Users, Maximize2, Building2 } from 'lucide-react';
+import { Clock, Eye, Edit, Trash2, MapPin } from 'lucide-react';
 import { getStatusColor, getTypeBadgeColor } from '../../utils/StatusUtils';
+import { useLanguage } from '../../i18n';
 
 export default function ProvincesList({
   provinces = [],
@@ -12,11 +13,29 @@ export default function ProvincesList({
   onDelete,
   startIndex = 0
 }) {
+  const { t } = useLanguage();
   const handleView = onViewProvince || onView || (() => {});
   const handleEdit = onEditProvince || onEdit || (() => {});
   const handleDeleteItem = onDeleteProvince || onDelete || (() => {});
 
   const safeProvinces = provinces || [];
+
+  const getTypeLabel = (type) => {
+    switch (type) {
+      case 'Capital City': return t('provinces.typeCapitalCity', 'Capital City');
+      case 'Province': return t('provinces.typeProvince', 'Province');
+      case 'Municipality': return t('provinces.typeMunicipality', 'Municipality');
+      default: return type;
+    }
+  };
+
+  const getStatusLabel = (status) => {
+    switch (status) {
+      case 'Active': return t('provinces.statusActive', 'Active');
+      case 'Inactive': return t('provinces.statusInactive', 'Inactive');
+      default: return status || t('provinces.statusActive', 'Active');
+    }
+  };
 
   return (
     <>
@@ -38,27 +57,27 @@ export default function ProvincesList({
                     </p>
                   </div>
                   <span className={`inline-flex items-center px-2 py-0.5 mt-1 text-[10px] font-medium rounded-md border ${getTypeBadgeColor(province.type)}`}>
-                    {province.type}
+                    {getTypeLabel(province.type)}
                   </span>
                 </div>
 
                 <span className={`shrink-0 inline-flex items-center gap-1 px-2.5 py-0.5 text-[10px] font-semibold rounded-md border ${getStatusColor(province.status)}`}>
                   <Clock className="w-3 h-3" />
-                  {province.status}
+                  {getStatusLabel(province.status)}
                 </span>
               </div>
 
               <div className="grid grid-cols-3 gap-2 text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] pt-1 border-t border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]">
                 <div>
-                  <span className="text-[10px] text-[var(--color-text-muted-light)] block">Pop.</span>
+                  <span className="text-[10px] text-[var(--color-text-muted-light)] block">{t('provinces.mobilePop', 'Pop.')}</span>
                   <span className="font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">{province.population}</span>
                 </div>
                 <div>
-                  <span className="text-[10px] text-[var(--color-text-muted-light)] block">Area</span>
+                  <span className="text-[10px] text-[var(--color-text-muted-light)] block">{t('provinces.mobileArea', 'Area')}</span>
                   <span className="font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">{province.area}</span>
                 </div>
                 <div>
-                  <span className="text-[10px] text-[var(--color-text-muted-light)] block">Districts</span>
+                  <span className="text-[10px] text-[var(--color-text-muted-light)] block">{t('provinces.mobileDistricts', 'Districts')}</span>
                   <span className="font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">{province.districts}</span>
                 </div>
               </div>
@@ -68,7 +87,7 @@ export default function ProvincesList({
                   type="button"
                   onClick={() => handleView(province)}
                   className="p-1.5 text-[var(--color-purple-badge-text)] dark:text-[var(--color-purple-badge-dark-text)] hover:bg-[var(--color-purple-badge-bg)] dark:hover:bg-[var(--color-purple-badge-dark-bg)] rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
-                  title="View Details"
+                  title={t('provinces.tooltipViewDetails', 'View Details')}
                 >
                   <Eye className="w-4 h-4" />
                 </button>
@@ -76,7 +95,7 @@ export default function ProvincesList({
                   type="button"
                   onClick={() => handleEdit(province)}
                   className="p-1.5 text-[var(--color-info-text)] dark:text-[var(--color-info-dark-text)] hover:bg-[var(--color-info-bg)] dark:hover:bg-[var(--color-info-dark-bg)] rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
-                  title="Edit"
+                  title={t('provinces.tooltipEditProvince', 'Edit')}
                 >
                   <Edit className="w-4 h-4" />
                 </button>
@@ -84,7 +103,7 @@ export default function ProvincesList({
                   type="button"
                   onClick={() => handleDeleteItem(province.id || province)}
                   className="p-1.5 text-[var(--color-danger-text)] dark:text-[var(--color-danger-dark-text)] hover:bg-[var(--color-danger-bg)] dark:hover:bg-[var(--color-danger-dark-bg)] rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
-                  title="Delete"
+                  title={t('provinces.tooltipDeleteProvince', 'Delete')}
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>
@@ -93,8 +112,12 @@ export default function ProvincesList({
           ))
         ) : (
           <div className="text-center py-12">
-            <h3 className="text-lg font-medium text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] mb-1">No provinces found</h3>
-            <p className="text-sm text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">Try adjusting your search or filter criteria</p>
+            <h3 className="text-lg font-medium text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] mb-1">
+              {t('provinces.noProvincesFound', 'No provinces found')}
+            </h3>
+            <p className="text-sm text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
+              {t('provinces.tryAdjustingFilter', 'Try adjusting your search or filter criteria')}
+            </p>
           </div>
         )}
       </div>
@@ -105,25 +128,25 @@ export default function ProvincesList({
           <thead className="bg-[var(--color-surface-hover-light)]/50 dark:bg-[var(--color-surface-hover-dark)]/50">
             <tr>
               <th className="pl-4 pr-2 py-3.5 text-xs font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] uppercase tracking-wider w-10 text-center">
-                #
+                {t('provinces.thIndex', '#')}
               </th>
               <th className="px-4 py-3.5 text-xs font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] uppercase tracking-wider">
-                Region & Type
+                {t('provinces.thRegionType', 'Region & Type')}
               </th>
               <th className="px-3 py-3.5 text-xs font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] uppercase tracking-wider whitespace-nowrap">
-                Population
+                {t('provinces.thPopulation', 'Population')}
               </th>
               <th className="px-3 py-3.5 text-xs font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] uppercase tracking-wider whitespace-nowrap">
-                Area
+                {t('provinces.thArea', 'Area')}
               </th>
               <th className="px-3 py-3.5 text-xs font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] uppercase tracking-wider whitespace-nowrap">
-                Districts
+                {t('provinces.thDistricts', 'Districts')}
               </th>
               <th className="px-3 py-3.5 text-xs font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] uppercase tracking-wider whitespace-nowrap w-28">
-                Status
+                {t('provinces.thStatus', 'Status')}
               </th>
               <th className="pl-3 pr-4 py-3.5 text-right text-xs font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] uppercase tracking-wider w-24 whitespace-nowrap">
-                Actions
+                {t('provinces.thActions', 'Actions')}
               </th>
             </tr>
           </thead>
@@ -152,7 +175,7 @@ export default function ProvincesList({
                         </p>
                         <div className="flex items-center gap-1.5 mt-0.5">
                           <span className={`text-[10px] font-semibold px-2 py-0.2 rounded-md border ${getTypeBadgeColor(province.type)}`}>
-                            {province.type}
+                            {getTypeLabel(province.type)}
                           </span>
                         </div>
                       </div>
@@ -169,7 +192,7 @@ export default function ProvincesList({
                   </td>
                   <td className="px-3 py-3.5 whitespace-nowrap">
                     <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 text-xs font-semibold rounded-md border ${getStatusColor(province.status)}`}>
-                      {province.status || 'Active'}
+                      {getStatusLabel(province.status)}
                     </span>
                   </td>
                   <td className="pl-3 pr-4 py-3.5 whitespace-nowrap text-right text-xs" onClick={(e) => e.stopPropagation()}>
@@ -178,7 +201,7 @@ export default function ProvincesList({
                         type="button"
                         onClick={() => handleView(province)}
                         className="p-1.5 text-[var(--color-purple-badge-text)] dark:text-[var(--color-purple-badge-dark-text)] hover:bg-[var(--color-purple-badge-bg)] dark:hover:bg-[var(--color-purple-badge-dark-bg)] rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
-                        title="View Details"
+                        title={t('provinces.tooltipViewDetails', 'View Details')}
                       >
                         <Eye className="w-4 h-4" />
                       </button>
@@ -186,7 +209,7 @@ export default function ProvincesList({
                         type="button"
                         onClick={() => handleEdit(province)}
                         className="p-1.5 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/30 rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
-                        title="Edit"
+                        title={t('provinces.tooltipEditProvince', 'Edit')}
                       >
                         <Edit className="w-4 h-4" />
                       </button>
@@ -194,7 +217,7 @@ export default function ProvincesList({
                         type="button"
                         onClick={() => handleDeleteItem(province.id || province)}
                         className="p-1.5 text-[var(--color-danger-text)] dark:text-[var(--color-danger-dark-text)] hover:bg-[var(--color-danger-bg)] dark:hover:bg-[var(--color-danger-dark-bg)] rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
-                        title="Delete"
+                        title={t('provinces.tooltipDeleteProvince', 'Delete')}
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -207,10 +230,10 @@ export default function ProvincesList({
                 <td colSpan="7" className="text-center py-12 px-4">
                   <MapPin className="w-12 h-12 text-blue-500 mx-auto mb-2 opacity-80" />
                   <h3 className="text-base font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] mb-1">
-                    No provinces found
+                    {t('provinces.noProvincesFound', 'No provinces found')}
                   </h3>
                   <p className="text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
-                    Try adjusting your search or filter criteria
+                    {t('provinces.tryAdjustingFilter', 'Try adjusting your search or filter criteria')}
                   </p>
                 </td>
               </tr>

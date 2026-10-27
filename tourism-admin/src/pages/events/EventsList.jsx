@@ -1,5 +1,7 @@
-import { Eye, Edit, Trash2, MapPin, Users, Star, Clock, Calendar } from 'lucide-react';
+import React from 'react';
+import { Eye, Edit, Trash2, MapPin, Users, Clock, Calendar } from 'lucide-react';
 import { getEventStatusColor as getStatusColor, getCategoryColor } from '../../utils/StatusUtils';
+import { useLanguage } from '../../i18n';
 
 export default function EventsList({
   events = [],
@@ -11,11 +13,35 @@ export default function EventsList({
   onDeleteEvent,
   startIndex = 0
 }) {
+  const { t } = useLanguage();
   const handleView = onViewDetails || onViewEvent || (() => {});
   const handleEdit = onEdit || onEditEvent || (() => {});
   const handleDeleteItem = onDelete || onDeleteEvent || (() => {});
 
   const safeEvents = events || [];
+
+  const getCategoryLabel = (cat) => {
+    switch (cat) {
+      case 'Cultural': return t('events.catCultural', 'Cultural');
+      case 'Festival': return t('events.catFestival', 'Festival');
+      case 'Sports': return t('events.catSports', 'Sports');
+      case 'Food': return t('events.catFood', 'Food');
+      case 'Music': return t('events.catMusic', 'Music');
+      case 'Exhibition': return t('events.catExhibition', 'Exhibition');
+      default: return cat;
+    }
+  };
+
+  const getStatusLabel = (status) => {
+    switch (status) {
+      case 'Upcoming': return t('events.statusUpcoming', 'Upcoming');
+      case 'Ongoing': return t('events.statusOngoing', 'Ongoing');
+      case 'Completed': return t('events.statusCompleted', 'Completed');
+      case 'Cancelled': return t('events.statusCancelled', 'Cancelled');
+      case 'Scheduled': return t('events.statusScheduled', 'Scheduled');
+      default: return status;
+    }
+  };
 
   return (
     <>
@@ -48,13 +74,13 @@ export default function EventsList({
                         {event.title}
                       </p>
                       <span className={`px-2 py-0.5 text-[10px] font-bold rounded-md border shrink-0 ${getStatusColor(event.status)}`}>
-                        {event.status}
+                        {getStatusLabel(event.status)}
                       </span>
                     </div>
 
                     <div className="flex items-center gap-2 mt-1 flex-wrap">
                       <span className={`px-2 py-0.5 text-[10px] font-semibold rounded-md border ${getCategoryColor(event.category)}`}>
-                        {event.category}
+                        {getCategoryLabel(event.category)}
                       </span>
                       <span className="text-xs text-[var(--color-text-muted-light)] dark:text-[var(--color-text-secondary-dark)] flex items-center gap-1 font-mono">
                         <Clock className="w-3 h-3" />
@@ -75,7 +101,7 @@ export default function EventsList({
                         type="button"
                         onClick={() => handleView(event)}
                         className="p-1.5 text-[var(--color-purple-badge-text)] dark:text-[var(--color-purple-badge-dark-text)] hover:bg-[var(--color-purple-badge-bg)] dark:hover:bg-[var(--color-purple-badge-dark-bg)] rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
-                        title="View Details"
+                        title={t('events.tooltipViewDetails', 'View Details')}
                       >
                         <Eye className="w-4 h-4" />
                       </button>
@@ -83,7 +109,7 @@ export default function EventsList({
                         type="button"
                         onClick={() => handleEdit(event)}
                         className="p-1.5 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/30 rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
-                        title="Edit"
+                        title={t('events.tooltipEditEvent', 'Edit')}
                       >
                         <Edit className="w-4 h-4" />
                       </button>
@@ -91,7 +117,7 @@ export default function EventsList({
                         type="button"
                         onClick={() => handleDeleteItem(event.id)}
                         className="p-1.5 text-[var(--color-danger-text)] dark:text-[var(--color-danger-dark-text)] hover:bg-[var(--color-danger-bg)] dark:hover:bg-[var(--color-danger-dark-bg)] rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
-                        title="Delete"
+                        title={t('events.tooltipDeleteEvent', 'Delete')}
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -105,10 +131,10 @@ export default function EventsList({
           <div className="text-center py-12 px-4">
             <Calendar className="w-12 h-12 text-blue-500 mx-auto mb-2 opacity-80" />
             <h3 className="text-base font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] mb-1">
-              No events found
+              {t('events.noEventsFound', 'No events found')}
             </h3>
             <p className="text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
-              Try adjusting your search or filter criteria
+              {t('events.tryAdjustingFilter', 'Try adjusting your search or filter criteria')}
             </p>
           </div>
         )}
@@ -120,25 +146,25 @@ export default function EventsList({
           <thead className="bg-[var(--color-surface-hover-light)]/50 dark:bg-[var(--color-surface-hover-dark)]/50">
             <tr>
               <th className="pl-4 pr-2 py-3.5 text-xs font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] uppercase tracking-wider w-10 text-center">
-                #
+                {t('events.thIndex', '#')}
               </th>
               <th className="px-4 py-3.5 text-xs font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] uppercase tracking-wider">
-                Event & Category
+                {t('events.thEventCategory', 'Event & Category')}
               </th>
               <th className="px-3 py-3.5 text-xs font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] uppercase tracking-wider whitespace-nowrap w-36">
-                Date & Time
+                {t('events.thDateTime', 'Date & Time')}
               </th>
               <th className="px-3 py-3.5 text-xs font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] uppercase tracking-wider whitespace-nowrap w-44">
-                Location
+                {t('events.thLocation', 'Location')}
               </th>
               <th className="px-3 py-3.5 text-xs font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] uppercase tracking-wider whitespace-nowrap w-28">
-                Attendees
+                {t('events.thAttendees', 'Attendees')}
               </th>
               <th className="px-3 py-3.5 text-xs font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] uppercase tracking-wider whitespace-nowrap w-32">
-                Status
+                {t('events.thStatus', 'Status')}
               </th>
               <th className="pl-3 pr-4 py-3.5 text-right text-xs font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] uppercase tracking-wider w-24 whitespace-nowrap">
-                Actions
+                {t('events.thActions', 'Actions')}
               </th>
             </tr>
           </thead>
@@ -173,11 +199,11 @@ export default function EventsList({
                           </p>
                           <div className="flex items-center gap-1.5 mt-0.5">
                             <span className={`text-[10px] font-semibold px-2 py-0.2 rounded-md border ${getCategoryColor(event.category)}`}>
-                              {event.category}
+                              {getCategoryLabel(event.category)}
                             </span>
                             {event.featured && (
                               <span className="text-[10px] font-semibold px-1.5 py-0.2 bg-[var(--color-warning-bg)] dark:bg-[var(--color-warning-dark-bg)] text-[var(--color-warning-text)] dark:text-[var(--color-warning-dark-text)] rounded-md border border-[var(--color-warning-border)] dark:border-[var(--color-warning-dark-border)]">
-                                Featured
+                                {t('events.featuredBadge', 'Featured')}
                               </span>
                             )}
                           </div>
@@ -211,7 +237,7 @@ export default function EventsList({
 
                     <td className="px-3 py-3.5 whitespace-nowrap">
                       <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 text-xs font-semibold rounded-md border ${getStatusColor(event.status)}`}>
-                        {event.status}
+                        {getStatusLabel(event.status)}
                       </span>
                     </td>
 
@@ -221,7 +247,7 @@ export default function EventsList({
                           type="button"
                           onClick={() => handleView(event)}
                           className="p-1.5 text-[var(--color-purple-badge-text)] dark:text-[var(--color-purple-badge-dark-text)] hover:bg-[var(--color-purple-badge-bg)] dark:hover:bg-[var(--color-purple-badge-dark-bg)] rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
-                          title="View Details"
+                          title={t('events.tooltipViewDetails', 'View Details')}
                         >
                           <Eye className="w-4 h-4" />
                         </button>
@@ -229,7 +255,7 @@ export default function EventsList({
                           type="button"
                           onClick={() => handleEdit(event)}
                           className="p-1.5 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/30 rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
-                          title="Edit"
+                          title={t('events.tooltipEditEvent', 'Edit')}
                         >
                           <Edit className="w-4 h-4" />
                         </button>
@@ -237,7 +263,7 @@ export default function EventsList({
                           type="button"
                           onClick={() => handleDeleteItem(event.id)}
                           className="p-1.5 text-[var(--color-danger-text)] dark:text-[var(--color-danger-dark-text)] hover:bg-[var(--color-danger-bg)] dark:hover:bg-[var(--color-danger-dark-bg)] rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
-                          title="Delete"
+                          title={t('events.tooltipDeleteEvent', 'Delete')}
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
@@ -251,10 +277,10 @@ export default function EventsList({
                 <td colSpan="7" className="text-center py-12 px-4">
                   <Calendar className="w-12 h-12 text-blue-500 mx-auto mb-2 opacity-80" />
                   <h3 className="text-base font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] mb-1">
-                    No events found
+                    {t('events.noEventsFound', 'No events found')}
                   </h3>
                   <p className="text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
-                    Try adjusting your search or filter criteria
+                    {t('events.tryAdjustingFilter', 'Try adjusting your search or filter criteria')}
                   </p>
                 </td>
               </tr>

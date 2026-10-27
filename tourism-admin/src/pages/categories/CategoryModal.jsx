@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { Tag, CheckCircle2, ChevronDown, FileText, Palette, Plus, Check } from 'lucide-react';
+import { useLanguage } from '../../i18n';
 
 export default function CategoryModal({
   isOpen,
@@ -10,6 +11,8 @@ export default function CategoryModal({
   onClose,
   onSubmit
 }) {
+  const { t } = useLanguage();
+
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
@@ -67,10 +70,14 @@ export default function CategoryModal({
             </div>
             <div>
               <h3 className="text-base font-bold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">
-                {editingCategory ? "Edit Category" : "Add New Category"}
+                {editingCategory
+                  ? t('categories.modalEditTitle', 'Edit Category')
+                  : t('categories.modalAddTitle', 'Add New Category')}
               </h3>
               <p className="text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mt-0.5">
-                {editingCategory ? "Update category information and color badge" : "Create a new classification for places and attractions"}
+                {editingCategory
+                  ? t('categories.modalEditSubtitle', 'Update category information and color badge')
+                  : t('categories.modalAddSubtitle', 'Create a new classification for places and attractions')}
               </p>
             </div>
           </div>
@@ -80,21 +87,25 @@ export default function CategoryModal({
         <form onSubmit={handleFormSubmit} className="flex flex-col flex-1 min-h-0 overflow-hidden">
           <div className="p-6 space-y-4 overflow-y-auto flex-1">
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">Category Name *</label>
+              <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">
+                {t('categories.categoryNameLabel', 'Category Name')} <span className="text-rose-500">*</span>
+              </label>
               <div className="relative">
                 <Tag className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
                 <input
                   type="text"
                   value={data.name || ''}
                   onChange={(e) => updateForm({ ...data, name: e.target.value })}
-                  placeholder="e.g. Temple, Beach, Mountain, Waterfall"
+                  placeholder={t('categories.categoryNamePlaceholder', 'e.g. Temple, Beach, Mountain, Waterfall')}
                   className="w-full pl-9 pr-4 py-2.5 bg-[var(--color-bg-light)] dark:bg-[var(--color-input-dark-bg)] border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]/70 rounded-md text-sm text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] placeholder-[var(--color-text-muted-light)] focus:outline-none focus:ring-2 focus:ring-[var(--color-input)] transition-all"
                   required
                 />
               </div>
             </div>
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">Status</label>
+              <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">
+                {t('categories.statusLabel', 'Status')}
+              </label>
               <div className="relative">
                 <CheckCircle2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
                 <select
@@ -102,20 +113,22 @@ export default function CategoryModal({
                   onChange={(e) => updateForm({ ...data, status: e.target.value })}
                   className="appearance-none w-full bg-[var(--color-bg-light)] dark:bg-[var(--color-input-dark-bg)] border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]/70 rounded-md pl-9 pr-9 py-2.5 text-sm text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] focus:outline-none focus:ring-2 focus:ring-[var(--color-input)] transition-all cursor-pointer"
                 >
-                  <option value="Active">Active</option>
-                  <option value="Inactive">Inactive</option>
+                  <option value="Active">{t('categories.statusActive', 'Active')}</option>
+                  <option value="Inactive">{t('categories.statusInactive', 'Inactive')}</option>
                 </select>
                 <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
               </div>
             </div>
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">Description</label>
+              <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">
+                {t('categories.descriptionLabel', 'Description')}
+              </label>
               <div className="relative">
                 <FileText className="absolute left-3 top-3 w-4 h-4 text-gray-400 pointer-events-none" />
                 <textarea
                   value={data.description || ''}
                   onChange={(e) => updateForm({ ...data, description: e.target.value })}
-                  placeholder="Enter description for this category..."
+                  placeholder={t('categories.descriptionPlaceholder', 'Enter description for this category...')}
                   rows="3"
                   className="w-full pl-9 pr-4 py-2.5 bg-[var(--color-bg-light)] dark:bg-[var(--color-input-dark-bg)] border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]/70 rounded-md text-sm text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] placeholder-[var(--color-text-muted-light)] focus:outline-none focus:ring-2 focus:ring-[var(--color-input)] resize-none transition-all"
                 />
@@ -124,7 +137,7 @@ export default function CategoryModal({
             <div>
               <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5 flex items-center gap-1.5">
                 <Palette className="w-3.5 h-3.5 text-[var(--color-primary)]" />
-                <span>Color Theme</span>
+                <span>{t('categories.colorThemeLabel', 'Color Theme')}</span>
               </label>
               <div className="flex gap-2.5 flex-wrap pt-1">
                 {colors.map((color) => (
@@ -147,7 +160,7 @@ export default function CategoryModal({
               onClick={onClose}
               className="flex-1 py-2.5 px-4 rounded-md border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] hover:bg-[var(--color-surface-hover-light)] dark:hover:bg-[var(--color-surface-hover-dark)] font-medium text-sm transition-colors text-center cursor-pointer"
             >
-              Cancel
+              {t('categories.cancelBtn', 'Cancel')}
             </button>
             <button 
               type="submit"
@@ -157,12 +170,12 @@ export default function CategoryModal({
               {editingCategory ? (
                 <>
                   <Check className="w-4 h-4" />
-                  <span>Update Category</span>
+                  <span>{t('categories.updateBtn', 'Update Category')}</span>
                 </>
               ) : (
                 <>
                   <Plus className="w-4 h-4" />
-                  <span>Add Category</span>
+                  <span>{t('categories.addBtn', 'Add Category')}</span>
                 </>
               )}
             </button>

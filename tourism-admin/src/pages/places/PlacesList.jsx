@@ -1,8 +1,18 @@
-import { Star, MapPin, Edit, Eye, Trash2, Clock, Landmark } from 'lucide-react';
+import { Star, MapPin, Edit, Eye, Trash2, Landmark } from 'lucide-react';
+import { useLanguage } from '../../i18n';
 import { getStatusColor } from '../../utils/StatusUtils';
 
 export default function PlacesList({ places, onViewPlace, onEditPlace, onDeletePlace, startIndex = 0 }) {
+  const { t } = useLanguage();
   const safePlaces = places || [];
+
+  const getStatusLabel = (st) => {
+    if (!st || st === 'Active') return t('places.statusActive', 'Active');
+    if (st === 'Inactive') return t('places.statusInactive', 'Inactive');
+    if (st === 'Closed') return t('places.statusClosed', 'Closed');
+    if (st === 'Under Renovation') return t('places.statusRenovation', 'Under Renovation');
+    return st;
+  };
 
   return (
     <>
@@ -29,8 +39,8 @@ export default function PlacesList({ places, onViewPlace, onEditPlace, onDeleteP
                     <p className="text-sm font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] truncate">
                       {place.name}
                     </p>
-                    <span className="shrink-0 inline-flex items-center px-2 py-0.5 text-[10px] font-bold rounded-md bg-[var(--color-success-bg)] dark:bg-[var(--color-success-dark-bg)] text-[var(--color-success-text)] dark:text-[var(--color-success-dark-text)] border border-[var(--color-success-border)] dark:border-[var(--color-success-dark-border)]">
-                      {place.status || 'Active'}
+                    <span className={`shrink-0 inline-flex items-center px-2 py-0.5 text-[10px] font-bold rounded-md border ${getStatusColor(place.status)}`}>
+                      {getStatusLabel(place.status)}
                     </span>
                   </div>
 
@@ -57,7 +67,7 @@ export default function PlacesList({ places, onViewPlace, onEditPlace, onDeleteP
                       type="button"
                       onClick={() => onViewPlace(place.id)}
                       className="p-1.5 text-[var(--color-purple-badge-text)] dark:text-[var(--color-purple-badge-dark-text)] hover:bg-[var(--color-purple-badge-bg)] dark:hover:bg-[var(--color-purple-badge-dark-bg)] rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
-                      title="View Details"
+                      title={t('places.tooltipViewDetails', 'View Details')}
                     >
                       <Eye className="w-4 h-4" />
                     </button>
@@ -65,7 +75,7 @@ export default function PlacesList({ places, onViewPlace, onEditPlace, onDeleteP
                       type="button"
                       onClick={() => onEditPlace(place)}
                       className="p-1.5 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/30 rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
-                      title="Edit"
+                      title={t('places.tooltipEdit', 'Edit')}
                     >
                       <Edit className="w-4 h-4" />
                     </button>
@@ -73,7 +83,7 @@ export default function PlacesList({ places, onViewPlace, onEditPlace, onDeleteP
                       type="button"
                       onClick={() => onDeletePlace(place.id)}
                       className="p-1.5 text-[var(--color-danger-text)] dark:text-[var(--color-danger-dark-text)] hover:bg-[var(--color-danger-bg)] dark:hover:bg-[var(--color-danger-dark-bg)] rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
-                      title="Delete"
+                      title={t('places.tooltipDelete', 'Delete')}
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -86,10 +96,10 @@ export default function PlacesList({ places, onViewPlace, onEditPlace, onDeleteP
           <div className="text-center py-12 px-4">
             <Landmark className="w-12 h-12 text-blue-500 mx-auto mb-2 opacity-80" />
             <h3 className="text-base font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] mb-1">
-              No places found
+              {t('places.noPlacesFound', 'No places found')}
             </h3>
             <p className="text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
-              Try adjusting your search or filter criteria
+              {t('places.refineSearchFilter', 'Try adjusting your search or filter criteria')}
             </p>
           </div>
         )}
@@ -101,22 +111,22 @@ export default function PlacesList({ places, onViewPlace, onEditPlace, onDeleteP
           <thead className="bg-[var(--color-surface-hover-light)]/50 dark:bg-[var(--color-surface-hover-dark)]/50">
             <tr>
               <th className="pl-4 pr-2 py-3.5 text-xs font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] uppercase tracking-wider w-10 text-center">
-                #
+                {t('places.thIndex', '#')}
               </th>
               <th className="px-4 py-3.5 text-xs font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] uppercase tracking-wider">
-                Place & Category
+                {t('places.thPlaceCategory', 'Place & Category')}
               </th>
               <th className="px-3 py-3.5 text-xs font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] uppercase tracking-wider whitespace-nowrap w-48">
-                Address
+                {t('places.thAddress', 'Address')}
               </th>
               <th className="px-3 py-3.5 text-xs font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] uppercase tracking-wider whitespace-nowrap w-32">
-                Rating
+                {t('places.thRating', 'Rating')}
               </th>
               <th className="px-3 py-3.5 text-xs font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] uppercase tracking-wider whitespace-nowrap w-28">
-                Status
+                {t('places.thStatus', 'Status')}
               </th>
               <th className="pl-3 pr-4 py-3.5 text-right text-xs font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] uppercase tracking-wider w-24 whitespace-nowrap">
-                Actions
+                {t('places.thActions', 'Actions')}
               </th>
             </tr>
           </thead>
@@ -173,8 +183,8 @@ export default function PlacesList({ places, onViewPlace, onEditPlace, onDeleteP
                   </td>
 
                   <td className="px-3 py-3.5 whitespace-nowrap">
-                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 text-xs font-semibold rounded-md bg-[var(--color-success-bg)] dark:bg-[var(--color-success-dark-bg)] text-[var(--color-success-text)] dark:text-[var(--color-success-dark-text)] border border-[var(--color-success-border)] dark:border-[var(--color-success-dark-border)]">
-                      {place.status || 'Active'}
+                    <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 text-xs font-semibold rounded-md border ${getStatusColor(place.status)}`}>
+                      {getStatusLabel(place.status)}
                     </span>
                   </td>
 
@@ -184,7 +194,7 @@ export default function PlacesList({ places, onViewPlace, onEditPlace, onDeleteP
                         type="button"
                         onClick={() => onViewPlace(place.id)}
                         className="p-1.5 text-[var(--color-purple-badge-text)] dark:text-[var(--color-purple-badge-dark-text)] hover:bg-[var(--color-purple-badge-bg)] dark:hover:bg-[var(--color-purple-badge-dark-bg)] rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
-                        title="View Details"
+                        title={t('places.tooltipViewDetails', 'View Details')}
                       >
                         <Eye className="w-4 h-4" />
                       </button>
@@ -192,7 +202,7 @@ export default function PlacesList({ places, onViewPlace, onEditPlace, onDeleteP
                         type="button"
                         onClick={() => onEditPlace(place)}
                         className="p-1.5 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/30 rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
-                        title="Edit"
+                        title={t('places.tooltipEdit', 'Edit')}
                       >
                         <Edit className="w-4 h-4" />
                       </button>
@@ -200,7 +210,7 @@ export default function PlacesList({ places, onViewPlace, onEditPlace, onDeleteP
                         type="button"
                         onClick={() => onDeletePlace(place.id)}
                         className="p-1.5 text-[var(--color-danger-text)] dark:text-[var(--color-danger-dark-text)] hover:bg-[var(--color-danger-bg)] dark:hover:bg-[var(--color-danger-dark-bg)] rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
-                        title="Delete"
+                        title={t('places.tooltipDelete', 'Delete')}
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -213,10 +223,10 @@ export default function PlacesList({ places, onViewPlace, onEditPlace, onDeleteP
                 <td colSpan="6" className="text-center py-12 px-4">
                   <Landmark className="w-12 h-12 text-blue-500 mx-auto mb-2 opacity-80" />
                   <h3 className="text-base font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] mb-1">
-                    No places found
+                    {t('places.noPlacesFound', 'No places found')}
                   </h3>
                   <p className="text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
-                    Try adjusting your search or filter criteria
+                    {t('places.refineSearchFilter', 'Try adjusting your search or filter criteria')}
                   </p>
                 </td>
               </tr>

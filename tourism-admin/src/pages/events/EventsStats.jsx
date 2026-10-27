@@ -1,6 +1,9 @@
+import React from 'react';
 import { Calendar, Bell, Clock, Users } from 'lucide-react';
+import { useLanguage } from '../../i18n';
 
 export default function EventsStats({ events = [] }) {
+  const { t } = useLanguage();
   const safeEvents = Array.isArray(events) ? events : [];
   const total = safeEvents.length;
   const upcoming = safeEvents.filter(e => e.status === 'Upcoming').length;
@@ -9,33 +12,35 @@ export default function EventsStats({ events = [] }) {
 
   const stats = [
     {
-      label: 'Total Events',
+      label: t('events.statTotalEvents', 'Total Events'),
       value: total.toLocaleString(),
-      subtext: 'Scheduled festivals & events',
+      subtext: t('events.subtextTotalEvents', 'Scheduled festivals & events'),
       icon: Calendar,
       color: 'text-[var(--color-info-text)] dark:text-[var(--color-info-dark-text)]',
       bg: 'bg-[var(--color-info-bg)] dark:bg-[var(--color-info-dark-bg)]'
     },
     {
-      label: 'Upcoming Events',
+      label: t('events.statUpcomingEvents', 'Upcoming Events'),
       value: upcoming.toLocaleString(),
-      subtext: `${upcoming} events starting soon`,
+      subtext: t('events.subtextUpcomingEvents', '{count} events starting soon').replace('{count}', upcoming),
       icon: Bell,
       color: 'text-[var(--color-warning-text)] dark:text-[var(--color-warning-dark-text)]',
       bg: 'bg-[var(--color-warning-bg)] dark:bg-[var(--color-warning-dark-bg)]'
     },
     {
-      label: 'Ongoing Events',
+      label: t('events.statOngoingEvents', 'Ongoing Events'),
       value: ongoing.toLocaleString(),
-      subtext: ongoing === 0 ? 'No active events currently' : `${ongoing} events happening now`,
+      subtext: ongoing === 0 
+        ? t('events.subtextOngoingNone', 'No active events currently') 
+        : t('events.subtextOngoingCount', '{count} events happening now').replace('{count}', ongoing),
       icon: Clock,
       color: 'text-[var(--color-success-text)] dark:text-[var(--color-success-dark-text)]',
       bg: 'bg-[var(--color-success-bg)] dark:bg-[var(--color-success-dark-bg)]'
     },
     {
-      label: 'Total Attendees',
+      label: t('events.statTotalAttendees', 'Total Attendees'),
       value: totalAttendees.toLocaleString(),
-      subtext: 'Registered participants',
+      subtext: t('events.subtextTotalAttendees', 'Registered participants'),
       icon: Users,
       color: 'text-[var(--color-purple-badge-text)] dark:text-[var(--color-purple-badge-dark-text)]',
       bg: 'bg-[var(--color-purple-badge-bg)] dark:bg-[var(--color-purple-badge-dark-bg)]'

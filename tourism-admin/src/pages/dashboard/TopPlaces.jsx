@@ -1,6 +1,7 @@
 import { Star, Landmark } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
+import { useLanguage } from '../../i18n';
 
 const barColors = [
   '#3B82F6', // blue-500
@@ -17,6 +18,7 @@ const barColors = [
 
 export default function TopPlaces({ places, topPlaces, timeRange = 'yearly', isLoading = false }) {
   const navigate = useNavigate();
+  const { t, currentLang } = useLanguage();
 
   const rawList = (Array.isArray(places) && places.length > 0)
     ? places
@@ -25,12 +27,21 @@ export default function TopPlaces({ places, topPlaces, timeRange = 'yearly', isL
   // Enforce top 10 places strictly from database
   const placesList = rawList.slice(0, 10);
 
-  const metricLabel = placesList[0]?.metric_label || (
-    timeRange === 'today' ? "Today's Visits" :
-    timeRange === 'weekly' ? "Weekly Visits" :
-    timeRange === 'monthly' ? "Monthly Visits" :
-    "Annual Visits"
-  );
+  const getMetricLabel = () => {
+    switch (timeRange) {
+      case 'today':
+        return t('dashboard.todaysVisits', "Today's Visits");
+      case 'weekly':
+        return t('dashboard.weeklyVisits', "Weekly Visits");
+      case 'monthly':
+        return t('dashboard.monthlyVisits', "Monthly Visits");
+      case 'yearly':
+      default:
+        return t('dashboard.annualVisits', "Annual Visits");
+    }
+  };
+
+  const metricLabel = getMetricLabel();
 
   const chartData = placesList.map((place, index) => {
     const baseVisitors = Number(place.visitors_count || place.visits || (place.reviews_count * 25 + 150)) || 250;
@@ -56,8 +67,8 @@ export default function TopPlaces({ places, topPlaces, timeRange = 'yearly', isL
       reviews: reviewsCount,
       periodReviews,
       rating: ratingVal,
-      category: place.category?.name || place.category || 'Attraction',
-      metricLabel: place.metric_label || metricLabel,
+      category: place.category?.name || place.category || t('sidebar.destinations', 'Attraction'),
+      metricLabel: metricLabel,
       rank: index + 1,
     };
   })
@@ -67,14 +78,14 @@ export default function TopPlaces({ places, topPlaces, timeRange = 'yearly', isL
   const getSubtitle = () => {
     switch (timeRange) {
       case 'today':
-        return "Top trending destinations ranked by today's estimated visitors";
+        return t('dashboard.topPlacesSubtitleToday', "Top trending destinations ranked by today's estimated visitors");
       case 'weekly':
-        return 'Top trending destinations ranked by 7-day visitor volume';
+        return t('dashboard.topPlacesSubtitleWeekly', "Top trending destinations ranked by 7-day visitor volume");
       case 'monthly':
-        return 'Top destinations ranked by monthly visitor traffic';
+        return t('dashboard.topPlacesSubtitleMonthly', "Top destinations ranked by monthly visitor traffic");
       case 'yearly':
       default:
-        return 'Top destinations ranked by annual visitors & rating';
+        return t('dashboard.topPlacesSubtitleYearly', "Top destinations ranked by annual visitors & rating");
     }
   };
 
@@ -85,7 +96,7 @@ export default function TopPlaces({ places, topPlaces, timeRange = 'yearly', isL
           <div>
             <h3 className="font-semibold text-sm md:text-base text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] flex items-center gap-2">
               <Landmark className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-              <span>Top Places</span>
+              <span>{t('dashboard.topPlacesTitle', 'Top Places')}</span>
               <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 border border-blue-200/60 dark:border-blue-900/60">
                 {metricLabel}
               </span>
@@ -98,7 +109,7 @@ export default function TopPlaces({ places, topPlaces, timeRange = 'yearly', isL
             onClick={() => navigate('/places')}
             className="text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline cursor-pointer"
           >
-            View All
+            {t('dashboard.viewAll', 'View All')}
           </button>
         </div>
 
@@ -107,10 +118,10 @@ export default function TopPlaces({ places, topPlaces, timeRange = 'yearly', isL
           {chartData.length === 0 ? (
             <div className="h-full flex flex-col items-center justify-center text-gray-400 text-xs">
               <Landmark className="w-8 h-8 mb-2 stroke-1 text-gray-300 dark:text-zinc-600" />
-              <p>No destination records available in database</p>
+              <p>{t('dashboard.noPlacesRecorded', 'No destination records available in database')}</p>
             </div>
           ) : (
-            <ResponsiveContainer width="100%" height="100%" key={`top-places-${timeRange}`}>
+            <ResponsiveContainer width="100%" height="100%" key={`top-places-${timeRange}-${currentLang}`}>
               <BarChart
                 data={chartData}
                 layout="vertical"
@@ -156,7 +167,7 @@ export default function TopPlaces({ places, topPlaces, timeRange = 'yearly', isL
                               <Star className="w-3 h-3 fill-amber-500" />
                               {data.rating}
                             </span>
-                            <span>{data.reviews.toLocaleString()} reviews</span>
+                            <span>{t('dashboard.reviewsCountLabel', '{count} reviews').replace('{count}', data.reviews.toLocaleString())}</span>
                           </div>
                         </div>
                       );

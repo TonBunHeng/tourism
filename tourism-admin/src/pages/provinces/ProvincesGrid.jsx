@@ -1,11 +1,34 @@
+import React from 'react';
 import { Eye, Edit, Trash2, Users, Navigation, Building2, Home, Star, Clock } from 'lucide-react';
 import { getStatusColor, getTypeBadgeColor } from '../../utils/StatusUtils';
+import { useLanguage } from '../../i18n';
 
-export default function ProvincesGrid({ provinces, onViewProvince, onEditProvince, onDeleteProvince }) {
+export default function ProvincesGrid({ provinces = [], onViewProvince, onEditProvince, onDeleteProvince }) {
+  const { t } = useLanguage();
+
+  const getTypeLabel = (type) => {
+    switch (type) {
+      case 'Capital City': return t('provinces.typeCapitalCity', 'Capital City');
+      case 'Province': return t('provinces.typeProvince', 'Province');
+      case 'Municipality': return t('provinces.typeMunicipality', 'Municipality');
+      default: return type;
+    }
+  };
+
+  const getStatusLabel = (status) => {
+    switch (status) {
+      case 'Active': return t('provinces.statusActive', 'Active');
+      case 'Inactive': return t('provinces.statusInactive', 'Inactive');
+      default: return status || t('provinces.statusActive', 'Active');
+    }
+  };
+
+  const safeProvinces = provinces || [];
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4 md:p-6">
-      {provinces.length > 0 ? (
-        provinces.map((province) => {
+      {safeProvinces.length > 0 ? (
+        safeProvinces.map((province) => {
           return (
             <div
               key={province.id}
@@ -16,7 +39,7 @@ export default function ProvincesGrid({ provinces, onViewProvince, onEditProvinc
                 <div className="min-w-0">
                   <h3 className="font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] text-sm truncate">{province.name}</h3>
                   <span className={`inline-block text-xs font-medium px-2 py-0.5 rounded-md border ${getTypeBadgeColor(province.type)}`}>
-                    {province.type}
+                    {getTypeLabel(province.type)}
                   </span>
                 </div>
                 {/* Actions: always visible on touch/mobile, fade in on hover for pointer devices */}
@@ -25,7 +48,7 @@ export default function ProvincesGrid({ provinces, onViewProvince, onEditProvinc
                     type="button"
                     onClick={(e) => { e.stopPropagation(); onViewProvince(province); }}
                     className="p-1.5 text-[var(--color-purple-badge-text)] dark:text-[var(--color-purple-badge-dark-text)] hover:bg-[var(--color-purple-badge-bg)] dark:hover:bg-[var(--color-purple-badge-dark-bg)] rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
-                    title="View Details"
+                    title={t('provinces.tooltipViewDetails', 'View Details')}
                   >
                     <Eye className="w-3.5 h-3.5" />
                   </button>
@@ -33,7 +56,7 @@ export default function ProvincesGrid({ provinces, onViewProvince, onEditProvinc
                     type="button"
                     onClick={(e) => { e.stopPropagation(); onEditProvince(province); }}
                     className="p-1.5 text-[var(--color-info-text)] dark:text-[var(--color-info-dark-text)] hover:bg-[var(--color-info-bg)] dark:hover:bg-[var(--color-info-dark-bg)] rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
-                    title="Edit"
+                    title={t('provinces.tooltipEditProvince', 'Edit')}
                   >
                     <Edit className="w-3.5 h-3.5" />
                   </button>
@@ -41,7 +64,7 @@ export default function ProvincesGrid({ provinces, onViewProvince, onEditProvinc
                     type="button"
                     onClick={(e) => { e.stopPropagation(); onDeleteProvince(province.id || province); }}
                     className="p-1.5 text-[var(--color-danger-text)] dark:text-[var(--color-danger-dark-text)] hover:bg-[var(--color-danger-bg)] dark:hover:bg-[var(--color-danger-dark-bg)] rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
-                    title="Delete"
+                    title={t('provinces.tooltipDeleteProvince', 'Delete')}
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>
@@ -61,11 +84,11 @@ export default function ProvincesGrid({ provinces, onViewProvince, onEditProvinc
                 </div>
                 <div className="flex items-center gap-1.5 text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] min-w-0">
                   <Building2 className="w-3.5 h-3.5 flex-shrink-0" />
-                  <span className="truncate">{province.districts} Districts</span>
+                  <span className="truncate">{t('provinces.districtsCount', '{count} Districts').replace('{count}', province.districts ?? 0)}</span>
                 </div>
                 <div className="flex items-center gap-1.5 text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] min-w-0">
                   <Home className="w-3.5 h-3.5 flex-shrink-0" />
-                  <span className="truncate">{province.places} Places</span>
+                  <span className="truncate">{t('provinces.placesCount', '{count} Places').replace('{count}', province.places ?? 0)}</span>
                 </div>
               </div>
 
@@ -76,7 +99,7 @@ export default function ProvincesGrid({ provinces, onViewProvince, onEditProvinc
                 </div>
                 <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 text-xs font-medium rounded-md border flex-shrink-0 ${getStatusColor(province.status)}`}>
                   <Clock className="w-3 h-3" />
-                  {province.status}
+                  {getStatusLabel(province.status)}
                 </span>
               </div>
             </div>
@@ -84,8 +107,12 @@ export default function ProvincesGrid({ provinces, onViewProvince, onEditProvinc
         })
       ) : (
         <div className="col-span-full text-center py-12">
-          <h3 className="text-lg font-medium text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] mb-1">No provinces found</h3>
-          <p className="text-sm text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">Try adjusting your search or filter criteria</p>
+          <h3 className="text-lg font-medium text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] mb-1">
+            {t('provinces.noProvincesFound', 'No provinces found')}
+          </h3>
+          <p className="text-sm text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
+            {t('provinces.tryAdjustingFilter', 'Try adjusting your search or filter criteria')}
+          </p>
         </div>
       )}
     </div>

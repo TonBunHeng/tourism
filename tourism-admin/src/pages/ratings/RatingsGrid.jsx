@@ -1,5 +1,6 @@
 import { Star, ThumbsUp, ThumbsDown, Check, X, Eye, Clock, Calendar, Image as ImageIcon, MapPin, User, Reply, Trash2 } from 'lucide-react';
 import { getStatusColor, renderStars } from '../../utils/StatusUtils';
+import { useLanguage } from '../../i18n';
 
 export default function RatingsGrid({
   reviews = [],
@@ -10,15 +11,29 @@ export default function RatingsGrid({
   onReply,
   onDelete
 }) {
+  const { t } = useLanguage();
+
   const handleView = (review) => {
     if (onView) onView(review);
     else if (onViewDetails) onViewDetails(review);
   };
 
+  const getStatusLabel = (status) => {
+    switch (status) {
+      case 'Approved': return t('ratings.statusApproved', 'Approved');
+      case 'Pending': return t('ratings.statusPending', 'Pending');
+      case 'Rejected': return t('ratings.statusRejected', 'Rejected');
+      case 'Published': return t('ratings.statusPublished', 'Published');
+      case 'Flagged': return t('ratings.statusFlagged', 'Flagged');
+      case 'Archived': return t('ratings.statusArchived', 'Archived');
+      default: return status;
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="p-12 text-center text-slate-500 dark:text-zinc-400 font-medium">
-        Loading ratings and reviews...
+        {t('ratings.loadingRatings', 'Loading ratings and reviews...')}
       </div>
     );
   }
@@ -26,8 +41,12 @@ export default function RatingsGrid({
   if (!reviews || reviews.length === 0) {
     return (
       <div className="text-center py-12">
-        <h3 className="text-lg font-medium text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] mb-1">No reviews found</h3>
-        <p className="text-sm text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">Try adjusting your search or filter criteria</p>
+        <h3 className="text-lg font-medium text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] mb-1">
+          {t('ratings.noReviewsFound', 'No reviews found')}
+        </h3>
+        <p className="text-sm text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
+          {t('ratings.tryAdjustingFilter', 'Try adjusting your search or filter criteria')}
+        </p>
       </div>
     );
   }
@@ -38,10 +57,10 @@ export default function RatingsGrid({
         const avatarUrl = typeof review.avatar === 'string' && review.avatar.length > 0
           ? review.avatar
           : (typeof review.user === 'object' && typeof review.user?.avatar === 'string' ? review.user.avatar : null);
-        const userName = typeof review.user === 'object' ? (review.user?.name || review.user_name || 'Traveler') : (review.user_name || review.user || 'Traveler');
+        const userName = typeof review.user === 'object' ? (review.user?.name || review.user_name || t('ratings.anonymousTraveler', 'Traveler')) : (review.user_name || review.user || t('ratings.anonymousTraveler', 'Traveler'));
         const userVerified = typeof review.user === 'object' ? review.user?.verified : review.is_verified;
-        const placeName = typeof review.place === 'object' ? (review.place?.name || review.place_name || 'Attraction') : (review.place_name || review.place || 'Attraction');
-        const reviewDate = review.created_at ? new Date(review.created_at).toLocaleDateString() : (review.date || 'Recent');
+        const placeName = typeof review.place === 'object' ? (review.place?.name || review.place_name || t('ratings.attractionFallback', 'Attraction')) : (review.place_name || review.place || t('ratings.attractionFallback', 'Attraction'));
+        const reviewDate = review.created_at ? new Date(review.created_at).toLocaleDateString() : (review.date || t('ratings.recentFallback', 'Recent'));
 
         return (
           <div
@@ -68,7 +87,7 @@ export default function RatingsGrid({
                       </span>
                       {userVerified && (
                         <span className="text-[10px] flex items-center gap-0.5 text-[var(--color-info-text)] dark:text-[var(--color-info-dark-text)] font-semibold">
-                          <Check className="w-3 h-3" /> Verified
+                          <Check className="w-3 h-3" /> {t('ratings.verifiedBadge', 'Verified')}
                         </span>
                       )}
                     </div>
@@ -77,7 +96,7 @@ export default function RatingsGrid({
 
                 <span className={`inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium rounded-md border shrink-0 ${getStatusColor(review.status)}`}>
                   <Clock className="w-3 h-3" />
-                  {review.status}
+                  {getStatusLabel(review.status)}
                 </span>
               </div>
 
@@ -97,7 +116,7 @@ export default function RatingsGrid({
                 {review.title && (
                   <p className="text-sm font-bold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] line-clamp-1">{review.title}</p>
                 )}
-                <p className="text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] line-clamp-3 mt-1 leading-relaxed">{review.comment}</p>
+                <p className="text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] line-clamp-3 mt-1 leading-relaxed">{review.comment || t('ratings.noComment', 'No comment provided.')}</p>
               </div>
 
               {/* Photos */}
@@ -113,7 +132,7 @@ export default function RatingsGrid({
                   ))}
                   {review.images.length > 3 && (
                     <span className="text-xs font-medium text-[var(--color-text-muted-light)] dark:text-[var(--color-text-secondary-dark)]">
-                      +{review.images.length - 3} more
+                      {t('ratings.morePhotos', '+{count} more').replace('{count}', review.images.length - 3)}
                     </span>
                   )}
                 </div>
@@ -140,7 +159,7 @@ export default function RatingsGrid({
                       type="button"
                       onClick={() => onStatusChange(review.id, 'Approved')}
                       className="p-1.5 text-[var(--color-success-text)] dark:text-[var(--color-success-dark-text)] hover:bg-[var(--color-success-bg)] dark:hover:bg-[var(--color-success-dark-bg)] rounded-md transition-colors cursor-pointer"
-                      title="Approve Review"
+                      title={t('ratings.tooltipApprove', 'Approve Review')}
                     >
                       <Check className="w-4 h-4" />
                     </button>
@@ -148,7 +167,7 @@ export default function RatingsGrid({
                       type="button"
                       onClick={() => onStatusChange(review.id, 'Rejected')}
                       className="p-1.5 text-[var(--color-danger-text)] dark:text-[var(--color-danger-dark-text)] hover:bg-[var(--color-danger-bg)] dark:hover:bg-[var(--color-danger-dark-bg)] rounded-md transition-colors cursor-pointer"
-                      title="Reject Review"
+                      title={t('ratings.tooltipReject', 'Reject Review')}
                     >
                       <X className="w-4 h-4" />
                     </button>
@@ -159,7 +178,7 @@ export default function RatingsGrid({
                     type="button"
                     onClick={() => onReply(review)}
                     className="p-1.5 text-[var(--color-info-text)] dark:text-[var(--color-info-dark-text)] hover:bg-[var(--color-info-bg)] dark:hover:bg-[var(--color-info-dark-bg)] rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
-                    title="Reply"
+                    title={t('ratings.tooltipReply', 'Reply')}
                   >
                     <Reply className="w-4 h-4" />
                   </button>
@@ -168,7 +187,7 @@ export default function RatingsGrid({
                   type="button"
                   onClick={() => handleView(review)}
                   className="p-1.5 text-[var(--color-purple-badge-text)] dark:text-[var(--color-purple-badge-dark-text)] hover:bg-[var(--color-purple-badge-bg)] dark:hover:bg-[var(--color-purple-badge-dark-bg)] rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
-                  title="View Details"
+                  title={t('ratings.tooltipViewDetails', 'View Details')}
                 >
                   <Eye className="w-4 h-4" />
                 </button>
@@ -177,7 +196,7 @@ export default function RatingsGrid({
                     type="button"
                     onClick={() => onDelete(review.id)}
                     className="p-1.5 text-[var(--color-danger-text)] dark:text-[var(--color-danger-dark-text)] hover:bg-[var(--color-danger-bg)] dark:hover:bg-[var(--color-danger-dark-bg)] rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
-                    title="Delete Review"
+                    title={t('ratings.tooltipDelete', 'Delete Review')}
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>

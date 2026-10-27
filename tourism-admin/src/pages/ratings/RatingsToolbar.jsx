@@ -1,5 +1,6 @@
 import React from 'react';
 import { ChevronDown } from 'lucide-react';
+import { useLanguage } from '../../i18n';
 
 export default function RatingsToolbar({
   selectedStatus = 'All',
@@ -12,6 +13,8 @@ export default function RatingsToolbar({
   places = ['All'],
   totalCount
 }) {
+  const { t } = useLanguage();
+
   const handleStatus = (val) => {
     if (onStatusChange) onStatusChange(val);
     if (setSelectedStatus) setSelectedStatus(val);
@@ -22,16 +25,28 @@ export default function RatingsToolbar({
     if (setSelectedPlace) setSelectedPlace(val);
   };
 
+  const getStatusLabel = (status) => {
+    switch (status) {
+      case 'All': return t('ratings.allStatuses', 'All Status');
+      case 'Approved': return t('ratings.statusApproved', 'Approved');
+      case 'Pending': return t('ratings.statusPending', 'Pending');
+      case 'Rejected': return t('ratings.statusRejected', 'Rejected');
+      default: return status;
+    }
+  };
+
   return (
     <div className="px-4 md:px-6 py-4 border-b border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex items-center gap-2.5">
           <h2 className="text-lg md:text-xl font-bold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">
-            All Reviews
+            {t('ratings.allReviews', 'All Reviews')}
           </h2>
           {totalCount !== undefined && (
             <span className="text-xs font-semibold px-2 py-0.5 rounded-md bg-blue-50 text-[#003E83] dark:bg-blue-950/50 dark:text-blue-400 border border-blue-100 dark:border-blue-900/40">
-              {totalCount} {totalCount === 1 ? 'review' : 'reviews'}
+              {totalCount === 1
+                ? t('ratings.reviewCountPillSingle', '1 review')
+                : t('ratings.reviewCountPill', '{count} reviews').replace('{count}', totalCount)}
             </span>
           )}
         </div>
@@ -47,7 +62,7 @@ export default function RatingsToolbar({
               >
                 {places.map((place) => (
                   <option key={place} value={place}>
-                    {place === 'All' ? 'All Places' : place}
+                    {place === 'All' ? t('ratings.allPlaces', 'All Places') : place}
                   </option>
                 ))}
               </select>
@@ -64,7 +79,7 @@ export default function RatingsToolbar({
             >
               {statuses.map((status) => (
                 <option key={status} value={status}>
-                  {status === 'All' ? 'All Status' : status}
+                  {getStatusLabel(status)}
                 </option>
               ))}
             </select>

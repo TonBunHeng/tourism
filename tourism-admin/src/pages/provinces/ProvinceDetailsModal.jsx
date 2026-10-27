@@ -1,7 +1,10 @@
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { X, Check, Users, Navigation, Star, Edit } from 'lucide-react';
+import { useLanguage } from '../../i18n';
 
 export default function ProvinceDetailsModal({ province, onClose, onEditProvince }) {
+  const { t } = useLanguage();
+
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === 'Escape') onClose?.();
@@ -18,6 +21,23 @@ export default function ProvinceDetailsModal({ province, onClose, onEditProvince
 
   if (!province) return null;
 
+  const getTypeLabel = (type) => {
+    switch (type) {
+      case 'Capital City': return t('provinces.typeCapitalCity', 'Capital City');
+      case 'Province': return t('provinces.typeProvince', 'Province');
+      case 'Municipality': return t('provinces.typeMunicipality', 'Municipality');
+      default: return type;
+    }
+  };
+
+  const getStatusLabel = (status) => {
+    switch (status) {
+      case 'Active': return t('provinces.statusActive', 'Active');
+      case 'Inactive': return t('provinces.statusInactive', 'Inactive');
+      default: return status || t('provinces.statusActive', 'Active');
+    }
+  };
+
   return (
     <div
       className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-alert-backdrop"
@@ -31,8 +51,12 @@ export default function ProvinceDetailsModal({ province, onClose, onEditProvince
       >
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-zinc-800 shrink-0">
           <div>
-            <h3 className="text-base font-bold text-gray-900 dark:text-zinc-100">Province Details</h3>
-            <p className="text-xs text-gray-500 dark:text-zinc-400">ID: #{province.id}</p>
+            <h3 className="text-base font-bold text-gray-900 dark:text-zinc-100">
+              {t('provinces.modalTitle', 'Province Details')}
+            </h3>
+            <p className="text-xs text-gray-500 dark:text-zinc-400">
+              {t('provinces.idLabel', 'ID: #{id}').replace('{id}', province.id)}
+            </p>
           </div>
           <button
             onClick={onClose}
@@ -45,34 +69,48 @@ export default function ProvinceDetailsModal({ province, onClose, onEditProvince
 
         <div className="p-6 space-y-5 max-h-[75vh] overflow-y-auto">
           <div>
-            <span className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">Province Name</span>
-            <p className="text-base font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] mt-1">{province.name}</p>
+            <span className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
+              {t('provinces.labelProvinceName', 'Province Name')}
+            </span>
+            <p className="text-base font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] mt-1">
+              {province.name}
+            </p>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="bg-[var(--color-surface-hover-light)] dark:bg-[var(--color-surface-hover-dark)]/50 p-3.5 rounded-md border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]">
-              <span className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">Type</span>
-              <p className="text-sm font-medium text-[var(--color-info-text)] dark:text-[var(--color-info-dark-text)] mt-1">{province.type}</p>
+              <span className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
+                {t('provinces.labelType', 'Type')}
+              </span>
+              <p className="text-sm font-medium text-[var(--color-info-text)] dark:text-[var(--color-info-dark-text)] mt-1">
+                {getTypeLabel(province.type)}
+              </p>
             </div>
             <div className="bg-[var(--color-surface-hover-light)] dark:bg-[var(--color-surface-hover-dark)]/50 p-3.5 rounded-md border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]">
-              <span className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">Status</span>
+              <span className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
+                {t('provinces.labelStatus', 'Status')}
+              </span>
               <p className="text-sm font-medium text-[var(--color-success-text)] dark:text-[var(--color-success-dark-text)] mt-1 flex items-center gap-1.5">
                 <Check className="w-3.5 h-3.5" />
-                {province.status}
+                {getStatusLabel(province.status)}
               </p>
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="bg-[var(--color-surface-hover-light)] dark:bg-[var(--color-surface-hover-dark)]/50 p-3.5 rounded-md border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]">
-              <span className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">Population</span>
+              <span className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
+                {t('provinces.labelPopulation', 'Population')}
+              </span>
               <p className="text-sm font-medium text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] mt-1 flex items-center gap-1.5">
                 <Users className="w-3.5 h-3.5 text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]" />
                 {province.population}
               </p>
             </div>
             <div className="bg-[var(--color-surface-hover-light)] dark:bg-[var(--color-surface-hover-dark)]/50 p-3.5 rounded-md border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]">
-              <span className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">Area</span>
+              <span className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
+                {t('provinces.labelArea', 'Area')}
+              </span>
               <p className="text-sm font-medium text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] mt-1 flex items-center gap-1.5">
                 <Navigation className="w-3.5 h-3.5 text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]" />
                 {province.area}
@@ -82,22 +120,32 @@ export default function ProvinceDetailsModal({ province, onClose, onEditProvince
 
           <div className="grid grid-cols-2 gap-4">
             <div className="bg-[var(--color-surface-hover-light)] dark:bg-[var(--color-surface-hover-dark)]/50 p-3.5 rounded-md border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]">
-              <span className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">Districts & Communes</span>
+              <span className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
+                {t('provinces.labelDistrictsCommunes', 'Districts & Communes')}
+              </span>
               <p className="text-sm font-medium text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] mt-1">
-                {province.districts} Districts, {province.communes} Communes
+                {t('provinces.districtsCommunesSummary', '{districts} Districts, {communes} Communes')
+                  .replace('{districts}', province.districts ?? 0)
+                  .replace('{communes}', province.communes ?? 0)}
               </p>
             </div>
             <div className="bg-[var(--color-surface-hover-light)] dark:bg-[var(--color-surface-hover-dark)]/50 p-3.5 rounded-md border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]">
-              <span className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">Rating & Places</span>
+              <span className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
+                {t('provinces.labelRatingPlaces', 'Rating & Places')}
+              </span>
               <p className="text-sm font-medium text-[var(--color-warning-text)] dark:text-[var(--color-warning-dark-text)] mt-1 flex items-center gap-1">
                 <Star className="w-3.5 h-3.5 fill-[var(--color-warning-text)] dark:fill-[var(--color-warning-dark-text)]" />
-                {province.rating} ({province.places} places)
+                {t('provinces.ratingPlacesSummary', '{rating} ({places} places)')
+                  .replace('{rating}', province.rating || '0')
+                  .replace('{places}', province.places ?? 0)}
               </p>
             </div>
           </div>
 
           <div className="bg-[var(--color-surface-hover-light)] dark:bg-[var(--color-surface-hover-dark)]/50 p-3.5 rounded-md border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]">
-            <span className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">Description</span>
+            <span className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
+              {t('provinces.labelDescription', 'Description')}
+            </span>
             <p className="text-sm text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mt-1">{province.description}</p>
           </div>
         </div>
@@ -112,7 +160,7 @@ export default function ProvinceDetailsModal({ province, onClose, onEditProvince
             className="py-2 px-4 rounded-md bg-[#003E83] hover:bg-[#002e62] text-white font-medium text-xs sm:text-sm transition-colors flex items-center gap-2 cursor-pointer"
           >
             <Edit className="w-4 h-4" />
-            Edit Province
+            {t('provinces.editProvinceBtn', 'Edit Province')}
           </button>
         </div>
       </div>

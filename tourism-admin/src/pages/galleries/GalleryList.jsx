@@ -1,8 +1,17 @@
-import { Clock, Eye, Edit, Trash2, Video, Image as ImageIcon, Eye as ViewsIcon } from 'lucide-react';
+import React from 'react';
+import { Eye, Edit, Trash2, Video, Image as ImageIcon, Eye as ViewsIcon } from 'lucide-react';
 import { getGalleryStatusColor as getStatusColor, getTypeIcon } from '../../utils/StatusUtils';
+import { useLanguage } from '../../i18n';
 
 export default function GalleryList({ media, mediaItems, onPreview, onEdit, onDelete, startIndex = 0 }) {
+  const { t } = useLanguage();
   const items = Array.isArray(media) ? media : (Array.isArray(mediaItems) ? mediaItems : []);
+
+  const getStatusLabel = (status) => {
+    if (status === 'Published') return t('gallery.statusPublished', 'Published');
+    if (status === 'Draft') return t('gallery.statusDraft', 'Draft');
+    return status;
+  };
 
   return (
     <>
@@ -34,7 +43,7 @@ export default function GalleryList({ media, mediaItems, onPreview, onEdit, onDe
                         {item.title}
                       </p>
                       <span className={`px-2 py-0.5 text-[10px] font-bold rounded-md border shrink-0 ${getStatusColor(item.status)}`}>
-                        {item.status}
+                        {getStatusLabel(item.status)}
                       </span>
                     </div>
 
@@ -43,7 +52,7 @@ export default function GalleryList({ media, mediaItems, onPreview, onEdit, onDe
                         {item.category}
                       </span>
                       <span className="text-xs text-[var(--color-text-muted-light)] dark:text-[var(--color-text-secondary-dark)]">
-                        {item.size} • {(item.views || 0).toLocaleString()} views
+                        {item.size} • {t('gallery.viewsCount', '{count} views').replace('{count}', (item.views || 0).toLocaleString())}
                       </span>
                     </div>
 
@@ -55,7 +64,7 @@ export default function GalleryList({ media, mediaItems, onPreview, onEdit, onDe
                         type="button"
                         onClick={() => onPreview(item)}
                         className="p-1.5 text-[var(--color-purple-badge-text)] dark:text-[var(--color-purple-badge-dark-text)] hover:bg-[var(--color-purple-badge-bg)] dark:hover:bg-[var(--color-purple-badge-dark-bg)] rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
-                        title="View Details"
+                        title={t('gallery.tooltipViewDetails', 'View Details')}
                       >
                         <Eye className="w-4 h-4" />
                       </button>
@@ -63,7 +72,7 @@ export default function GalleryList({ media, mediaItems, onPreview, onEdit, onDe
                         type="button"
                         onClick={() => onEdit(item)}
                         className="p-1.5 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/30 rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
-                        title="Edit"
+                        title={t('gallery.tooltipEditMedia', 'Edit')}
                       >
                         <Edit className="w-4 h-4" />
                       </button>
@@ -71,7 +80,7 @@ export default function GalleryList({ media, mediaItems, onPreview, onEdit, onDe
                         type="button"
                         onClick={() => onDelete(item.id)}
                         className="p-1.5 text-[var(--color-danger-text)] dark:text-[var(--color-danger-dark-text)] hover:bg-[var(--color-danger-bg)] dark:hover:bg-[var(--color-danger-dark-bg)] rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
-                        title="Delete"
+                        title={t('gallery.tooltipDeleteMedia', 'Delete')}
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -85,10 +94,10 @@ export default function GalleryList({ media, mediaItems, onPreview, onEdit, onDe
           <div className="text-center py-12 px-4">
             <ImageIcon className="w-12 h-12 text-blue-500 mx-auto mb-2 opacity-80" />
             <h3 className="text-base font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] mb-1">
-              No media found
+              {t('gallery.noMediaFound', 'No media found')}
             </h3>
             <p className="text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
-              Try adjusting your search or filter criteria
+              {t('gallery.tryAdjustingFilter', 'Try adjusting your search or filter criteria')}
             </p>
           </div>
         )}
@@ -100,25 +109,25 @@ export default function GalleryList({ media, mediaItems, onPreview, onEdit, onDe
           <thead className="bg-[var(--color-surface-hover-light)]/50 dark:bg-[var(--color-surface-hover-dark)]/50">
             <tr>
               <th className="pl-4 pr-2 py-3.5 text-xs font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] uppercase tracking-wider w-10 text-center">
-                #
+                {t('gallery.thIndex', '#')}
               </th>
               <th className="px-4 py-3.5 text-xs font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] uppercase tracking-wider">
-                Media & Title
+                {t('gallery.thMediaTitle', 'Media & Title')}
               </th>
               <th className="px-3 py-3.5 text-xs font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] uppercase tracking-wider whitespace-nowrap w-36">
-                Category
+                {t('gallery.thCategory', 'Category')}
               </th>
               <th className="px-3 py-3.5 text-xs font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] uppercase tracking-wider whitespace-nowrap w-28">
-                Size
+                {t('gallery.thSize', 'Size')}
               </th>
               <th className="px-3 py-3.5 text-xs font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] uppercase tracking-wider whitespace-nowrap w-28">
-                Views
+                {t('gallery.thViews', 'Views')}
               </th>
               <th className="px-3 py-3.5 text-xs font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] uppercase tracking-wider whitespace-nowrap w-32">
-                Status
+                {t('gallery.thStatus', 'Status')}
               </th>
               <th className="pl-3 pr-4 py-3.5 text-right text-xs font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] uppercase tracking-wider w-24 whitespace-nowrap">
-                Actions
+                {t('gallery.thActions', 'Actions')}
               </th>
             </tr>
           </thead>
@@ -155,7 +164,7 @@ export default function GalleryList({ media, mediaItems, onPreview, onEdit, onDe
                             {item.title}
                           </p>
                           <p className="text-[11px] text-[var(--color-text-muted-light)] dark:text-[var(--color-text-secondary-dark)] truncate font-mono">
-                            {item.dimensions || (item.type === 'video' ? 'Video Stream' : 'Image File')}
+                            {item.dimensions || (item.type === 'video' ? t('gallery.videoStream', 'Video Stream') : t('gallery.imageFile', 'Image File'))}
                           </p>
                         </div>
                       </div>
@@ -180,7 +189,7 @@ export default function GalleryList({ media, mediaItems, onPreview, onEdit, onDe
 
                     <td className="px-3 py-3.5 whitespace-nowrap">
                       <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 text-xs font-semibold rounded-md border ${getStatusColor(item.status)}`}>
-                        {item.status}
+                        {getStatusLabel(item.status)}
                       </span>
                     </td>
 
@@ -190,7 +199,7 @@ export default function GalleryList({ media, mediaItems, onPreview, onEdit, onDe
                           type="button"
                           onClick={() => onPreview(item)}
                           className="p-1.5 text-[var(--color-purple-badge-text)] dark:text-[var(--color-purple-badge-dark-text)] hover:bg-[var(--color-purple-badge-bg)] dark:hover:bg-[var(--color-purple-badge-dark-bg)] rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
-                          title="View Details"
+                          title={t('gallery.tooltipViewDetails', 'View Details')}
                         >
                           <Eye className="w-4 h-4" />
                         </button>
@@ -198,7 +207,7 @@ export default function GalleryList({ media, mediaItems, onPreview, onEdit, onDe
                           type="button"
                           onClick={() => onEdit(item)}
                           className="p-1.5 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/30 rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
-                          title="Edit"
+                          title={t('gallery.tooltipEditMedia', 'Edit')}
                         >
                           <Edit className="w-4 h-4" />
                         </button>
@@ -206,7 +215,7 @@ export default function GalleryList({ media, mediaItems, onPreview, onEdit, onDe
                           type="button"
                           onClick={() => onDelete(item.id)}
                           className="p-1.5 text-[var(--color-danger-text)] dark:text-[var(--color-danger-dark-text)] hover:bg-[var(--color-danger-bg)] dark:hover:bg-[var(--color-danger-dark-bg)] rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
-                          title="Delete"
+                          title={t('gallery.tooltipDeleteMedia', 'Delete')}
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
@@ -220,10 +229,10 @@ export default function GalleryList({ media, mediaItems, onPreview, onEdit, onDe
                 <td colSpan="7" className="text-center py-12 px-4">
                   <ImageIcon className="w-12 h-12 text-blue-500 mx-auto mb-2 opacity-80" />
                   <h3 className="text-base font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] mb-1">
-                    No media found
+                    {t('gallery.noMediaFound', 'No media found')}
                   </h3>
                   <p className="text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
-                    Try adjusting your search or filter criteria
+                    {t('gallery.tryAdjustingFilter', 'Try adjusting your search or filter criteria')}
                   </p>
                 </td>
               </tr>

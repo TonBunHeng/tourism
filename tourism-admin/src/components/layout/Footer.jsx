@@ -1,4 +1,7 @@
+import { useLanguage } from '../../i18n';
+
 export default function Footer() {
+  const { t } = useLanguage();
   const currentYear = new Date().getFullYear();
 
   return (
@@ -12,7 +15,7 @@ export default function Footer() {
 
       <div className="flex items-center gap-2 text-xs text-emerald-600 dark:text-emerald-400 font-medium">
         <span className="w-2 h-2 rounded-md bg-emerald-500 animate-pulse" />
-        <span>System Online</span>
+        <span>{t('footer.systemOnline', 'System Online')}</span>
       </div>
     </footer>
   );

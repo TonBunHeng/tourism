@@ -10,11 +10,12 @@ import BookingDetailsModal from './BookingDetailsModal';
 import BookingCancelModal from './BookingCancelModal';
 import { useAlert } from '../../context/AlertContext';
 import { useSearch } from '../../context/SearchContext';
+import { useLanguage } from '../../i18n';
 import { getStatusColor } from '../../utils/StatusUtils';
-
 import { getPageCache, setPageCache } from '../../utils/pageCache';
 
 export default function Bookings() {
+  const { t } = useLanguage();
   const { showConfirm, showSuccess, showError } = useAlert();
   const { searchTerm: search } = useSearch();
 
@@ -35,6 +36,16 @@ export default function Bookings() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
+  const getStatusText = useCallback((status) => {
+    switch (status) {
+      case 'confirmed': return t('bookings.statusConfirmed', 'Confirmed');
+      case 'completed': return t('bookings.statusCompleted', 'Completed');
+      case 'cancelled': return t('bookings.statusCancelled', 'Cancelled');
+      case 'pending':
+      default: return t('bookings.statusPending', 'Pending');
+    }
+  }, [t]);
+
   const fetchBookings = useCallback(async (isManualRefresh = false) => {
     if (isManualRefresh) setIsRefreshing(true);
     else if (!getPageCache('bookings_data')) setLoading(true);
@@ -45,8 +56,8 @@ export default function Bookings() {
       if (Array.isArray(list)) {
         const normalized = list.map((b) => ({
           ...b,
-          business_name: b.business?.name || b.business_name || 'Hospitality Partner',
-          service_name: b.service?.name || b.service_name || 'Travel Experience',
+          business_name: b.business?.name || b.business_name || t('bookings.defaultPartner', 'Hospitality Partner'),
+          service_name: b.service?.name || b.service_name || t('bookings.defaultService', 'Travel Experience'),
           total_price: Number(b.total_price) || 0,
           status: b.status || 'pending'
         }));
@@ -62,7 +73,7 @@ export default function Bookings() {
       setLoading(false);
       setIsRefreshing(false);
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     fetchBookings();
@@ -137,7 +148,10 @@ export default function Bookings() {
       if (selectedBooking && selectedBooking.id === id) {
         setSelectedBooking(prev => ({ ...prev, status: newStatus, cancellation_reason: reason }));
       }
-      showSuccess(`Booking status successfully changed to ${newStatus}.`, 'Status Updated');
+      showSuccess(
+        t('bookings.statusUpdatedSuccess', 'Booking status successfully changed to {status}.').replace('{status}', getStatusText(newStatus)),
+        t('bookings.statusUpdatedTitle', 'Status Updated')
+      );
       setActionLoadingId(null);
     }
   };
@@ -153,9 +167,9 @@ export default function Bookings() {
   // Delete Booking
   const handleDeleteBooking = async (booking) => {
     const confirmed = await showConfirm({
-      title: 'Delete Booking Record',
-      message: `Are you sure you want to delete reservation "${booking.booking_reference}" permanently?`,
-      confirmText: 'Delete Record',
+      title: t('bookings.deleteTitle', 'Delete Booking Record'),
+      message: t('bookings.deleteMessage', 'Are you sure you want to delete reservation "{ref}" permanently?\n\nThis action cannot be undone.').replace('{ref}', booking.booking_reference),
+      confirmText: t('bookings.deleteConfirmBtn', 'Delete Record'),
       type: 'danger'
     });
 
@@ -171,40 +185,43 @@ export default function Bookings() {
       if (selectedBooking && selectedBooking.id === booking.id) {
         setSelectedBooking(null);
       }
-      showSuccess(`Reservation "${booking.booking_reference}" has been removed.`, 'Booking Deleted');
+      showSuccess(
+        t('bookings.deletedSuccess', 'Reservation "{ref}" has been removed.').replace('{ref}', booking.booking_reference),
+        t('bookings.deletedTitle', 'Booking Deleted')
+      );
       setActionLoadingId(null);
     }
   };
 
   const statsList = [
     {
-      label: "Total Reservations",
+      label: t('bookings.statTotalReservations', 'Total Reservations'),
       value: (stats.total || 0).toLocaleString(),
-      subtext: "Booking queue volume",
+      subtext: t('bookings.statTotalSubtext', 'Booking queue volume'),
       icon: CalendarCheck,
       color: "text-[var(--color-info-text)] dark:text-[var(--color-info-dark-text)]",
       bg: "bg-[var(--color-info-bg)] dark:bg-[var(--color-info-dark-bg)]"
     },
     {
-      label: "Pending Action",
+      label: t('bookings.statPendingAction', 'Pending Action'),
       value: (stats.pending || 0).toLocaleString(),
-      subtext: "Requires review/confirmation",
+      subtext: t('bookings.statPendingSubtext', 'Requires review/confirmation'),
       icon: Clock,
       color: "text-[var(--color-warning-text)] dark:text-[var(--color-warning-dark-text)]",
       bg: "bg-[var(--color-warning-bg)] dark:bg-[var(--color-warning-dark-bg)]"
     },
     {
-      label: "Confirmed Bookings",
+      label: t('bookings.statConfirmedBookings', 'Confirmed Bookings'),
       value: (stats.confirmed || 0).toLocaleString(),
-      subtext: "Awaiting tourist arrival",
+      subtext: t('bookings.statConfirmedSubtext', 'Awaiting tourist arrival'),
       icon: CheckCircle2,
       color: "text-[var(--color-success-text)] dark:text-[var(--color-success-dark-text)]",
       bg: "bg-[var(--color-success-bg)] dark:bg-[var(--color-success-dark-bg)]"
     },
     {
-      label: "Gross Transaction Value",
+      label: t('bookings.statGrossValue', 'Gross Transaction Value'),
       value: `$${stats.totalRevenue.toLocaleString()}`,
-      subtext: "Active confirmed volume",
+      subtext: t('bookings.statGrossSubtext', 'Active confirmed volume'),
       icon: DollarSign,
       color: "text-[var(--color-purple-badge-text)] dark:text-[var(--color-purple-badge-dark-text)]",
       bg: "bg-[var(--color-purple-badge-bg)] dark:bg-[var(--color-purple-badge-dark-bg)]"
@@ -218,10 +235,10 @@ export default function Bookings() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <h1 className="text-xl sm:text-2xl font-bold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] tracking-tight">
-              Bookings & Reservations
+              {t('bookings.title', 'Bookings')}
             </h1>
             <p className="text-xs sm:text-sm text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mt-1">
-              Review, approve, fulfill, and monitor tourist reservations for hotels, tour packages, and travel experiences.
+              {t('bookings.subtitle', 'Review, approve, fulfill, and monitor tourist reservations for hotels, tour packages, and travel experiences.')}
             </p>
           </div>
         </div>
@@ -264,11 +281,11 @@ export default function Bookings() {
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="flex items-center gap-2.5">
               <h2 className="text-lg md:text-xl font-bold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">
-                All Bookings
+                {t('bookings.allBookings', 'All Bookings')}
               </h2>
               {totalRecords !== undefined && (
                 <span className="text-xs font-semibold px-2 py-0.5 rounded-md bg-blue-50 text-[#003E83] dark:bg-blue-950/50 dark:text-blue-400 border border-blue-100 dark:border-blue-900/40">
-                  {totalRecords} {totalRecords === 1 ? 'booking' : 'bookings'}
+                  {totalRecords} {totalRecords === 1 ? t('bookings.bookingCountSingle', 'booking') : t('bookings.bookingCountPlural', 'bookings')}
                 </span>
               )}
             </div>
@@ -281,11 +298,11 @@ export default function Bookings() {
                   onChange={(e) => { setStatusFilter(e.target.value); setCurrentPage(1); }}
                   className="appearance-none w-full sm:w-auto pl-4 pr-9 py-2 border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--color-input)] focus:border-transparent bg-[var(--color-white)] dark:bg-[var(--color-bg-dark)] text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] text-sm cursor-pointer shadow-xs font-medium"
                 >
-                  <option value="all">All Bookings</option>
-                  <option value="pending">Pending</option>
-                  <option value="confirmed">Confirmed</option>
-                  <option value="completed">Completed</option>
-                  <option value="cancelled">Cancelled</option>
+                  <option value="all">{t('bookings.filterAll', 'All Bookings')}</option>
+                  <option value="pending">{t('bookings.filterPending', 'Pending')}</option>
+                  <option value="confirmed">{t('bookings.filterConfirmed', 'Confirmed')}</option>
+                  <option value="completed">{t('bookings.filterCompleted', 'Completed')}</option>
+                  <option value="cancelled">{t('bookings.filterCancelled', 'Cancelled')}</option>
                 </select>
                 <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--color-text-muted-light)] dark:text-[var(--color-text-secondary-dark)] pointer-events-none" />
               </div>
@@ -302,25 +319,25 @@ export default function Bookings() {
                   #
                 </th>
                 <th className="px-4 py-3.5 text-left text-xs font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] uppercase tracking-wider whitespace-nowrap">
-                  REFERENCE
+                  {t('bookings.colReference', 'REFERENCE')}
                 </th>
                 <th className="px-4 py-3.5 text-left text-xs font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] uppercase tracking-wider whitespace-nowrap">
-                  GUEST INFORMATION
+                  {t('bookings.colGuestInfo', 'GUEST INFORMATION')}
                 </th>
                 <th className="px-4 py-3.5 text-left text-xs font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] uppercase tracking-wider whitespace-nowrap">
-                  EXPERIENCE & PARTNER
+                  {t('bookings.colExperiencePartner', 'EXPERIENCE & PARTNER')}
                 </th>
                 <th className="px-4 py-3.5 text-left text-xs font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] uppercase tracking-wider whitespace-nowrap">
-                  TRAVEL DATE & GUESTS
+                  {t('bookings.colDateGuests', 'TRAVEL DATE & GUESTS')}
                 </th>
                 <th className="px-4 py-3.5 text-left text-xs font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] uppercase tracking-wider whitespace-nowrap">
-                  TOTAL PRICE
+                  {t('bookings.colTotalPrice', 'TOTAL PRICE')}
                 </th>
                 <th className="px-4 py-3.5 text-left text-xs font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] uppercase tracking-wider whitespace-nowrap">
-                  STATUS
+                  {t('bookings.colStatus', 'STATUS')}
                 </th>
                 <th className="px-4 py-3.5 text-right text-xs font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] uppercase tracking-wider whitespace-nowrap">
-                  ACTIONS
+                  {t('bookings.colActions', 'ACTIONS')}
                 </th>
               </tr>
             </thead>
@@ -329,7 +346,7 @@ export default function Bookings() {
                 <tr>
                   <td colSpan={8} className="text-center py-12 text-[var(--color-text-muted-light)]">
                     <RefreshCw className="w-5 h-5 animate-spin mx-auto mb-2 text-[#003E83]" />
-                    Loading reservations queue...
+                    {t('bookings.loadingQueue', 'Loading reservations queue...')}
                   </td>
                 </tr>
               ) : paginatedBookings.length === 0 ? (
@@ -337,10 +354,10 @@ export default function Bookings() {
                   <td colSpan={8} className="text-center py-12 px-4">
                     <CalendarCheck className="w-12 h-12 text-[#003E83] mx-auto mb-2 opacity-80" />
                     <h3 className="text-base font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] mb-1">
-                      No bookings found
+                      {t('bookings.noBookingsFound', 'No bookings found')}
                     </h3>
                     <p className="text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
-                      Try adjusting your search query or status filter
+                      {t('bookings.adjustFilterPrompt', 'Try adjusting your search query or status filter')}
                     </p>
                   </td>
                 </tr>
@@ -362,7 +379,7 @@ export default function Bookings() {
                           type="button"
                           onClick={() => handleCopyCode(b.booking_reference)}
                           className="inline-flex items-center gap-1.5 font-mono text-xs font-bold bg-blue-50 dark:bg-blue-950/60 text-[#003E83] dark:text-blue-400 border border-blue-100 dark:border-blue-900/40 px-2 py-1 rounded-md hover:bg-blue-100 transition-colors cursor-pointer"
-                          title="Click to copy code"
+                          title={t('bookings.clickToCopy', 'Click to copy code')}
                         >
                           <span>{b.booking_reference}</span>
                           {copiedCode === b.booking_reference ? (
@@ -375,21 +392,21 @@ export default function Bookings() {
 
                       <td className="px-4 py-3.5">
                         <div className="text-xs md:text-sm font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">
-                          {b.customer_name}
+                          {b.customer_name || t('bookings.defaultGuest', 'Guest')}
                         </div>
                         <div className="text-[11px] text-[var(--color-text-muted-light)] dark:text-[var(--color-text-secondary-dark)] flex items-center gap-1 mt-0.5 truncate max-w-xs">
                           <Mail className="w-3 h-3 shrink-0" />
-                          <span className="truncate">{b.customer_email}</span>
+                          <span className="truncate">{b.customer_email || t('bookings.noEmailProvided', 'No email provided')}</span>
                         </div>
                       </td>
 
                       <td className="px-4 py-3.5">
                         <div className="text-xs font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] truncate max-w-xs">
-                          {b.service_name}
+                          {b.service_name || t('bookings.defaultService', 'Travel Experience')}
                         </div>
                         <div className="text-[11px] text-[var(--color-text-muted-light)] dark:text-[var(--color-text-secondary-dark)] flex items-center gap-1 mt-0.5 truncate max-w-xs">
                           <Building2 className="w-3 h-3 text-[#003E83] dark:text-blue-400 shrink-0" />
-                          <span className="truncate">{b.business_name}</span>
+                          <span className="truncate">{b.business_name || t('bookings.defaultPartner', 'Hospitality Partner')}</span>
                         </div>
                       </td>
 
@@ -398,7 +415,7 @@ export default function Bookings() {
                           {b.booking_date}
                         </div>
                         <div className="text-[11px] text-[var(--color-text-muted-light)] dark:text-[var(--color-text-secondary-dark)]">
-                          {b.number_of_guests || 1} {b.number_of_guests === 1 ? 'Guest' : 'Guests'} • {b.booking_time || 'Full day'}
+                          {b.number_of_guests || 1} {b.number_of_guests === 1 ? t('bookings.guestSingle', 'Guest') : t('bookings.guestPlural', 'Guests')} • {b.booking_time || t('bookings.fullDay', 'Full day')}
                         </div>
                       </td>
 
@@ -407,7 +424,7 @@ export default function Bookings() {
                           ${b.total_price}
                         </div>
                         <div className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase">
-                          {b.payment_status || 'Paid'}
+                          {b.payment_status === 'pending' ? t('bookings.pendingPayment', 'Pending') : t('bookings.paid', 'Paid')}
                         </div>
                       </td>
 
@@ -417,17 +434,59 @@ export default function Bookings() {
                           {isConfirmed && <CheckCircle2 className="w-3.5 h-3.5 mr-1" />}
                           {isCompleted && <CheckCircle2 className="w-3.5 h-3.5 mr-1" />}
                           {isCancelled && <XCircle className="w-3.5 h-3.5 mr-1" />}
-                          {b.status}
+                          {getStatusText(b.status)}
                         </span>
                       </td>
 
                       <td className="px-4 py-3.5 text-right whitespace-nowrap text-xs">
                         <div className="flex items-center justify-end gap-1.5">
+                          {isPending && (
+                            <>
+                              <button
+                                type="button"
+                                onClick={() => handleUpdateStatus(b.id, 'confirmed')}
+                                className="p-1.5 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
+                                title={t('bookings.confirmBooking', 'Confirm Booking')}
+                              >
+                                <CheckCircle2 className="w-4 h-4" />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => { setBookingToCancel(b); setIsCancelModalOpen(true); }}
+                                className="p-1.5 text-rose-500 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
+                                title={t('bookings.cancelBooking', 'Cancel / Decline')}
+                              >
+                                <XCircle className="w-4 h-4" />
+                              </button>
+                            </>
+                          )}
+
+                          {isConfirmed && (
+                            <>
+                              <button
+                                type="button"
+                                onClick={() => handleUpdateStatus(b.id, 'completed')}
+                                className="p-1.5 text-[#003E83] dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40 rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
+                                title={t('bookings.completeBooking', 'Complete Booking')}
+                              >
+                                <CheckCircle2 className="w-4 h-4" />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => { setBookingToCancel(b); setIsCancelModalOpen(true); }}
+                                className="p-1.5 text-rose-500 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
+                                title={t('bookings.cancelBooking', 'Cancel / Decline')}
+                              >
+                                <XCircle className="w-4 h-4" />
+                              </button>
+                            </>
+                          )}
+
                           <button
                             type="button"
                             onClick={() => setSelectedBooking(b)}
                             className="p-1.5 text-[var(--color-purple-badge-text)] dark:text-[var(--color-purple-badge-dark-text)] hover:bg-[var(--color-purple-badge-bg)] dark:hover:bg-[var(--color-purple-badge-dark-bg)] rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
-                            title="View Booking Details"
+                            title={t('bookings.viewDetails', 'View Booking Details')}
                           >
                             <Eye className="w-4 h-4" />
                           </button>
@@ -437,10 +496,19 @@ export default function Bookings() {
                             target="_blank"
                             rel="noopener noreferrer"
                             className="p-1.5 text-[#003E83] dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40 rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer inline-flex items-center justify-center"
-                            title="Visit Public Page"
+                            title={t('bookings.visitPublicPage', 'Visit Public Page')}
                           >
                             <ExternalLink className="w-4 h-4" />
                           </a>
+
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteBooking(b)}
+                            className="p-1.5 text-[var(--color-danger-text)] dark:text-[var(--color-danger-dark-text)] hover:bg-[var(--color-danger-bg)] dark:hover:bg-[var(--color-danger-dark-bg)] rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
+                            title={t('bookings.deleteBooking', 'Delete Booking')}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
                         </div>
                       </td>
                     </tr>
@@ -459,7 +527,7 @@ export default function Bookings() {
           startIndex={startIndex}
           endIndex={endIndex}
           totalRecords={totalRecords}
-          label="bookings"
+          label={t('sidebar.bookings', 'bookings')}
         />
       </div>
 

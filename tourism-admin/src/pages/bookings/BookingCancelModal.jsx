@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { AlertTriangle, X } from 'lucide-react';
+import { useLanguage } from '../../i18n';
 
 export default function BookingCancelModal({
   isOpen,
@@ -8,8 +9,16 @@ export default function BookingCancelModal({
   onSubmit,
   booking = null
 }) {
-  const [reason, setReason] = useState('Service provider unavailable or schedule conflict.');
+  const { t } = useLanguage();
+  const [reason, setReason] = useState('');
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (isOpen) {
+      setReason(t('bookings.defaultCancelReason', 'Service provider unavailable or schedule conflict.'));
+      setError('');
+    }
+  }, [isOpen, t]);
 
   useEffect(() => {
     if (isOpen) {
@@ -32,7 +41,7 @@ export default function BookingCancelModal({
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!reason.trim()) {
-      setError('Please provide a reason for cancelling this booking.');
+      setError(t('bookings.cancelReasonRequired', 'Please provide a reason for cancelling this booking.'));
       return;
     }
     onSubmit(reason.trim());
@@ -57,17 +66,17 @@ export default function BookingCancelModal({
             </div>
             <div>
               <h3 className="text-sm font-bold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">
-                Cancel / Decline Reservation
+                {t('bookings.cancelModalTitle', 'Cancel / Decline Reservation')}
               </h3>
               <p className="text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
-                Reference: <span className="font-mono">{booking.booking_reference}</span>
+                {t('bookings.referenceLabel', 'Reference:')} <span className="font-mono">{booking.booking_reference}</span>
               </p>
             </div>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="p-1 rounded-md text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] hover:bg-[var(--color-surface-hover-light)] transition-colors"
+            className="p-1 rounded-md text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] hover:bg-[var(--color-surface-hover-light)] transition-colors cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
@@ -76,13 +85,13 @@ export default function BookingCancelModal({
         <form onSubmit={handleSubmit} className="p-5 space-y-4">
           <div>
             <label className="block text-xs font-semibold text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">
-              Reason for Cancellation <span className="text-rose-500">*</span>
+              {t('bookings.reasonForCancellation', 'Reason for Cancellation')} <span className="text-rose-500">*</span>
             </label>
             <textarea
               rows={3}
               value={reason}
               onChange={(e) => { setReason(e.target.value); setError(''); }}
-              placeholder="Provide a clear reason for cancellation to notify the customer..."
+              placeholder={t('bookings.cancelPlaceholder', 'Provide a clear reason for cancellation to notify the customer...')}
               className="w-full px-3 py-2 border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--color-input)] focus:border-transparent bg-[var(--color-white)] dark:bg-[var(--color-bg-dark)] text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] text-sm resize-none"
             />
             {error && <p className="text-[11px] text-rose-500 mt-1">{error}</p>}
@@ -94,13 +103,13 @@ export default function BookingCancelModal({
               onClick={onClose}
               className="px-4 py-2 border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] rounded-md text-xs font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] hover:bg-[var(--color-surface-hover-light)] dark:hover:bg-[var(--color-surface-hover-dark)] transition-colors cursor-pointer"
             >
-              Back
+              {t('common.back', 'Back')}
             </button>
             <button
               type="submit"
               className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-md text-xs font-medium transition-colors shadow-xs cursor-pointer"
             >
-              Confirm Cancellation
+              {t('bookings.confirmCancellation', 'Confirm Cancellation')}
             </button>
           </div>
         </form>

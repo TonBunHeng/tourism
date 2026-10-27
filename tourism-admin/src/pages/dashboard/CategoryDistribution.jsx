@@ -1,6 +1,7 @@
 import { Layers } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
+import { useLanguage } from '../../i18n';
 
 const donutColors = [
   '#8B5CF6', // purple-500
@@ -17,6 +18,7 @@ const donutColors = [
 
 export default function CategoryDistribution({ distribution, timeRange = 'yearly', isLoading = false }) {
   const navigate = useNavigate();
+  const { t, currentLang } = useLanguage();
 
   // Purely database-driven: no static or default categories
   const rawCategories = (Array.isArray(distribution) && distribution.length > 0)
@@ -48,28 +50,28 @@ export default function CategoryDistribution({ distribution, timeRange = 'yearly
   const getSubtitle = () => {
     switch (timeRange) {
       case 'today':
-        return "Visitor footfall breakdown by category (Today)";
+        return t('dashboard.catSubtitleToday', "Visitor footfall breakdown by category (Today)");
       case 'weekly':
-        return '7-day traveler traffic & visits across categories';
+        return t('dashboard.catSubtitleWeekly', '7-day traveler traffic & visits across categories');
       case 'monthly':
-        return 'Monthly visitor volume & engagement by category';
+        return t('dashboard.catSubtitleMonthly', 'Monthly visitor volume & engagement by category');
       case 'yearly':
       default:
-        return 'Proportion of registered destinations by category';
+        return t('dashboard.catSubtitleYearly', 'Proportion of registered destinations by category');
     }
   };
 
   const getCenterLabel = () => {
     switch (timeRange) {
       case 'today':
-        return "Today's Visits";
+        return t('dashboard.todaysVisits', "Today's Visits");
       case 'weekly':
-        return 'Weekly Visits';
+        return t('dashboard.weeklyVisits', 'Weekly Visits');
       case 'monthly':
-        return 'Monthly Visits';
+        return t('dashboard.monthlyVisits', 'Monthly Visits');
       case 'yearly':
       default:
-        return 'Total Places';
+        return t('dashboard.totalPlaces', 'Total Places');
     }
   };
 
@@ -77,7 +79,7 @@ export default function CategoryDistribution({ distribution, timeRange = 'yearly
     ? `${(totalPlacesCount / 1000).toFixed(totalPlacesCount >= 10000 ? 0 : 1)}k`
     : totalPlacesCount.toLocaleString();
 
-  const badgeText = categories[0]?.metric_label || (isYearly ? `${categories.length} Categories` : getCenterLabel());
+  const badgeText = isYearly ? t('dashboard.categoriesCount', '{count} Categories').replace('{count}', categories.length) : getCenterLabel();
 
   return (
     <div className={`bg-[var(--color-white)] dark:bg-[var(--color-bg-dark)] rounded-md shadow-sm border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] p-5 flex flex-col justify-between h-full transition-opacity duration-200 ${isLoading ? 'opacity-60' : 'opacity-100'}`}>
@@ -86,7 +88,7 @@ export default function CategoryDistribution({ distribution, timeRange = 'yearly
           <div>
             <h3 className="font-semibold text-sm md:text-base text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] flex items-center gap-2">
               <Layers className="w-4 h-4 text-purple-600 dark:text-purple-400" />
-              <span>Category Distribution</span>
+              <span>{t('dashboard.categoryDistributionTitle', 'Category Distribution')}</span>
               <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 border border-purple-200/60 dark:border-purple-900/60">
                 {badgeText}
               </span>
@@ -99,7 +101,7 @@ export default function CategoryDistribution({ distribution, timeRange = 'yearly
             onClick={() => navigate('/categories')}
             className="text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline cursor-pointer"
           >
-            View All
+            {t('dashboard.viewAll', 'View All')}
           </button>
         </div>
 
@@ -108,7 +110,7 @@ export default function CategoryDistribution({ distribution, timeRange = 'yearly
           {categories.length === 0 ? (
             <div className="h-full flex flex-col items-center justify-center text-gray-400 text-xs">
               <Layers className="w-8 h-8 mb-2 stroke-1 text-gray-300 dark:text-zinc-600" />
-              <p>No category distribution in database</p>
+              <p>{t('dashboard.noCategoriesData', 'No category data available in database')}</p>
             </div>
           ) : (
             <>
@@ -123,7 +125,7 @@ export default function CategoryDistribution({ distribution, timeRange = 'yearly
               </div>
 
               <div className="w-full h-full relative z-10">
-                <ResponsiveContainer width="100%" height="100%" key={`cat-dist-${timeRange}`}>
+                <ResponsiveContainer width="100%" height="100%" key={`cat-dist-${timeRange}-${currentLang}`}>
                   <PieChart>
                     <Pie
                       data={chartData}
@@ -148,7 +150,6 @@ export default function CategoryDistribution({ distribution, timeRange = 'yearly
                       content={({ active, payload }) => {
                         if (active && payload && payload.length) {
                           const data = payload[0].payload;
-                          const unit = isYearly ? (data.count === 1 ? 'place' : 'places') : 'visits';
                           return (
                             <div className="bg-[var(--color-white)] dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 p-2.5 rounded-md shadow-md text-xs space-y-1">
                               <p className="font-semibold text-gray-900 dark:text-zinc-100 flex items-center gap-1.5">
@@ -157,7 +158,9 @@ export default function CategoryDistribution({ distribution, timeRange = 'yearly
                               </p>
                               <div className="flex items-center gap-3 pt-1 border-t border-gray-100 dark:border-zinc-800">
                                 <span className="text-gray-900 dark:text-zinc-100 font-bold">
-                                  {data.count.toLocaleString()} {unit}
+                                  {isYearly
+                                    ? t('dashboard.placesCount', '{count} places').replace('{count}', data.count.toLocaleString())
+                                    : t('dashboard.visitsCount', '{count} visits').replace('{count}', data.count.toLocaleString())}
                                 </span>
                                 <span className="text-purple-600 dark:text-purple-400 font-semibold">
                                   ({data.percentage}%)

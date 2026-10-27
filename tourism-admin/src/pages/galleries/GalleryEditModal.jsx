@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, ChevronDown, Upload, Trash2, Loader2 } from 'lucide-react';
 import uploadService from '../../services/uploadService';
+import { useLanguage } from '../../i18n';
 
 export default function GalleryEditModal({
   isOpen,
@@ -10,6 +11,7 @@ export default function GalleryEditModal({
   onSubmit,
   categories = []
 }) {
+  const { t } = useLanguage();
   const [isUploading, setIsUploading] = useState(false);
 
   useEffect(() => {
@@ -81,7 +83,9 @@ export default function GalleryEditModal({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-zinc-800 shrink-0">
-          <h3 className="text-base font-bold text-gray-900 dark:text-zinc-100">Edit Media</h3>
+          <h3 className="text-base font-bold text-gray-900 dark:text-zinc-100">
+            {t('gallery.editModalTitle', 'Edit Media')}
+          </h3>
           <button
             onClick={onClose}
             className="p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-zinc-200 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-md transition-all active:scale-90 cursor-pointer"
@@ -93,7 +97,9 @@ export default function GalleryEditModal({
 
         <form onSubmit={onSubmit} className="p-6 space-y-4 max-h-[75vh] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none']">
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">Title</label>
+            <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">
+              {t('gallery.labelTitle', 'Title')}
+            </label>
             <input
               type="text"
               value={editingMedia.title}
@@ -105,7 +111,9 @@ export default function GalleryEditModal({
 
           {/* Picture / Video Upload & Preview Field */}
           <div className="space-y-2">
-            <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">Media File (Picture / Video)</label>
+            <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
+              {t('gallery.labelMediaFile', 'Media File (Picture / Video)')}
+            </label>
 
             {editingMedia.url ? (
               <div className="relative w-full h-44 rounded-md overflow-hidden border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] group shadow-sm">
@@ -117,7 +125,7 @@ export default function GalleryEditModal({
                 <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                   <label className="p-2.5 bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] text-white rounded-md text-xs font-medium flex items-center gap-1.5 cursor-pointer shadow-md transition-colors">
                     <Upload className="w-4 h-4" />
-                    Change Media
+                    {t('gallery.changeMediaBtn', 'Change Media')}
                     <input type="file" accept="image/*,video/*" className="hidden" onChange={handleFileChange} />
                   </label>
                   <button
@@ -126,14 +134,16 @@ export default function GalleryEditModal({
                     className="p-2.5 bg-red-600 hover:bg-red-700 text-white rounded-md text-xs font-medium flex items-center gap-1 cursor-pointer shadow-md transition-colors"
                   >
                     <Trash2 className="w-4 h-4" />
-                    Remove
+                    {t('gallery.removeBtn', 'Remove')}
                   </button>
                 </div>
               </div>
             ) : (
               <label className="border-2 border-dashed border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] bg-[var(--color-surface-hover-light)] dark:bg-[var(--color-surface-hover-dark)]/50 rounded-md p-6 text-center hover:border-[var(--color-primary)] transition-colors cursor-pointer block">
                 <Upload className="w-8 h-8 text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mx-auto mb-2" />
-                <p className="text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] font-medium text-xs">Drop picture/video here or click to upload</p>
+                <p className="text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] font-medium text-xs">
+                  {t('gallery.dropUploadPrompt', 'Drop picture/video here or click to upload')}
+                </p>
                 <input type="file" accept="image/*,video/*" className="hidden" onChange={handleFileChange} />
               </label>
             )}
@@ -142,29 +152,33 @@ export default function GalleryEditModal({
               type="url"
               value={editingMedia.url}
               onChange={(e) => onEditingMediaChange({ ...editingMedia, url: e.target.value })}
-              placeholder="Or enter media URL (https://...)"
+              placeholder={t('gallery.enterUrlPlaceholder', 'Or enter media URL (https://...)')}
               className="w-full bg-[var(--color-bg-light)] dark:bg-[var(--color-bg-dark)] border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] rounded-md px-4 py-2.5 text-xs text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] placeholder-[var(--color-text-muted-light)] focus:outline-none focus:ring-2 focus:ring-[var(--color-input)] transition-all"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">Media Type</label>
+              <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">
+                {t('gallery.labelMediaType', 'Media Type')}
+              </label>
               <div className="relative">
                 <select
                   value={editingMedia.type || 'image'}
                   onChange={(e) => onEditingMediaChange({ ...editingMedia, type: e.target.value })}
                   className="appearance-none w-full bg-[var(--color-bg-light)] dark:bg-[var(--color-bg-dark)] border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] rounded-md px-4 py-3 text-sm text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] focus:outline-none focus:ring-2 focus:ring-[var(--color-input)] focus:border-transparent cursor-pointer"
                 >
-                  <option value="image">Image</option>
-                  <option value="video">Video</option>
+                  <option value="image">{t('gallery.typeImage', 'Image')}</option>
+                  <option value="video">{t('gallery.typeVideo', 'Video')}</option>
                 </select>
                 <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] pointer-events-none" />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">Category</label>
+              <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">
+                {t('gallery.thCategory', 'Category')}
+              </label>
               <div className="relative">
                 <select
                   value={editingMedia.category}
@@ -181,15 +195,17 @@ export default function GalleryEditModal({
           </div>
 
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">Status</label>
+            <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">
+              {t('gallery.labelStatus', 'Status')}
+            </label>
             <div className="relative">
               <select
                 value={editingMedia.status || 'Published'}
                 onChange={(e) => onEditingMediaChange({ ...editingMedia, status: e.target.value })}
                 className="appearance-none w-full bg-[var(--color-bg-light)] dark:bg-[var(--color-bg-dark)] border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] rounded-md px-4 py-3 text-sm text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] focus:outline-none focus:ring-2 focus:ring-[var(--color-input)] focus:border-transparent cursor-pointer"
               >
-                <option value="Published">Published</option>
-                <option value="Draft">Draft</option>
+                <option value="Published">{t('gallery.statusPublished', 'Published')}</option>
+                <option value="Draft">{t('gallery.statusDraft', 'Draft')}</option>
               </select>
               <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] pointer-events-none" />
             </div>
@@ -201,7 +217,7 @@ export default function GalleryEditModal({
               onClick={onClose}
               className="flex-1 py-2.5 px-4 rounded-md border border-gray-300 dark:border-zinc-700 text-gray-700 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-800 font-medium text-sm transition-colors text-center cursor-pointer"
             >
-              Cancel
+              {t('gallery.cancelBtn', 'Cancel')}
             </button>
             <button
               type="submit"
@@ -211,10 +227,10 @@ export default function GalleryEditModal({
               {isUploading ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  <span>Uploading...</span>
+                  <span>{t('gallery.uploadingBtn', 'Uploading...')}</span>
                 </>
               ) : (
-                'Save Changes'
+                t('gallery.saveChangesBtn', 'Save Changes')
               )}
             </button>
           </div>

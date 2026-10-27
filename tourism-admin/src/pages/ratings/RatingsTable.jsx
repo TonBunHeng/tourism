@@ -16,6 +16,7 @@ import {
   MessageSquare
 } from 'lucide-react';
 import { getStatusColor, renderStars } from '../../utils/StatusUtils';
+import { useLanguage } from '../../i18n';
 
 export default function RatingsTable({
   reviews = [],
@@ -27,6 +28,8 @@ export default function RatingsTable({
   onDelete,
   startIndex = 0
 }) {
+  const { t } = useLanguage();
+
   const handleView = (review) => {
     if (onView) onView(review);
     else if (onViewDetails) onViewDetails(review);
@@ -34,10 +37,22 @@ export default function RatingsTable({
 
   const safeReviews = reviews || [];
 
+  const getStatusLabel = (status) => {
+    switch (status) {
+      case 'Approved': return t('ratings.statusApproved', 'Approved');
+      case 'Pending': return t('ratings.statusPending', 'Pending');
+      case 'Rejected': return t('ratings.statusRejected', 'Rejected');
+      case 'Published': return t('ratings.statusPublished', 'Published');
+      case 'Flagged': return t('ratings.statusFlagged', 'Flagged');
+      case 'Archived': return t('ratings.statusArchived', 'Archived');
+      default: return status;
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="p-12 text-center text-slate-500 dark:text-zinc-400 font-medium">
-        Loading ratings and reviews...
+        {t('ratings.loadingRatings', 'Loading ratings and reviews...')}
       </div>
     );
   }
@@ -51,10 +66,10 @@ export default function RatingsTable({
             const avatarUrl = typeof review.avatar === 'string' && review.avatar.length > 0
               ? review.avatar
               : (typeof review.user === 'object' && typeof review.user?.avatar === 'string' ? review.user.avatar : null);
-            const userName = typeof review.user === 'object' ? (review.user?.name || review.user_name || 'Traveler') : (review.user_name || review.user || 'Traveler');
+            const userName = typeof review.user === 'object' ? (review.user?.name || review.user_name || t('ratings.anonymousTraveler', 'Traveler')) : (review.user_name || review.user || t('ratings.anonymousTraveler', 'Traveler'));
             const userVerified = typeof review.user === 'object' ? review.user?.verified : review.is_verified;
-            const placeName = typeof review.place === 'object' ? (review.place?.name || review.place_name || 'Attraction') : (review.place_name || review.place || 'Attraction');
-            const reviewDate = review.created_at ? new Date(review.created_at).toLocaleDateString() : (review.date || 'Recent');
+            const placeName = typeof review.place === 'object' ? (review.place?.name || review.place_name || t('ratings.attractionFallback', 'Attraction')) : (review.place_name || review.place || t('ratings.attractionFallback', 'Attraction'));
+            const reviewDate = review.created_at ? new Date(review.created_at).toLocaleDateString() : (review.date || t('ratings.recentFallback', 'Recent'));
 
             return (
               <div
@@ -84,7 +99,7 @@ export default function RatingsTable({
                         )}
                       </div>
                       <span className={`px-2 py-0.5 text-[10px] font-bold rounded-md border shrink-0 ${getStatusColor(review.status)}`}>
-                        {review.status}
+                        {getStatusLabel(review.status)}
                       </span>
                     </div>
 
@@ -106,7 +121,7 @@ export default function RatingsTable({
                     </p>
 
                     <p className="text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] line-clamp-2 mt-1">
-                      {review.comment || review.title || 'No comment provided.'}
+                      {review.comment || review.title || t('ratings.noComment', 'No comment provided.')}
                     </p>
 
                     <div
@@ -129,7 +144,7 @@ export default function RatingsTable({
                               type="button"
                               onClick={() => onStatusChange(review.id, 'Approved')}
                               className="p-1.5 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 rounded-md transition-colors cursor-pointer"
-                              title="Approve Review"
+                              title={t('ratings.tooltipApprove', 'Approve Review')}
                             >
                               <Check className="w-4 h-4" />
                             </button>
@@ -137,7 +152,7 @@ export default function RatingsTable({
                               type="button"
                               onClick={() => onStatusChange(review.id, 'Rejected')}
                               className="p-1.5 text-[var(--color-danger-text)] dark:text-[var(--color-danger-dark-text)] hover:bg-[var(--color-danger-bg)] dark:hover:bg-[var(--color-danger-dark-bg)] rounded-md transition-colors cursor-pointer"
-                              title="Reject Review"
+                              title={t('ratings.tooltipReject', 'Reject Review')}
                             >
                               <X className="w-4 h-4" />
                             </button>
@@ -148,7 +163,7 @@ export default function RatingsTable({
                             type="button"
                             onClick={() => onReply(review)}
                             className="p-1.5 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/30 rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
-                            title="Reply"
+                            title={t('ratings.tooltipReply', 'Reply')}
                           >
                             <Reply className="w-4 h-4" />
                           </button>
@@ -157,7 +172,7 @@ export default function RatingsTable({
                           type="button"
                           onClick={() => handleView(review)}
                           className="p-1.5 text-[var(--color-purple-badge-text)] dark:text-[var(--color-purple-badge-dark-text)] hover:bg-[var(--color-purple-badge-bg)] dark:hover:bg-[var(--color-purple-badge-dark-bg)] rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
-                          title="View Details"
+                          title={t('ratings.tooltipViewDetails', 'View Details')}
                         >
                           <Eye className="w-4 h-4" />
                         </button>
@@ -166,7 +181,7 @@ export default function RatingsTable({
                             type="button"
                             onClick={() => onDelete(review.id)}
                             className="p-1.5 text-[var(--color-danger-text)] dark:text-[var(--color-danger-dark-text)] hover:bg-[var(--color-danger-bg)] dark:hover:bg-[var(--color-danger-dark-bg)] rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
-                            title="Delete"
+                            title={t('ratings.tooltipDelete', 'Delete Review')}
                           >
                             <Trash2 className="w-4 h-4" />
                           </button>
@@ -182,10 +197,10 @@ export default function RatingsTable({
           <div className="text-center py-12 px-4">
             <MessageSquare className="w-12 h-12 text-blue-500 mx-auto mb-2 opacity-80" />
             <h3 className="text-base font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] mb-1">
-              No reviews found
+              {t('ratings.noReviewsFound', 'No reviews found')}
             </h3>
             <p className="text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
-              Try adjusting your search or filter criteria
+              {t('ratings.tryAdjustingFilter', 'Try adjusting your search or filter criteria')}
             </p>
           </div>
         )}
@@ -197,25 +212,25 @@ export default function RatingsTable({
           <thead className="bg-[var(--color-surface-hover-light)]/50 dark:bg-[var(--color-surface-hover-dark)]/50">
             <tr>
               <th className="pl-4 pr-2 py-3.5 text-xs font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] uppercase tracking-wider w-10 text-center">
-                #
+                {t('ratings.thIndex', '#')}
               </th>
               <th className="px-4 py-3.5 text-xs font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] uppercase tracking-wider">
-                Review & User
+                {t('ratings.thReviewUser', 'Review & User')}
               </th>
               <th className="px-3 py-3.5 text-xs font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] uppercase tracking-wider whitespace-nowrap w-44">
-                Target Place
+                {t('ratings.thTargetPlace', 'Target Place')}
               </th>
               <th className="px-3 py-3.5 text-xs font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] uppercase tracking-wider whitespace-nowrap w-28">
-                Rating
+                {t('ratings.thRating', 'Rating')}
               </th>
               <th className="px-3 py-3.5 text-xs font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] uppercase tracking-wider whitespace-nowrap w-32">
-                Date
+                {t('ratings.thDate', 'Date')}
               </th>
               <th className="px-3 py-3.5 text-xs font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] uppercase tracking-wider whitespace-nowrap w-28">
-                Status
+                {t('ratings.thStatus', 'Status')}
               </th>
               <th className="pl-3 pr-4 py-3.5 text-right text-xs font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] uppercase tracking-wider w-28 whitespace-nowrap">
-                Actions
+                {t('ratings.thActions', 'Actions')}
               </th>
             </tr>
           </thead>
@@ -225,10 +240,10 @@ export default function RatingsTable({
                 const avatarUrl = typeof review.avatar === 'string' && review.avatar.length > 0
                   ? review.avatar
                   : (typeof review.user === 'object' && typeof review.user?.avatar === 'string' ? review.user.avatar : null);
-                const userName = typeof review.user === 'object' ? (review.user?.name || review.user_name || 'Traveler') : (review.user_name || review.user || 'Traveler');
+                const userName = typeof review.user === 'object' ? (review.user?.name || review.user_name || t('ratings.anonymousTraveler', 'Traveler')) : (review.user_name || review.user || t('ratings.anonymousTraveler', 'Traveler'));
                 const userVerified = typeof review.user === 'object' ? review.user?.verified : review.is_verified;
-                const placeName = typeof review.place === 'object' ? (review.place?.name || review.place_name || 'Attraction') : (review.place_name || review.place || 'Attraction');
-                const reviewDate = review.created_at ? new Date(review.created_at).toLocaleDateString() : (review.date || 'Recent');
+                const placeName = typeof review.place === 'object' ? (review.place?.name || review.place_name || t('ratings.attractionFallback', 'Attraction')) : (review.place_name || review.place || t('ratings.attractionFallback', 'Attraction'));
+                const reviewDate = review.created_at ? new Date(review.created_at).toLocaleDateString() : (review.date || t('ratings.recentFallback', 'Recent'));
 
                 return (
                   <tr
@@ -264,7 +279,10 @@ export default function RatingsTable({
                           </p>
                           {review.images && review.images.length > 0 && (
                             <div className="flex items-center gap-1 mt-0.5 text-[11px] text-blue-600 dark:text-blue-400 font-medium">
-                              <ImageIcon className="w-3 h-3" /> {review.images.length} {review.images.length === 1 ? 'photo' : 'photos'}
+                              <ImageIcon className="w-3 h-3" />{' '}
+                              {review.images.length === 1
+                                ? t('ratings.photosCountSingle', '1 photo')
+                                : t('ratings.photosCount', '{count} photos').replace('{count}', review.images.length)}
                             </div>
                           )}
                         </div>
@@ -298,7 +316,7 @@ export default function RatingsTable({
 
                     <td className="px-3 py-3.5 whitespace-nowrap">
                       <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 text-xs font-semibold rounded-md border ${getStatusColor(review.status)}`}>
-                        {review.status}
+                        {getStatusLabel(review.status)}
                       </span>
                     </td>
 
@@ -308,7 +326,7 @@ export default function RatingsTable({
                           type="button"
                           onClick={() => handleView(review)}
                           className="p-1.5 text-[var(--color-purple-badge-text)] dark:text-[var(--color-purple-badge-dark-text)] hover:bg-[var(--color-purple-badge-bg)] dark:hover:bg-[var(--color-purple-badge-dark-bg)] rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
-                          title="View Details"
+                          title={t('ratings.tooltipViewDetails', 'View Details')}
                         >
                           <Eye className="w-4 h-4" />
                         </button>
@@ -317,7 +335,7 @@ export default function RatingsTable({
                             type="button"
                             onClick={() => onReply(review)}
                             className="p-1.5 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/30 rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
-                            title="Reply"
+                            title={t('ratings.tooltipReply', 'Reply')}
                           >
                             <Reply className="w-4 h-4" />
                           </button>
@@ -328,7 +346,7 @@ export default function RatingsTable({
                               type="button"
                               onClick={() => onStatusChange(review.id, 'Approved')}
                               className="p-1.5 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 rounded-md transition-colors cursor-pointer"
-                              title="Approve Review"
+                              title={t('ratings.tooltipApprove', 'Approve Review')}
                             >
                               <Check className="w-4 h-4" />
                             </button>
@@ -336,7 +354,7 @@ export default function RatingsTable({
                               type="button"
                               onClick={() => onStatusChange(review.id, 'Rejected')}
                               className="p-1.5 text-[var(--color-danger-text)] dark:text-[var(--color-danger-dark-text)] hover:bg-[var(--color-danger-bg)] dark:hover:bg-[var(--color-danger-dark-bg)] rounded-md transition-colors cursor-pointer"
-                              title="Reject Review"
+                              title={t('ratings.tooltipReject', 'Reject Review')}
                             >
                               <X className="w-4 h-4" />
                             </button>
@@ -347,7 +365,7 @@ export default function RatingsTable({
                             type="button"
                             onClick={() => onDelete(review.id)}
                             className="p-1.5 text-[var(--color-danger-text)] dark:text-[var(--color-danger-dark-text)] hover:bg-[var(--color-danger-bg)] dark:hover:bg-[var(--color-danger-dark-bg)] rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
-                            title="Delete Review"
+                            title={t('ratings.tooltipDelete', 'Delete Review')}
                           >
                             <Trash2 className="w-4 h-4" />
                           </button>
@@ -362,10 +380,10 @@ export default function RatingsTable({
                 <td colSpan="7" className="text-center py-12 px-4">
                   <MessageSquare className="w-12 h-12 text-blue-500 mx-auto mb-2 opacity-80" />
                   <h3 className="text-base font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] mb-1">
-                    No reviews found
+                    {t('ratings.noReviewsFound', 'No reviews found')}
                   </h3>
                   <p className="text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
-                    Try adjusting your search or filter criteria
+                    {t('ratings.tryAdjustingFilter', 'Try adjusting your search or filter criteria')}
                   </p>
                 </td>
               </tr>

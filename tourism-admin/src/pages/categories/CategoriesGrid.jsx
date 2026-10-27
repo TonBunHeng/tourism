@@ -1,4 +1,5 @@
 import { Eye, Edit, Trash2, Clock, FolderTree } from 'lucide-react';
+import { useLanguage } from '../../i18n';
 import { getStatusColor } from '../../utils/StatusUtils';
 
 export default function CategoriesGrid({
@@ -10,6 +11,7 @@ export default function CategoriesGrid({
   onEditCategory,
   onDeleteCategory
 }) {
+  const { t } = useLanguage();
   const handleView = onView || onViewCategory || (() => {});
   const handleEdit = onEdit || onEditCategory || (() => {});
   const handleDeleteItem = onDelete || onDeleteCategory || (() => {});
@@ -21,6 +23,7 @@ export default function CategoriesGrid({
       {safeCategories.length > 0 ? (
         safeCategories.map((category) => {
           const themeColor = category.color || '#8B5CF6';
+          const isActive = category.status === 'Active';
           return (
             <div
               key={category.id}
@@ -42,7 +45,9 @@ export default function CategoriesGrid({
                   <div className="min-w-0">
                     <h3 className="font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] text-sm truncate">{category.name}</h3>
                     <div className="flex items-center gap-2 mt-0.5">
-                      <span className="text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">{category.placeCount} places</span>
+                      <span className="text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
+                        {category.placeCount ?? category.places_count ?? 0} {t('categories.placesRegistered', 'places')}
+                      </span>
                       {/* Color Tag Badge */}
                       <span className="inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.2 rounded-md bg-gray-100 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700">
                         <span className="w-2 h-2 rounded-md shrink-0" style={{ backgroundColor: themeColor }} />
@@ -57,7 +62,7 @@ export default function CategoriesGrid({
                     type="button"
                     onClick={(e) => { e.stopPropagation(); handleView(category); }}
                     className="p-1.5 text-[var(--color-purple-badge-text)] dark:text-[var(--color-purple-badge-dark-text)] hover:bg-[var(--color-purple-badge-bg)] dark:hover:bg-[var(--color-purple-badge-dark-bg)] rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
-                    title="View"
+                    title={t('categories.tooltipViewDetails', 'View')}
                   >
                     <Eye className="w-3.5 h-3.5" />
                   </button>
@@ -65,34 +70,42 @@ export default function CategoriesGrid({
                     type="button"
                     onClick={(e) => { e.stopPropagation(); handleEdit(category); }}
                     className="p-1.5 text-[var(--color-info-text)] dark:text-[var(--color-info-dark-text)] hover:bg-[var(--color-info-bg)] dark:hover:bg-[var(--color-info-dark-bg)] rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
-                    title="Edit"
+                    title={t('categories.tooltipEdit', 'Edit')}
                   >
                     <Edit className="w-3.5 h-3.5" />
                   </button>
                   <button
                     onClick={() => handleDeleteItem(category.id)}
                     className="p-1.5 text-[var(--color-danger-text)] dark:text-[var(--color-danger-dark-text)] hover:bg-[var(--color-danger-bg)] dark:hover:bg-[var(--color-danger-dark-bg)] rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
-                    title="Delete"
+                    title={t('categories.tooltipDelete', 'Delete')}
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>
                 </div>
               </div>
-              <p className="text-sm text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-3 line-clamp-2">{category.description}</p>
+              <p className="text-sm text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-3 line-clamp-2">
+                {category.description || t('categories.defaultDescription', 'General category classification')}
+              </p>
               <div className="flex items-center justify-between gap-2 pt-3 border-t border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]">
                 <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 text-xs font-medium rounded-md border flex-shrink-0 ${getStatusColor(category.status)}`}>
                   <Clock className="w-3 h-3" />
-                  {category.status}
+                  {isActive ? t('categories.statusActive', 'Active') : t('categories.statusInactive', 'Inactive')}
                 </span>
-                <span className="text-xs text-[var(--color-text-muted-light)] dark:text-[var(--color-text-secondary-dark)] truncate">Created: {category.createdAt}</span>
+                <span className="text-xs text-[var(--color-text-muted-light)] dark:text-[var(--color-text-secondary-dark)] truncate">
+                  {t('categories.createdDateLabel', 'Created')}: {category.createdAt}
+                </span>
               </div>
             </div>
           );
         })
       ) : (
         <div className="col-span-full text-center py-12">
-          <h3 className="text-lg font-medium text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] mb-1">No categories found</h3>
-          <p className="text-sm text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">Try adjusting your search or filter criteria</p>
+          <h3 className="text-lg font-medium text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] mb-1">
+            {t('categories.noCategoriesFound', 'No categories found')}
+          </h3>
+          <p className="text-sm text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
+            {t('categories.refineSearchFilter', 'Try adjusting your search or filter criteria')}
+          </p>
         </div>
       )}
     </div>

@@ -1,6 +1,8 @@
 import { MessageSquare, Star, ThumbsUp, Clock } from 'lucide-react';
+import { useLanguage } from '../../i18n';
 
 export default function RatingsStats({ reviews = [], stats: statsOverview }) {
+  const { t } = useLanguage();
   const safeReviews = Array.isArray(reviews) ? reviews : [];
   const total = statsOverview?.total_ratings ?? safeReviews.length;
   const avgRating = statsOverview?.avg_rating !== undefined ? Number(statsOverview.avg_rating).toFixed(1) : (total > 0
@@ -11,33 +13,35 @@ export default function RatingsStats({ reviews = [], stats: statsOverview }) {
 
   const stats = [
     {
-      label: 'Total Reviews',
+      label: t('ratings.statTotalReviews', 'Total Reviews'),
       value: total.toLocaleString(),
-      subtext: 'Traveler reviews logged',
+      subtext: t('ratings.subtextTotalReviews', 'Traveler reviews logged'),
       icon: MessageSquare,
       color: 'text-[var(--color-info-text)] dark:text-[var(--color-info-dark-text)]',
       bg: 'bg-[var(--color-info-bg)] dark:bg-[var(--color-info-dark-bg)]'
     },
     {
-      label: 'Average Rating',
+      label: t('ratings.statAvgRating', 'Average Rating'),
       value: `${avgRating} ★`,
-      subtext: 'Destination score out of 5.0',
+      subtext: t('ratings.subtextAvgRating', 'Destination score out of 5.0'),
       icon: Star,
       color: 'text-[var(--color-warning-text)] dark:text-[var(--color-warning-dark-text)]',
       bg: 'bg-[var(--color-warning-bg)] dark:bg-[var(--color-warning-dark-bg)]'
     },
     {
-      label: 'Total Likes',
+      label: t('ratings.statTotalLikes', 'Total Likes'),
       value: totalLikes.toLocaleString(),
-      subtext: 'Community helpful votes',
+      subtext: t('ratings.subtextTotalLikes', 'Community helpful votes'),
       icon: ThumbsUp,
       color: 'text-[var(--color-success-text)] dark:text-[var(--color-success-dark-text)]',
       bg: 'bg-[var(--color-success-bg)] dark:bg-[var(--color-success-dark-bg)]'
     },
     {
-      label: 'Pending Reviews',
+      label: t('ratings.statPendingReviews', 'Pending Reviews'),
       value: pending.toLocaleString(),
-      subtext: pending === 0 ? 'All reviews moderated' : `${pending} awaiting admin approval`,
+      subtext: pending === 0
+        ? t('ratings.subtextPendingNone', 'All reviews moderated')
+        : t('ratings.subtextPendingCount', '{count} awaiting admin approval').replace('{count}', pending),
       icon: Clock,
       color: 'text-[var(--color-purple-badge-text)] dark:text-[var(--color-purple-badge-dark-text)]',
       bg: 'bg-[var(--color-purple-badge-bg)] dark:bg-[var(--color-purple-badge-dark-bg)]'

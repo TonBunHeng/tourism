@@ -3,8 +3,10 @@ import { LogOut } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import authService from '../../services/authService';
+import { useLanguage } from '../../i18n';
 
 export default function LogoutAlert({ isOpen, onClose, onLogout }) {
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
@@ -63,12 +65,12 @@ export default function LogoutAlert({ isOpen, onClose, onLogout }) {
 
         {/* Title */}
         <h3 id="logout-modal-title" className="text-lg font-bold text-gray-900 dark:text-white text-center mb-2 tracking-tight">
-          Logout Confirmation
+          {t('logoutAlert.title', 'Logout Confirmation')}
         </h3>
 
         {/* Message */}
         <p className="text-sm text-gray-500 dark:text-zinc-400 text-center mb-6 leading-relaxed">
-          Are you sure you want to log out of your account?
+          {t('logoutAlert.message', 'Are you sure you want to log out of your account?')}
         </p>
 
         {/* Buttons */}
@@ -79,7 +81,7 @@ export default function LogoutAlert({ isOpen, onClose, onLogout }) {
             disabled={isLoggingOut}
             className="flex-1 py-2.5 px-4 border border-gray-300 dark:border-zinc-800 bg-transparent hover:bg-gray-100 dark:hover:bg-zinc-800/80 text-gray-700 dark:text-zinc-300 font-medium rounded-md transition-colors cursor-pointer disabled:opacity-50 text-sm"
           >
-            Cancel
+            {t('logoutAlert.cancel', 'Cancel')}
           </button>
           <button
             type="button"
@@ -87,7 +89,7 @@ export default function LogoutAlert({ isOpen, onClose, onLogout }) {
             disabled={isLoggingOut}
             className="flex-1 py-2.5 px-4 bg-red-500 hover:bg-red-600 text-white font-medium rounded-md transition-colors cursor-pointer disabled:opacity-50 flex items-center justify-center gap-1.5 text-sm"
           >
-            {isLoggingOut ? 'Signing out...' : 'Sign Out'}
+            {isLoggingOut ? t('logoutAlert.signingOut', 'Signing out...') : t('logoutAlert.confirm', 'Sign Out')}
           </button>
         </div>
       </div>

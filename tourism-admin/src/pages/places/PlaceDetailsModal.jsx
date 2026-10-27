@@ -1,7 +1,10 @@
 import { useEffect } from 'react';
-import { X, Star, MapPin, Edit, CheckCircle, ExternalLink, Image as ImageIcon } from 'lucide-react';
+import { X, Star, MapPin, Edit, CheckCircle, ExternalLink } from 'lucide-react';
+import { useLanguage } from '../../i18n';
 
 export default function PlaceDetailsModal({ place, onClose, onEditPlace }) {
+  const { t } = useLanguage();
+
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === 'Escape') onClose?.();
@@ -18,6 +21,8 @@ export default function PlaceDetailsModal({ place, onClose, onEditPlace }) {
 
   if (!place) return null;
 
+  const isActive = place.status === 'Active';
+
   return (
     <div
       className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-alert-backdrop"
@@ -32,8 +37,12 @@ export default function PlaceDetailsModal({ place, onClose, onEditPlace }) {
         {/* Modal Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-zinc-800 shrink-0">
           <div>
-            <h3 className="text-base font-bold text-gray-900 dark:text-zinc-100">Place Details</h3>
-            <p className="text-xs text-gray-500 dark:text-zinc-400">ID: #{place.id}</p>
+            <h3 className="text-base font-bold text-gray-900 dark:text-zinc-100">
+              {t('places.detailsTitle', 'Place Details')}
+            </h3>
+            <p className="text-xs text-gray-500 dark:text-zinc-400">
+              {t('places.idLabel', 'ID: #{id}').replace('{id}', place.id)}
+            </p>
           </div>
           <button
             onClick={onClose}
@@ -54,40 +63,54 @@ export default function PlaceDetailsModal({ place, onClose, onEditPlace }) {
           )}
 
           <div>
-            <span className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">Place Name</span>
+            <span className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
+              {t('places.placeNameLabel', 'Place Name')}
+            </span>
             <p className="text-base font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] mt-1">{place.name}</p>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="bg-[var(--color-surface-hover-light)] dark:bg-[var(--color-surface-hover-dark)]/50 p-3.5 rounded-md border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]">
-              <span className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">Category</span>
+              <span className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
+                {t('places.categoryLabel', 'Category')}
+              </span>
               <p className="text-sm font-medium text-[var(--color-info-text)] dark:text-[var(--color-info-dark-text)] mt-1">{place.category}</p>
             </div>
             <div className="bg-[var(--color-surface-hover-light)] dark:bg-[var(--color-surface-hover-dark)]/50 p-3.5 rounded-md border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]">
-              <span className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">Status</span>
+              <span className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
+                {t('places.statusLabel', 'Status')}
+              </span>
               <p className="text-sm font-medium text-[var(--color-success-text)] dark:text-[var(--color-success-dark-text)] mt-1 flex items-center gap-1.5">
                 <CheckCircle className="w-3.5 h-3.5" />
-                {place.status}
+                {isActive ? t('places.statusActive', 'Active') : t('places.statusInactive', place.status || 'Inactive')}
               </p>
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="bg-[var(--color-surface-hover-light)] dark:bg-[var(--color-surface-hover-dark)]/50 p-3.5 rounded-md border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]">
-              <span className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">Rating</span>
+              <span className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
+                {t('places.ratingLabel', 'Rating')}
+              </span>
               <p className="text-sm font-medium text-[var(--color-warning-text)] dark:text-[var(--color-warning-dark-text)] mt-1 flex items-center gap-1">
                 <Star className="w-4 h-4 fill-[var(--color-warning-text)] dark:fill-[var(--color-warning-dark-text)] text-[var(--color-warning-text)] dark:text-[var(--color-warning-dark-text)]" />
                 {place.rating} / 5.0
               </p>
             </div>
             <div className="bg-[var(--color-surface-hover-light)] dark:bg-[var(--color-surface-hover-dark)]/50 p-3.5 rounded-md border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]">
-              <span className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">Reviews</span>
-              <p className="text-sm font-medium text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] mt-1">{place.reviews} total reviews</p>
+              <span className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
+                {t('places.statTotalReviews', 'Reviews')}
+              </span>
+              <p className="text-sm font-medium text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] mt-1">
+                {place.reviews} {t('places.totalReviewsLabel', 'total reviews')}
+              </p>
             </div>
           </div>
 
           <div className="bg-[var(--color-surface-hover-light)] dark:bg-[var(--color-surface-hover-dark)]/50 p-3.5 rounded-md border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]">
-            <span className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">Address</span>
+            <span className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
+              {t('places.addressLabel', 'Address')}
+            </span>
             <p className="text-sm text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mt-1 flex items-start gap-1.5">
               <MapPin className="w-4 h-4 text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] shrink-0 mt-0.5" />
               <span>{place.address}</span>
@@ -99,7 +122,7 @@ export default function PlaceDetailsModal({ place, onClose, onEditPlace }) {
             <div className="flex items-center justify-between">
               <span className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] flex items-center gap-1.5">
                 <MapPin className="w-4 h-4 text-[var(--color-info-text)] dark:text-[var(--color-info-dark-text)]" />
-                Google Maps Location
+                {t('places.googleMapsLocation', 'Google Maps Location')}
               </span>
               <a
                 href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(place.address || place.name)}`}
@@ -107,7 +130,7 @@ export default function PlaceDetailsModal({ place, onClose, onEditPlace }) {
                 rel="noopener noreferrer"
                 className="text-xs text-[var(--color-info-text)] dark:text-[var(--color-info-dark-text)] hover:underline flex items-center gap-1 font-medium"
               >
-                <span>Open in Google Maps</span>
+                <span>{t('places.openGoogleMaps', 'Open in Google Maps')}</span>
                 <ExternalLink className="w-3.5 h-3.5" />
               </a>
             </div>
@@ -135,10 +158,10 @@ export default function PlaceDetailsModal({ place, onClose, onEditPlace }) {
               onClose();
               onEditPlace(currentPlace);
             }}
-            className="py-2 px-4 rounded-md bg-[#003E83] hover:bg-[#002e62] text-white font-medium text-xs sm:text-sm transition-colors flex items-center gap-2 cursor-pointer"
+            className="py-2 px-4 rounded-md bg-[#003E83] hover:bg-[#002e62] text-white font-medium text-xs sm:text-sm transition-colors flex items-center gap-2 cursor-pointer shadow-xs"
           >
             <Edit className="w-4 h-4" />
-            Edit Place
+            {t('places.editPlaceBtn', 'Edit Place')}
           </button>
         </div>
       </div>

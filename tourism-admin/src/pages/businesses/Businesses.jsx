@@ -13,8 +13,10 @@ import { useAlert } from '../../context/AlertContext';
 import { useSearch } from '../../context/SearchContext';
 import { getBusinessVerificationStatusColor } from '../../utils/StatusUtils';
 import { getPageCache, setPageCache } from '../../utils/pageCache';
+import { useLanguage } from '../../i18n';
 
 export default function Businesses() {
+  const { t } = useLanguage();
   const { showConfirm, showSuccess, showError } = useAlert();
   const cachedData = getPageCache('businesses_data');
   const [businesses, setBusinesses] = useState(() => cachedData?.businesses || []);
@@ -129,7 +131,10 @@ export default function Businesses() {
       if (viewingBusiness && viewingBusiness.id === business.id) {
         setViewingBusiness(prev => ({ ...prev, verification_status: 'approved' }));
       }
-      showSuccess(`Business profile "${business.name}" has been approved and activated on AngkorVerses.`, 'Profile Approved');
+      showSuccess(
+        t('businesses.approvedSuccess', 'Business profile "{name}" has been approved and activated on AngkorVerses.').replace('{name}', business.name),
+        t('businesses.approvedTitle', 'Profile Approved')
+      );
       setActionLoading(null);
     }
   };
@@ -140,8 +145,8 @@ export default function Businesses() {
       isOpen: true,
       actionType: 'reject',
       targetBusiness: business,
-      title: 'Reject Business Profile',
-      subtitle: `Please state the reason for rejecting "${business.name}"`
+      title: t('businesses.rejectModalTitle', 'Reject Business Profile'),
+      subtitle: t('businesses.rejectSubtitle', 'Please state the reason for rejecting "{name}"').replace('{name}', business.name)
     });
   };
 
@@ -151,8 +156,8 @@ export default function Businesses() {
       isOpen: true,
       actionType: 'suspend',
       targetBusiness: business,
-      title: 'Suspend Business Profile',
-      subtitle: `Provide operational justification for suspending "${business.name}"`
+      title: t('businesses.suspendModalTitle', 'Suspend Business Profile'),
+      subtitle: t('businesses.suspendSubtitle', 'Provide operational justification for suspending "{name}"').replace('{name}', business.name)
     });
   };
 
@@ -169,14 +174,20 @@ export default function Businesses() {
         if (viewingBusiness && viewingBusiness.id === targetBusiness.id) {
           setViewingBusiness(prev => ({ ...prev, verification_status: 'rejected', rejection_reason: reasonText }));
         }
-        showSuccess(`Business profile "${targetBusiness.name}" has been rejected.`, 'Profile Rejected');
+        showSuccess(
+          t('businesses.rejectedSuccess', 'Business profile "{name}" has been rejected.').replace('{name}', targetBusiness.name),
+          t('businesses.rejectedTitle', 'Profile Rejected')
+        );
       } else {
         await businessService.suspend(targetBusiness.id, { suspension_reason: reasonText });
         setBusinesses(prev => prev.map(b => b.id === targetBusiness.id ? { ...b, verification_status: 'suspended', suspension_reason: reasonText } : b));
         if (viewingBusiness && viewingBusiness.id === targetBusiness.id) {
           setViewingBusiness(prev => ({ ...prev, verification_status: 'suspended', suspension_reason: reasonText }));
         }
-        showSuccess(`Business profile "${targetBusiness.name}" has been suspended.`, 'Profile Suspended');
+        showSuccess(
+          t('businesses.suspendedSuccess', 'Business profile "{name}" has been suspended.').replace('{name}', targetBusiness.name),
+          t('businesses.suspendedTitle', 'Profile Suspended')
+        );
       }
     } catch (err) {
       setBusinesses(prev => prev.map(b => b.id === targetBusiness.id ? { ...b, verification_status: actionType === 'reject' ? 'rejected' : 'suspended' } : b));
@@ -197,7 +208,10 @@ export default function Businesses() {
       if (viewingBusiness && viewingBusiness.id === business.id) {
         setViewingBusiness(prev => ({ ...prev, verification_status: 'approved' }));
       }
-      showSuccess(`Business profile "${business.name}" has been reactivated.`, 'Profile Reactivated');
+      showSuccess(
+        t('businesses.reactivatedSuccess', 'Business profile "{name}" has been reactivated.').replace('{name}', business.name),
+        t('businesses.reactivatedTitle', 'Profile Reactivated')
+      );
       setActionLoading(null);
     }
   };
@@ -205,9 +219,9 @@ export default function Businesses() {
   // Handle Delete Action
   const handleDelete = async (business) => {
     const confirmed = await showConfirm({
-      title: 'Delete Business Profile',
-      message: `Are you sure you want to permanently delete "${business.name}"?\n\nThis will remove all associated ratings, media, and owner profile links.`,
-      confirmText: 'Delete Profile',
+      title: t('businesses.deleteTitle', 'Delete Business Profile'),
+      message: t('businesses.deleteMessage', 'Are you sure you want to permanently delete "{name}"?\n\nThis will remove all associated ratings, media, and owner profile links.').replace('{name}', business.name),
+      confirmText: t('businesses.deleteConfirmBtn', 'Delete Profile'),
       type: 'danger'
     });
 
@@ -223,7 +237,10 @@ export default function Businesses() {
       if (viewingBusiness && viewingBusiness.id === business.id) {
         setViewingBusiness(null);
       }
-      showSuccess(`Business profile "${business.name}" has been removed.`, 'Profile Deleted');
+      showSuccess(
+        t('businesses.deletedSuccess', 'Business profile "{name}" has been removed.').replace('{name}', business.name),
+        t('businesses.deletedTitle', 'Profile Deleted')
+      );
       setActionLoading(null);
     }
   };
@@ -252,7 +269,10 @@ export default function Businesses() {
             phone: formData.owner_phone || b.owner?.phone,
           }
         } : b));
-        showSuccess(`Business profile "${formData.name}" has been updated.`, 'Changes Saved');
+        showSuccess(
+          t('businesses.updatedSuccess', 'Business profile "{name}" has been updated.').replace('{name}', formData.name),
+          t('businesses.updatedTitle', 'Changes Saved')
+        );
       } else {
         const newId = Date.now();
         const newBiz = {
@@ -278,12 +298,15 @@ export default function Businesses() {
         };
         await businessService.create(formData).catch(() => {});
         setBusinesses(prev => [newBiz, ...prev]);
-        showSuccess(`New business profile "${formData.name}" registered successfully.`, 'Business Created');
+        showSuccess(
+          t('businesses.createdSuccess', 'New business profile "{name}" registered successfully.').replace('{name}', formData.name),
+          t('businesses.createdTitle', 'Business Created')
+        );
       }
       setIsAddModalOpen(false);
       setEditingBusiness(null);
     } catch (err) {
-      showError(err.message || 'Failed to save business profile.', 'Error Saving');
+      showError(err.message || t('businesses.errorSaving', 'Failed to save business profile.'), t('businesses.errorSavingTitle', 'Error Saving'));
     }
   };
 
@@ -296,38 +319,48 @@ export default function Businesses() {
 
   const statsList = [
     {
-      label: "Total Businesses",
+      label: t('businesses.totalBusinesses', "Total Businesses"),
       value: (stats.total || 0).toLocaleString(),
-      subtext: "All business records",
+      subtext: t('businesses.allRecords', "All business records"),
       icon: Building2,
       color: "text-[var(--color-info-text)] dark:text-[var(--color-info-dark-text)]",
       bg: "bg-[var(--color-info-bg)] dark:bg-[var(--color-info-dark-bg)]"
     },
     {
-      label: "Active & Approved",
+      label: t('businesses.activeApproved', "Active & Approved"),
       value: (stats.approved || 0).toLocaleString(),
-      subtext: "Verified commercial listings",
+      subtext: t('businesses.verifiedListings', "Verified commercial listings"),
       icon: CheckCircle,
       color: "text-[var(--color-success-text)] dark:text-[var(--color-success-dark-text)]",
       bg: "bg-[var(--color-success-bg)] dark:bg-[var(--color-success-dark-bg)]"
     },
     {
-      label: "Pending Review",
+      label: t('businesses.pendingReview', "Pending Review"),
       value: (stats.pending || 0).toLocaleString(),
-      subtext: "Awaiting verification",
+      subtext: t('businesses.awaitingVerification', "Awaiting verification"),
       icon: AlertCircle,
       color: "text-[var(--color-warning-text)] dark:text-[var(--color-warning-dark-text)]",
       bg: "bg-[var(--color-warning-bg)] dark:bg-[var(--color-warning-dark-bg)]"
     },
     {
-      label: "Suspended",
+      label: t('businesses.suspended', "Suspended"),
       value: (stats.suspended || 0).toLocaleString(),
-      subtext: "Temporarily flagged",
+      subtext: t('businesses.temporarilyFlagged', "Temporarily flagged"),
       icon: AlertTriangle,
       color: "text-[var(--color-warning-text)] dark:text-[var(--color-warning-dark-text)]",
       bg: "bg-[var(--color-warning-bg)] dark:bg-[var(--color-warning-dark-bg)]"
     }
   ];
+
+  const getStatusText = (status) => {
+    switch (status) {
+      case 'approved': return t('businesses.statusApproved', 'Approved');
+      case 'pending': return t('businesses.statusPending', 'Pending Review');
+      case 'suspended': return t('businesses.statusSuspended', 'Suspended');
+      case 'rejected': return t('businesses.statusRejected', 'Rejected');
+      default: return status;
+    }
+  };
 
   return (
     <div className="flex flex-col">
@@ -336,10 +369,10 @@ export default function Businesses() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <h1 className="text-xl sm:text-2xl font-bold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] tracking-tight">
-              Managed Business Profiles
+              {t('businesses.pageTitle', 'Businesses')}
             </h1>
             <p className="text-xs sm:text-sm text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mt-1">
-              Review, verify, approve, and manage commercial tourism profiles from business owners across Cambodia.
+              {t('businesses.pageSubtitle', 'Review, verify, approve, and manage commercial tourism profiles from business owners across Cambodia.')}
             </p>
           </div>
           <div className="flex items-center gap-2.5 shrink-0 w-full sm:w-auto">
@@ -354,7 +387,7 @@ export default function Businesses() {
               className="flex items-center justify-center gap-1.5 md:gap-2 px-3.5 py-2 text-xs md:text-sm font-medium rounded-md border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] hover:bg-[var(--color-surface-hover-light)] dark:hover:bg-[var(--color-surface-hover-dark)] text-[#003E83] dark:text-blue-400 transition-colors cursor-pointer"
             >
               <ExternalLink className="w-4 h-4 shrink-0" />
-              <span>Visit Page</span>
+              <span>{t('businesses.visitPage', 'Visit Page')}</span>
             </a>
             <button
               type="button"
@@ -362,7 +395,7 @@ export default function Businesses() {
               className="flex items-center justify-center gap-1.5 md:gap-2 px-4 py-2 text-xs md:text-sm font-medium rounded-md bg-[#003E83] hover:bg-[#002e62] text-white transition-colors shrink-0 w-full sm:w-auto cursor-pointer shadow-xs"
             >
               <Plus className="w-4 h-4 shrink-0" />
-              <span>Register Business</span>
+              <span>{t('businesses.registerBusiness', 'Register Business')}</span>
             </button>
           </div>
         </div>
@@ -405,11 +438,13 @@ export default function Businesses() {
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="flex items-center gap-2.5">
               <h2 className="text-lg md:text-xl font-bold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">
-                All Businesses
+                {t('businesses.allBusinesses', 'All Businesses')}
               </h2>
               {totalRecords !== undefined && (
                 <span className="text-xs font-semibold px-2 py-0.5 rounded-md bg-blue-50 text-[#003E83] dark:bg-blue-950/50 dark:text-blue-400 border border-blue-100 dark:border-blue-900/40">
-                  {totalRecords} {totalRecords === 1 ? 'business' : 'businesses'}
+                  {totalRecords === 1
+                    ? t('businesses.businessCount', '{count} business').replace('{count}', totalRecords)
+                    : t('businesses.businessesCount', '{count} businesses').replace('{count}', totalRecords)}
                 </span>
               )}
             </div>
@@ -422,11 +457,11 @@ export default function Businesses() {
                   onChange={(e) => { setStatusFilter(e.target.value); setCurrentPage(1); }}
                   className="appearance-none w-full sm:w-auto pl-4 pr-9 py-2 border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--color-input)] focus:border-transparent bg-[var(--color-white)] dark:bg-[var(--color-bg-dark)] text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] text-sm cursor-pointer shadow-xs font-medium"
                 >
-                  <option value="all">All Statuses</option>
-                  <option value="pending">Pending Review</option>
-                  <option value="approved">Approved</option>
-                  <option value="suspended">Suspended</option>
-                  <option value="rejected">Rejected</option>
+                  <option value="all">{t('businesses.allStatuses', 'All Statuses')}</option>
+                  <option value="pending">{t('businesses.statusPending', 'Pending Review')}</option>
+                  <option value="approved">{t('businesses.statusApproved', 'Approved')}</option>
+                  <option value="suspended">{t('businesses.statusSuspended', 'Suspended')}</option>
+                  <option value="rejected">{t('businesses.statusRejected', 'Rejected')}</option>
                 </select>
                 <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--color-text-muted-light)] dark:text-[var(--color-text-secondary-dark)] pointer-events-none" />
               </div>
@@ -440,22 +475,22 @@ export default function Businesses() {
             <thead className="bg-[var(--color-surface-hover-light)]/50 dark:bg-[var(--color-surface-hover-dark)]/50">
               <tr>
                 <th className="pl-4 pr-2 py-3.5 text-xs font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] uppercase tracking-wider w-10 text-center">
-                  #
+                  {t('businesses.colNumber', '#')}
                 </th>
                 <th className="px-4 py-3.5 text-left text-xs font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] uppercase tracking-wider whitespace-nowrap">
-                  BUSINESS NAME & CATEGORY
+                  {t('businesses.colNameCategory', 'BUSINESS NAME & CATEGORY')}
                 </th>
                 <th className="px-4 py-3.5 text-left text-xs font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] uppercase tracking-wider whitespace-nowrap">
-                  OWNER CONTACT
+                  {t('businesses.colOwnerContact', 'OWNER CONTACT')}
                 </th>
                 <th className="px-4 py-3.5 text-left text-xs font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] uppercase tracking-wider whitespace-nowrap">
-                  PROVINCE & LICENSE
+                  {t('businesses.colProvinceLicense', 'PROVINCE & LICENSE')}
                 </th>
                 <th className="px-4 py-3.5 text-left text-xs font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] uppercase tracking-wider whitespace-nowrap">
-                  VERIFICATION STATUS
+                  {t('businesses.colStatus', 'VERIFICATION STATUS')}
                 </th>
                 <th className="px-4 py-3.5 text-right text-xs font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] uppercase tracking-wider whitespace-nowrap">
-                  ACTIONS
+                  {t('businesses.colActions', 'ACTIONS')}
                 </th>
               </tr>
             </thead>
@@ -464,7 +499,7 @@ export default function Businesses() {
                 <tr>
                   <td colSpan={6} className="text-center py-10 text-[var(--color-text-muted-light)]">
                     <RefreshCw className="w-5 h-5 animate-spin mx-auto mb-2 text-[#003E83]" />
-                    Loading business registrations...
+                    {t('businesses.loadingRecords', 'Loading business registrations...')}
                   </td>
                 </tr>
               ) : paginatedBusinesses.length === 0 ? (
@@ -472,10 +507,10 @@ export default function Businesses() {
                   <td colSpan={6} className="text-center py-12 px-4">
                     <Building2 className="w-12 h-12 text-[#003E83] mx-auto mb-2 opacity-80" />
                     <h3 className="text-base font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] mb-1">
-                      No business profile records found
+                      {t('businesses.noRecordsFound', 'No business profile records found')}
                     </h3>
                     <p className="text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
-                      Try refining your search or filter criteria
+                      {t('businesses.refineFilterPrompt', 'Try refining your search or filter criteria')}
                     </p>
                   </td>
                 </tr>
@@ -536,7 +571,7 @@ export default function Businesses() {
                           {status === 'approved' && <CheckCircle className="w-3.5 h-3.5 mr-1" />}
                           {status === 'suspended' && <AlertTriangle className="w-3.5 h-3.5 mr-1" />}
                           {status === 'rejected' && <XCircle className="w-3.5 h-3.5 mr-1" />}
-                          {status}
+                          {getStatusText(status)}
                         </span>
                       </td>
 
@@ -545,7 +580,7 @@ export default function Businesses() {
                           <button
                             onClick={() => setViewingBusiness(b)}
                             className="p-1.5 text-[var(--color-purple-badge-text)] dark:text-[var(--color-purple-badge-dark-text)] hover:bg-[var(--color-purple-badge-bg)] dark:hover:bg-[var(--color-purple-badge-dark-bg)] rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
-                            title="View Details"
+                            title={t('businesses.viewDetails', 'View Details')}
                           >
                             <Eye className="w-4 h-4" />
                           </button>
@@ -559,7 +594,7 @@ export default function Businesses() {
                             target="_blank"
                             rel="noopener noreferrer"
                             className="p-1.5 text-[#003E83] dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40 rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer inline-flex items-center justify-center"
-                            title="Visit Public Page"
+                            title={t('businesses.visitPublicPage', 'Visit Public Page')}
                           >
                             <ExternalLink className="w-4 h-4" />
                           </a>
@@ -567,7 +602,7 @@ export default function Businesses() {
                           <button
                             onClick={() => { setEditingBusiness(b); setIsAddModalOpen(true); }}
                             className="p-1.5 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/30 rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
-                            title="Edit Profile"
+                            title={t('businesses.editProfile', 'Edit Profile')}
                           >
                             <Edit className="w-4 h-4" />
                           </button>
@@ -579,14 +614,14 @@ export default function Businesses() {
                                 disabled={actionLoading === b.id}
                                 className="bg-emerald-600 hover:bg-emerald-700 text-white px-2.5 py-1 rounded-md text-xs font-medium transition-all active:scale-95 hover:scale-105 disabled:opacity-50 cursor-pointer"
                               >
-                                Approve
+                                {t('businesses.approve', 'Approve')}
                               </button>
                               <button
                                 onClick={() => openRejectModal(b)}
                                 disabled={actionLoading === b.id}
                                 className="bg-red-600 hover:bg-red-700 text-white px-2.5 py-1 rounded-md text-xs font-medium transition-all active:scale-95 hover:scale-105 disabled:opacity-50 cursor-pointer"
                               >
-                                Reject
+                                {t('businesses.reject', 'Reject')}
                               </button>
                             </>
                           )}
@@ -597,7 +632,7 @@ export default function Businesses() {
                               disabled={actionLoading === b.id}
                               className="bg-amber-600 hover:bg-amber-700 text-white px-2.5 py-1 rounded-md text-xs font-medium transition-all active:scale-95 hover:scale-105 disabled:opacity-50 cursor-pointer"
                             >
-                              Suspend
+                              {t('businesses.suspend', 'Suspend')}
                             </button>
                           )}
 
@@ -607,14 +642,14 @@ export default function Businesses() {
                               disabled={actionLoading === b.id}
                               className="bg-[#003E83] hover:bg-[#002e62] text-white px-2.5 py-1 rounded-md text-xs font-medium transition-all active:scale-95 hover:scale-105 disabled:opacity-50 cursor-pointer"
                             >
-                              Reactivate
+                              {t('businesses.reactivate', 'Reactivate')}
                             </button>
                           )}
 
                           <button
                             onClick={() => handleDelete(b)}
                             className="p-1.5 text-[var(--color-danger-text)] dark:text-[var(--color-danger-dark-text)] hover:bg-[var(--color-danger-bg)] dark:hover:bg-[var(--color-danger-dark-bg)] rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
-                            title="Delete Profile"
+                            title={t('businesses.deleteProfile', 'Delete Profile')}
                           >
                             <Trash2 className="w-4 h-4" />
                           </button>
@@ -636,7 +671,7 @@ export default function Businesses() {
           startIndex={startIndex}
           endIndex={endIndex}
           totalRecords={totalRecords}
-          label="businesses"
+          label={t('sidebar.businesses', 'businesses')}
         />
       </div>
 

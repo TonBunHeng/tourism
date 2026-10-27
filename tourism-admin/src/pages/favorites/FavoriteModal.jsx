@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { X, ChevronDown, Plus, Search, MapPin, Check, BookmarkPlus, Sparkles } from 'lucide-react';
+import { X, ChevronDown, Search, MapPin, BookmarkPlus } from 'lucide-react';
+import { useLanguage } from '../../i18n';
 
 export default function FavoriteModal({
   isOpen,
@@ -12,6 +13,7 @@ export default function FavoriteModal({
   availablePlaces = [],
   onAddExisting
 }) {
+  const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState('existing'); // 'existing' | 'custom'
 
   useEffect(() => {
@@ -27,6 +29,7 @@ export default function FavoriteModal({
       window.removeEventListener('keydown', handleKeyDown);
     };
   }, [isOpen, onClose]);
+
   const [placeSearch, setPlaceSearch] = useState('');
   const [markVisitedOnAdd, setMarkVisitedOnAdd] = useState(false);
 
@@ -60,10 +63,10 @@ export default function FavoriteModal({
             </div>
             <div>
               <h3 className="text-lg font-bold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] tracking-tight">
-                Add Favorite Place
+                {t('favorites.addModalTitle')}
               </h3>
               <p className="text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
-                Save a new destination to your personal collection
+                {t('favorites.addModalSubtitle')}
               </p>
             </div>
           </div>
@@ -71,7 +74,7 @@ export default function FavoriteModal({
             type="button"
             onClick={onClose}
             className="p-1.5 text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] hover:text-[var(--color-text-primary-light)] dark:hover:text-[var(--color-white)] hover:bg-[var(--color-surface-hover-light)] dark:hover:bg-[var(--color-surface-hover-dark)] rounded-md transition-all active:scale-90 cursor-pointer"
-            aria-label="Close"
+            aria-label={t('favorites.btnClose')}
           >
             <X className="w-5 h-5" />
           </button>
@@ -89,7 +92,7 @@ export default function FavoriteModal({
                   : 'border-transparent text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] hover:text-[var(--color-text-primary-light)]'
               }`}
             >
-              Select from Places ({availablePlaces.length})
+              {t('favorites.tabExisting')} ({availablePlaces.length})
             </button>
             <button
               type="button"
@@ -100,7 +103,7 @@ export default function FavoriteModal({
                   : 'border-transparent text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] hover:text-[var(--color-text-primary-light)]'
               }`}
             >
-              Create New Place
+              {t('favorites.tabCustom')}
             </button>
           </div>
         )}
@@ -113,7 +116,7 @@ export default function FavoriteModal({
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--color-text-muted-light)]" />
                 <input
                   type="text"
-                  placeholder="Search existing places..."
+                  placeholder={t('favorites.searchPlacePlaceholder')}
                   value={placeSearch}
                   onChange={(e) => setPlaceSearch(e.target.value)}
                   className="w-full pl-9 pr-4 py-2 text-xs md:text-sm border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] rounded-md bg-[var(--color-bg-light)] dark:bg-[var(--color-bg-dark)] text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/40"
@@ -128,7 +131,7 @@ export default function FavoriteModal({
                     onChange={(e) => setMarkVisitedOnAdd(e.target.checked)}
                     className="rounded-md text-[var(--color-primary)] focus:ring-[var(--color-primary)]"
                   />
-                  <span>Mark as visited immediately</span>
+                  <span>{t('favorites.markVisitedOnAdd')}</span>
                 </label>
               </div>
 
@@ -169,13 +172,13 @@ export default function FavoriteModal({
                         onClick={() => onAddExisting && onAddExisting(place.id, markVisitedOnAdd)}
                         className="px-3 py-1.5 text-xs font-semibold rounded-md bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary-hover)] transition-all shrink-0 cursor-pointer shadow-sm"
                       >
-                        + Add
+                        + {t('favorites.selectPlaceBtn')}
                       </button>
                     </div>
                   ))
                 ) : (
                   <p className="text-center py-6 text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
-                    No matching places found.
+                    {t('favorites.noPlacesFound')}
                   </p>
                 )}
               </div>
@@ -184,11 +187,11 @@ export default function FavoriteModal({
             <form onSubmit={onSubmit} className="space-y-4">
               <div>
                 <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">
-                  Place Name *
+                  {t('favorites.labelPlaceName')}
                 </label>
                 <input
                   type="text"
-                  placeholder="e.g., Angkor Wat, Pub Street..."
+                  placeholder={t('favorites.placeholderPlaceName')}
                   value={newPlace.name || ''}
                   onChange={(e) => updatePlace({ ...newPlace, name: e.target.value })}
                   className="w-full bg-[var(--color-bg-light)] dark:bg-[var(--color-bg-dark)] border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] rounded-md px-3.5 py-2.5 text-xs md:text-sm text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] placeholder-[var(--color-text-muted-light)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/40 focus:border-[var(--color-primary)]"
@@ -199,7 +202,7 @@ export default function FavoriteModal({
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                 <div>
                   <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">
-                    Category
+                    {t('favorites.labelCategoryInput')}
                   </label>
                   <div className="relative">
                     <select
@@ -217,11 +220,11 @@ export default function FavoriteModal({
 
                 <div>
                   <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">
-                    Location / Province *
+                    {t('favorites.labelLocationInput')}
                   </label>
                   <input
                     type="text"
-                    placeholder="e.g., Siem Reap, Cambodia"
+                    placeholder={t('favorites.placeholderLocation')}
                     value={newPlace.location || ''}
                     onChange={(e) => updatePlace({ ...newPlace, location: e.target.value })}
                     className="w-full bg-[var(--color-bg-light)] dark:bg-[var(--color-bg-dark)] border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] rounded-md px-3.5 py-2.5 text-xs md:text-sm text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] placeholder-[var(--color-text-muted-light)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/40 focus:border-[var(--color-primary)]"
@@ -233,11 +236,11 @@ export default function FavoriteModal({
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                 <div>
                   <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">
-                    Best Time to Visit
+                    {t('favorites.labelBestTimeInput')}
                   </label>
                   <input
                     type="text"
-                    placeholder="e.g., Sunrise / 6:00 AM"
+                    placeholder={t('favorites.placeholderBestTime')}
                     value={newPlace.bestTime || ''}
                     onChange={(e) => updatePlace({ ...newPlace, bestTime: e.target.value })}
                     className="w-full bg-[var(--color-bg-light)] dark:bg-[var(--color-bg-dark)] border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] rounded-md px-3.5 py-2.5 text-xs md:text-sm text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] placeholder-[var(--color-text-muted-light)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/40"
@@ -246,11 +249,11 @@ export default function FavoriteModal({
 
                 <div>
                   <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">
-                    Price / Entry Fee
+                    {t('favorites.labelEstimatedPrice')}
                   </label>
                   <input
                     type="text"
-                    placeholder="e.g., Free or $20"
+                    placeholder={t('favorites.placeholderPrice')}
                     value={newPlace.price || ''}
                     onChange={(e) => updatePlace({ ...newPlace, price: e.target.value })}
                     className="w-full bg-[var(--color-bg-light)] dark:bg-[var(--color-bg-dark)] border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] rounded-md px-3.5 py-2.5 text-xs md:text-sm text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] placeholder-[var(--color-text-muted-light)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/40"
@@ -260,11 +263,11 @@ export default function FavoriteModal({
 
               <div>
                 <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">
-                  Image URL (optional)
+                  {t('favorites.labelImageUrl')}
                 </label>
                 <input
                   type="url"
-                  placeholder="https://images.unsplash.com/..."
+                  placeholder={t('favorites.placeholderImageUrl')}
                   value={newPlace.image || newPlace.image_url || ''}
                   onChange={(e) => updatePlace({ ...newPlace, image: e.target.value, image_url: e.target.value })}
                   className="w-full bg-[var(--color-bg-light)] dark:bg-[var(--color-bg-dark)] border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] rounded-md px-3.5 py-2.5 text-xs md:text-sm text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] placeholder-[var(--color-text-muted-light)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/40"
@@ -273,11 +276,11 @@ export default function FavoriteModal({
 
               <div>
                 <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">
-                  Description
+                  {t('favorites.labelDescription')}
                 </label>
                 <textarea
                   rows="3"
-                  placeholder="Tell us what makes this place special..."
+                  placeholder={t('favorites.placeholderDescription')}
                   value={newPlace.description || ''}
                   onChange={(e) => updatePlace({ ...newPlace, description: e.target.value })}
                   className="w-full bg-[var(--color-bg-light)] dark:bg-[var(--color-bg-dark)] border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] rounded-md px-3.5 py-2.5 text-xs md:text-sm text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] placeholder-[var(--color-text-muted-light)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/40 resize-none"
@@ -291,13 +294,13 @@ export default function FavoriteModal({
                   onClick={onClose}
                   className="flex-1 py-2.5 px-4 rounded-md border border-gray-300 dark:border-zinc-700 text-gray-700 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-800 font-medium text-xs md:text-sm transition-colors text-center cursor-pointer"
                 >
-                  Cancel
+                  {t('favorites.cancelBtn')}
                 </button>
                 <button
                   type="submit"
                   className="flex-1 py-2.5 px-4 rounded-md bg-[#003E83] hover:bg-[#002e62] text-white font-medium text-xs md:text-sm transition-colors text-center cursor-pointer"
                 >
-                  Save & Favorite
+                  {t('favorites.addDestinationBtn')}
                 </button>
               </div>
             </form>

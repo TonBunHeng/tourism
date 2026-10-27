@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { Sun, Moon, Monitor } from 'lucide-react';
 import { getInitialTheme, applyTheme, THEME_CHANGE_EVENT } from '../../utils/Theme';
+import { useLanguage } from '../../i18n';
 
 export default function PreferencesTab() {
+  const { currentLang, setLanguage, t } = useLanguage();
   const [currentTheme, setCurrentTheme] = useState(() => getInitialTheme());
 
   const handleThemeChange = (themeId) => {
@@ -76,20 +78,24 @@ export default function PreferencesTab() {
       </div>
 
       <div className="bg-[var(--color-white)] dark:bg-[var(--color-bg-dark)] rounded-md p-4 md:p-5 shadow-sm border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]">
-        <h3 className="font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] mb-4">Language & Region</h3>
+        <h3 className="font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] mb-4">{t('preferences.languageRegion', 'Language & Region')}</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">Language</label>
-            <select className="w-full px-4 py-2 border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--color-input)] focus:border-transparent bg-[var(--color-white)] dark:bg-[var(--color-bg-dark)] text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">
-              <option>English</option>
-              <option>Khmer</option>
+            <label className="block text-sm font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">{t('preferences.language', 'Language')}</label>
+            <select
+              value={currentLang}
+              onChange={(e) => setLanguage(e.target.value)}
+              className="w-full px-4 py-2 border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--color-input)] focus:border-transparent bg-[var(--color-white)] dark:bg-[var(--color-bg-dark)] text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] cursor-pointer"
+            >
+              <option value="EN">{t('preferences.english', 'English')}</option>
+              <option value="KH">{t('preferences.khmer', 'ភាសាខ្មែរ (Khmer)')}</option>
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">Timezone</label>
-            <select className="w-full px-4 py-2 border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--color-input)] focus:border-transparent bg-[var(--color-white)] dark:bg-[var(--color-bg-dark)] text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">
-              <option>Asia/Phnom_Penh</option>
-              <option>America/New_York</option>
+            <label className="block text-sm font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">{t('preferences.timezone', 'Timezone')}</label>
+            <select className="w-full px-4 py-2 border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--color-input)] focus:border-transparent bg-[var(--color-white)] dark:bg-[var(--color-bg-dark)] text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] cursor-pointer">
+              <option>Asia/Phnom_Penh (UTC+7)</option>
+              <option>America/New_York (UTC-5)</option>
             </select>
           </div>
         </div>

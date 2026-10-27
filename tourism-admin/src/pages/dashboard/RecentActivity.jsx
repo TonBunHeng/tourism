@@ -1,9 +1,11 @@
 import React from 'react';
 import { Landmark, MessageSquare, Image, User, Calendar, Bell, Clock, ArrowRight, CalendarCheck } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useLanguage } from '../../i18n';
 
 export default function RecentActivity({ activities, recentPlaces }) {
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   const getIcon = (type) => {
     switch (type) {
@@ -22,6 +24,43 @@ export default function RecentActivity({ activities, recentPlaces }) {
       default:
         return Bell;
     }
+  };
+
+  const getActivityTypeLabel = (type) => {
+    switch (type) {
+      case 'place': return t('sidebar.places', 'Place');
+      case 'booking': return t('sidebar.bookings', 'Booking');
+      case 'review': return t('sidebar.ratingsReviews', 'Review');
+      case 'gallery': return t('sidebar.galleries', 'Gallery');
+      case 'user': return t('sidebar.users', 'User');
+      case 'event': return t('sidebar.events', 'Event');
+      default: return type;
+    }
+  };
+
+  const formatAction = (activity) => {
+    if (activity.actionKey) return t(activity.actionKey, activity.action);
+    switch (activity.action) {
+      case 'Published new destination':
+        return t('dashboard.actPublishedPlace', 'Published new destination');
+      case 'Submitted 5-star review for':
+        return t('dashboard.actSubmittedReview', 'Submitted 5-star review for');
+      case 'Registered verified traveler profile':
+        return t('dashboard.actRegisteredUser', 'Registered verified traveler profile');
+      case 'Uploaded high-res gallery for':
+        return t('dashboard.actUploadedGallery', 'Uploaded high-res gallery for');
+      case 'Scheduled cultural festival':
+        return t('dashboard.actScheduledEvent', 'Scheduled cultural festival');
+      case 'Added new place':
+        return t('dashboard.actAddedPlace', 'Added new place');
+      default:
+        return activity.action;
+    }
+  };
+
+  const formatTime = (time) => {
+    if (time === 'Recently') return t('dashboard.justNow', 'Recently');
+    return time;
   };
 
   const getBadgeStyle = (type) => {
@@ -69,17 +108,17 @@ export default function RecentActivity({ activities, recentPlaces }) {
       <div className="flex items-center justify-between mb-4 flex-shrink-0 pb-3 border-b border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]">
         <div>
           <h3 className="font-semibold text-sm md:text-base text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">
-            Recent Activity
+            {t('dashboard.recentActivityTitle', 'Recent Activity')}
           </h3>
           <p className="text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
-            Latest platform events & updates
+            {t('dashboard.recentActivitySubtitle', 'Latest platform events & updates')}
           </p>
         </div>
         <button
           onClick={() => navigate('/notifications')}
           className="text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 cursor-pointer"
         >
-          View All
+          <span>{t('dashboard.viewAll', 'View All')}</span>
           <ArrowRight className="w-3.5 h-3.5" />
         </button>
       </div>
@@ -103,12 +142,12 @@ export default function RecentActivity({ activities, recentPlaces }) {
                       {activity.user}
                     </p>
                     <span className={`text-[10px] px-2 py-0.2 rounded-md font-semibold uppercase tracking-wider border shrink-0 ${getBadgeStyle(activity.type)}`}>
-                      {activity.type}
+                      {getActivityTypeLabel(activity.type)}
                     </span>
                   </div>
 
                   <p className="text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] line-clamp-1 mt-0.5">
-                    {activity.action}{' '}
+                    {formatAction(activity)}{' '}
                     {activity.target && (
                       <span className="font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">
                         {activity.target}
@@ -118,7 +157,7 @@ export default function RecentActivity({ activities, recentPlaces }) {
 
                   <div className="flex items-center gap-1 text-[11px] text-[var(--color-text-muted-light)] dark:text-[var(--color-text-secondary-dark)] font-mono mt-1">
                     <Clock className="w-3 h-3 text-slate-400" />
-                    <span>{activity.time}</span>
+                    <span>{formatTime(activity.time)}</span>
                   </div>
                 </div>
               </div>
@@ -126,7 +165,7 @@ export default function RecentActivity({ activities, recentPlaces }) {
           })
         ) : (
           <div className="text-center py-8 text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
-            No recent activity recorded yet.
+            {t('dashboard.noRecentActivity', 'No recent activity recorded yet.')}
           </div>
         )}
       </div>

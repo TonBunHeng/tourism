@@ -4,8 +4,10 @@ import Sidebar from "../components/layout/Sidebar";
 import Header from "../components/layout/Header";
 import Footer from "../components/layout/Footer";
 import { SIDEBAR_COMPACT_CHANGE_EVENT } from "../utils/Theme";
+import { useLanguage } from "../i18n";
 
 export default function Main() {
+  const { currentLang, t } = useLanguage();
   const location = useLocation();
   const mainRef = useRef(null);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
@@ -41,34 +43,37 @@ export default function Main() {
   useEffect(() => {
     const pageTitles = {
       "/": "Login",
-      "/dashboard": "Dashboard",
-      "/place": "Places",
-      "/places": "Places",
-      "/businesses": "Businesses",
-      "/categories": "Categories",
-      "/provinces": "Provinces",
-      "/galleries": "Galleries",
-      "/events": "Events",
-      "/reports": "Reports",
-      "/reports/analytics": "Reports Analytics",
-      "/users": "Users",
-      "/reviews": "Reviews",
-      "/ratings": "Ratings",
-      "/ratings/analytics": "Ratings Analytics",
-      "/favorites": "Favorites",
-      "/favorites/analytics": "Favorites Analytics",
-      "/deletion-requests": "Deletion Requests",
-      "/security": "Security & Audit Center",
-      "/tracking-users": "Users Tracking",
-      "/settings": "Settings",
-      "/profile": "Profile",
-      "/notifications": "Notifications Center",
+      "/dashboard": t("sidebar.dashboard", "Dashboard"),
+      "/place": t("sidebar.places", "Places"),
+      "/places": t("sidebar.places", "Places"),
+      "/businesses": t("sidebar.businesses", "Businesses"),
+      "/bookings": t("sidebar.bookings", "Bookings"),
+      "/tours": t("sidebar.tourPackages", "Tour Packages"),
+      "/guides": t("sidebar.tourGuides", "Tour Guides"),
+      "/categories": t("sidebar.categories", "Categories"),
+      "/provinces": t("sidebar.provinces", "Provinces"),
+      "/galleries": t("sidebar.galleries", "Galleries"),
+      "/events": t("sidebar.events", "Events"),
+      "/reports": t("sidebar.reports", "Reports"),
+      "/reports/analytics": `${t("sidebar.reports", "Reports")} ${t("common.analytics", "Analytics")}`,
+      "/users": t("sidebar.users", "Users"),
+      "/reviews": t("sidebar.ratingsReviews", "Ratings & Reviews"),
+      "/ratings": t("sidebar.ratingsReviews", "Ratings & Reviews"),
+      "/ratings/analytics": t("ratings.analyticsTitle", "Ratings & Reviews Analytics"),
+      "/favorites": t("favorites.title", "Favorites"),
+      "/favorites/analytics": t("favorites.analyticsTitle", "Favorites Analytics"),
+      "/deletion-requests": t("sidebar.deletionRequests", "Deletion Requests"),
+      "/security": t("sidebar.securityAlerts", "Security & Audit Center"),
+      "/tracking-users": t("sidebar.userTracking", "Users Tracking"),
+      "/settings": t("sidebar.settings", "Settings"),
+      "/profile": t("sidebar.profile", "Profile"),
+      "/notifications": t("notifications.title", "Notifications"),
       "/login": "Login",
-      "/logout": "Logout",
+      "/logout": t("sidebar.logout", "Logout"),
     };
 
     document.title = `${pageTitles[location.pathname] || "AngkorVerses"} | AngkorVerses`;
-  }, [location.pathname]);
+  }, [location.pathname, currentLang, t]);
 
   // Scroll to top when page changes
   useEffect(() => {

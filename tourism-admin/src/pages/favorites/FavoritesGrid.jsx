@@ -14,7 +14,7 @@ import {
   User,
   Calendar
 } from 'lucide-react';
-import { renderStars } from '../../utils/StatusUtils';
+import { useLanguage } from '../../i18n';
 
 export default function FavoritesGrid({
   favorites = [],
@@ -27,6 +27,8 @@ export default function FavoritesGrid({
   onViewDetails,
   onView
 }) {
+  const { t } = useLanguage();
+
   const handleToggleVisit = (id) => {
     if (onToggleVisited) onToggleVisited(id);
     else if (onToggleStatus) onToggleStatus(id);
@@ -41,17 +43,6 @@ export default function FavoritesGrid({
     if (onDelete) onDelete(id);
   };
 
-  const handleSelect = (id, e) => {
-    e.stopPropagation();
-    if (onToggleSelect) {
-      onToggleSelect(id);
-    } else if (setSelectedFavorites) {
-      setSelectedFavorites(prev =>
-        prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]
-      );
-    }
-  };
-
   if (!favorites || favorites.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-20 px-4 text-center">
@@ -59,10 +50,10 @@ export default function FavoritesGrid({
           <Landmark className="w-8 h-8" />
         </div>
         <h3 className="text-lg font-bold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] mb-1">
-          No Favorite Destinations Found
+          {t('favorites.noFavoritesFound')}
         </h3>
         <p className="text-sm text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] max-w-md">
-          No user favorites match your search or filter criteria.
+          {t('favorites.tryAdjustingFilter')}
         </p>
       </div>
     );
@@ -78,16 +69,16 @@ export default function FavoritesGrid({
         const reviewsCount = favorite.reviewsCount ?? favorite.reviews ?? favorite.place?.reviews_count ?? 0;
 
         const userInfo = favorite.user || {};
-        const userName = userInfo.name || favorite.user_name || 'Traveler';
+        const userName = userInfo.name || favorite.user_name || t('favorites.anonymousTraveler');
         const userAvatar = userInfo.avatar || favorite.user_avatar || null;
-        const userEmail = userInfo.email || favorite.user_email || 'user@angkorverses.com';
-        const savedDate = favorite.saved_date || (favorite.created_at ? new Date(favorite.created_at).toLocaleDateString() : 'Recent');
+        const savedDate = favorite.saved_date || (favorite.created_at ? t('favorites.savedDate', { date: new Date(favorite.created_at).toLocaleDateString() }) : '');
 
         return (
           <div
             key={favorite.id}
-            className={`bg-[var(--color-white)] dark:bg-[var(--color-bg-dark)] border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] rounded-md overflow-hidden shadow-xs flex flex-col justify-between group ${isSelected ? 'ring-2 ring-[var(--color-primary)]' : ''
-              }`}
+            className={`bg-[var(--color-white)] dark:bg-[var(--color-bg-dark)] border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] rounded-md overflow-hidden shadow-xs flex flex-col justify-between group ${
+              isSelected ? 'ring-2 ring-[var(--color-primary)]' : ''
+            }`}
           >
             {/* Image & Badges */}
             <div className="relative h-44 w-full overflow-hidden bg-slate-100 dark:bg-zinc-800">
@@ -110,13 +101,12 @@ export default function FavoritesGrid({
               {/* Dark overlay for contrast */}
               <div className="absolute inset-0 bg-black/40" />
 
-
               {/* Heart Badge (Top Right) */}
               <div className="absolute top-3 right-3 z-10">
                 <button
                   type="button"
                   onClick={() => handleDelete(favorite.id || favorite.place_id)}
-                  title="Remove from favorites"
+                  title={t('favorites.tooltipDelete')}
                   className="p-1.5 rounded-md bg-white/90 dark:bg-zinc-900/90 text-rose-600 hover:bg-white transition-colors shadow-xs cursor-pointer"
                 >
                   <Heart className="w-4 h-4 fill-current text-rose-600" />
@@ -131,18 +121,19 @@ export default function FavoritesGrid({
                 </span>
 
                 <span
-                  className={`inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-md border ${isVisited
+                  className={`inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-md border ${
+                    isVisited
                       ? 'bg-emerald-600 text-white border-emerald-500'
                       : 'bg-[#003E83] text-white border-blue-800'
-                    }`}
+                  }`}
                 >
                   {isVisited ? (
                     <>
-                      <CheckCircle2 className="w-3.5 h-3.5" /> Visited
+                      <CheckCircle2 className="w-3.5 h-3.5" /> {t('favorites.statusVisited')}
                     </>
                   ) : (
                     <>
-                      <Clock className="w-3.5 h-3.5" /> To Visit
+                      <Clock className="w-3.5 h-3.5" /> {t('favorites.statusToVisit')}
                     </>
                   )}
                 </span>
@@ -177,9 +168,11 @@ export default function FavoritesGrid({
                     <p className="text-xs font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] truncate">
                       {userName}
                     </p>
-                    <p className="text-[10px] text-[var(--color-text-muted-light)] dark:text-[var(--color-text-secondary-dark)] flex items-center gap-1">
-                      <Calendar className="w-2.5 h-2.5" /> {savedDate}
-                    </p>
+                    {savedDate && (
+                      <p className="text-[10px] text-[var(--color-text-muted-light)] dark:text-[var(--color-text-secondary-dark)] flex items-center gap-1">
+                        <Calendar className="w-2.5 h-2.5" /> {savedDate}
+                      </p>
+                    )}
                   </div>
                 </div>
 
@@ -215,14 +208,15 @@ export default function FavoritesGrid({
                 <button
                   type="button"
                   onClick={() => handleToggleVisit(favorite.id)}
-                  className={`flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded-md border transition-colors cursor-pointer ${isVisited
+                  className={`flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded-md border transition-colors cursor-pointer ${
+                    isVisited
                       ? 'bg-[var(--color-success-bg)] dark:bg-[var(--color-success-dark-bg)] text-[var(--color-success-text)] dark:text-[var(--color-success-dark-text)] border-[var(--color-success-border)] dark:border-[var(--color-success-dark-border)] hover:opacity-85'
                       : 'bg-[var(--color-neutral-badge-bg)] dark:bg-[var(--color-neutral-badge-dark-bg)] text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] hover:text-[var(--color-primary)]'
-                    }`}
-                  title={isVisited ? 'Mark as to visit' : 'Mark as visited'}
+                  }`}
+                  title={isVisited ? t('favorites.tooltipMarkToVisit') : t('favorites.tooltipMarkVisited')}
                 >
                   <Check className="w-3.5 h-3.5" />
-                  <span>{isVisited ? 'Visited' : 'Mark Visited'}</span>
+                  <span>{isVisited ? t('favorites.statusVisited') : t('favorites.tooltipMarkVisited')}</span>
                 </button>
 
                 <div className="flex items-center gap-1">
@@ -230,7 +224,7 @@ export default function FavoritesGrid({
                     type="button"
                     onClick={() => handleView(favorite)}
                     className="p-1.5 text-[var(--color-purple-badge-text)] dark:text-[var(--color-purple-badge-dark-text)] hover:bg-[var(--color-purple-badge-bg)] dark:hover:bg-[var(--color-purple-badge-dark-bg)] rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
-                    title="View Details"
+                    title={t('favorites.tooltipViewDetails')}
                   >
                     <Eye className="w-4 h-4" />
                   </button>
@@ -239,7 +233,7 @@ export default function FavoritesGrid({
                     type="button"
                     onClick={() => handleDelete(favorite.id || favorite.place_id)}
                     className="p-1.5 text-[var(--color-danger-text)] dark:text-[var(--color-danger-dark-text)] hover:bg-[var(--color-danger-bg)] dark:hover:bg-[var(--color-danger-dark-bg)] rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
-                    title="Remove from favorites"
+                    title={t('favorites.tooltipDelete')}
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>

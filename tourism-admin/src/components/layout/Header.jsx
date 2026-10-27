@@ -8,22 +8,17 @@ import { getInitialTheme, applyTheme, THEME_CHANGE_EVENT, isDarkTheme } from '..
 import LogoutAlert from './LogoutAlert';
 import notificationService from '../../services/notificationService';
 import { useSearch } from '../../context/SearchContext';
+import { useLanguage } from '../../i18n';
 
 export default function Header({ toggleSidebar, isSidebarOpen, isExpanded, toggleExpand }) {
   const navigate = useNavigate();
   const { searchTerm, setSearchTerm, placeholder } = useSearch();
+  const { currentLang, setLanguage, t } = useLanguage();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showLangMenu, setShowLangMenu] = useState(false);
   const [showLogoutAlert, setShowLogoutAlert] = useState(false);
-  const [currentLang, setCurrentLang] = useState(() => {
-    try {
-      return localStorage.getItem('app_language') || 'EN';
-    } catch {
-      return 'EN';
-    }
-  });
   const [searchQuery, setSearchQuery] = useState('');
 
   const [notifications, setNotifications] = useState([]);
@@ -227,11 +222,7 @@ export default function Header({ toggleSidebar, isSidebarOpen, isExpanded, toggl
   };
 
   const handleSelectLang = (lang) => {
-    setCurrentLang(lang);
-    try {
-      localStorage.setItem('app_language', lang);
-      window.dispatchEvent(new CustomEvent('language-changed', { detail: { lang } }));
-    } catch (e) {}
+    setLanguage(lang);
     setShowLangMenu(false);
   };
 
@@ -269,7 +260,7 @@ export default function Header({ toggleSidebar, isSidebarOpen, isExpanded, toggl
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder={placeholder}
+                placeholder={placeholder || t('header.searchPlaceholder', 'Search across modules, places, bookings...')}
                 className="w-full pl-9 pr-8 py-1.5 text-xs sm:text-sm bg-gray-100 dark:bg-zinc-800/80 hover:bg-gray-100/90 dark:hover:bg-zinc-800 text-gray-900 dark:text-zinc-100 placeholder-gray-400 dark:placeholder-zinc-500 border border-gray-200 dark:border-zinc-700/70 rounded-md focus:outline-none focus:ring-1 focus:ring-[#003E83] dark:focus:ring-blue-500 focus:bg-white dark:focus:bg-zinc-900 focus:border-[#003E83] dark:focus:border-blue-500 transition-all duration-150 shadow-xs"
               />
               {searchTerm && (
@@ -310,8 +301,8 @@ export default function Header({ toggleSidebar, isSidebarOpen, isExpanded, toggl
                 className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-md active:scale-95 text-gray-600 dark:text-zinc-300 transition-all duration-150 cursor-pointer ${
                   showLangMenu ? 'bg-gray-100 dark:bg-zinc-800 text-[#003E83] dark:text-blue-400' : 'hover:bg-gray-100 dark:hover:bg-zinc-800'
                 }`}
-                aria-label="Change language"
-                title="Change language (English / ភាសាខ្មែរ)"
+                aria-label={t('header.selectLanguage', 'Select Language')}
+                title={`${t('header.selectLanguage', 'Select Language')} (${t('header.english', 'English')} / ${t('header.khmer', 'ភាសាខ្មែរ')})`}
               >
                 <Globe size={18} className="shrink-0 transition-transform duration-200" />
                 <span className="text-xs font-semibold uppercase tracking-wider">{currentLang}</span>
@@ -320,7 +311,7 @@ export default function Header({ toggleSidebar, isSidebarOpen, isExpanded, toggl
               {showLangMenu && (
                 <div className="absolute right-0 mt-2 w-44 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-md rounded-md shadow-xl border border-gray-200 dark:border-zinc-800 py-1.5 z-50 animate-dropdown overflow-hidden">
                   <div className="px-3.5 py-1.5 text-[11px] font-semibold text-gray-400 dark:text-zinc-500 uppercase tracking-wider">
-                    Select Language
+                    {t('header.selectLanguage', 'Select Language')}
                   </div>
                   <button
                     type="button"
@@ -331,7 +322,7 @@ export default function Header({ toggleSidebar, isSidebarOpen, isExpanded, toggl
                         : 'text-gray-700 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-800/60'
                     }`}
                   >
-                    <span>English</span>
+                    <span>{t('header.english', 'English')}</span>
                     <span className="text-xs uppercase px-1.5 py-0.5 bg-gray-100 dark:bg-zinc-800 rounded-md font-mono text-gray-500 dark:text-zinc-400">EN</span>
                   </button>
                   <button
@@ -343,7 +334,7 @@ export default function Header({ toggleSidebar, isSidebarOpen, isExpanded, toggl
                         : 'text-gray-700 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-800/60'
                     }`}
                   >
-                    <span className="font-medium">ភាសាខ្មែរ</span>
+                    <span className="font-medium">{t('header.khmer', 'ភាសាខ្មែរ')}</span>
                     <span className="text-xs uppercase px-1.5 py-0.5 bg-gray-100 dark:bg-zinc-800 rounded-md font-mono text-gray-500 dark:text-zinc-400">KH</span>
                   </button>
                 </div>
@@ -373,10 +364,10 @@ export default function Header({ toggleSidebar, isSidebarOpen, isExpanded, toggl
                 <div className="absolute right-0 mt-2 w-72 sm:w-96 max-w-[calc(100vw-2rem)] bg-white/95 dark:bg-zinc-900/95 backdrop-blur-md rounded-md shadow-xl border border-gray-200 dark:border-zinc-800 overflow-hidden z-50 animate-dropdown">
                   <div className="p-3.5 border-b border-gray-200 dark:border-zinc-800 flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <h3 className="font-semibold text-sm text-gray-800 dark:text-zinc-100">Notifications</h3>
+                      <h3 className="font-semibold text-sm text-gray-800 dark:text-zinc-100">{t('header.notifications', 'Notifications')}</h3>
                       {unreadCount > 0 && (
                         <span className="px-1.5 py-0.5 text-[10px] font-semibold bg-blue-100 text-[#003E83] dark:bg-blue-950/60 dark:text-blue-400 rounded-md">
-                          {unreadCount} new
+                          {unreadCount} {t('header.unread', 'unread')}
                         </span>
                       )}
                     </div>
@@ -386,7 +377,7 @@ export default function Header({ toggleSidebar, isSidebarOpen, isExpanded, toggl
                         onClick={handleMarkAllRead}
                         className="text-xs text-[#003E83] dark:text-blue-400 hover:underline font-medium cursor-pointer"
                       >
-                        Mark all read
+                        {t('header.markAllRead', 'Mark all read')}
                       </button>
                     )}
                   </div>
@@ -395,11 +386,11 @@ export default function Header({ toggleSidebar, isSidebarOpen, isExpanded, toggl
                     {loadingNotifs ? (
                       <div className="p-6 text-center text-gray-400 flex items-center justify-center gap-2">
                         <Loader2 className="w-4 h-4 animate-spin text-blue-500" />
-                        <span className="text-xs">Loading notifications...</span>
+                        <span className="text-xs">{t('common.loading', 'Loading notifications...')}</span>
                       </div>
                     ) : notifications.length === 0 ? (
                       <div className="p-6 text-center text-gray-400 dark:text-zinc-500 text-xs">
-                        No notifications found.
+                        {t('header.noNotifications', 'No notifications found.')}
                       </div>
                     ) : (
                       notifications.map(n => (
@@ -427,7 +418,7 @@ export default function Header({ toggleSidebar, isSidebarOpen, isExpanded, toggl
                       onClick={() => setShowNotifications(false)}
                       className="text-xs text-[#003E83] dark:text-blue-400 hover:underline font-medium"
                     >
-                      View all in Notifications Center →
+                      {t('header.viewAllNotifications', 'View all in Notifications Center →')}
                     </Link>
                   </div>
                 </div>
@@ -440,8 +431,8 @@ export default function Header({ toggleSidebar, isSidebarOpen, isExpanded, toggl
                 type="button"
                 onClick={toggleProfileMenu}
                 className="p-0.5 rounded-md hover:bg-gray-100 dark:hover:bg-zinc-800 active:scale-95 transition-all duration-150 cursor-pointer"
-                aria-label="Profile menu"
-                title="Profile menu"
+                aria-label={t('header.myProfile', 'My Profile')}
+                title={t('header.myProfile', 'My Profile')}
               >
                 <div className={`w-8 h-8 rounded-md bg-blue-100 dark:bg-zinc-800 text-blue-700 dark:text-blue-400 border flex items-center justify-center font-bold text-xs overflow-hidden transition-all duration-150 ${
                   showProfileMenu ? 'border-[#003E83] ring-2 ring-blue-200 dark:ring-blue-900/50' : 'border-gray-200 dark:border-zinc-700'
@@ -482,7 +473,7 @@ export default function Header({ toggleSidebar, isSidebarOpen, isExpanded, toggl
                   <div className="p-1.5">
                     <Link to="/profile" onClick={() => setShowProfileMenu(false)} className="flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-gray-700 dark:text-zinc-300 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-md transition-colors duration-150">
                       <User size={16} className="text-gray-400" />
-                      My Profile
+                      {t('header.myProfile', 'My Profile')}
                     </Link>
                     {(() => {
                       const role = JSON.parse(localStorage.getItem('user') || '{}')?.role;
@@ -490,7 +481,7 @@ export default function Header({ toggleSidebar, isSidebarOpen, isExpanded, toggl
                         return (
                           <Link to="/settings" onClick={() => setShowProfileMenu(false)} className="flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-gray-700 dark:text-zinc-300 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-md transition-colors duration-150">
                             <Settings size={16} className="text-gray-400" />
-                            Settings
+                            {t('header.settings', 'Settings')}
                           </Link>
                         );
                       }
@@ -506,7 +497,7 @@ export default function Header({ toggleSidebar, isSidebarOpen, isExpanded, toggl
                       className="flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 rounded-md transition-colors duration-150 w-full text-left cursor-pointer"
                     >
                       <LogOut size={16} className="text-red-500 dark:text-red-400" />
-                      Log Out
+                      {t('header.logout', 'Log Out')}
                     </button>
                   </div>
                 </div>
@@ -521,7 +512,7 @@ export default function Header({ toggleSidebar, isSidebarOpen, isExpanded, toggl
             <div className="relative">
               <input
                 type="text"
-                placeholder={placeholder}
+                placeholder={placeholder || t('header.searchPlaceholder', 'Search across modules, places, bookings...')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pl-9 pr-4 py-2 text-sm bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-100 border border-gray-300 dark:border-zinc-700 rounded-md focus:outline-none focus:ring-1 focus:ring-[#003E83] focus:border-[#003E83] transition-colors"

@@ -1,11 +1,27 @@
 import React, { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import {
-  User, Mail, Phone, MapPin, Award, CheckCircle2,
-  AlertCircle, DollarSign, Languages, Clock, BookOpen,
+  Mail, Phone, MapPin, CheckCircle2,
+  AlertCircle, DollarSign, Languages, Clock,
   Edit, Trash2, ShieldCheck, X
 } from 'lucide-react';
+import { useLanguage } from '../../i18n';
 import { getStatusColor } from '../../utils/StatusUtils';
+
+const PROVINCE_KEYS = {
+  'Siem Reap & Angkor': 'provSiemReap',
+  'Phnom Penh': 'provPhnomPenh',
+  'Battambang': 'provBattambang',
+  'Kampot & Kep': 'provKampotKep',
+  'Preah Sihanouk': 'provSihanouk',
+  'Koh Kong': 'provKohKong',
+  'Mondulkiri': 'provMondulkiri',
+  'Ratanakiri': 'provRatanakiri',
+  'Preah Vihear': 'provPreahVihear',
+  'Kratie': 'provKratie',
+  'Pursat': 'provPursat',
+  'Kampong Cham': 'provKampongCham'
+};
 
 export default function GuideDetailsModal({
   guide,
@@ -14,6 +30,8 @@ export default function GuideDetailsModal({
   onToggleStatus,
   onDelete
 }) {
+  const { t } = useLanguage();
+
   useEffect(() => {
     if (guide) {
       document.body.style.overflow = 'hidden';
@@ -37,6 +55,11 @@ export default function GuideDetailsModal({
   const languages = Array.isArray(guide.languages)
     ? guide.languages
     : (typeof guide.languages === 'string' ? guide.languages.split(',').map(l => l.trim()).filter(Boolean) : []);
+
+  const provinceDisplay = guide.province || guide.location || 'Siem Reap';
+  const translatedProvince = PROVINCE_KEYS[provinceDisplay]
+    ? t(`guides.${PROVINCE_KEYS[provinceDisplay]}`, provinceDisplay)
+    : provinceDisplay;
 
   return createPortal(
     <div
@@ -71,11 +94,11 @@ export default function GuideDetailsModal({
                   </h2>
                   <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-xs font-semibold border ${getStatusColor(isActive ? 'active' : 'inactive')}`}>
                     {isActive ? <CheckCircle2 className="w-3.5 h-3.5" /> : <AlertCircle className="w-3.5 h-3.5" />}
-                    {isActive ? 'Accredited' : 'Inactive'}
+                    {isActive ? t('guides.statusAccredited', 'Accredited') : t('guides.statusInactive', 'Inactive')}
                   </span>
                 </div>
                 <p className="text-xs font-mono text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mt-0.5">
-                  License: {guide.license_no || 'Pending Certification'}
+                  {t('guides.licenseNo', 'License')}: {guide.license_no || t('guides.pendingCertification', 'Pending Certification')}
                 </p>
               </div>
             </div>
@@ -96,37 +119,37 @@ export default function GuideDetailsModal({
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             <div className="p-3 rounded-md bg-[var(--color-surface-hover-light)] dark:bg-[var(--color-surface-hover-dark)]/40 border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]">
               <span className="text-[11px] font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] flex items-center gap-1">
-                <DollarSign className="w-3.5 h-3.5 text-[#003E83] dark:text-blue-400" /> Daily Rate
+                <DollarSign className="w-3.5 h-3.5 text-[#003E83] dark:text-blue-400" /> {t('guides.metricDailyRate', 'Daily Rate')}
               </span>
               <p className="text-base font-bold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] mt-1">
-                ${guide.daily_rate || '45'} <span className="text-xs font-normal text-[var(--color-text-muted-light)]">/ day</span>
+                ${guide.daily_rate || '45'} <span className="text-xs font-normal text-[var(--color-text-muted-light)]">{t('guides.perDay', '/ day')}</span>
               </p>
             </div>
 
             <div className="p-3 rounded-md bg-[var(--color-surface-hover-light)] dark:bg-[var(--color-surface-hover-dark)]/40 border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]">
               <span className="text-[11px] font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] flex items-center gap-1">
-                <Clock className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" /> Experience
+                <Clock className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" /> {t('guides.metricExperience', 'Experience')}
               </span>
               <p className="text-base font-bold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] mt-1">
-                {guide.experience_years || '5'}+ <span className="text-xs font-normal text-[var(--color-text-muted-light)]">years</span>
+                {guide.experience_years || '5'}+ <span className="text-xs font-normal text-[var(--color-text-muted-light)]">{t('guides.yearsPlus', 'years')}</span>
               </p>
             </div>
 
             <div className="p-3 rounded-md bg-[var(--color-surface-hover-light)] dark:bg-[var(--color-surface-hover-dark)]/40 border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]">
               <span className="text-[11px] font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] flex items-center gap-1">
-                <MapPin className="w-3.5 h-3.5 text-rose-500" /> Region
+                <MapPin className="w-3.5 h-3.5 text-rose-500" /> {t('guides.metricRegion', 'Region')}
               </span>
               <p className="text-sm font-bold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] mt-1 truncate">
-                {guide.province || guide.location || 'Siem Reap'}
+                {translatedProvince}
               </p>
             </div>
 
             <div className="p-3 rounded-md bg-[var(--color-surface-hover-light)] dark:bg-[var(--color-surface-hover-dark)]/40 border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]">
               <span className="text-[11px] font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] flex items-center gap-1">
-                <Languages className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" /> Languages
+                <Languages className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" /> {t('guides.metricLanguages', 'Languages')}
               </span>
               <p className="text-sm font-bold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] mt-1">
-                {languages.length} Spoken
+                {t('guides.languagesSpokenCount', '{count} Spoken').replace('{count}', languages.length)}
               </p>
             </div>
           </div>
@@ -134,7 +157,7 @@ export default function GuideDetailsModal({
           {/* Contact Information */}
           <div className="space-y-2">
             <h3 className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
-              Contact Information
+              {t('guides.contactInformation', 'Contact Information')}
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-4 rounded-md bg-[var(--color-surface-hover-light)] dark:bg-[var(--color-surface-hover-dark)]/30 border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]">
               <div className="flex items-center gap-2.5">
@@ -142,9 +165,11 @@ export default function GuideDetailsModal({
                   <Mail className="w-4 h-4" />
                 </div>
                 <div>
-                  <span className="text-[11px] text-[var(--color-text-muted-light)] dark:text-[var(--color-text-secondary-dark)] block">Email</span>
+                  <span className="text-[11px] text-[var(--color-text-muted-light)] dark:text-[var(--color-text-secondary-dark)] block">
+                    {t('guides.emailLabel', 'Email')}
+                  </span>
                   <span className="text-xs font-medium text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">
-                    {guide.email || 'No email registered'}
+                    {guide.email || t('guides.noEmailRegistered', 'No email registered')}
                   </span>
                 </div>
               </div>
@@ -154,9 +179,11 @@ export default function GuideDetailsModal({
                   <Phone className="w-4 h-4" />
                 </div>
                 <div>
-                  <span className="text-[11px] text-[var(--color-text-muted-light)] dark:text-[var(--color-text-secondary-dark)] block">Phone</span>
+                  <span className="text-[11px] text-[var(--color-text-muted-light)] dark:text-[var(--color-text-secondary-dark)] block">
+                    {t('guides.phoneLabel', 'Phone')}
+                  </span>
                   <span className="text-xs font-medium text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">
-                    {guide.phone || 'No phone registered'}
+                    {guide.phone || t('guides.noPhoneRegistered', 'No phone registered')}
                   </span>
                 </div>
               </div>
@@ -166,7 +193,7 @@ export default function GuideDetailsModal({
           {/* Spoken Languages */}
           <div className="space-y-2">
             <h3 className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
-              Language Capabilities
+              {t('guides.languageCapabilities', 'Language Capabilities')}
             </h3>
             <div className="flex flex-wrap gap-2">
               {languages.length > 0 ? (
@@ -179,7 +206,9 @@ export default function GuideDetailsModal({
                   </span>
                 ))
               ) : (
-                <span className="text-xs text-[var(--color-text-muted-light)]">No languages specified</span>
+                <span className="text-xs text-[var(--color-text-muted-light)]">
+                  {t('guides.noLanguagesSpecified', 'No languages specified')}
+                </span>
               )}
             </div>
           </div>
@@ -187,11 +216,11 @@ export default function GuideDetailsModal({
           {/* Specialties & Bio */}
           <div className="space-y-2">
             <h3 className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
-              Specialties & Historical Expertise
+              {t('guides.specialtiesExpertise', 'Specialties & Historical Expertise')}
             </h3>
             <div className="p-4 rounded-md bg-[var(--color-surface-hover-light)] dark:bg-[var(--color-surface-hover-dark)]/30 border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]">
               <p className="text-xs leading-relaxed text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
-                {guide.specialties || guide.bio || 'General tourism specialist with extensive background in cultural, architectural, and historical exploration across Cambodian destinations.'}
+                {guide.specialties || guide.bio || t('guides.defaultBio', 'General tourism specialist with extensive background in cultural, architectural, and historical exploration across Cambodian destinations.')}
               </p>
             </div>
           </div>
@@ -201,13 +230,11 @@ export default function GuideDetailsModal({
         <div className="p-4 border-t border-[var(--color-border-subtle-light)] dark:border-[var(--color-modal-border)] bg-[var(--color-surface-hover-light)]/40 dark:bg-[var(--color-surface-hover-dark)]/20 flex flex-wrap items-center justify-between gap-3 shrink-0">
           <button
             type="button"
-            onClick={() => {
-              onDelete?.(guide);
-            }}
+            onClick={() => onDelete?.(guide)}
             className="px-3 py-2 text-xs font-medium text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded-md transition-colors inline-flex items-center gap-1.5 cursor-pointer"
           >
             <Trash2 className="w-3.5 h-3.5" />
-            <span>Delete Profile</span>
+            <span>{t('guides.deleteProfileBtn', 'Delete Profile')}</span>
           </button>
 
           <div className="flex items-center gap-2">
@@ -221,7 +248,7 @@ export default function GuideDetailsModal({
               }`}
             >
               <ShieldCheck className="w-3.5 h-3.5" />
-              <span>{isActive ? 'Mark Inactive' : 'Accredit Guide'}</span>
+              <span>{isActive ? t('guides.markInactiveBtn', 'Mark Inactive') : t('guides.accreditGuideBtn', 'Accredit Guide')}</span>
             </button>
 
             <button
@@ -230,7 +257,7 @@ export default function GuideDetailsModal({
               className="px-4 py-2 bg-[#003E83] hover:bg-[#002e62] text-white rounded-md text-xs font-medium transition-colors inline-flex items-center gap-1.5 cursor-pointer shadow-xs"
             >
               <Edit className="w-3.5 h-3.5" />
-              <span>Edit Guide</span>
+              <span>{t('guides.editGuideBtn', 'Edit Guide')}</span>
             </button>
           </div>
         </div>

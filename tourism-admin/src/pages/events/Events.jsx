@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 import SimplePagination from '../../components/common/SimplePagination';
 import EventsHeader from './EventsHeader';
@@ -13,8 +13,11 @@ import authService, { isSuperAdminRole } from '../../services/authService';
 import { useAlert } from '../../context/AlertContext';
 import { useSearch } from '../../context/SearchContext';
 import { getPageCache, setPageCache } from '../../utils/pageCache';
+import { useLanguage } from '../../i18n';
 
 export default function Events() {
+  const { t } = useLanguage();
+  const location = useLocation();
   const { showConfirm, showSuccess, showError } = useAlert();
   const { searchTerm, setSearchTerm } = useSearch();
   const currentUser = authService.getCurrentUser();
@@ -54,7 +57,7 @@ export default function Events() {
 
   const categoriesList = ['All', 'Cultural', 'Festival', 'Sports', 'Food', 'Music', 'Exhibition'];
 
-  const loadEvents = async () => {
+  const loadEvents = useCallback(async () => {
     if (!cachedEvents && events.length === 0) {
       setIsLoading(true);
     }
@@ -111,7 +114,7 @@ export default function Events() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [currentPage, searchTerm, selectedCategory, selectedStatus, itemsPerPage, cachedEvents, events.length]);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -119,7 +122,7 @@ export default function Events() {
 
   useEffect(() => {
     loadEvents();
-  }, [currentPage, searchTerm, selectedCategory, selectedStatus]);
+  }, [loadEvents]);
 
   const handleSearchChange = (val) => {
     setSearchTerm(val);
@@ -149,9 +152,9 @@ export default function Events() {
 
     if (isSuperAdmin) {
       const confirmed = await showConfirm({
-        title: 'Delete Event',
-        message: `Are you sure you want to permanently delete "${eventTitle}"?\n\nThis action cannot be undone.`,
-        confirmText: 'Delete Permanently',
+        title: t('events.deleteEventTitle', 'Delete Event'),
+        message: t('events.deletePermanentConfirm', 'Are you sure you want to permanently delete "{name}"?\n\nThis action cannot be undone.').replace('{name}', eventTitle),
+        confirmText: t('events.deletePermanentBtn', 'Delete Permanently'),
         type: 'danger'
       });
 
@@ -159,18 +162,24 @@ export default function Events() {
 
       try {
         await eventService.deleteEvent(eventId);
-        showSuccess(`Event "${eventTitle}" has been permanently deleted.`, 'Event Deleted');
+        showSuccess(
+          t('events.deleteSuccessMsg', 'Event "{name}" has been permanently deleted.').replace('{name}', eventTitle),
+          t('events.deleteSuccessTitle', 'Event Deleted')
+        );
         loadEvents();
       } catch (e) {
-        showError(e.message || 'Failed to delete event.', 'Delete Failed');
+        showError(
+          e.message || t('events.deleteFailedMsg', 'Failed to delete event.'),
+          t('events.deleteFailedTitle', 'Delete Failed')
+        );
       }
       return;
     }
 
     const confirmed = await showConfirm({
-      title: 'Submit Deletion Request',
-      message: `Are you sure you want to submit a deletion request for "${eventTitle}"?\n\nThis will be submitted to the Super Administrator for review and approval.`,
-      confirmText: 'Submit Deletion',
+      title: t('events.deletionRequestTitle', 'Submit Deletion Request'),
+      message: t('events.deletionRequestMessage', 'Are you sure you want to submit a deletion request for "{name}"?\n\nThis will be submitted to the Super Administrator for review and approval.').replace('{name}', eventTitle),
+      confirmText: t('events.submitDeletionBtn', 'Submit Deletion'),
       type: 'danger'
     });
 
@@ -179,7 +188,7 @@ export default function Events() {
     try {
       await deletionRequestService.createRequest({
         request_type: 'item',
-        reason: `Request to delete event: ${eventTitle}`,
+        reason: t('events.deletionRequestReason', 'Request to delete event: {name}').replace('{name}', eventTitle),
         urgency: 'medium',
         items: [{
           item_type: 'event',
@@ -188,9 +197,15 @@ export default function Events() {
           category: event?.category || 'Event'
         }]
       });
-      showSuccess(`Deletion request for "${eventTitle}" has been submitted to Super Admin for approval.`, 'Request Submitted');
+      showSuccess(
+        t('events.deletionRequestSuccessMsg', 'Deletion request for "{name}" has been submitted to Super Admin for approval.').replace('{name}', eventTitle),
+        t('events.requestSubmittedTitle', 'Request Submitted')
+      );
     } catch (e) {
-      showError(e.message || 'Failed to submit deletion request.', 'Submission Failed');
+      showError(
+        e.message || t('events.submissionFailedMsg', 'Failed to submit deletion request.'),
+        t('events.submissionFailedTitle', 'Submission Failed')
+      );
     }
   };
 
@@ -275,15 +290,24 @@ export default function Events() {
 
       if (editingEvent) {
         await eventService.updateEvent(editingEvent.id, payload);
-        showSuccess(`Event "${formData.title}" has been updated successfully.`, 'Event Updated');
+        showSuccess(
+          t('events.eventUpdatedSuccess', 'Event "{name}" has been updated successfully.').replace('{name}', formData.title),
+          t('events.eventUpdatedTitle', 'Event Updated')
+        );
       } else {
         await eventService.createEvent(payload);
-        showSuccess(`Event "${formData.title}" has been created successfully.`, 'Event Created');
+        showSuccess(
+          t('events.eventCreatedSuccess', 'Event "{name}" has been created successfully.').replace('{name}', formData.title),
+          t('events.eventCreatedTitle', 'Event Created')
+        );
       }
       closeModal();
       loadEvents();
     } catch (e) {
-      showError(e.message || 'Failed to save event.', 'Save Failed');
+      showError(
+        e.message || t('events.saveFailedMsg', 'Failed to save event.'),
+        t('events.saveFailedTitle', 'Save Failed')
+      );
     }
   };
 
@@ -311,7 +335,7 @@ export default function Events() {
 
         {isLoading ? (
           <div className="p-12 text-center text-slate-500 dark:text-zinc-400 font-medium">
-            Loading events from API...
+            {t('events.loadingEvents', 'Loading events from API...')}
           </div>
         ) : (
           <EventsList
@@ -331,7 +355,7 @@ export default function Events() {
           startIndex={startIndex}
           endIndex={endIndex}
           totalRecords={totalRecords}
-          label="events"
+          label={t('events.paginationLabel', 'events')}
         />
       </div>
 

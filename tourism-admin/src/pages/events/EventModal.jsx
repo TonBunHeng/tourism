@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   ChevronDown,
   Upload,
@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import uploadService from '../../services/uploadService';
 import { validateImageFile } from '../../utils/fileValidation';
+import { useLanguage } from '../../i18n';
 
 export const calculateAutoStatus = (startDate, endDate, manualStatus) => {
   if (manualStatus === 'Cancelled') return 'Cancelled';
@@ -47,6 +48,7 @@ export default function EventModal({
   onSubmit,
   categories = ['Cultural', 'Festival', 'Sports', 'Food', 'Music', 'Exhibition']
 }) {
+  const { t } = useLanguage();
   const [isUploading, setIsUploading] = useState(false);
   const [autoStatusMode, setAutoStatusMode] = useState(true);
   const [fileValidationError, setFileValidationError] = useState('');
@@ -55,6 +57,29 @@ export default function EventModal({
   const safeCategories = Array.isArray(categories) && categories.length > 0
     ? categories
     : ['Cultural', 'Festival', 'Sports', 'Food', 'Music', 'Exhibition'];
+
+  const getCategoryLabel = (cat) => {
+    switch (cat) {
+      case 'Cultural': return t('events.catCultural', 'Cultural');
+      case 'Festival': return t('events.catFestival', 'Festival');
+      case 'Sports': return t('events.catSports', 'Sports');
+      case 'Food': return t('events.catFood', 'Food');
+      case 'Music': return t('events.catMusic', 'Music');
+      case 'Exhibition': return t('events.catExhibition', 'Exhibition');
+      default: return cat;
+    }
+  };
+
+  const getStatusLabel = (status) => {
+    switch (status) {
+      case 'Upcoming': return t('events.statusUpcoming', 'Upcoming');
+      case 'Ongoing': return t('events.statusOngoing', 'Ongoing');
+      case 'Completed': return t('events.statusCompleted', 'Completed');
+      case 'Cancelled': return t('events.statusCancelled', 'Cancelled');
+      case 'Scheduled': return t('events.statusScheduled', 'Scheduled');
+      default: return status;
+    }
+  };
 
   const updateForm = (newData) => {
     if (onFormDataChange) {
@@ -160,10 +185,10 @@ export default function EventModal({
             </div>
             <div>
               <h3 className="text-base font-bold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">
-                {editingEvent ? 'Edit Event' : 'Create New Event'}
+                {editingEvent ? t('events.titleEdit', 'Edit Event') : t('events.titleCreate', 'Create New Event')}
               </h3>
               <p className="text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mt-0.5">
-                {editingEvent ? 'Update festival schedules and venue information' : 'Create cultural festivals, exhibitions or seasonal activities'}
+                {editingEvent ? t('events.subtitleEdit', 'Update festival schedules and venue information') : t('events.subtitleCreate', 'Create cultural festivals, exhibitions or seasonal activities')}
               </p>
             </div>
           </div>
@@ -183,7 +208,7 @@ export default function EventModal({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">
-                  Category *
+                  {t('events.labelCategoryInput', 'Category *')}
                 </label>
                 <div className="relative">
                   <Layers className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
@@ -194,7 +219,7 @@ export default function EventModal({
                   >
                     {safeCategories.map((c) => (
                       <option key={c} value={c}>
-                        {c}
+                        {getCategoryLabel(c)}
                       </option>
                     ))}
                   </select>
@@ -205,11 +230,11 @@ export default function EventModal({
               <div>
                 <div className="flex items-center justify-between mb-1.5">
                   <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
-                    Status *
+                    {t('events.labelStatusInput', 'Status *')}
                   </label>
                   {autoStatusMode && (
                     <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-0.5">
-                      <Sparkles className="w-3 h-3" /> Auto Active
+                      <Sparkles className="w-3 h-3" /> {t('events.autoActiveTag', 'Auto Active')}
                     </span>
                   )}
                 </div>
@@ -220,11 +245,11 @@ export default function EventModal({
                     onChange={(e) => handleManualStatusChange(e.target.value)}
                     className="appearance-none w-full bg-[var(--color-bg-light)] dark:bg-[var(--color-input-dark-bg)] border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]/70 rounded-md pl-9 pr-9 py-2.5 text-sm text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] focus:outline-none focus:ring-2 focus:ring-[var(--color-input)] cursor-pointer"
                   >
-                    <option value="Auto">✨ Auto ({currentComputedStatus})</option>
-                    <option value="Upcoming">Upcoming</option>
-                    <option value="Ongoing">Ongoing</option>
-                    <option value="Completed">Completed</option>
-                    <option value="Cancelled">Cancelled</option>
+                    <option value="Auto">✨ {t('events.statusAuto', 'Auto')} ({getStatusLabel(currentComputedStatus)})</option>
+                    <option value="Upcoming">{t('events.statusUpcoming', 'Upcoming')}</option>
+                    <option value="Ongoing">{t('events.statusOngoing', 'Ongoing')}</option>
+                    <option value="Completed">{t('events.statusCompleted', 'Completed')}</option>
+                    <option value="Cancelled">{t('events.statusCancelled', 'Cancelled')}</option>
                   </select>
                   <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
                 </div>
@@ -234,7 +259,7 @@ export default function EventModal({
             {/* Event Title */}
             <div>
               <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">
-                Event Title *
+                {t('events.labelTitleInput', 'Event Title *')}
               </label>
               <div className="relative">
                 <Sparkles className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
@@ -242,7 +267,7 @@ export default function EventModal({
                   type="text"
                   value={safeFormData.title || ''}
                   onChange={(e) => updateForm({ ...safeFormData, title: e.target.value })}
-                  placeholder="e.g. Bon Om Touk (Water Festival), Angkor Marathon"
+                  placeholder={t('events.placeholderTitle', 'e.g. Bon Om Touk (Water Festival), Angkor Marathon')}
                   className="w-full pl-9 pr-4 py-2.5 bg-[var(--color-bg-light)] dark:bg-[var(--color-input-dark-bg)] border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]/70 rounded-md text-sm text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] placeholder-[var(--color-text-muted-light)] focus:outline-none focus:ring-2 focus:ring-[var(--color-input)] transition-all"
                   required
                 />
@@ -252,7 +277,7 @@ export default function EventModal({
             {/* Event Picture Upload Field */}
             <div>
               <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">
-                Event Banner / Picture
+                {t('events.labelBannerPicture', 'Event Banner / Picture')}
               </label>
 
               {safeFormData.imageUrl || safeFormData.image_url ? (
@@ -264,7 +289,7 @@ export default function EventModal({
                   />
                   <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                     <label className="px-3 py-1.5 bg-[#003E83] hover:bg-[#002e62] text-white rounded-md text-xs font-medium transition-colors cursor-pointer">
-                      Change Image
+                      {t('events.changeImageBtn', 'Change Image')}
                       <input
                         type="file"
                         accept="image/*"
@@ -278,7 +303,7 @@ export default function EventModal({
                       className="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-md text-xs flex items-center gap-1 font-medium transition-colors cursor-pointer"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
-                      Remove
+                      {t('events.removeBtn', 'Remove')}
                     </button>
                   </div>
                 </div>
@@ -286,7 +311,7 @@ export default function EventModal({
                 <label className="border-2 border-dashed border-gray-300 dark:border-zinc-700 bg-gray-50/70 dark:bg-zinc-800/40 rounded-md p-4 text-center hover:border-[#003E83] dark:hover:border-[#003E83] transition-colors cursor-pointer block mb-2">
                   <Upload className="w-6 h-6 text-gray-400 mx-auto mb-1.5" />
                   <p className="text-gray-800 dark:text-zinc-200 font-medium text-xs">
-                    {isUploading ? 'Uploading banner to server...' : 'Click to upload event banner'}
+                    {isUploading ? t('events.uploadingBannerText', 'Uploading banner to server...') : t('events.clickUploadBannerPrompt', 'Click to upload event banner')}
                   </p>
                   <p className="text-[11px] text-gray-500 dark:text-zinc-400 mt-0.5">PNG, JPG, WEBP</p>
                   <input
@@ -304,7 +329,7 @@ export default function EventModal({
                   type="text"
                   value={safeFormData.imageUrl || safeFormData.image_url || ''}
                   onChange={(e) => updateForm({ ...safeFormData, imageUrl: e.target.value, image_url: e.target.value })}
-                  placeholder="Or paste banner image URL (https://...)"
+                  placeholder={t('events.pasteUrlPlaceholder', 'Or paste banner image URL (https://...)')}
                   className="w-full pl-9 pr-4 py-2 bg-[var(--color-bg-light)] dark:bg-[var(--color-input-dark-bg)] border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]/70 rounded-md text-xs text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] placeholder-[var(--color-text-muted-light)] focus:outline-none focus:ring-2 focus:ring-[var(--color-input)] transition-all"
                 />
               </div>
@@ -313,14 +338,14 @@ export default function EventModal({
             {/* Description */}
             <div>
               <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">
-                Description
+                {t('events.labelDescriptionInput', 'Description')}
               </label>
               <div className="relative">
                 <FileText className="absolute left-3 top-3 w-4 h-4 text-gray-400 pointer-events-none" />
                 <textarea
                   value={safeFormData.description || ''}
                   onChange={(e) => updateForm({ ...safeFormData, description: e.target.value })}
-                  placeholder="Describe festival activities, schedule, and cultural importance..."
+                  placeholder={t('events.placeholderDescription', 'Describe festival activities, schedule, and cultural importance...')}
                   rows={2}
                   className="w-full pl-9 pr-4 py-2.5 bg-[var(--color-bg-light)] dark:bg-[var(--color-input-dark-bg)] border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]/70 rounded-md text-sm text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] placeholder-[var(--color-text-muted-light)] focus:outline-none focus:ring-2 focus:ring-[var(--color-input)] resize-none transition-all"
                   required
@@ -331,7 +356,7 @@ export default function EventModal({
             {/* Location */}
             <div>
               <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">
-                Location *
+                {t('events.labelLocationInput', 'Location *')}
               </label>
               <div className="relative">
                 <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
@@ -339,7 +364,7 @@ export default function EventModal({
                   type="text"
                   value={safeFormData.location || ''}
                   onChange={(e) => updateForm({ ...safeFormData, location: e.target.value })}
-                  placeholder="e.g. Tonle Sap Riverfront, Phnom Penh"
+                  placeholder={t('events.placeholderLocation', 'e.g. Tonle Sap Riverfront, Phnom Penh')}
                   className="w-full pl-9 pr-4 py-2.5 bg-[var(--color-bg-light)] dark:bg-[var(--color-input-dark-bg)] border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]/70 rounded-md text-sm text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] placeholder-[var(--color-text-muted-light)] focus:outline-none focus:ring-2 focus:ring-[var(--color-input)] transition-all"
                   required
                 />
@@ -350,7 +375,7 @@ export default function EventModal({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">
-                  Start Date *
+                  {t('events.labelStartDate', 'Start Date *')}
                 </label>
                 <div className="relative">
                   <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
@@ -366,7 +391,7 @@ export default function EventModal({
 
               <div>
                 <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">
-                  End Date
+                  {t('events.labelEndDate', 'End Date')}
                 </label>
                 <div className="relative">
                   <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
@@ -385,7 +410,7 @@ export default function EventModal({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">
-                  Event Time
+                  {t('events.labelEventTime', 'Event Time')}
                 </label>
                 {(() => {
                   const rawTime = safeFormData.start_time || safeFormData.time || '08:00 AM';
@@ -429,7 +454,7 @@ export default function EventModal({
 
               <div>
                 <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">
-                  Price
+                  {t('events.labelPriceInput', 'Price')}
                 </label>
                 <div className="relative">
                   <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
@@ -437,7 +462,7 @@ export default function EventModal({
                     type="text"
                     value={safeFormData.price || ''}
                     onChange={(e) => updateForm({ ...safeFormData, price: e.target.value })}
-                    placeholder="e.g. Free, $45 USD"
+                    placeholder={t('events.placeholderPrice', 'e.g. Free, $45 USD')}
                     className="w-full pl-9 pr-4 py-2.5 bg-[var(--color-bg-light)] dark:bg-[var(--color-input-dark-bg)] border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]/70 rounded-md text-sm text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] placeholder-[var(--color-text-muted-light)] focus:outline-none focus:ring-2 focus:ring-[var(--color-input)] transition-all"
                     required
                   />
@@ -448,7 +473,7 @@ export default function EventModal({
             {/* Organizer */}
             <div>
               <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">
-                Organizer
+                {t('events.labelOrganizerInput', 'Organizer')}
               </label>
               <div className="relative">
                 <Users className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
@@ -456,7 +481,7 @@ export default function EventModal({
                   type="text"
                   value={safeFormData.organizer || ''}
                   onChange={(e) => updateForm({ ...safeFormData, organizer: e.target.value })}
-                  placeholder="e.g. Ministry of Tourism, National Olympic Committee"
+                  placeholder={t('events.placeholderOrganizer', 'e.g. Ministry of Tourism, National Olympic Committee')}
                   className="w-full pl-9 pr-4 py-2.5 bg-[var(--color-bg-light)] dark:bg-[var(--color-input-dark-bg)] border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]/70 rounded-md text-sm text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] placeholder-[var(--color-text-muted-light)] focus:outline-none focus:ring-2 focus:ring-[var(--color-input)] transition-all"
                   required
                 />
@@ -470,7 +495,7 @@ export default function EventModal({
               onClick={onClose}
               className="flex-1 py-2.5 px-4 rounded-md border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] hover:bg-[var(--color-surface-hover-light)] dark:hover:bg-[var(--color-surface-hover-dark)] font-medium text-sm transition-colors text-center cursor-pointer"
             >
-              Cancel
+              {t('events.cancelBtn', 'Cancel')}
             </button>
             <button
               type="submit"
@@ -478,16 +503,16 @@ export default function EventModal({
               className="flex-1 py-2.5 px-4 rounded-md bg-[#003E83] hover:bg-[#002e62] active:scale-[0.98] text-white font-medium text-sm transition-all text-center cursor-pointer shadow-xs disabled:opacity-50 flex items-center justify-center gap-1.5"
             >
               {isUploading ? (
-                'Uploading Image...'
+                t('events.uploadingImageBtn', 'Uploading Image...')
               ) : editingEvent ? (
                 <>
                   <Check className="w-4 h-4" />
-                  <span>Update Event</span>
+                  <span>{t('events.updateEventBtn', 'Update Event')}</span>
                 </>
               ) : (
                 <>
                   <Plus className="w-4 h-4" />
-                  <span>Create Event</span>
+                  <span>{t('events.createEventBtn', 'Create Event')}</span>
                 </>
               )}
             </button>

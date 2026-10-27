@@ -1,6 +1,8 @@
 import { Star, ThumbsUp, MessageSquare, ThumbsDown } from 'lucide-react';
+import { useLanguage } from '../../i18n';
 
 export default function RatingsSentiment({ reviews = [], ratingDistribution, stats: statsOverview }) {
+  const { t } = useLanguage();
   const safeReviews = Array.isArray(reviews) ? reviews : [];
   const total = statsOverview?.total_ratings ?? safeReviews.length;
 
@@ -21,9 +23,11 @@ export default function RatingsSentiment({ reviews = [], ratingDistribution, sta
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6 sm:mb-8">
       <div className="bg-[var(--color-white)] dark:bg-[var(--color-bg-dark)] rounded-md shadow-sm border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] p-4 sm:p-6 lg:col-span-2">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-sm font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">Rating Distribution</h3>
+          <h3 className="text-sm font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">
+            {t('ratings.ratingDistribution', 'Rating Distribution')}
+          </h3>
           <span className="text-xs text-[var(--color-text-muted-light)] dark:text-[var(--color-text-secondary-dark)]">
-            Based on {total.toLocaleString()} reviews
+            {t('ratings.basedOnReviews', 'Based on {count} reviews').replace('{count}', total.toLocaleString())}
           </span>
         </div>
         <div className="space-y-3">
@@ -52,14 +56,20 @@ export default function RatingsSentiment({ reviews = [], ratingDistribution, sta
       </div>
       <div className="bg-[var(--color-white)] dark:bg-[var(--color-bg-dark)] rounded-md shadow-sm border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] p-4 sm:p-6 flex flex-col justify-between">
         <div>
-          <h3 className="text-sm font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] mb-4">Overall Sentiment</h3>
+          <h3 className="text-sm font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] mb-4">
+            {t('ratings.overallSentiment', 'Overall Sentiment')}
+          </h3>
           <div className="space-y-3">
             <div className="flex items-center justify-between p-3 bg-[var(--color-success-bg)] dark:bg-[var(--color-success-dark-bg)] rounded-md border border-[var(--color-success-border)] dark:border-[var(--color-success-dark-border)]">
               <div className="flex items-center gap-2">
                 <ThumbsUp className="w-5 h-5 text-[var(--color-success-text)] dark:text-[var(--color-success-dark-text)]" />
                 <div>
-                  <p className="text-sm font-semibold text-[var(--color-success-text)] dark:text-[var(--color-success-dark-text)]">Positive (4-5★)</p>
-                  <p className="text-[10px] text-[var(--color-success-text)]/80 dark:text-[var(--color-success-dark-text)]/80">{positiveCount} reviews</p>
+                  <p className="text-sm font-semibold text-[var(--color-success-text)] dark:text-[var(--color-success-dark-text)]">
+                    {t('ratings.sentimentPositive', 'Positive (4-5★)')}
+                  </p>
+                  <p className="text-[10px] text-[var(--color-success-text)]/80 dark:text-[var(--color-success-dark-text)]/80">
+                    {t('ratings.reviewsCount', '{count} reviews').replace('{count}', positiveCount)}
+                  </p>
                 </div>
               </div>
               <span className="text-base font-bold text-[var(--color-success-text)] dark:text-[var(--color-success-dark-text)]">
@@ -70,8 +80,12 @@ export default function RatingsSentiment({ reviews = [], ratingDistribution, sta
               <div className="flex items-center gap-2">
                 <MessageSquare className="w-5 h-5 text-[var(--color-warning-text)] dark:text-[var(--color-warning-dark-text)]" />
                 <div>
-                  <p className="text-sm font-semibold text-[var(--color-warning-text)] dark:text-[var(--color-warning-dark-text)]">Neutral (3★)</p>
-                  <p className="text-[10px] text-[var(--color-warning-text)]/80 dark:text-[var(--color-warning-dark-text)]/80">{neutralCount} reviews</p>
+                  <p className="text-sm font-semibold text-[var(--color-warning-text)] dark:text-[var(--color-warning-dark-text)]">
+                    {t('ratings.sentimentNeutral', 'Neutral (3★)')}
+                  </p>
+                  <p className="text-[10px] text-[var(--color-warning-text)]/80 dark:text-[var(--color-warning-dark-text)]/80">
+                    {t('ratings.reviewsCount', '{count} reviews').replace('{count}', neutralCount)}
+                  </p>
                 </div>
               </div>
               <span className="text-base font-bold text-[var(--color-warning-text)] dark:text-[var(--color-warning-dark-text)]">
@@ -82,8 +96,12 @@ export default function RatingsSentiment({ reviews = [], ratingDistribution, sta
               <div className="flex items-center gap-2">
                 <ThumbsDown className="w-5 h-5 text-[var(--color-danger-text)] dark:text-[var(--color-danger-dark-text)]" />
                 <div>
-                  <p className="text-sm font-semibold text-[var(--color-danger-text)] dark:text-[var(--color-danger-dark-text)]">Negative (1-2★)</p>
-                  <p className="text-[10px] text-[var(--color-danger-text)]/80 dark:text-[var(--color-danger-dark-text)]/80">{negativeCount} reviews</p>
+                  <p className="text-sm font-semibold text-[var(--color-danger-text)] dark:text-[var(--color-danger-dark-text)]">
+                    {t('ratings.sentimentNegative', 'Negative (1-2★)')}
+                  </p>
+                  <p className="text-[10px] text-[var(--color-danger-text)]/80 dark:text-[var(--color-danger-dark-text)]/80">
+                    {t('ratings.reviewsCount', '{count} reviews').replace('{count}', negativeCount)}
+                  </p>
                 </div>
               </div>
               <span className="text-base font-bold text-[var(--color-danger-text)] dark:text-[var(--color-danger-dark-text)]">

@@ -30,8 +30,10 @@ import {
 } from 'recharts';
 import { Link } from 'react-router-dom';
 import reviewService from '../../services/reviewService';
+import { useLanguage } from '../../i18n';
 
 export default function RatingsAnalytics({ reviews: initialReviews = [] }) {
+  const { t } = useLanguage();
   const [reviews, setReviews] = useState(initialReviews);
   const [timeframe, setTimeframe] = useState('Year');
   const [selectedCategory, setSelectedCategory] = useState('ALL');
@@ -42,13 +44,13 @@ export default function RatingsAnalytics({ reviews: initialReviews = [] }) {
 
   const timeframeLabel = useMemo(() => {
     switch (timeframe) {
-      case 'Day': return 'Today';
-      case 'Week': return 'This Week';
-      case 'Month': return 'This Month';
+      case 'Day': return t('ratings.tfToday', 'Today');
+      case 'Week': return t('ratings.tfWeek', 'This Week');
+      case 'Month': return t('ratings.tfMonth', 'This Month');
       case 'Year':
-      default: return '2026';
+      default: return t('ratings.tfYear', '2026');
     }
-  }, [timeframe]);
+  }, [timeframe, t]);
 
   // Sync prop reviews if passed from parent
   useEffect(() => {
@@ -400,33 +402,35 @@ export default function RatingsAnalytics({ reviews: initialReviews = [] }) {
 
   const stats = [
     {
-      label: 'Total Reviews',
+      label: t('ratings.statTotalReviews', 'Total Reviews'),
       value: total.toLocaleString(),
-      subtext: total === 1 ? '1 review recorded' : `${total.toLocaleString()} reviews recorded`,
+      subtext: total === 1
+        ? t('ratings.pillCountSingle', '1 review')
+        : t('ratings.pillCount', '{count} reviews recorded').replace('{count}', total.toLocaleString()),
       icon: MessageSquare,
       color: 'text-[var(--color-info-text)] dark:text-[var(--color-info-dark-text)]',
       bg: 'bg-[var(--color-info-bg)] dark:bg-[var(--color-info-dark-bg)]'
     },
     {
-      label: 'Average Rating',
+      label: t('ratings.statAvgRating', 'Average Rating'),
       value: `${avgRating} ★`,
-      subtext: 'Destination score out of 5.0',
+      subtext: t('ratings.subtextAvgRating', 'Destination score out of 5.0'),
       icon: Star,
       color: 'text-[var(--color-warning-text)] dark:text-[var(--color-warning-dark-text)]',
       bg: 'bg-[var(--color-warning-bg)] dark:bg-[var(--color-warning-dark-bg)]'
     },
     {
-      label: 'Positive Sentiment',
+      label: t('ratings.statPositiveSentiment', 'Positive Sentiment'),
       value: `${positivePct}%`,
-      subtext: `${positiveCount} of ${total} rated 4-5★`,
+      subtext: t('ratings.subtextPositiveSentiment', '{count} of {total} rated 4-5★').replace('{count}', positiveCount).replace('{total}', total),
       icon: ThumbsUp,
       color: 'text-[var(--color-success-text)] dark:text-[var(--color-success-dark-text)]',
       bg: 'bg-[var(--color-success-bg)] dark:bg-[var(--color-success-dark-bg)]'
     },
     {
-      label: 'Verified Reviews',
+      label: t('ratings.statVerifiedReviews', 'Verified Reviews'),
       value: `${verifiedPct}%`,
-      subtext: 'Authentic traveler feedback',
+      subtext: t('ratings.subtextVerifiedReviews', 'Authentic traveler feedback'),
       icon: ShieldCheck,
       color: 'text-[var(--color-purple-badge-text)] dark:text-[var(--color-purple-badge-dark-text)]',
       bg: 'bg-[var(--color-purple-badge-bg)] dark:bg-[var(--color-purple-badge-dark-bg)]'
@@ -440,10 +444,10 @@ export default function RatingsAnalytics({ reviews: initialReviews = [] }) {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <h1 className="text-xl sm:text-2xl font-bold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] tracking-tight">
-              Ratings & Reviews Analytics
+              {t('ratings.analyticsTitle', 'Ratings & Reviews Analytics')}
             </h1>
             <p className="text-xs sm:text-sm text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mt-1">
-              Summary of traveler ratings, score trajectory, and destination feedback
+              {t('ratings.analyticsSubtitle', 'In-depth sentiment metrics, rating distributions, and tourist satisfaction trends')}
             </p>
           </div>
 
@@ -453,7 +457,7 @@ export default function RatingsAnalytics({ reviews: initialReviews = [] }) {
               className="flex items-center justify-center gap-1.5 md:gap-2 px-4 py-2 text-xs md:text-sm font-medium rounded-md border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] bg-[var(--color-white)] dark:bg-[var(--color-bg-dark)] hover:bg-gray-100 dark:hover:bg-gray-800 text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] shadow-xs transition-colors cursor-pointer shrink-0 w-full sm:w-auto"
             >
               <ArrowLeft className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
-              <span>Back to Reviews</span>
+              <span>{t('ratings.backToReviews', 'Back to Reviews')}</span>
             </Link>
           </div>
         </div>
@@ -495,10 +499,10 @@ export default function RatingsAnalytics({ reviews: initialReviews = [] }) {
           <div className="flex items-center gap-2">
             <Filter className="w-4 h-4 text-[#003E83] dark:text-blue-400 shrink-0" />
             <span className="text-sm font-bold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">
-              Filter Analytics
+              {t('ratings.filterAnalytics', 'Filter Analytics')}
             </span>
             <span className="text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
-              ({total.toLocaleString()} records)
+              {t('ratings.recordsCount', '({count} records)').replace('{count}', total.toLocaleString())}
             </span>
           </div>
 
@@ -510,7 +514,7 @@ export default function RatingsAnalytics({ reviews: initialReviews = [] }) {
                 onChange={(e) => setSelectedCategory(e.target.value)}
                 className="appearance-none w-full sm:w-auto pl-3.5 pr-8 py-2 border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] rounded-md bg-[var(--color-white)] dark:bg-[var(--color-bg-dark)] text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] text-xs md:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[var(--color-input)] focus:border-transparent cursor-pointer shadow-xs"
               >
-                <option value="ALL">All Categories</option>
+                <option value="ALL">{t('ratings.filterAllCategories', 'All Categories')}</option>
                 {categories.map(cat => (
                   <option key={cat} value={cat}>{cat}</option>
                 ))}
@@ -525,14 +529,14 @@ export default function RatingsAnalytics({ reviews: initialReviews = [] }) {
                 onChange={(e) => setRatingFilter(e.target.value)}
                 className="appearance-none w-full sm:w-auto pl-3.5 pr-8 py-2 border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] rounded-md bg-[var(--color-white)] dark:bg-[var(--color-bg-dark)] text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] text-xs md:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[var(--color-input)] focus:border-transparent cursor-pointer shadow-xs"
               >
-                <option value="ALL">All Star Ratings</option>
-                <option value="5">5 Stars Only</option>
-                <option value="4">4 Stars Only</option>
-                <option value="3">3 Stars Only</option>
-                <option value="2">2 Stars Only</option>
-                <option value="1">1 Star Only</option>
-                <option value="positive">Positive (4★ & 5★)</option>
-                <option value="critical">Needs Attention (1★ - 3★)</option>
+                <option value="ALL">{t('ratings.filterAllRatings', 'All Star Ratings')}</option>
+                <option value="5">{t('ratings.filter5Stars', '5 Stars Only')}</option>
+                <option value="4">{t('ratings.filter4Stars', '4 Stars Only')}</option>
+                <option value="3">{t('ratings.filter3Stars', '3 Stars Only')}</option>
+                <option value="2">{t('ratings.filter2Stars', '2 Stars Only')}</option>
+                <option value="1">{t('ratings.filter1Star', '1 Star Only')}</option>
+                <option value="positive">{t('ratings.filterPositiveOnly', 'Positive (4★ & 5★)')}</option>
+                <option value="critical">{t('ratings.filterCriticalOnly', 'Needs Attention (1★ - 3★)')}</option>
               </select>
               <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--color-text-muted-light)] dark:text-[var(--color-text-secondary-dark)] pointer-events-none" />
             </div>
@@ -544,10 +548,10 @@ export default function RatingsAnalytics({ reviews: initialReviews = [] }) {
                 onChange={(e) => setTimeframe(e.target.value)}
                 className="appearance-none w-full sm:w-auto pl-3.5 pr-8 py-2 border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] rounded-md bg-[var(--color-white)] dark:bg-[var(--color-bg-dark)] text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] text-xs md:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[var(--color-input)] focus:border-transparent cursor-pointer shadow-xs"
               >
-                <option value="Year">Year</option>
-                <option value="Month">Month</option>
-                <option value="Week">Week</option>
-                <option value="Day">Day</option>
+                <option value="Year">{t('ratings.optYear', 'Year')}</option>
+                <option value="Month">{t('ratings.optMonth', 'Month')}</option>
+                <option value="Week">{t('ratings.optWeek', 'Week')}</option>
+                <option value="Day">{t('ratings.optDay', 'Day')}</option>
               </select>
               <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--color-text-muted-light)] dark:text-[var(--color-text-secondary-dark)] pointer-events-none" />
             </div>
@@ -559,7 +563,7 @@ export default function RatingsAnalytics({ reviews: initialReviews = [] }) {
                 className="flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-rose-600 hover:text-rose-700 dark:text-rose-400 dark:hover:text-rose-300 hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded-md cursor-pointer transition-colors"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
-                <span>Reset</span>
+                <span>{t('ratings.resetBtn', 'Reset')}</span>
               </button>
             )}
           </div>
@@ -576,14 +580,14 @@ export default function RatingsAnalytics({ reviews: initialReviews = [] }) {
               <div>
                 <h3 className="font-semibold text-sm md:text-base text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] flex items-center gap-2">
                   <TrendingUp className="w-4 h-4 text-[#003E83] dark:text-blue-400" />
-                  <span>Sentiment Velocity ({timeframeLabel})</span>
+                  <span>{t('ratings.chartSentimentVelocity', 'Sentiment Velocity ({timeframe})').replace('{timeframe}', timeframeLabel)}</span>
                 </h3>
                 <p className="text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mt-0.5">
-                  Distribution of positive, neutral, and critical traveler ratings
+                  {t('ratings.chartSentimentSubtitle', 'Distribution of positive, neutral, and critical traveler ratings')}
                 </p>
               </div>
               <span className="text-[11px] font-semibold px-2.5 py-1 rounded-md border border-blue-100 dark:border-blue-900/50 bg-blue-50 dark:bg-blue-950/40 text-[#003E83] dark:text-blue-400 shrink-0 self-start sm:self-center">
-                Total: {total.toLocaleString()} Reviews
+                {t('ratings.totalVolumeReviews', 'Total: {count} Reviews').replace('{count}', total.toLocaleString())}
               </span>
             </div>
 
@@ -591,15 +595,15 @@ export default function RatingsAnalytics({ reviews: initialReviews = [] }) {
             <div className="flex items-center gap-3 sm:gap-4 flex-wrap mb-3 text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
               <span className="inline-flex items-center gap-1.5 font-medium">
                 <span className="w-2.5 h-2.5 rounded-xs bg-[#10b981]" />
-                <span>Positive (4-5★)</span>
+                <span>{t('ratings.sentimentPositive', 'Positive (4-5★)')}</span>
               </span>
               <span className="inline-flex items-center gap-1.5 font-medium">
                 <span className="w-2.5 h-2.5 rounded-xs bg-[#f59e0b]" />
-                <span>Neutral (3★)</span>
+                <span>{t('ratings.sentimentNeutral', 'Neutral (3★)')}</span>
               </span>
               <span className="inline-flex items-center gap-1.5 font-medium">
                 <span className="w-2.5 h-2.5 rounded-xs bg-[#ef4444]" />
-                <span>Critical (1-2★)</span>
+                <span>{t('ratings.sentimentNegative', 'Critical (1-2★)')}</span>
               </span>
             </div>
 
@@ -636,27 +640,31 @@ export default function RatingsAnalytics({ reviews: initialReviews = [] }) {
                           <div className="bg-[var(--color-white)] dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 p-2.5 rounded-md shadow-md text-xs space-y-1.5 min-w-[170px]">
                             <div className="flex items-center justify-between border-b border-gray-100 dark:border-zinc-800 pb-1">
                               <p className="font-bold text-gray-900 dark:text-zinc-100">{label}</p>
-                              <span className="text-[11px] font-semibold text-gray-500 dark:text-zinc-400">{totalM} {totalM === 1 ? 'review' : 'reviews'}</span>
+                              <span className="text-[11px] font-semibold text-gray-500 dark:text-zinc-400">
+                                {totalM === 1
+                                  ? t('ratings.reviewCountPillSingle', '1 review')
+                                  : t('ratings.reviewCountPill', '{count} reviews').replace('{count}', totalM)}
+                              </span>
                             </div>
                             <div className="space-y-1 text-gray-600 dark:text-zinc-300">
                               <div className="flex items-center justify-between gap-3">
                                 <span className="flex items-center gap-1.5">
                                   <span className="w-2 h-2 rounded-xs bg-[#10b981]" />
-                                  Positive (4-5★):
+                                  {t('ratings.sentimentPositive', 'Positive (4-5★)')}:
                                 </span>
                                 <span className="font-bold text-[#10b981]">{pos}</span>
                               </div>
                               <div className="flex items-center justify-between gap-3">
                                 <span className="flex items-center gap-1.5">
                                   <span className="w-2 h-2 rounded-xs bg-[#f59e0b]" />
-                                  Neutral (3★):
+                                  {t('ratings.sentimentNeutral', 'Neutral (3★)')}:
                                 </span>
                                 <span className="font-bold text-[#f59e0b]">{neu}</span>
                               </div>
                               <div className="flex items-center justify-between gap-3">
                                 <span className="flex items-center gap-1.5">
                                   <span className="w-2 h-2 rounded-xs bg-[#ef4444]" />
-                                  Critical (1-2★):
+                                  {t('ratings.sentimentNegative', 'Critical (1-2★)')}:
                                 </span>
                                 <span className="font-bold text-[#ef4444]">{crit}</span>
                               </div>
@@ -667,9 +675,9 @@ export default function RatingsAnalytics({ reviews: initialReviews = [] }) {
                       return null;
                     }}
                   />
-                  <Bar dataKey="positive" stackId="sentiment" fill="#10b981" radius={[0, 0, 0, 0]} name="Positive (4-5★)" barSize={16} isAnimationActive={true} animationDuration={800} />
-                  <Bar dataKey="neutral" stackId="sentiment" fill="#f59e0b" radius={[0, 0, 0, 0]} name="Neutral (3★)" barSize={16} isAnimationActive={true} animationDuration={800} />
-                  <Bar dataKey="critical" stackId="sentiment" fill="#ef4444" radius={[3, 3, 0, 0]} name="Critical (1-2★)" barSize={16} isAnimationActive={true} animationDuration={800} />
+                  <Bar dataKey="positive" stackId="sentiment" fill="#10b981" radius={[0, 0, 0, 0]} name={t('ratings.sentimentPositive', 'Positive (4-5★)')} barSize={16} isAnimationActive={true} animationDuration={800} />
+                  <Bar dataKey="neutral" stackId="sentiment" fill="#f59e0b" radius={[0, 0, 0, 0]} name={t('ratings.sentimentNeutral', 'Neutral (3★)')} barSize={16} isAnimationActive={true} animationDuration={800} />
+                  <Bar dataKey="critical" stackId="sentiment" fill="#ef4444" radius={[3, 3, 0, 0]} name={t('ratings.sentimentNegative', 'Critical (1-2★)')} barSize={16} isAnimationActive={true} animationDuration={800} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -679,15 +687,21 @@ export default function RatingsAnalytics({ reviews: initialReviews = [] }) {
           <div className="mt-3 pt-2.5 border-t border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] grid grid-cols-3 gap-2 text-center">
             <div className="p-1.5 sm:p-2 rounded-md bg-[var(--color-surface-hover-light)] dark:bg-[var(--color-surface-hover-dark)]/50 border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]">
               <p className="text-xs sm:text-sm font-bold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">{timeframeLabel}</p>
-              <p className="text-[10px] sm:text-[11px] text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] truncate">Timeframe</p>
+              <p className="text-[10px] sm:text-[11px] text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] truncate">
+                {t('ratings.timeframeLabel', 'Timeframe')}
+              </p>
             </div>
             <div className="p-1.5 sm:p-2 rounded-md bg-[var(--color-surface-hover-light)] dark:bg-[var(--color-surface-hover-dark)]/50 border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]">
               <p className="text-xs sm:text-sm font-bold text-[#003E83] dark:text-blue-400">{total.toLocaleString()}</p>
-              <p className="text-[10px] sm:text-[11px] text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] truncate">Total Volume</p>
+              <p className="text-[10px] sm:text-[11px] text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] truncate">
+                {t('ratings.totalVolume', 'Total Volume')}
+              </p>
             </div>
             <div className="p-1.5 sm:p-2 rounded-md bg-[var(--color-success-bg)] dark:bg-[var(--color-success-dark-bg)] border border-[var(--color-success-border)] dark:border-[var(--color-success-dark-border)]">
               <p className="text-xs sm:text-sm font-bold text-[var(--color-success-text)] dark:text-[var(--color-success-dark-text)]">{positivePct}%</p>
-              <p className="text-[10px] sm:text-[11px] text-[var(--color-success-text)] dark:text-[var(--color-success-dark-text)] truncate">Positive Share</p>
+              <p className="text-[10px] sm:text-[11px] text-[var(--color-success-text)] dark:text-[var(--color-success-dark-text)] truncate">
+                {t('ratings.positiveShare', 'Positive Share')}
+              </p>
             </div>
           </div>
         </div>
@@ -699,10 +713,10 @@ export default function RatingsAnalytics({ reviews: initialReviews = [] }) {
               <div>
                 <h3 className="font-semibold text-sm md:text-base text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] flex items-center gap-2">
                   <Award className="w-4 h-4 text-amber-500" />
-                  <span>Net Sentiment & Star Distribution</span>
+                  <span>{t('ratings.chartDistributionTitle', 'Net Sentiment & Star Distribution')}</span>
                 </h3>
                 <p className="text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
-                  Satisfaction index (CSAT) & 5-tier star breakdown
+                  {t('ratings.chartDistributionSubtitle', 'Satisfaction index (CSAT) & 5-tier star breakdown')}
                 </p>
               </div>
               <div className="flex items-center gap-1 bg-gray-100 dark:bg-zinc-800/80 p-0.5 rounded-md border border-gray-200/50 dark:border-zinc-700/50 self-start sm:self-auto">
@@ -715,7 +729,7 @@ export default function RatingsAnalytics({ reviews: initialReviews = [] }) {
                       : 'text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] hover:text-gray-900 dark:hover:text-white'
                   }`}
                 >
-                  By Stars
+                  {t('ratings.tabByStars', 'By Stars')}
                 </button>
                 <button
                   type="button"
@@ -726,7 +740,7 @@ export default function RatingsAnalytics({ reviews: initialReviews = [] }) {
                       : 'text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] hover:text-gray-900 dark:hover:text-white'
                   }`}
                 >
-                  Sentiment
+                  {t('ratings.tabSentiment', 'Sentiment')}
                 </button>
               </div>
             </div>
@@ -736,7 +750,7 @@ export default function RatingsAnalytics({ reviews: initialReviews = [] }) {
               {total === 0 ? (
                 <div className="h-full flex flex-col items-center justify-center text-gray-400 text-xs">
                   <Award className="w-8 h-8 mb-2 stroke-1 text-gray-300 dark:text-zinc-600" />
-                  <p>No ratings recorded yet</p>
+                  <p>{t('ratings.noRatingsYet', 'No ratings recorded yet')}</p>
                 </div>
               ) : (
                 <>
@@ -746,7 +760,9 @@ export default function RatingsAnalytics({ reviews: initialReviews = [] }) {
                       {ratingChartTab === 'stars' ? `${avgRating} ★` : `${positivePct}%`}
                     </span>
                     <span className="text-[11px] text-gray-500 dark:text-zinc-400 font-medium">
-                      {ratingChartTab === 'stars' ? `Avg (${total.toLocaleString()} Reviews)` : 'CSAT Score'}
+                      {ratingChartTab === 'stars'
+                        ? t('ratings.avgDonutLabel', 'Avg ({count} Reviews)').replace('{count}', total.toLocaleString())
+                        : t('ratings.csatScore', 'CSAT Score')}
                     </span>
                   </div>
 
@@ -831,7 +847,7 @@ export default function RatingsAnalytics({ reviews: initialReviews = [] }) {
                       <div className="flex items-center gap-1.5 min-w-0 pr-1">
                         <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: item.fillColor }} />
                         <span className="text-gray-700 dark:text-zinc-300 font-medium truncate text-[11px]">
-                          {item.stars} Stars
+                          {t('ratings.starsCountLabel', '{count} Stars').replace('{count}', item.stars)}
                         </span>
                       </div>
                       <span className="text-gray-500 dark:text-zinc-400 text-[10px] font-semibold shrink-0">
@@ -843,7 +859,7 @@ export default function RatingsAnalytics({ reviews: initialReviews = [] }) {
                     <div className="flex items-center gap-1.5 min-w-0 pr-1">
                       <span className="w-2.5 h-2.5 rounded-full shrink-0 bg-blue-600" />
                       <span className="text-gray-700 dark:text-zinc-300 font-medium truncate text-[11px]">
-                        Net Sentiment
+                        {t('ratings.netSentiment', 'Net Sentiment')}
                       </span>
                     </div>
                     <span className="text-blue-600 dark:text-blue-400 text-[10px] font-semibold shrink-0">
@@ -870,7 +886,7 @@ export default function RatingsAnalytics({ reviews: initialReviews = [] }) {
                     <div className="flex items-center gap-1.5 min-w-0 pr-1">
                       <span className="w-2.5 h-2.5 rounded-full shrink-0 bg-blue-600" />
                       <span className="text-gray-700 dark:text-zinc-300 font-medium truncate text-[11px]">
-                        Net Sentiment
+                        {t('ratings.netSentiment', 'Net Sentiment')}
                       </span>
                     </div>
                     <span className="text-blue-600 dark:text-blue-400 text-[10px] font-semibold shrink-0">
@@ -890,16 +906,16 @@ export default function RatingsAnalytics({ reviews: initialReviews = [] }) {
           <div>
             <h3 className="font-semibold text-sm md:text-base text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] flex items-center gap-2">
               <TrendingUp className="w-4 h-4 text-[#003E83] dark:text-blue-400" />
-              <span>Average Rating Score Progression ({timeframeLabel})</span>
+              <span>{t('ratings.chartProgressionTitle', 'Average Rating Score Progression ({timeframe})').replace('{timeframe}', timeframeLabel)}</span>
             </h3>
             <p className="text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mt-0.5">
-              Score trajectory and trend analysis from database
+              {t('ratings.chartProgressionSubtitle', 'Score trajectory and trend analysis from database')}
             </p>
           </div>
           <div className="flex items-center gap-2">
             <span className="flex items-center gap-1.5 text-xs font-semibold text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 px-3 py-1.5 rounded-md border border-amber-200 dark:border-amber-900/50">
               <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-              <span>Overall Score: {avgRating} ★ ({total} Reviews)</span>
+              <span>{t('ratings.overallScoreBadge', 'Overall Score: {score} ★ ({count} Reviews)').replace('{score}', avgRating).replace('{count}', total)}</span>
             </span>
           </div>
         </div>
@@ -920,14 +936,16 @@ export default function RatingsAnalytics({ reviews: initialReviews = [] }) {
                       <div className="bg-[var(--color-white)] dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 p-3 rounded-md shadow-md text-xs space-y-1.5 min-w-[200px]">
                         <div className="flex items-center justify-between border-b border-gray-100 dark:border-zinc-800 pb-1">
                           <p className="font-bold text-gray-900 dark:text-zinc-100">{label} {timeframe !== 'ALL' ? timeframe : ''}</p>
-                          <span className="text-[11px] font-semibold text-gray-500 dark:text-zinc-400">{mData?.ratingsCount || 0} reviews</span>
+                          <span className="text-[11px] font-semibold text-gray-500 dark:text-zinc-400">
+                            {t('ratings.reviewsCount', '{count} reviews').replace('{count}', mData?.ratingsCount || 0)}
+                          </span>
                         </div>
                         <div className="space-y-1.5">
                           {trajectoryVal !== undefined && (
                             <div className="flex items-center justify-between gap-3 text-gray-600 dark:text-zinc-300">
                               <span className="flex items-center gap-1.5 font-medium">
                                 <span className="w-2.5 h-1 bg-[#4472C4] rounded-full" />
-                                Score Trajectory (Prevailing):
+                                {t('ratings.scoreTrajectory', 'Score Trajectory (Prevailing)')}:
                               </span>
                               <span className="font-bold text-[#4472C4]">{Number(trajectoryVal).toFixed(1)} ★</span>
                             </div>
@@ -936,7 +954,7 @@ export default function RatingsAnalytics({ reviews: initialReviews = [] }) {
                             <div className="flex items-center justify-between gap-3 text-gray-600 dark:text-zinc-300">
                               <span className="flex items-center gap-1.5 font-medium">
                                 <span className="w-2.5 h-1 bg-[#ED7D31] rounded-full" />
-                                In-Month Average Score:
+                                {t('ratings.inMonthAvg', 'In-Month Average Score')}:
                               </span>
                               <span className="font-bold text-[#ED7D31]">{Number(monthAvgVal).toFixed(1)} ★</span>
                             </div>
@@ -957,7 +975,7 @@ export default function RatingsAnalytics({ reviews: initialReviews = [] }) {
               <Line
                 type="monotone"
                 dataKey="avgRating"
-                name="Score Trajectory (Prevailing)"
+                name={t('ratings.scoreTrajectory', 'Score Trajectory (Prevailing)')}
                 stroke="#4472C4"
                 strokeWidth={3}
                 dot={{ r: 3, fill: '#4472C4' }}
@@ -969,7 +987,7 @@ export default function RatingsAnalytics({ reviews: initialReviews = [] }) {
               <Line
                 type="monotone"
                 dataKey="monthAvg"
-                name="In-Month Average Score"
+                name={t('ratings.inMonthAvg', 'In-Month Average Score')}
                 stroke="#ED7D31"
                 strokeWidth={3}
                 dot={{ r: 3, fill: '#ED7D31' }}

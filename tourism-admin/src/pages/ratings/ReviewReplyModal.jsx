@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { X, Send } from 'lucide-react';
+import { useLanguage } from '../../i18n';
 
 export default function ReviewReplyModal({
   isOpen,
@@ -11,6 +12,8 @@ export default function ReviewReplyModal({
   onSubmit,
   onSendReply
 }) {
+  const { t } = useLanguage();
+
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === 'Escape') onClose?.();
@@ -27,7 +30,7 @@ export default function ReviewReplyModal({
 
   if (!isOpen || !review) return null;
 
-  const userName = typeof review.user === 'object' ? (review.user?.name || review.user_name || 'Traveler') : (review.user_name || review.user || 'Traveler');
+  const userName = typeof review.user === 'object' ? (review.user?.name || review.user_name || t('ratings.anonymousTraveler', 'Traveler')) : (review.user_name || review.user || t('ratings.anonymousTraveler', 'Traveler'));
   const reviewComment = review.comment || '';
 
   const handleTextChange = (val) => {
@@ -57,8 +60,12 @@ export default function ReviewReplyModal({
       >
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-zinc-800 shrink-0">
           <div>
-            <h3 className="text-base font-bold text-gray-900 dark:text-zinc-100">Reply to Review</h3>
-            <p className="text-xs text-gray-500 dark:text-zinc-400">Direct response to traveler</p>
+            <h3 className="text-base font-bold text-gray-900 dark:text-zinc-100">
+              {t('ratings.replyModalTitle', 'Reply to Review')}
+            </h3>
+            <p className="text-xs text-gray-500 dark:text-zinc-400">
+              {t('ratings.replySubtitle', 'Direct response to traveler')}
+            </p>
           </div>
           <button
             type="button"
@@ -74,7 +81,7 @@ export default function ReviewReplyModal({
           <div className="p-6 space-y-4 max-h-[75vh] overflow-y-auto">
             <div className="p-3.5 bg-gray-50 dark:bg-zinc-800/40 rounded-md border border-gray-200 dark:border-zinc-700">
               <p className="text-xs font-semibold text-gray-700 dark:text-zinc-300 mb-1">
-                Review by <span className="text-gray-900 dark:text-zinc-100 font-bold">{userName}</span>
+                {t('ratings.reviewBy', 'Review by {name}').replace('{name}', userName)}
               </p>
               <p className="text-xs text-gray-600 dark:text-zinc-400 line-clamp-3 leading-relaxed">
                 "{reviewComment}"
@@ -83,12 +90,12 @@ export default function ReviewReplyModal({
 
             <div>
               <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">
-                Your Official Reply
+                {t('ratings.yourOfficialReply', 'Your Official Reply')}
               </label>
               <textarea
                 value={replyText}
                 onChange={(e) => handleTextChange(e.target.value)}
-                placeholder="Write your response as Admin..."
+                placeholder={t('ratings.replyPlaceholder', 'Write your response as Admin...')}
                 rows="4"
                 required
                 className="w-full bg-[var(--color-bg-light)] dark:bg-[var(--color-surface-hover-dark)] border border-gray-300 dark:border-zinc-700 rounded-md px-3.5 py-2.5 text-sm text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] placeholder-[var(--color-text-muted-light)] focus:outline-none focus:ring-1 focus:ring-[#003E83] resize-none transition-colors"
@@ -102,7 +109,7 @@ export default function ReviewReplyModal({
               onClick={onClose}
               className="flex-1 py-2.5 px-4 rounded-md border border-gray-300 dark:border-zinc-700 text-gray-700 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-800 font-medium text-xs sm:text-sm transition-colors text-center cursor-pointer"
             >
-              Cancel
+              {t('ratings.cancelBtn', 'Cancel')}
             </button>
             <button
               type="submit"
@@ -110,7 +117,7 @@ export default function ReviewReplyModal({
               className="flex-1 py-2.5 px-4 rounded-md bg-[#003E83] hover:bg-[#002e62] disabled:opacity-50 text-white font-medium text-xs sm:text-sm transition-colors text-center flex items-center justify-center gap-2 cursor-pointer"
             >
               <Send className="w-4 h-4" />
-              Send Reply
+              {t('ratings.sendReplyBtn', 'Send Reply')}
             </button>
           </div>
         </form>

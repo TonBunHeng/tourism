@@ -5,17 +5,14 @@ import {
   Users,
   Star,
   CheckCircle2,
-  Clock,
   Filter,
   RotateCcw,
-  Landmark,
   Calendar,
   ChevronDown,
   TrendingUp,
   Compass
 } from 'lucide-react';
 import {
-  ComposedChart,
   BarChart,
   Bar,
   Line,
@@ -32,8 +29,10 @@ import {
 } from 'recharts';
 import { Link } from 'react-router-dom';
 import favoriteService from '../../services/favoriteService';
+import { useLanguage } from '../../i18n';
 
 export default function FavoritesAnalytics({ favorites: initialFavorites = [] }) {
+  const { t } = useLanguage();
   const [favorites, setFavorites] = useState(initialFavorites);
   const [timeframe, setTimeframe] = useState('Year');
   const [selectedCategory, setSelectedCategory] = useState('ALL');
@@ -44,13 +43,13 @@ export default function FavoritesAnalytics({ favorites: initialFavorites = [] })
 
   const timeframeLabel = useMemo(() => {
     switch (timeframe) {
-      case 'Day': return 'Today';
-      case 'Week': return 'This Week';
-      case 'Month': return 'This Month';
+      case 'Day': return t('favorites.tfToday');
+      case 'Week': return t('favorites.tfWeek');
+      case 'Month': return t('favorites.tfMonth');
       case 'Year':
-      default: return '2026';
+      default: return t('favorites.tfYear');
     }
-  }, [timeframe]);
+  }, [timeframe, t]);
 
   // Sync prop favorites if passed from parent
   useEffect(() => {
@@ -293,19 +292,13 @@ export default function FavoritesAnalytics({ favorites: initialFavorites = [] })
 
   const journeyData = useMemo(() => {
     if (total === 0) {
-      return [{ name: 'No Saves', value: 1, percentage: 0, color: '#9CA3AF' }];
+      return [{ name: t('favorites.noFavoritesRecorded'), value: 1, percentage: 0, color: '#9CA3AF' }];
     }
     return [
-      { name: 'Visited Places', value: visitedCount, percentage: visitedPct, color: '#10b981' },
-      { name: 'To Visit (Planned)', value: plannedCount, percentage: plannedPct, color: '#3b82f6' }
+      { name: t('favorites.statusVisited'), value: visitedCount, percentage: visitedPct, color: '#10b981' },
+      { name: t('favorites.statusToVisit'), value: plannedCount, percentage: plannedPct, color: '#3b82f6' }
     ].filter(item => item.value > 0);
-  }, [visitedCount, visitedPct, plannedCount, plannedPct, total]);
-
-  const conversionStatus = useMemo(() => {
-    if (visitedPct >= 60) return { label: 'High Intent', color: 'text-emerald-700 bg-emerald-50 dark:bg-emerald-950/40 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800' };
-    if (visitedPct >= 35) return { label: 'Active Wishlists', color: 'text-blue-700 bg-blue-50 dark:bg-blue-950/40 dark:text-blue-400 border-blue-200 dark:border-blue-800' };
-    return { label: 'In Planning', color: 'text-amber-700 bg-amber-50 dark:bg-amber-950/40 dark:text-amber-400 border-amber-200 dark:border-amber-800' };
-  }, [visitedPct]);
+  }, [visitedCount, visitedPct, plannedCount, plannedPct, total, t]);
 
   const isFilterActive = timeframe !== 'Year' || selectedCategory !== 'ALL' || visitFilter !== 'ALL';
 
@@ -317,33 +310,33 @@ export default function FavoritesAnalytics({ favorites: initialFavorites = [] })
 
   const stats = [
     {
-      label: 'Total Favorites',
+      label: t('favorites.statTotalSaved'),
       value: total.toLocaleString(),
-      subtext: total === 1 ? '1 place saved' : `${total.toLocaleString()} places saved`,
+      subtext: total === 1 ? t('favorites.pillCountSingle') : t('favorites.pillCount', { count: total }),
       icon: Heart,
       color: 'text-[var(--color-rose-badge-text)] dark:text-[var(--color-rose-badge-dark-text)]',
       bg: 'bg-[var(--color-rose-badge-bg)] dark:bg-[var(--color-rose-badge-dark-bg)]'
     },
     {
-      label: 'Active Travelers',
+      label: t('favorites.statUniqueTravelers'),
       value: uniqueUsers > 0 ? uniqueUsers.toLocaleString() : total > 0 ? '1' : '0',
-      subtext: `${uniqueUsers} user wishlists active`,
+      subtext: t('favorites.subtextUniqueTravelers'),
       icon: Users,
       color: 'text-[var(--color-info-text)] dark:text-[var(--color-info-dark-text)]',
       bg: 'bg-[var(--color-info-bg)] dark:bg-[var(--color-info-dark-bg)]'
     },
     {
-      label: 'Average Place Rating',
+      label: t('favorites.statAvgPlaceScore'),
       value: `${avgRating} ★`,
-      subtext: 'Average destination score',
+      subtext: t('favorites.subtextAvgPlaceScore'),
       icon: Star,
       color: 'text-[var(--color-warning-text)] dark:text-[var(--color-warning-dark-text)]',
       bg: 'bg-[var(--color-warning-bg)] dark:bg-[var(--color-warning-dark-bg)]'
     },
     {
-      label: 'Visited Conversion',
+      label: t('favorites.statConversionRate'),
       value: `${visitedPct}%`,
-      subtext: `${visitedCount} of ${total} marked visited`,
+      subtext: t('favorites.subtextConversionRate'),
       icon: CheckCircle2,
       color: 'text-[var(--color-success-text)] dark:text-[var(--color-success-dark-text)]',
       bg: 'bg-[var(--color-success-bg)] dark:bg-[var(--color-success-dark-bg)]'
@@ -357,10 +350,10 @@ export default function FavoritesAnalytics({ favorites: initialFavorites = [] })
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <h1 className="text-xl sm:text-2xl font-bold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] tracking-tight">
-              Favorite Places Analytics
+              {t('favorites.analyticsTitle', 'Favorites Analytics')}
             </h1>
             <p className="text-xs sm:text-sm text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mt-1">
-              Summary of saved places, traveler wishlists, and journey statuses
+              {t('favorites.analyticsSubtitle', 'Deep-dive engagement trends, category distributions, and traveler retention metrics')}
             </p>
           </div>
 
@@ -370,7 +363,7 @@ export default function FavoritesAnalytics({ favorites: initialFavorites = [] })
               className="flex items-center justify-center gap-1.5 md:gap-2 px-4 py-2 text-xs md:text-sm font-medium rounded-md border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] bg-[var(--color-white)] dark:bg-[var(--color-bg-dark)] hover:bg-gray-100 dark:hover:bg-gray-800 text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] shadow-xs transition-colors cursor-pointer shrink-0 w-full sm:w-auto"
             >
               <ArrowLeft className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
-              <span>Back to Favorites</span>
+              <span>{t('favorites.backToFavorites', 'Back to Favorites')}</span>
             </Link>
           </div>
         </div>
@@ -412,10 +405,10 @@ export default function FavoritesAnalytics({ favorites: initialFavorites = [] })
           <div className="flex items-center gap-2">
             <Filter className="w-4 h-4 text-[#003E83] dark:text-blue-400 shrink-0" />
             <span className="text-sm font-bold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">
-              Filter Analytics
+              {t('favorites.filterAnalytics')}
             </span>
             <span className="text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
-              ({total.toLocaleString()} records)
+              {t('favorites.recordsCount', { count: total.toLocaleString() })}
             </span>
           </div>
 
@@ -428,7 +421,7 @@ export default function FavoritesAnalytics({ favorites: initialFavorites = [] })
                 className="appearance-none w-full sm:w-auto pl-3.5 pr-8 py-2 border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] rounded-md bg-[var(--color-white)] dark:bg-[var(--color-bg-dark)] text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] text-xs md:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[var(--color-input)] focus:border-transparent cursor-pointer shadow-xs"
               >
                 {categories.map(cat => (
-                  <option key={cat} value={cat}>{cat === 'ALL' ? 'All Categories' : cat}</option>
+                  <option key={cat} value={cat}>{cat === 'ALL' ? t('favorites.filterAllCategories') : cat}</option>
                 ))}
               </select>
               <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--color-text-muted-light)] dark:text-[var(--color-text-secondary-dark)] pointer-events-none" />
@@ -441,9 +434,9 @@ export default function FavoritesAnalytics({ favorites: initialFavorites = [] })
                 onChange={(e) => setVisitFilter(e.target.value)}
                 className="appearance-none w-full sm:w-auto pl-3.5 pr-8 py-2 border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] rounded-md bg-[var(--color-white)] dark:bg-[var(--color-bg-dark)] text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] text-xs md:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[var(--color-input)] focus:border-transparent cursor-pointer shadow-xs"
               >
-                <option value="ALL">All Journey Status</option>
-                <option value="VISITED">Visited Places</option>
-                <option value="PLANNED">To Visit (Planned)</option>
+                <option value="ALL">{t('favorites.filterAllStatus')}</option>
+                <option value="VISITED">{t('favorites.filterVisited')}</option>
+                <option value="PLANNED">{t('favorites.filterToVisit')}</option>
               </select>
               <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--color-text-muted-light)] dark:text-[var(--color-text-secondary-dark)] pointer-events-none" />
             </div>
@@ -455,10 +448,10 @@ export default function FavoritesAnalytics({ favorites: initialFavorites = [] })
                 onChange={(e) => setTimeframe(e.target.value)}
                 className="appearance-none w-full sm:w-auto pl-3.5 pr-8 py-2 border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] rounded-md bg-[var(--color-white)] dark:bg-[var(--color-bg-dark)] text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] text-xs md:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[var(--color-input)] focus:border-transparent cursor-pointer shadow-xs"
               >
-                <option value="Year">Year</option>
-                <option value="Month">Month</option>
-                <option value="Week">Week</option>
-                <option value="Day">Day</option>
+                <option value="Year">{t('favorites.tfYear')}</option>
+                <option value="Month">{t('favorites.tfMonth')}</option>
+                <option value="Week">{t('favorites.tfWeek')}</option>
+                <option value="Day">{t('favorites.tfToday')}</option>
               </select>
               <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--color-text-muted-light)] dark:text-[var(--color-text-secondary-dark)] pointer-events-none" />
             </div>
@@ -470,7 +463,7 @@ export default function FavoritesAnalytics({ favorites: initialFavorites = [] })
                 className="flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-rose-600 hover:text-rose-700 dark:text-rose-400 dark:hover:text-rose-300 hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded-md cursor-pointer transition-colors"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
-                <span>Reset</span>
+                <span>{t('favorites.resetBtn')}</span>
               </button>
             )}
           </div>
@@ -479,7 +472,7 @@ export default function FavoritesAnalytics({ favorites: initialFavorites = [] })
 
       {/* 4. Balanced Side-by-Side Analytics Charts Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6 sm:mb-8">
-        {/* Chart 1: Wishlist Saves Velocity */}
+        {/* Chart 1: Favorites Growth & Retention */}
         <div className="bg-[var(--color-white)] dark:bg-[var(--color-bg-dark)] rounded-md shadow-xs border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] p-4 sm:p-5 flex flex-col justify-between">
           <div>
             {/* Header: Title + Volume Badge */}
@@ -487,14 +480,14 @@ export default function FavoritesAnalytics({ favorites: initialFavorites = [] })
               <div>
                 <h3 className="font-semibold text-sm md:text-base text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] flex items-center gap-2">
                   <Calendar className="w-4 h-4 text-[#003E83] dark:text-blue-400" />
-                  <span>Wishlist Saves Velocity ({timeframeLabel})</span>
+                  <span>{t('favorites.chartGrowthTitle', { timeframe: timeframeLabel })}</span>
                 </h3>
                 <p className="text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mt-0.5">
-                  Distribution of visited vs planned place saves
+                  {t('favorites.chartGrowthSubtitle')}
                 </p>
               </div>
               <span className="text-[11px] font-semibold px-2.5 py-1 rounded-md border border-blue-100 dark:border-blue-900/50 bg-blue-50 dark:bg-blue-950/40 text-[#003E83] dark:text-blue-400 shrink-0 self-start sm:self-center">
-                Total: {total.toLocaleString()} Saves
+                {t('favorites.totalSavedPill', { count: total.toLocaleString() })}
               </span>
             </div>
 
@@ -502,11 +495,11 @@ export default function FavoritesAnalytics({ favorites: initialFavorites = [] })
             <div className="flex items-center gap-3 sm:gap-4 flex-wrap mb-3 text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
               <span className="inline-flex items-center gap-1.5 font-medium">
                 <span className="w-2.5 h-2.5 rounded-xs bg-[#10b981]" />
-                <span>Visited (Completed)</span>
+                <span>{t('favorites.statusVisited')}</span>
               </span>
               <span className="inline-flex items-center gap-1.5 font-medium">
                 <span className="w-2.5 h-2.5 rounded-xs bg-[#3b82f6]" />
-                <span>To Visit (Planned)</span>
+                <span>{t('favorites.statusToVisit')}</span>
               </span>
             </div>
 
@@ -543,20 +536,20 @@ export default function FavoritesAnalytics({ favorites: initialFavorites = [] })
                           <div className="bg-[var(--color-white)] dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 p-2.5 rounded-md shadow-md text-xs space-y-1.5 min-w-[170px]">
                             <div className="flex items-center justify-between border-b border-gray-100 dark:border-zinc-800 pb-1">
                               <p className="font-bold text-gray-900 dark:text-zinc-100">{label}</p>
-                              <span className="text-[11px] font-semibold text-gray-500 dark:text-zinc-400">{totalM} {totalM === 1 ? 'save' : 'saves'}</span>
+                              <span className="text-[11px] font-semibold text-gray-500 dark:text-zinc-400">{totalM === 1 ? t('favorites.pillCountSingle') : t('favorites.pillCount', { count: totalM })}</span>
                             </div>
                             <div className="space-y-1 text-gray-600 dark:text-zinc-300">
                               <div className="flex items-center justify-between gap-3">
                                 <span className="flex items-center gap-1.5">
                                   <span className="w-2 h-2 rounded-xs bg-[#10b981]" />
-                                  Visited:
+                                  {t('favorites.statusVisited')}:
                                 </span>
                                 <span className="font-bold text-[#10b981]">{vCount}</span>
                               </div>
                               <div className="flex items-center justify-between gap-3">
                                 <span className="flex items-center gap-1.5">
                                   <span className="w-2 h-2 rounded-xs bg-[#3b82f6]" />
-                                  To Visit:
+                                  {t('favorites.statusToVisit')}:
                                 </span>
                                 <span className="font-bold text-[#3b82f6]">{pCount}</span>
                               </div>
@@ -567,8 +560,8 @@ export default function FavoritesAnalytics({ favorites: initialFavorites = [] })
                       return null;
                     }}
                   />
-                  <Bar dataKey="visited" stackId="status" fill="#10b981" radius={[0, 0, 0, 0]} name="Visited" barSize={16} isAnimationActive={true} animationDuration={800} />
-                  <Bar dataKey="planned" stackId="status" fill="#3b82f6" radius={[3, 3, 0, 0]} name="To Visit" barSize={16} isAnimationActive={true} animationDuration={800} />
+                  <Bar dataKey="visited" stackId="status" fill="#10b981" radius={[0, 0, 0, 0]} name={t('favorites.statusVisited')} barSize={16} isAnimationActive={true} animationDuration={800} />
+                  <Bar dataKey="planned" stackId="status" fill="#3b82f6" radius={[3, 3, 0, 0]} name={t('favorites.statusToVisit')} barSize={16} isAnimationActive={true} animationDuration={800} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -578,30 +571,30 @@ export default function FavoritesAnalytics({ favorites: initialFavorites = [] })
           <div className="mt-3 pt-2.5 border-t border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] grid grid-cols-3 gap-2 text-center">
             <div className="p-1.5 sm:p-2 rounded-md bg-[var(--color-surface-hover-light)] dark:bg-[var(--color-surface-hover-dark)]/50 border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]">
               <p className="text-xs sm:text-sm font-bold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">{timeframeLabel}</p>
-              <p className="text-[10px] sm:text-[11px] text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] truncate">Timeframe</p>
+              <p className="text-[10px] sm:text-[11px] text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] truncate">{t('favorites.statAvgRating')}</p>
             </div>
             <div className="p-1.5 sm:p-2 rounded-md bg-[var(--color-surface-hover-light)] dark:bg-[var(--color-surface-hover-dark)]/50 border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]">
               <p className="text-xs sm:text-sm font-bold text-[#003E83] dark:text-blue-400">{total.toLocaleString()}</p>
-              <p className="text-[10px] sm:text-[11px] text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] truncate">Total Saves</p>
+              <p className="text-[10px] sm:text-[11px] text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] truncate">{t('favorites.statTotalFavorites')}</p>
             </div>
             <div className="p-1.5 sm:p-2 rounded-md bg-[var(--color-success-bg)] dark:bg-[var(--color-success-dark-bg)] border border-[var(--color-success-border)] dark:border-[var(--color-success-dark-border)]">
               <p className="text-xs sm:text-sm font-bold text-[var(--color-success-text)] dark:text-[var(--color-success-dark-text)]">{visitedPct}%</p>
-              <p className="text-[10px] sm:text-[11px] text-[var(--color-success-text)] dark:text-[var(--color-success-dark-text)] truncate">Conversion</p>
+              <p className="text-[10px] sm:text-[11px] text-[var(--color-success-text)] dark:text-[var(--color-success-dark-text)] truncate">{t('favorites.statConversionRate')}</p>
             </div>
           </div>
         </div>
 
-        {/* Chart 2: Journey Conversion & Category Hub */}
+        {/* Chart 2: Category Distribution & Visit Conversion */}
         <div className="bg-[var(--color-white)] dark:bg-[var(--color-bg-dark)] rounded-md shadow-sm border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] p-5 flex flex-col justify-between h-full">
           <div>
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3 pb-3 border-b border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]">
               <div>
                 <h3 className="font-semibold text-sm md:text-base text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] flex items-center gap-2">
                   <Compass className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                  <span>Journey Conversion & Category Hub</span>
+                  <span>{t('favorites.chartCategoryTitle')}</span>
                 </h3>
                 <p className="text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
-                  Wishlist breakdown by category and trip completion status
+                  {t('favorites.chartCategorySubtitle')}
                 </p>
               </div>
               <div className="flex items-center gap-1 bg-gray-100 dark:bg-zinc-800/80 p-0.5 rounded-md border border-gray-200/50 dark:border-zinc-700/50 self-start sm:self-auto">
@@ -614,7 +607,7 @@ export default function FavoritesAnalytics({ favorites: initialFavorites = [] })
                       : 'text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] hover:text-gray-900 dark:hover:text-white'
                   }`}
                 >
-                  By Category
+                  {t('favorites.tabByCategory')}
                 </button>
                 <button
                   type="button"
@@ -625,17 +618,17 @@ export default function FavoritesAnalytics({ favorites: initialFavorites = [] })
                       : 'text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] hover:text-gray-900 dark:hover:text-white'
                   }`}
                 >
-                  Journey Status
+                  {t('favorites.tabByStatus')}
                 </button>
               </div>
             </div>
 
-            {/* Donut Chart Container (Modeled identically to CategoryDistribution) */}
+            {/* Donut Chart Container */}
             <div className="relative h-[250px] w-full flex items-center justify-center my-1">
               {total === 0 ? (
                 <div className="h-full flex flex-col items-center justify-center text-gray-400 text-xs">
                   <Compass className="w-8 h-8 mb-2 stroke-1 text-gray-300 dark:text-zinc-600" />
-                  <p>No favorites recorded yet</p>
+                  <p>{t('favorites.noFavoritesRecorded')}</p>
                 </div>
               ) : (
                 <>
@@ -645,7 +638,7 @@ export default function FavoritesAnalytics({ favorites: initialFavorites = [] })
                       {favoritesChartTab === 'category' ? total.toLocaleString() : `${visitedPct}%`}
                     </span>
                     <span className="text-[11px] text-gray-500 dark:text-zinc-400 font-medium">
-                      {favoritesChartTab === 'category' ? 'Total Favorites' : 'Conversion Rate'}
+                      {favoritesChartTab === 'category' ? t('favorites.statTotalFavorites') : t('favorites.statConversionRate')}
                     </span>
                   </div>
 
@@ -702,7 +695,7 @@ export default function FavoritesAnalytics({ favorites: initialFavorites = [] })
                                   </p>
                                   <div className="flex items-center gap-3 pt-1 border-t border-gray-100 dark:border-zinc-800">
                                     <span className="text-gray-900 dark:text-zinc-100 font-bold">
-                                      {data.count.toLocaleString()} {data.count === 1 ? 'place' : 'places'}
+                                      {data.count === 1 ? t('favorites.pillCountSingle') : t('favorites.pillCount', { count: data.count.toLocaleString() })}
                                     </span>
                                     <span className="text-emerald-600 dark:text-emerald-400 font-semibold">
                                       ({data.percentage}%)
@@ -721,7 +714,7 @@ export default function FavoritesAnalytics({ favorites: initialFavorites = [] })
               )}
             </div>
 
-            {/* Legend / Breakdown Grid (CategoryDistribution design) */}
+            {/* Legend / Breakdown Grid */}
             <div className="grid grid-cols-2 gap-x-3 gap-y-2 pt-2 border-t border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]">
               {favoritesChartTab === 'category' ? (
                 <>
@@ -739,7 +732,7 @@ export default function FavoritesAnalytics({ favorites: initialFavorites = [] })
                     </div>
                   ))}
                   {categoryData.length === 0 && (
-                    <p className="text-xs text-gray-400 col-span-2 text-center py-2">No category records found</p>
+                    <p className="text-xs text-gray-400 col-span-2 text-center py-2">{t('favorites.noFavoritesRecorded')}</p>
                   )}
                 </>
               ) : (
@@ -761,18 +754,18 @@ export default function FavoritesAnalytics({ favorites: initialFavorites = [] })
                     <div className="flex items-center gap-1.5 min-w-0 pr-1">
                       <span className="w-2.5 h-2.5 rounded-full shrink-0 bg-purple-500" />
                       <span className="text-gray-700 dark:text-zinc-300 font-medium truncate text-[11px]">
-                        Active Travelers
+                        {t('favorites.statUniqueTravelers')}
                       </span>
                     </div>
                     <span className="text-purple-600 dark:text-purple-400 text-[10px] font-semibold shrink-0">
-                      {uniqueUsers} <span className="font-normal text-gray-400">(Wishlists)</span>
+                      {uniqueUsers}
                     </span>
                   </div>
                   <div className="flex items-center justify-between text-xs min-w-0">
                     <div className="flex items-center gap-1.5 min-w-0 pr-1">
                       <span className="w-2.5 h-2.5 rounded-full shrink-0 bg-amber-500" />
                       <span className="text-gray-700 dark:text-zinc-300 font-medium truncate text-[11px]">
-                        Avg Rating
+                        {t('favorites.statAvgPlaceScore')}
                       </span>
                     </div>
                     <span className="text-amber-600 dark:text-amber-400 text-[10px] font-semibold shrink-0">
@@ -786,22 +779,22 @@ export default function FavoritesAnalytics({ favorites: initialFavorites = [] })
         </div>
       </div>
 
-      {/* 5. Cumulative Wishlist Growth & Save Trajectory Line Chart (Modeled after UserGrowthChart) */}
+      {/* 5. Cumulative Wishlist Growth & Save Trajectory Line Chart */}
       <div className="w-full bg-[var(--color-white)] dark:bg-[var(--color-bg-dark)] rounded-md shadow-xs border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] p-4 sm:p-6 mb-6 sm:mb-8 transition-opacity duration-200">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 pb-3 border-b border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]">
           <div>
             <h3 className="font-semibold text-sm md:text-base text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] flex items-center gap-2">
               <TrendingUp className="w-4 h-4 text-[#003E83] dark:text-blue-400" />
-              <span>Cumulative Wishlist Growth & Save Trajectory ({timeframeLabel})</span>
+              <span>{t('favorites.cumulativeGrowthTitle')} ({timeframeLabel})</span>
             </h3>
             <p className="text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mt-0.5">
-              Overall wishlist accumulation vs new traveler saves from database
+              {t('favorites.cumulativeGrowthSubtitle')}
             </p>
           </div>
           <div className="flex items-center gap-2">
             <span className="flex items-center gap-1.5 text-xs font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-3 py-1.5 rounded-md border border-emerald-200 dark:border-emerald-900/50">
               <Heart className="w-3.5 h-3.5 fill-rose-500 text-rose-500" />
-              <span>Total Saved: {total.toLocaleString()} Places ({uniqueUsers} Travelers)</span>
+              <span>{t('favorites.totalSavedPill', { count: total.toLocaleString() })}</span>
             </span>
           </div>
         </div>
@@ -820,21 +813,21 @@ export default function FavoritesAnalytics({ favorites: initialFavorites = [] })
                     return (
                       <div className="bg-[var(--color-white)] dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 p-3 rounded-md shadow-md text-xs space-y-1.5 min-w-[200px]">
                         <div className="flex items-center justify-between border-b border-gray-100 dark:border-zinc-800 pb-1">
-                          <p className="font-bold text-gray-900 dark:text-zinc-100">{label} {timeframe !== 'ALL' ? timeframe : ''}</p>
-                          <span className="text-[11px] font-semibold text-gray-500 dark:text-zinc-400">{newSavesVal} new saves</span>
+                          <p className="font-bold text-gray-900 dark:text-zinc-100">{label} {timeframe !== 'ALL' ? timeframeLabel : ''}</p>
+                          <span className="text-[11px] font-semibold text-gray-500 dark:text-zinc-400">{newSavesVal === 1 ? t('favorites.pillCountSingle') : t('favorites.pillCount', { count: newSavesVal })}</span>
                         </div>
                         <div className="space-y-1.5">
                           <div className="flex items-center justify-between gap-3 text-gray-600 dark:text-zinc-300">
                             <span className="flex items-center gap-1.5 font-medium">
                               <span className="w-2.5 h-1 bg-[#4472C4] rounded-full" />
-                              Cumulative Wishlist:
+                              {t('favorites.cumulativeGrowthTitle')}:
                             </span>
                             <span className="font-bold text-[#4472C4]">{cumVal}</span>
                           </div>
                           <div className="flex items-center justify-between gap-3 text-gray-600 dark:text-zinc-300">
                             <span className="flex items-center gap-1.5 font-medium">
                               <span className="w-2.5 h-1 bg-[#ED7D31] rounded-full" />
-                              Monthly New Saves:
+                              {t('favorites.statTotalSaved')}:
                             </span>
                             <span className="font-bold text-[#ED7D31]">{newSavesVal}</span>
                           </div>
@@ -854,7 +847,7 @@ export default function FavoritesAnalytics({ favorites: initialFavorites = [] })
               <Line
                 type="monotone"
                 dataKey="cumulative"
-                name="Cumulative Wishlist"
+                name={t('favorites.cumulativeGrowthTitle')}
                 stroke="#4472C4"
                 strokeWidth={3}
                 dot={{ r: 3, fill: '#4472C4' }}
@@ -866,7 +859,7 @@ export default function FavoritesAnalytics({ favorites: initialFavorites = [] })
               <Line
                 type="monotone"
                 dataKey="newSaves"
-                name="Monthly New Saves"
+                name={t('favorites.statTotalSaved')}
                 stroke="#ED7D31"
                 strokeWidth={3}
                 dot={{ r: 3, fill: '#ED7D31' }}

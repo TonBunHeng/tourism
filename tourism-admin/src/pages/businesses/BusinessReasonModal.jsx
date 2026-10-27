@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { AlertTriangle } from 'lucide-react';
+import { useLanguage } from '../../i18n';
 
 export default function BusinessReasonModal({
   isOpen,
   onClose,
   onSubmit,
-  title = 'Provide Reason',
+  title = '',
   subtitle = '',
   actionType = 'reject', // 'reject' | 'suspend'
   businessName = ''
 }) {
+  const { t } = useLanguage();
   const [reason, setReason] = useState('');
   const [error, setError] = useState('');
 
@@ -35,19 +37,19 @@ export default function BusinessReasonModal({
     if (isOpen) {
       setReason(
         actionType === 'reject'
-          ? 'Documentation requirements incomplete or invalid license verification details provided.'
-          : 'Profile flagged for review due to policy non-compliance.'
+          ? t('businesses.defaultRejectReason', 'Documentation requirements incomplete or invalid license verification details provided.')
+          : t('businesses.defaultSuspendReason', 'Profile flagged for review due to policy non-compliance.')
       );
       setError('');
     }
-  }, [isOpen, actionType]);
+  }, [isOpen, actionType, t]);
 
   if (!isOpen) return null;
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!reason.trim()) {
-      setError('Please enter a valid explanation reason before continuing.');
+      setError(t('businesses.reasonRequired', 'Please enter a valid explanation reason before continuing.'));
       return;
     }
     onSubmit(reason.trim());
@@ -55,6 +57,10 @@ export default function BusinessReasonModal({
   };
 
   const isReject = actionType === 'reject';
+  const modalTitle = title || (isReject ? t('businesses.rejectModalTitle', 'Reject Business Profile') : t('businesses.suspendModalTitle', 'Suspend Business Profile'));
+  const modalSubtitle = subtitle || (isReject
+    ? t('businesses.rejectSubtitle', 'Please state the reason for rejecting "{name}".').replace('{name}', businessName)
+    : t('businesses.suspendSubtitle', 'Provide operational justification for suspending "{name}".').replace('{name}', businessName));
 
   return createPortal(
     <div
@@ -83,18 +89,18 @@ export default function BusinessReasonModal({
 
         {/* Title */}
         <h3 id="alert-reason-title" className="text-lg font-bold text-gray-900 dark:text-white text-center mb-1 tracking-tight">
-          {title}
+          {modalTitle}
         </h3>
 
         {/* Subtitle */}
         <p className="text-sm text-gray-500 dark:text-zinc-400 text-center mb-5 leading-relaxed px-1">
-          {subtitle || (isReject ? `Please state the reason for rejecting "${businessName}".` : `Provide operational justification for suspending "${businessName}".`)}
+          {modalSubtitle}
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-xs font-semibold text-gray-700 dark:text-zinc-300 mb-1.5 uppercase tracking-wider text-left">
-              {isReject ? 'Rejection Reason' : 'Suspension Justification'} <span className="text-red-500">*</span>
+              {isReject ? t('businesses.rejectionReason', 'Rejection Reason') : t('businesses.suspensionJustification', 'Suspension Justification')} <span className="text-red-500">*</span>
             </label>
             <textarea
               rows={3}
@@ -103,15 +109,15 @@ export default function BusinessReasonModal({
                 setReason(e.target.value);
                 if (error) setError('');
               }}
-              placeholder="Enter explanation details for the business owner..."
+              placeholder={t('businesses.reasonPlaceholder', 'Enter explanation details for the business owner...')}
               className="w-full p-3 bg-gray-50 dark:bg-zinc-800/80 border border-gray-200 dark:border-zinc-700 rounded-md text-xs text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[var(--color-input)] transition-all resize-none"
             />
             {error && <p className="text-xs text-red-500 font-medium mt-1 text-left">{error}</p>}
           </div>
 
           <div className="bg-gray-50 dark:bg-zinc-800/40 p-3 rounded-md border border-gray-100 dark:border-zinc-800 text-[11px] text-gray-500 dark:text-zinc-400 text-left">
-            <span className="font-semibold text-gray-700 dark:text-zinc-300">Note: </span>
-            This message will be sent to the business owner&apos;s registered email address and updated in administrative audit logs.
+            <span className="font-semibold text-gray-700 dark:text-zinc-300">{t('common.note', 'Note')}: </span>
+            {t('businesses.auditNotice', "This message will be sent to the business owner's registered email address and updated in administrative audit logs.")}
           </div>
 
           {/* Action Buttons */}
@@ -121,7 +127,7 @@ export default function BusinessReasonModal({
               onClick={onClose}
               className="flex-1 py-2.5 px-4 border border-gray-300 dark:border-zinc-800 bg-transparent hover:bg-gray-100 dark:hover:bg-zinc-800/80 text-gray-700 dark:text-zinc-300 font-medium rounded-md transition-colors cursor-pointer text-sm"
             >
-              Cancel
+              {t('common.cancel', 'Cancel')}
             </button>
             <button
               type="submit"
@@ -131,7 +137,7 @@ export default function BusinessReasonModal({
                   : 'bg-amber-500 hover:bg-amber-600 active:scale-[0.98]'
               }`}
             >
-              Confirm {isReject ? 'Rejection' : 'Suspension'}
+              {isReject ? t('businesses.confirmRejection', 'Confirm Rejection') : t('businesses.confirmSuspension', 'Confirm Suspension')}
             </button>
           </div>
         </form>

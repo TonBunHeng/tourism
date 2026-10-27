@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { X, Sparkles, MapPin, Clock, DollarSign, Users, Image as ImageIcon } from 'lucide-react';
+import { useLanguage } from '../../i18n';
 
 const DESTINATIONS = [
   'Siem Reap',
@@ -25,12 +26,24 @@ const TOUR_CATEGORIES = [
   'Religious & Spiritual'
 ];
 
+const categoryKeyMap = {
+  'Cultural & Heritage': 'catCultural',
+  'Eco Tourism & Nature': 'catEco',
+  'Adventure & Trekking': 'catAdventure',
+  'Culinary & Food Tour': 'catCulinary',
+  'Beach & Island Excursion': 'catBeach',
+  'Historical & War History': 'catHistorical',
+  'Religious & Spiritual': 'catReligious',
+};
+
 export default function TourModal({
   isOpen,
   onClose,
   editingTour = null,
   onSubmit
 }) {
+  const { t } = useLanguage();
+
   const [formData, setFormData] = useState({
     title: '',
     destination: 'Siem Reap',
@@ -86,6 +99,8 @@ export default function TourModal({
         document.body.style.overflow = 'unset';
         window.removeEventListener('keydown', handleKeyDown);
       };
+    } else {
+      document.body.style.overflow = 'unset';
     }
   }, [isOpen, onClose]);
 
@@ -101,9 +116,9 @@ export default function TourModal({
   const handleSubmit = async (e) => {
     e.preventDefault();
     const newErrors = {};
-    if (!formData.title.trim()) newErrors.title = 'Tour title is required';
+    if (!formData.title.trim()) newErrors.title = t('tours.titleRequired', 'Tour title is required');
     if (!formData.price_per_person || Number(formData.price_per_person) <= 0) {
-      newErrors.price_per_person = 'Valid price per person is required';
+      newErrors.price_per_person = t('tours.priceRequired', 'Valid price per person is required');
     }
 
     if (Object.keys(newErrors).length > 0) {
@@ -141,10 +156,10 @@ export default function TourModal({
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-lg md:text-xl font-bold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">
-                {editingTour ? 'Edit Tour Package' : 'Create New Tour Package'}
+                {editingTour ? t('tours.editModalTitle', 'Edit Tour Package') : t('tours.createModalTitle', 'Create New Tour Package')}
               </h2>
               <p className="text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mt-0.5">
-                Set package itinerary, pricing, duration, and group capacity
+                {t('tours.modalSubtitle', 'Set package itinerary, pricing, duration, and group capacity')}
               </p>
             </div>
             <button
@@ -163,13 +178,13 @@ export default function TourModal({
             {/* Tour Title */}
             <div>
               <label className="block text-xs font-semibold text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">
-                Package Title <span className="text-rose-500">*</span>
+                {t('tours.packageTitle', 'Package Title')} <span className="text-rose-500">*</span>
               </label>
               <input
                 type="text"
                 value={formData.title}
                 onChange={(e) => handleChange('title', e.target.value)}
-                placeholder="e.g. Angkor Sunrise & Floating Village Day Tour"
+                placeholder={t('tours.titlePlaceholder', 'e.g. Angkor Sunrise & Floating Village Day Tour')}
                 className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--color-input)] focus:border-transparent bg-[var(--color-white)] dark:bg-[var(--color-bg-dark)] text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] text-sm ${
                   errors.title ? 'border-rose-400 ring-rose-200' : 'border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]'
                 }`}
@@ -181,7 +196,7 @@ export default function TourModal({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-semibold text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">
-                  Primary Destination <span className="text-rose-500">*</span>
+                  {t('tours.primaryDestination', 'Primary Destination')} <span className="text-rose-500">*</span>
                 </label>
                 <select
                   value={formData.destination}
@@ -196,7 +211,7 @@ export default function TourModal({
 
               <div>
                 <label className="block text-xs font-semibold text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">
-                  Tour Category <span className="text-rose-500">*</span>
+                  {t('tours.tourCategory', 'Tour Category')} <span className="text-rose-500">*</span>
                 </label>
                 <select
                   value={formData.category}
@@ -204,7 +219,9 @@ export default function TourModal({
                   className="w-full px-3 py-2 border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--color-input)] focus:border-transparent bg-[var(--color-white)] dark:bg-[var(--color-bg-dark)] text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] text-sm cursor-pointer"
                 >
                   {TOUR_CATEGORIES.map((c) => (
-                    <option key={c} value={c}>{c}</option>
+                    <option key={c} value={c}>
+                      {t(`tours.${categoryKeyMap[c] || c}`, c)}
+                    </option>
                   ))}
                 </select>
               </div>
@@ -214,27 +231,27 @@ export default function TourModal({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-semibold text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">
-                  Duration (e.g. 1 Day, 3 Days) <span className="text-rose-500">*</span>
+                  {t('tours.duration', 'Duration (e.g. 1 Day, 3 Days)')} <span className="text-rose-500">*</span>
                 </label>
                 <input
                   type="text"
                   value={formData.duration}
                   onChange={(e) => handleChange('duration', e.target.value)}
-                  placeholder="1 Full Day or 3 Days / 2 Nights"
+                  placeholder={t('tours.durationPlaceholder', '1 Full Day or 3 Days / 2 Nights')}
                   className="w-full px-3 py-2 border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--color-input)] focus:border-transparent bg-[var(--color-white)] dark:bg-[var(--color-bg-dark)] text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] text-sm"
                 />
               </div>
 
               <div>
                 <label className="block text-xs font-semibold text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">
-                  Price / Person (USD) <span className="text-rose-500">*</span>
+                  {t('tours.pricePerPerson', 'Price / Person (USD)')} <span className="text-rose-500">*</span>
                 </label>
                 <input
                   type="number"
                   min="1"
                   value={formData.price_per_person}
                   onChange={(e) => handleChange('price_per_person', e.target.value)}
-                  placeholder="60"
+                  placeholder={t('tours.pricePlaceholder', '60')}
                   className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--color-input)] focus:border-transparent bg-[var(--color-white)] dark:bg-[var(--color-bg-dark)] text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] text-sm ${
                     errors.price_per_person ? 'border-rose-400' : 'border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]'
                   }`}
@@ -247,29 +264,29 @@ export default function TourModal({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-semibold text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">
-                  Max Travelers (Group Size)
+                  {t('tours.maxTravelers', 'Max Travelers (Group Size)')}
                 </label>
                 <input
                   type="number"
                   min="1"
                   value={formData.max_travelers}
                   onChange={(e) => handleChange('max_travelers', e.target.value)}
-                  placeholder="12"
+                  placeholder={t('tours.maxTravelersPlaceholder', '12')}
                   className="w-full px-3 py-2 border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--color-input)] focus:border-transparent bg-[var(--color-white)] dark:bg-[var(--color-bg-dark)] text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] text-sm"
                 />
               </div>
 
               <div>
                 <label className="block text-xs font-semibold text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">
-                  Publish Status
+                  {t('tours.publishStatus', 'Publish Status')}
                 </label>
                 <select
                   value={formData.status}
                   onChange={(e) => handleChange('status', e.target.value)}
                   className="w-full px-3 py-2 border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--color-input)] focus:border-transparent bg-[var(--color-white)] dark:bg-[var(--color-bg-dark)] text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] text-sm cursor-pointer"
                 >
-                  <option value="active">Active & Published</option>
-                  <option value="draft">Draft (Unlisted)</option>
+                  <option value="active">{t('tours.statusActivePublished', 'Active & Published')}</option>
+                  <option value="draft">{t('tours.statusDraftUnlisted', 'Draft (Unlisted)')}</option>
                 </select>
               </div>
             </div>
@@ -277,13 +294,13 @@ export default function TourModal({
             {/* Cover Image URL */}
             <div>
               <label className="block text-xs font-semibold text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">
-                Cover Image URL
+                {t('tours.coverImageUrl', 'Cover Image URL')}
               </label>
               <input
                 type="url"
                 value={formData.cover_image}
                 onChange={(e) => handleChange('cover_image', e.target.value)}
-                placeholder="https://images.unsplash.com/photo-..."
+                placeholder={t('tours.imagePlaceholder', 'https://images.unsplash.com/photo-...')}
                 className="w-full px-3 py-2 border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--color-input)] focus:border-transparent bg-[var(--color-white)] dark:bg-[var(--color-bg-dark)] text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] text-sm"
               />
             </div>
@@ -291,13 +308,13 @@ export default function TourModal({
             {/* Description */}
             <div>
               <label className="block text-xs font-semibold text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">
-                Description & Itinerary Highlights
+                {t('tours.descriptionHighlights', 'Description & Itinerary Highlights')}
               </label>
               <textarea
                 rows={3}
                 value={formData.description}
                 onChange={(e) => handleChange('description', e.target.value)}
-                placeholder="Detailed itinerary breakdown, inclusions (water, transport, guide), and departure highlights..."
+                placeholder={t('tours.descPlaceholder', 'Detailed itinerary breakdown, inclusions (water, transport, guide), and departure highlights...')}
                 className="w-full px-3 py-2 border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--color-input)] focus:border-transparent bg-[var(--color-white)] dark:bg-[var(--color-bg-dark)] text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] text-sm resize-none"
               />
             </div>
@@ -311,14 +328,14 @@ export default function TourModal({
               disabled={isSubmitting}
               className="px-4 py-2 border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] rounded-md text-xs font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] hover:bg-[var(--color-surface-hover-light)] dark:hover:bg-[var(--color-surface-hover-dark)] transition-colors cursor-pointer"
             >
-              Cancel
+              {t('common.cancel', 'Cancel')}
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
               className="px-4 py-2 bg-[#003E83] hover:bg-[#002e62] text-white rounded-md text-xs font-medium transition-colors shadow-xs cursor-pointer flex items-center gap-1.5"
             >
-              <span>{editingTour ? 'Save Changes' : 'Create Package'}</span>
+              <span>{editingTour ? t('tours.saveChangesBtn', 'Save Changes') : t('tours.createPackageBtn', 'Create Package')}</span>
             </button>
           </div>
         </form>

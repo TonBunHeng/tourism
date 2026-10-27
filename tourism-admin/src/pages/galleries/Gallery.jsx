@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import SimplePagination from "../../components/common/SimplePagination";
 import GalleryHeader from "./GalleryHeader";
 import GalleryStats from "./GalleryStats";
@@ -14,8 +14,10 @@ import authService, { isSuperAdminRole } from "../../services/authService";
 import { useAlert } from "../../context/AlertContext";
 import { useSearch } from "../../context/SearchContext";
 import { getPageCache, setPageCache } from "../../utils/pageCache";
+import { useLanguage } from "../../i18n";
 
 export default function Gallery() {
+  const { t } = useLanguage();
   const { showConfirm, showSuccess, showError } = useAlert();
   const { searchTerm, setSearchTerm } = useSearch();
   const currentUser = authService.getCurrentUser();
@@ -53,7 +55,7 @@ export default function Gallery() {
     }
   };
 
-  const loadMedia = async () => {
+  const loadMedia = useCallback(async () => {
     if (!cachedGallery && mediaItems.length === 0) {
       setIsLoading(true);
     }
@@ -100,7 +102,7 @@ export default function Gallery() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [currentPage, searchTerm, selectedCategory, selectedType, itemsPerPage, cachedGallery, mediaItems.length]);
 
   useEffect(() => {
     loadCategories();
@@ -112,7 +114,7 @@ export default function Gallery() {
 
   useEffect(() => {
     loadMedia();
-  }, [currentPage, searchTerm, selectedCategory, selectedType]);
+  }, [loadMedia]);
 
   const handleSearchChange = (val) => { setSearchTerm(val); setCurrentPage(1); };
   const handleCategoryChange = (val) => { setSelectedCategory(val); setCurrentPage(1); };
@@ -127,9 +129,9 @@ export default function Gallery() {
 
     if (isSuperAdmin) {
       const confirmed = await showConfirm({
-        title: 'Delete Media',
-        message: `Are you sure you want to permanently delete "${mediaTitle}"?\n\nThis action cannot be undone.`,
-        confirmText: 'Delete Permanently',
+        title: t('gallery.deleteMediaTitle', 'Delete Media'),
+        message: t('gallery.deletePermanentConfirm', 'Are you sure you want to permanently delete "{name}"?\n\nThis action cannot be undone.').replace('{name}', mediaTitle),
+        confirmText: t('gallery.deletePermanentBtn', 'Delete Permanently'),
         type: 'danger'
       });
 
@@ -137,18 +139,24 @@ export default function Gallery() {
 
       try {
         await galleryService.deleteMedia(id);
-        showSuccess(`Media "${mediaTitle}" has been permanently deleted.`, 'Media Deleted');
+        showSuccess(
+          t('gallery.deleteSuccessMsg', 'Media "{name}" has been permanently deleted.').replace('{name}', mediaTitle),
+          t('gallery.deleteSuccessTitle', 'Media Deleted')
+        );
         loadMedia();
       } catch (e) {
-        showError(e.message || 'Failed to delete media.', 'Delete Failed');
+        showError(
+          e.message || t('gallery.deleteFailedMsg', 'Failed to delete media.'),
+          t('gallery.deleteFailedTitle', 'Delete Failed')
+        );
       }
       return;
     }
 
     const confirmed = await showConfirm({
-      title: 'Submit Deletion Request',
-      message: `Are you sure you want to submit a deletion request for "${mediaTitle}"?\n\nThis will be submitted to the Super Administrator for review and approval.`,
-      confirmText: 'Submit Deletion',
+      title: t('gallery.deletionRequestTitle', 'Submit Deletion Request'),
+      message: t('gallery.deletionRequestMessage', 'Are you sure you want to submit a deletion request for "{name}"?\n\nThis will be submitted to the Super Administrator for review and approval.').replace('{name}', mediaTitle),
+      confirmText: t('gallery.submitDeletionBtn', 'Submit Deletion'),
       type: 'danger'
     });
 
@@ -157,7 +165,7 @@ export default function Gallery() {
     try {
       await deletionRequestService.createRequest({
         request_type: 'item',
-        reason: `Request to delete media item: ${mediaTitle}`,
+        reason: t('gallery.deletionRequestReason', 'Request to delete media item: {name}').replace('{name}', mediaTitle),
         urgency: 'low',
         items: [{
           item_type: 'gallery',
@@ -166,9 +174,15 @@ export default function Gallery() {
           category: item?.category || 'Gallery'
         }]
       });
-      showSuccess(`Deletion request for "${mediaTitle}" has been submitted to Super Admin for approval.`, 'Request Submitted');
+      showSuccess(
+        t('gallery.deletionRequestSuccessMsg', 'Deletion request for "{name}" has been submitted to Super Admin for approval.').replace('{name}', mediaTitle),
+        t('gallery.requestSubmittedTitle', 'Request Submitted')
+      );
     } catch (e) {
-      showError(e.message || 'Failed to submit deletion request.', 'Submission Failed');
+      showError(
+        e.message || t('gallery.submissionFailedMsg', 'Failed to submit deletion request.'),
+        t('gallery.submissionFailedTitle', 'Submission Failed')
+      );
     }
   };
 
@@ -197,10 +211,16 @@ export default function Gallery() {
       });
       setIsEditOpen(false);
       setEditingMedia(null);
-      showSuccess(`Media item "${editingMedia.title}" has been updated successfully.`, 'Media Updated');
+      showSuccess(
+        t('gallery.mediaUpdatedSuccess', 'Media item "{name}" has been updated successfully.').replace('{name}', editingMedia.title),
+        t('gallery.mediaUpdatedTitle', 'Media Updated')
+      );
       loadMedia();
     } catch (err) {
-      showError(err.message || "Failed to update media item.", 'Update Failed');
+      showError(
+        err.message || t('gallery.updateFailedMsg', "Failed to update media item."),
+        t('gallery.updateFailedTitle', 'Update Failed')
+      );
     }
   };
 
@@ -216,10 +236,16 @@ export default function Gallery() {
         status: newMedia.status || "Published"
       });
       setIsUploadModalOpen(false);
-      showSuccess(`Media item "${newMedia.title}" has been created and published successfully.`, 'Media Uploaded');
+      showSuccess(
+        t('gallery.mediaUploadedSuccess', 'Media item "{name}" has been created and published successfully.').replace('{name}', newMedia.title),
+        t('gallery.mediaUploadedTitle', 'Media Uploaded')
+      );
       loadMedia();
     } catch (err) {
-      showError(err.message || "Failed to create media item.", 'Upload Failed');
+      showError(
+        err.message || t('gallery.uploadFailedMsg', "Failed to create media item."),
+        t('gallery.uploadFailedTitle', 'Upload Failed')
+      );
     }
   };
 
@@ -247,7 +273,7 @@ export default function Gallery() {
         {/* Content View */}
         {isLoading ? (
           <div className="p-12 text-center text-slate-500 dark:text-zinc-400 font-medium">
-            Loading gallery media from database...
+            {t('gallery.loadingMedia', 'Loading gallery media from database...')}
           </div>
         ) : (
           <GalleryList
@@ -268,7 +294,7 @@ export default function Gallery() {
           startIndex={startIndex}
           endIndex={endIndex}
           totalRecords={totalRecords}
-          label="media items"
+          label={t('gallery.paginationLabel', 'media items')}
         />
       </div>
 

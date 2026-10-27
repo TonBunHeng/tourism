@@ -2,7 +2,6 @@ import React, { useEffect } from 'react';
 import {
   X,
   MapPin,
-  Star,
   Clock,
   DollarSign,
   Compass,
@@ -18,6 +17,7 @@ import {
   Heart
 } from 'lucide-react';
 import { renderStars } from '../../utils/StatusUtils';
+import { useLanguage } from '../../i18n';
 
 export default function FavoriteDetailsModal({
   isOpen = false,
@@ -27,6 +27,8 @@ export default function FavoriteDetailsModal({
   onToggleStatus,
   onDelete
 }) {
+  const { t } = useLanguage();
+
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === 'Escape') onClose?.();
@@ -50,13 +52,13 @@ export default function FavoriteDetailsModal({
   const tagsList = Array.isArray(favorite.tags) ? favorite.tags : [];
 
   const userInfo = favorite.user || {};
-  const userName = userInfo.name || favorite.user_name || 'Traveler';
+  const userName = userInfo.name || favorite.user_name || t('favorites.anonymousTraveler');
   const userAvatar = userInfo.avatar || favorite.user_avatar || null;
   const userEmail = userInfo.email || favorite.user_email || 'user@angkorverses.com';
   const userPhone = userInfo.phone || 'Not provided';
   const userRole = userInfo.role || 'User';
   const userVerified = Boolean(userInfo.verified);
-  const savedDate = favorite.saved_date || (favorite.created_at ? new Date(favorite.created_at).toLocaleDateString() : 'Recent');
+  const savedDate = favorite.saved_date || (favorite.created_at ? new Date(favorite.created_at).toLocaleDateString() : '');
 
   const handleToggle = (id) => {
     if (onToggleVisited) onToggleVisited(id);
@@ -78,7 +80,6 @@ export default function FavoriteDetailsModal({
         className="bg-[var(--color-white)] dark:bg-[var(--color-bg-dark-modal)] rounded-md max-w-2xl w-full max-h-[90vh] shadow-2xl border border-gray-200 dark:border-zinc-800 overflow-hidden flex flex-col animate-alert-popup"
         onClick={(e) => e.stopPropagation()}
       >
-        
         {/* Modal Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] shrink-0">
           <div className="flex items-center gap-3">
@@ -87,10 +88,10 @@ export default function FavoriteDetailsModal({
             </div>
             <div>
               <h3 className="text-base md:text-lg font-bold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">
-                Favorite Place Details
+                {t('favorites.modalTitle')}
               </h3>
               <p className="text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
-                Saved destination record #{favorite.id}
+                {t('favorites.idLabel', { id: favorite.id })}
               </p>
             </div>
           </div>
@@ -99,7 +100,7 @@ export default function FavoriteDetailsModal({
             type="button"
             onClick={onClose}
             className="p-1.5 text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] hover:text-[var(--color-text-primary-light)] dark:hover:text-[var(--color-white)] hover:bg-[var(--color-surface-hover-light)] dark:hover:bg-[var(--color-surface-hover-dark)] rounded-md transition-colors cursor-pointer"
-            title="Close"
+            title={t('favorites.btnClose')}
           >
             <X className="w-5 h-5" />
           </button>
@@ -142,11 +143,11 @@ export default function FavoriteDetailsModal({
               >
                 {isVisited ? (
                   <>
-                    <CheckCircle2 className="w-3.5 h-3.5" /> Visited
+                    <CheckCircle2 className="w-3.5 h-3.5" /> {t('favorites.statusVisited')}
                   </>
                 ) : (
                   <>
-                    <Clock className="w-3.5 h-3.5" /> To Visit
+                    <Clock className="w-3.5 h-3.5" /> {t('favorites.statusToVisit')}
                   </>
                 )}
               </span>
@@ -167,7 +168,7 @@ export default function FavoriteDetailsModal({
           {/* Favorited By (Traveler / User Info Section) */}
           <div className="p-4 rounded-md bg-[var(--color-info-bg)]/40 dark:bg-[var(--color-info-dark-bg)]/30 border border-[var(--color-info-border)]/50 dark:border-[var(--color-info-dark-border)]/50">
             <span className="text-xs font-bold uppercase tracking-wider text-[var(--color-info-text)] dark:text-[var(--color-info-dark-text)] flex items-center gap-1.5 mb-3">
-              <User className="w-4 h-4" /> Favorited By Traveler
+              <User className="w-4 h-4" /> {t('favorites.labelSavedUser')}
             </span>
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
               <div className="flex items-center gap-3">
@@ -205,9 +206,11 @@ export default function FavoriteDetailsModal({
               </div>
 
               <div className="flex sm:flex-col items-center sm:items-end gap-1 text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] shrink-0">
-                <span className="flex items-center gap-1 text-[var(--color-primary)] font-semibold">
-                  <Calendar className="w-3.5 h-3.5" /> Saved: {savedDate}
-                </span>
+                {savedDate && (
+                  <span className="flex items-center gap-1 text-[var(--color-primary)] font-semibold">
+                    <Calendar className="w-3.5 h-3.5" /> {t('favorites.savedDate', { date: savedDate })}
+                  </span>
+                )}
                 <span className="text-[11px] text-[var(--color-text-muted-light)] dark:text-[var(--color-text-secondary-dark)]">
                   Role: {userRole}
                 </span>
@@ -220,7 +223,7 @@ export default function FavoriteDetailsModal({
             {/* Rating & Reviews */}
             <div className="p-3.5 rounded-md bg-[var(--color-surface-hover-light)]/60 dark:bg-[var(--color-surface-hover-dark)]/40 border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]">
               <span className="text-[11px] font-semibold uppercase tracking-wider text-[var(--color-text-muted-light)] dark:text-[var(--color-text-secondary-dark)] block">
-                Destination Rating
+                {t('favorites.labelRating')}
               </span>
               <div className="flex items-center gap-1.5 mt-1.5">
                 {renderStars(favorite.rating || favorite.place?.rating)}
@@ -229,50 +232,52 @@ export default function FavoriteDetailsModal({
                 </span>
               </div>
               <p className="text-[11px] text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mt-1">
-                Based on {reviewsCount} traveler reviews
+                {t('favorites.reviewsCount', { count: reviewsCount })}
               </p>
             </div>
 
             {/* Best Visiting Time */}
             <div className="p-3.5 rounded-md bg-[var(--color-surface-hover-light)]/60 dark:bg-[var(--color-surface-hover-dark)]/40 border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]">
               <span className="text-[11px] font-semibold uppercase tracking-wider text-[var(--color-text-muted-light)] dark:text-[var(--color-text-secondary-dark)] block">
-                Best Visiting Time
+                {t('favorites.labelBestTime')}
               </span>
               <div className="flex items-center gap-1.5 mt-1.5 text-xs md:text-sm font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">
                 <Clock className="w-4 h-4 text-[var(--color-info-text)] shrink-0" />
                 <span className="truncate">{favorite.bestTime || favorite.best_time || 'Morning / Afternoon'}</span>
               </div>
               <p className="text-[11px] text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mt-1">
-                Duration: {favorite.duration || '2-3 Hours'}
+                {t('favorites.labelDuration')}: {favorite.duration || '2-3 Hours'}
               </p>
             </div>
 
             {/* Entry Price */}
             <div className="p-3.5 rounded-md bg-[var(--color-surface-hover-light)]/60 dark:bg-[var(--color-surface-hover-dark)]/40 border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]">
               <span className="text-[11px] font-semibold uppercase tracking-wider text-[var(--color-text-muted-light)] dark:text-[var(--color-text-secondary-dark)] block">
-                Entry & Price
+                {t('favorites.labelPrice')}
               </span>
               <div className="flex items-center gap-1 mt-1.5 text-xs md:text-sm font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">
                 <DollarSign className="w-4 h-4 text-[var(--color-success-text)] shrink-0" />
                 <span>{favorite.price || 'Free'}</span>
               </div>
               <p className="text-[11px] text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mt-1">
-                Ticket / Admission
+                {t('favorites.labelOverview')}
               </p>
             </div>
 
             {/* Travel Wishlist Status */}
             <div className="p-3.5 rounded-md bg-[var(--color-surface-hover-light)]/60 dark:bg-[var(--color-surface-hover-dark)]/40 border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]">
               <span className="text-[11px] font-semibold uppercase tracking-wider text-[var(--color-text-muted-light)] dark:text-[var(--color-text-secondary-dark)] block">
-                Travel Status
+                {t('favorites.labelStatus')}
               </span>
               <div className="flex items-center gap-1.5 mt-1.5 text-xs md:text-sm font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">
                 <Compass className="w-4 h-4 text-[var(--color-purple-badge-text)] shrink-0" />
-                <span>{isVisited ? 'Visited Place' : 'Planned Wishlist'}</span>
+                <span>{isVisited ? t('favorites.statusVisited') : t('favorites.statusToVisit')}</span>
               </div>
-              <p className="text-[11px] text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mt-1">
-                Added on {savedDate}
-              </p>
+              {savedDate && (
+                <p className="text-[11px] text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mt-1">
+                  {t('favorites.savedDate', { date: savedDate })}
+                </p>
+              )}
             </div>
           </div>
 
@@ -280,7 +285,7 @@ export default function FavoriteDetailsModal({
           {favorite.description && (
             <div className="p-4 rounded-md bg-[var(--color-surface-hover-light)]/60 dark:bg-[var(--color-surface-hover-dark)]/40 border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]">
               <span className="text-[11px] font-semibold uppercase tracking-wider text-[var(--color-text-muted-light)] dark:text-[var(--color-text-secondary-dark)] block mb-1.5">
-                Overview & Destination Description
+                {t('favorites.labelNotes')}
               </span>
               <p className="text-xs md:text-sm text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] leading-relaxed">
                 {favorite.description}
@@ -292,7 +297,7 @@ export default function FavoriteDetailsModal({
           {tagsList.length > 0 && (
             <div>
               <span className="text-[11px] font-semibold uppercase tracking-wider text-[var(--color-text-muted-light)] dark:text-[var(--color-text-secondary-dark)] block mb-1.5">
-                Tags & Highlights
+                {t('favorites.labelTags')}
               </span>
               <div className="flex flex-wrap gap-1.5">
                 {tagsList.map((tag, idx) => (
@@ -319,7 +324,7 @@ export default function FavoriteDetailsModal({
             className="py-2 px-4 rounded-md bg-[var(--color-danger-bg)] dark:bg-[var(--color-danger-dark-bg)] hover:opacity-90 text-[var(--color-danger-text)] dark:text-[var(--color-danger-dark-text)] font-medium text-xs md:text-sm transition-colors flex items-center gap-1.5 border border-[var(--color-danger-border)] dark:border-[var(--color-danger-dark-border)] cursor-pointer"
           >
             <Trash2 className="w-4 h-4" />
-            <span>Remove</span>
+            <span>{t('favorites.btnRemove')}</span>
           </button>
 
           <button
@@ -331,7 +336,7 @@ export default function FavoriteDetailsModal({
             className="py-2 px-4 rounded-md bg-[#003E83] hover:bg-[#002e62] text-white font-medium text-xs md:text-sm transition-colors flex items-center gap-1.5 cursor-pointer"
           >
             {isVisited ? <Clock className="w-4 h-4" /> : <Check className="w-4 h-4" />}
-            <span>{isVisited ? 'Mark as To Visit' : 'Mark as Visited'}</span>
+            <span>{isVisited ? t('favorites.btnMarkToVisit') : t('favorites.btnMarkVisited')}</span>
           </button>
         </div>
       </div>

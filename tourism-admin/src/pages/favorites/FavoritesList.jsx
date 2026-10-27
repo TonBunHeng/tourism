@@ -8,10 +8,9 @@ import {
   Clock,
   Landmark,
   Check,
-  Calendar,
   User
 } from 'lucide-react';
-import { renderStars } from '../../utils/StatusUtils';
+import { useLanguage } from '../../i18n';
 
 export default function FavoritesList({
   favorites = [],
@@ -27,6 +26,8 @@ export default function FavoritesList({
   onView,
   startIndex = 0
 }) {
+  const { t } = useLanguage();
+
   const handleToggleVisit = (id) => {
     if (onToggleVisited) onToggleVisited(id);
     else if (onToggleStatus) onToggleStatus(id);
@@ -62,7 +63,7 @@ export default function FavoritesList({
             const isVisited = Boolean(favorite.visited || favorite.status === 'Visited');
             const isSelected = selectedFavorites.includes(favorite.id);
             const userInfo = favorite.user || {};
-            const userName = userInfo.name || favorite.user_name || 'Traveler';
+            const userName = userInfo.name || favorite.user_name || t('favorites.anonymousTraveler');
 
             return (
               <div
@@ -97,7 +98,7 @@ export default function FavoritesList({
                             : 'bg-[var(--color-info-bg)] dark:bg-[var(--color-info-dark-bg)] text-[var(--color-info-text)] dark:text-[var(--color-info-dark-text)] border-[var(--color-info-border)] dark:border-[var(--color-info-dark-border)]'
                         }`}
                       >
-                        {isVisited ? 'Visited' : 'To Visit'}
+                        {isVisited ? t('favorites.statusVisited') : t('favorites.statusToVisit')}
                       </span>
                     </div>
 
@@ -106,7 +107,7 @@ export default function FavoritesList({
                         {favorite.category}
                       </span>
                       <span className="text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
-                        By {userName}
+                        {userName}
                       </span>
                     </div>
 
@@ -123,7 +124,7 @@ export default function FavoritesList({
                         type="button"
                         onClick={() => handleToggleVisit(favorite.id)}
                         className="p-1.5 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/30 rounded-md transition-colors cursor-pointer"
-                        title={isVisited ? 'Mark as to visit' : 'Mark as visited'}
+                        title={isVisited ? t('favorites.tooltipMarkToVisit') : t('favorites.tooltipMarkVisited')}
                       >
                         <Check className="w-4 h-4" />
                       </button>
@@ -131,7 +132,7 @@ export default function FavoritesList({
                         type="button"
                         onClick={() => handleView(favorite)}
                         className="p-1.5 text-[var(--color-purple-badge-text)] dark:text-[var(--color-purple-badge-dark-text)] hover:bg-[var(--color-purple-badge-bg)] dark:hover:bg-[var(--color-purple-badge-dark-bg)] rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
-                        title="View Details"
+                        title={t('favorites.tooltipViewDetails')}
                       >
                         <Eye className="w-4 h-4" />
                       </button>
@@ -139,7 +140,7 @@ export default function FavoritesList({
                         type="button"
                         onClick={() => handleDelete(favorite.id || favorite.place_id)}
                         className="p-1.5 text-[var(--color-danger-text)] dark:text-[var(--color-danger-dark-text)] hover:bg-[var(--color-danger-bg)] dark:hover:bg-[var(--color-danger-dark-bg)] rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
-                        title="Remove"
+                        title={t('favorites.tooltipDelete')}
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -153,10 +154,10 @@ export default function FavoritesList({
           <div className="text-center py-12 px-4">
             <Landmark className="w-12 h-12 text-blue-500 mx-auto mb-2 opacity-80" />
             <h3 className="text-base font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] mb-1">
-              No favorite destinations found
+              {t('favorites.noFavoritesFound')}
             </h3>
             <p className="text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
-              Try adjusting your search or filter criteria
+              {t('favorites.tryAdjustingFilter')}
             </p>
           </div>
         )}
@@ -168,22 +169,22 @@ export default function FavoritesList({
           <thead className="bg-[var(--color-surface-hover-light)]/50 dark:bg-[var(--color-surface-hover-dark)]/50">
             <tr>
               <th className="pl-4 pr-2 py-3.5 text-xs font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] uppercase tracking-wider w-10 text-center">
-                #
+                {t('favorites.thIndex')}
               </th>
               <th className="px-4 py-3.5 text-xs font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] uppercase tracking-wider">
-                Place & Destination
+                {t('favorites.thPlaceAttraction')}
               </th>
               <th className="px-3 py-3.5 text-xs font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] uppercase tracking-wider whitespace-nowrap w-48">
-                Favorited By
+                {t('favorites.thSavedBy')}
               </th>
               <th className="px-3 py-3.5 text-xs font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] uppercase tracking-wider whitespace-nowrap w-32">
-                Rating
+                {t('favorites.thRating')}
               </th>
               <th className="px-3 py-3.5 text-xs font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] uppercase tracking-wider whitespace-nowrap w-28">
-                Status
+                {t('favorites.thStatus')}
               </th>
               <th className="pl-3 pr-4 py-3.5 text-right text-xs font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] uppercase tracking-wider w-24 whitespace-nowrap">
-                Actions
+                {t('favorites.thActions')}
               </th>
             </tr>
           </thead>
@@ -197,7 +198,7 @@ export default function FavoritesList({
                 const reviewsCount = favorite.reviewsCount ?? favorite.reviews ?? favorite.place?.reviews_count ?? 0;
 
                 const userInfo = favorite.user || {};
-                const userName = userInfo.name || favorite.user_name || 'Traveler';
+                const userName = userInfo.name || favorite.user_name || t('favorites.anonymousTraveler');
                 const userAvatar = userInfo.avatar || favorite.user_avatar || null;
                 const userEmail = userInfo.email || favorite.user_email || 'user@angkorverses.com';
                 const userVerified = Boolean(userInfo.verified);
@@ -295,11 +296,11 @@ export default function FavoritesList({
                       >
                         {isVisited ? (
                           <>
-                            <CheckCircle2 className="w-3 h-3" /> Visited
+                            <CheckCircle2 className="w-3 h-3" /> {t('favorites.statusVisited')}
                           </>
                         ) : (
                           <>
-                            <Clock className="w-3 h-3" /> To Visit
+                            <Clock className="w-3 h-3" /> {t('favorites.statusToVisit')}
                           </>
                         )}
                       </span>
@@ -311,7 +312,7 @@ export default function FavoritesList({
                           type="button"
                           onClick={() => handleToggleVisit(favorite.id)}
                           className="p-1.5 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/30 rounded-md transition-colors cursor-pointer"
-                          title={isVisited ? 'Mark as to visit' : 'Mark as visited'}
+                          title={isVisited ? t('favorites.tooltipMarkToVisit') : t('favorites.tooltipMarkVisited')}
                         >
                           <Check className="w-4 h-4" />
                         </button>
@@ -319,7 +320,7 @@ export default function FavoritesList({
                           type="button"
                           onClick={() => handleView(favorite)}
                           className="p-1.5 text-[var(--color-purple-badge-text)] dark:text-[var(--color-purple-badge-dark-text)] hover:bg-[var(--color-purple-badge-bg)] dark:hover:bg-[var(--color-purple-badge-dark-bg)] rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
-                          title="View Details"
+                          title={t('favorites.tooltipViewDetails')}
                         >
                           <Eye className="w-4 h-4" />
                         </button>
@@ -327,7 +328,7 @@ export default function FavoritesList({
                           type="button"
                           onClick={() => handleDelete(favorite.id || favorite.place_id)}
                           className="p-1.5 text-[var(--color-danger-text)] dark:text-[var(--color-danger-dark-text)] hover:bg-[var(--color-danger-bg)] dark:hover:bg-[var(--color-danger-dark-bg)] rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
-                          title="Remove from favorites"
+                          title={t('favorites.tooltipDelete')}
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
@@ -341,10 +342,10 @@ export default function FavoritesList({
                 <td colSpan="7" className="text-center py-12 px-4">
                   <Landmark className="w-12 h-12 text-blue-500 mx-auto mb-2 opacity-80" />
                   <h3 className="text-base font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] mb-1">
-                    No favorite destinations found
+                    {t('favorites.noFavoritesFound')}
                   </h3>
                   <p className="text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
-                    Try adjusting your search or filter criteria
+                    {t('favorites.tryAdjustingFilter')}
                   </p>
                 </td>
               </tr>

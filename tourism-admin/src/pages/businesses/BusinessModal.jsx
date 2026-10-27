@@ -8,6 +8,7 @@ import {
 import { uploadService } from '../../services/uploadService';
 import { categoryService } from '../../services/categoryService';
 import { validateImageFile } from '../../utils/fileValidation';
+import { useLanguage } from '../../i18n';
 
 const PROVINCES = [
   'Siem Reap',
@@ -52,20 +53,21 @@ const DEFAULT_CATEGORIES = [
   { id: '12', name: 'Palace' }
 ];
 
-const PRICE_TIERS = [
-  { value: '$', label: '$ Budget' },
-  { value: '$$', label: '$$ Moderate' },
-  { value: '$$$', label: '$$$ Luxury' },
-  { value: '$$$$', label: '$$$$ Premium' }
-];
-
 export default function BusinessModal({
   isOpen,
   onClose,
   editingBusiness = null,
   onSubmit
 }) {
+  const { t } = useLanguage();
   const fileInputRef = useRef(null);
+
+  const priceTiers = [
+    { value: '$', label: t('businesses.tierBudget', '$ Budget') },
+    { value: '$$', label: t('businesses.tierModerate', '$$ Moderate') },
+    { value: '$$$', label: t('businesses.tierLuxury', '$$$ Luxury') },
+    { value: '$$$$', label: t('businesses.tierPremium', '$$$$ Premium') }
+  ];
 
   const [formData, setFormData] = useState({
     name: '',
@@ -242,9 +244,9 @@ export default function BusinessModal({
 
   const validate = () => {
     const newErrors = {};
-    if (!formData.name.trim()) newErrors.name = 'Business name is required';
-    if (!formData.owner_name.trim()) newErrors.owner_name = 'Owner name is required';
-    if (!formData.owner_email.trim()) newErrors.owner_email = 'Owner email is required';
+    if (!formData.name.trim()) newErrors.name = t('businesses.nameRequired', 'Business name is required');
+    if (!formData.owner_name.trim()) newErrors.owner_name = t('businesses.ownerNameRequired', 'Owner name is required');
+    if (!formData.owner_email.trim()) newErrors.owner_email = t('businesses.ownerEmailRequired', 'Owner email is required');
     return newErrors;
   };
 
@@ -279,10 +281,14 @@ export default function BusinessModal({
             </div>
             <div>
               <h3 className="text-base font-bold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">
-                {editingBusiness ? 'Edit Business Profile' : 'Add New Business Profile'}
+                {editingBusiness
+                  ? t('businesses.editTitle', 'Edit Business Profile')
+                  : t('businesses.addTitle', 'Add New Business Profile')}
               </h3>
               <p className="text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mt-0.5">
-                {editingBusiness ? `Updating record #${editingBusiness.id}` : 'Register a commercial business entity in AngkorVerses'}
+                {editingBusiness
+                  ? t('businesses.editSubtitle', 'Updating record #{id}').replace('{id}', editingBusiness.id)
+                  : t('businesses.addSubtitle', 'Register a commercial business entity in AngkorVerses')}
               </p>
             </div>
           </div>
@@ -303,20 +309,20 @@ export default function BusinessModal({
             <div className="space-y-4">
               <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] border-b border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]/50 pb-2">
                 <Building2 size={14} className="text-[#003E83] dark:text-blue-400" />
-                <span>Basic Business Info</span>
+                <span>{t('businesses.basicInfo', 'Basic Business Info')}</span>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {/* Business Name */}
                 <div className="sm:col-span-2">
                   <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">
-                    Business Name <span className="text-red-500">*</span>
+                    {t('businesses.businessName', 'Business Name')} <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
                     value={formData.name}
                     onChange={(e) => handleChange('name', e.target.value)}
-                    placeholder="e.g. Angkor Boutique Hotel & Spa"
+                    placeholder={t('businesses.businessNamePlaceholder', 'e.g. Angkor Boutique Hotel & Spa')}
                     className="w-full px-3 py-2 bg-[var(--color-bg-light)] dark:bg-[var(--color-input-dark-bg)] border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]/70 rounded-md text-xs sm:text-sm text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] placeholder-[var(--color-text-muted-light)] focus:outline-none focus:ring-2 focus:ring-[var(--color-input)] transition-all"
                   />
                   {errors.name && <p className="text-xs text-red-500 dark:text-red-400 mt-1">{errors.name}</p>}
@@ -325,7 +331,7 @@ export default function BusinessModal({
                 {/* Category */}
                 <div>
                   <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">
-                    Category <span className="text-red-500">*</span>
+                    {t('businesses.category', 'Category')} <span className="text-red-500">*</span>
                   </label>
                   <select
                     value={formData.category_name}
@@ -345,7 +351,7 @@ export default function BusinessModal({
                 {/* Province */}
                 <div>
                   <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">
-                    Province <span className="text-red-500">*</span>
+                    {t('businesses.province', 'Province')} <span className="text-red-500">*</span>
                   </label>
                   <select
                     value={formData.province}
@@ -361,14 +367,14 @@ export default function BusinessModal({
                 {/* Price Tier */}
                 <div>
                   <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">
-                    Price Tier
+                    {t('businesses.priceTier', 'Price Tier')}
                   </label>
                   <select
                     value={formData.price_tier}
                     onChange={(e) => handleChange('price_tier', e.target.value)}
                     className="w-full px-3 py-2 bg-[var(--color-bg-light)] dark:bg-[var(--color-input-dark-bg)] border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]/70 rounded-md text-xs sm:text-sm text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] focus:outline-none focus:ring-2 focus:ring-[var(--color-input)] transition-all cursor-pointer"
                   >
-                    {PRICE_TIERS.map((tier) => (
+                    {priceTiers.map((tier) => (
                       <option key={tier.value} value={tier.value}>{tier.label}</option>
                     ))}
                   </select>
@@ -378,10 +384,10 @@ export default function BusinessModal({
                 <div className="sm:col-span-2">
                   <div className="flex items-center justify-between mb-1.5">
                     <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
-                      Cover Image URL / Photo Upload
+                      {t('businesses.coverImage', 'Cover Image URL / Photo Upload')}
                     </label>
                     <span className="text-[10px] text-[var(--color-text-muted-light)]">
-                      Paste URL, copy link, or drop picture
+                      {t('businesses.uploadHint', 'Paste URL, copy link, or drop picture')}
                     </span>
                   </div>
 
@@ -392,7 +398,7 @@ export default function BusinessModal({
                         type="text"
                         value={formData.image}
                         onChange={(e) => handleChange('image', e.target.value)}
-                        placeholder="Paste image URL (https://...) or drop picture below"
+                        placeholder={t('businesses.imagePlaceholder', 'Paste image URL (https://...) or drop picture below')}
                         className="w-full pl-9 pr-3 py-2 bg-[var(--color-bg-light)] dark:bg-[var(--color-input-dark-bg)] border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]/70 rounded-md text-xs sm:text-sm text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] placeholder-[var(--color-text-muted-light)] focus:outline-none focus:ring-2 focus:ring-[var(--color-input)] transition-all"
                       />
                     </div>
@@ -403,7 +409,7 @@ export default function BusinessModal({
                       className="px-3.5 py-2 border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] rounded-md hover:bg-[var(--color-surface-hover-light)] dark:hover:bg-[var(--color-surface-hover-dark)] text-xs font-medium text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] inline-flex items-center gap-1.5 transition-colors cursor-pointer shrink-0 shadow-2xs"
                     >
                       <Upload size={14} className={isUploadingImage ? 'animate-spin' : ''} />
-                      <span>{isUploadingImage ? 'Uploading...' : 'Browse Picture'}</span>
+                      <span>{isUploadingImage ? t('businesses.uploading', 'Uploading...') : t('businesses.browsePicture', 'Browse Picture')}</span>
                     </button>
                     <input
                       ref={fileInputRef}
@@ -433,7 +439,7 @@ export default function BusinessModal({
                       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent flex items-end justify-between p-3">
                         <div className="flex items-center gap-1.5 bg-black/60 backdrop-blur-xs text-white text-[11px] font-medium px-2.5 py-1 rounded-md">
                           <ImageIcon size={13} className="text-emerald-400" />
-                          <span>Photo Attached</span>
+                          <span>{t('businesses.photoAttached', 'Photo Attached')}</span>
                         </div>
                         <div className="flex items-center gap-2">
                           <button
@@ -441,13 +447,13 @@ export default function BusinessModal({
                             onClick={() => fileInputRef.current?.click()}
                             className="px-2.5 py-1 rounded-md bg-white/95 hover:bg-white text-gray-900 text-xs font-semibold shadow-xs transition-colors cursor-pointer"
                           >
-                            Change Photo
+                            {t('businesses.changePhoto', 'Change Photo')}
                           </button>
                           <button
                             type="button"
                             onClick={() => handleChange('image', '')}
                             className="p-1.5 rounded-md bg-red-600 hover:bg-red-700 text-white shadow-xs transition-colors cursor-pointer"
-                            title="Remove picture"
+                            title={t('businesses.removePicture', 'Remove picture')}
                           >
                             <XIcon size={14} />
                           </button>
@@ -468,9 +474,9 @@ export default function BusinessModal({
                     >
                       <ImageIcon className="w-8 h-8 text-[var(--color-text-muted-light)] mb-1.5" />
                       <p className="text-xs font-medium text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">
-                        Drag & drop picture here, or <span className="text-[#003E83] dark:text-blue-400 underline">browse file</span>
+                        {t('businesses.dragDropText', 'Drag & drop picture here, or browse file')}
                       </p>
-                      <p className="text-[10px] text-[var(--color-text-muted-light)] mt-0.5">Supports PNG, JPG, JPEG, WEBP files</p>
+                      <p className="text-[10px] text-[var(--color-text-muted-light)] mt-0.5">{t('businesses.supportsFormats', 'Supports PNG, JPG, JPEG, WEBP files')}</p>
                     </div>
                   )}
                 </div>
@@ -478,13 +484,13 @@ export default function BusinessModal({
                 {/* Description & Story */}
                 <div className="sm:col-span-2">
                   <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">
-                    Description & Story
+                    {t('businesses.description', 'Description & Story')}
                   </label>
                   <textarea
                     rows={3}
                     value={formData.description}
                     onChange={(e) => handleChange('description', e.target.value)}
-                    placeholder="Describe your hospitality services, atmosphere, and amenities..."
+                    placeholder={t('businesses.descPlaceholder', 'Describe your hospitality services, atmosphere, and amenities...')}
                     className="w-full px-3 py-2 bg-[var(--color-bg-light)] dark:bg-[var(--color-input-dark-bg)] border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]/70 rounded-md text-xs sm:text-sm text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] placeholder-[var(--color-text-muted-light)] focus:outline-none focus:ring-2 focus:ring-[var(--color-input)] transition-all resize-none"
                   />
                 </div>
@@ -495,20 +501,20 @@ export default function BusinessModal({
             <div className="space-y-4">
               <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] border-b border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]/50 pb-2">
                 <MapPin size={14} className="text-[#003E83] dark:text-blue-400" />
-                <span>Contact & Location</span>
+                <span>{t('businesses.contactLocation', 'Contact & Location')}</span>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {/* Full Address */}
                 <div className="sm:col-span-2">
                   <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">
-                    Full Address
+                    {t('businesses.fullAddress', 'Full Address')}
                   </label>
                   <input
                     type="text"
                     value={formData.address}
                     onChange={(e) => handleChange('address', e.target.value)}
-                    placeholder="Street address, Village, Sangkat..."
+                    placeholder={t('businesses.addressPlaceholder', 'Street address, Village, Sangkat...')}
                     className="w-full px-3 py-2 bg-[var(--color-bg-light)] dark:bg-[var(--color-input-dark-bg)] border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]/70 rounded-md text-xs sm:text-sm text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] placeholder-[var(--color-text-muted-light)] focus:outline-none focus:ring-2 focus:ring-[var(--color-input)] transition-all"
                   />
                 </div>
@@ -516,7 +522,7 @@ export default function BusinessModal({
                 {/* Phone */}
                 <div>
                   <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">
-                    Phone
+                    {t('businesses.phone', 'Phone')}
                   </label>
                   <div className="relative">
                     <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
@@ -533,7 +539,7 @@ export default function BusinessModal({
                 {/* Email */}
                 <div>
                   <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">
-                    Email
+                    {t('businesses.email', 'Email')}
                   </label>
                   <div className="relative">
                     <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
@@ -550,7 +556,7 @@ export default function BusinessModal({
                 {/* Website */}
                 <div className="sm:col-span-2">
                   <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">
-                    Website URL
+                    {t('businesses.website', 'Website URL')}
                   </label>
                   <div className="relative">
                     <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
@@ -567,7 +573,7 @@ export default function BusinessModal({
                 {/* Coordinates */}
                 <div>
                   <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">
-                    Latitude (Optional)
+                    {t('businesses.latitude', 'Latitude (Optional)')}
                   </label>
                   <div className="relative">
                     <Navigation className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
@@ -583,7 +589,7 @@ export default function BusinessModal({
 
                 <div>
                   <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">
-                    Longitude (Optional)
+                    {t('businesses.longitude', 'Longitude (Optional)')}
                   </label>
                   <div className="relative">
                     <Navigation className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
@@ -603,20 +609,20 @@ export default function BusinessModal({
             <div className="space-y-4">
               <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] border-b border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]/50 pb-2">
                 <User size={14} className="text-[#003E83] dark:text-blue-400" />
-                <span>Owner & Administrative Details</span>
+                <span>{t('businesses.ownerAdmin', 'Owner & Administrative Details')}</span>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {/* Owner Name */}
                 <div>
                   <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">
-                    Owner Full Name <span className="text-red-500">*</span>
+                    {t('businesses.ownerName', 'Owner Full Name')} <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
                     value={formData.owner_name}
                     onChange={(e) => handleChange('owner_name', e.target.value)}
-                    placeholder="e.g. Sok Sovann"
+                    placeholder={t('businesses.ownerNamePlaceholder', 'e.g. Sok Sovann')}
                     className="w-full px-3 py-2 bg-[var(--color-bg-light)] dark:bg-[var(--color-input-dark-bg)] border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]/70 rounded-md text-xs sm:text-sm text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] placeholder-[var(--color-text-muted-light)] focus:outline-none focus:ring-2 focus:ring-[var(--color-input)] transition-all"
                   />
                   {errors.owner_name && <p className="text-xs text-red-500 dark:text-red-400 mt-1">{errors.owner_name}</p>}
@@ -625,7 +631,7 @@ export default function BusinessModal({
                 {/* Owner Email */}
                 <div>
                   <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">
-                    Owner Email Address <span className="text-red-500">*</span>
+                    {t('businesses.ownerEmail', 'Owner Email Address')} <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="email"
@@ -640,7 +646,7 @@ export default function BusinessModal({
                 {/* Owner Phone */}
                 <div>
                   <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">
-                    Owner Phone Contact
+                    {t('businesses.ownerPhone', 'Owner Phone Contact')}
                   </label>
                   <input
                     type="text"
@@ -654,7 +660,7 @@ export default function BusinessModal({
                 {/* Commercial License / Tax ID */}
                 <div>
                   <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">
-                    Commercial License / Tax ID
+                    {t('businesses.licenseNumber', 'Commercial License / Tax ID')}
                   </label>
                   <input
                     type="text"
@@ -668,17 +674,17 @@ export default function BusinessModal({
                 {/* Verification Status */}
                 <div className="sm:col-span-2">
                   <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">
-                    Verification Status
+                    {t('businesses.verificationStatus', 'Verification Status')}
                   </label>
                   <select
                     value={formData.verification_status}
                     onChange={(e) => handleChange('verification_status', e.target.value)}
                     className="w-full px-3 py-2 bg-[var(--color-bg-light)] dark:bg-[var(--color-input-dark-bg)] border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]/70 rounded-md text-xs sm:text-sm text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] focus:outline-none focus:ring-2 focus:ring-[var(--color-input)] transition-all cursor-pointer capitalize"
                   >
-                    <option value="pending">Pending</option>
-                    <option value="approved">Approved</option>
-                    <option value="suspended">Suspended</option>
-                    <option value="rejected">Rejected</option>
+                    <option value="pending">{t('businesses.statusPending', 'Pending Review')}</option>
+                    <option value="approved">{t('businesses.statusApproved', 'Approved')}</option>
+                    <option value="suspended">{t('businesses.statusSuspended', 'Suspended')}</option>
+                    <option value="rejected">{t('businesses.statusRejected', 'Rejected')}</option>
                   </select>
                 </div>
               </div>
@@ -693,7 +699,7 @@ export default function BusinessModal({
               onClick={onClose}
               className="flex-1 py-2.5 px-4 rounded-md border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] hover:bg-[var(--color-surface-hover-light)] dark:hover:bg-[var(--color-surface-hover-dark)] font-medium text-sm transition-colors text-center cursor-pointer"
             >
-              Cancel
+              {t('common.cancel', 'Cancel')}
             </button>
             <button
               type="submit"
@@ -703,12 +709,12 @@ export default function BusinessModal({
               {editingBusiness ? (
                 <>
                   <Check className="w-4 h-4" />
-                  <span>Update Profile</span>
+                  <span>{t('businesses.updateProfileBtn', 'Update Profile')}</span>
                 </>
               ) : (
                 <>
                   <Plus className="w-4 h-4" />
-                  <span>Create Business</span>
+                  <span>{t('businesses.createBusinessBtn', 'Create Business')}</span>
                 </>
               )}
             </button>

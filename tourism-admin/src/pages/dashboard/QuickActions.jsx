@@ -10,6 +10,7 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 import { useNavigate } from 'react-router-dom';
+import { useLanguage } from '../../i18n';
 
 const PIE_COLORS = [
   '#3B82F6', // Blue
@@ -52,6 +53,7 @@ const CustomTooltip = ({ active, payload }) => {
 
 export default function QuickActions({ distribution = [] }) {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [hoveredItem, setHoveredItem] = useState(null);
 
   const rawCategories = Array.isArray(distribution) ? distribution : [];
@@ -76,17 +78,17 @@ export default function QuickActions({ distribution = [] }) {
           <div>
             <h3 className="text-sm font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] flex items-center gap-1.5">
               <PieChartIcon className="w-4 h-4 text-blue-500" />
-              <span>Category Distribution</span>
+              <span>{t('dashboard.categoryDistributionTitle', 'Category Distribution')}</span>
             </h3>
             <p className="text-[11px] text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
-              Destinations grouped by category from database
+              {t('dashboard.catSubtitleYearly', 'Destinations grouped by category from database')}
             </p>
           </div>
           <button
             onClick={() => navigate('/categories')}
             className="text-xs text-[var(--color-primary)] hover:text-[var(--color-primary-hover)] font-medium cursor-pointer"
           >
-            View All
+            {t('dashboard.viewAll', 'View All')}
           </button>
         </div>
 
@@ -95,7 +97,7 @@ export default function QuickActions({ distribution = [] }) {
           {rawCategories.length === 0 ? (
             <div className="flex flex-col items-center justify-center text-gray-400 text-xs">
               <PieChartIcon className="w-8 h-8 mb-2 stroke-1 text-gray-300 dark:text-zinc-600" />
-              <p>No category distribution available</p>
+              <p>{t('dashboard.noCategoriesData', 'No category distribution available')}</p>
             </div>
           ) : (
             <>
@@ -113,7 +115,7 @@ export default function QuickActions({ distribution = [] }) {
                       {hoveredItem.name}
                     </span>
                     <span className="text-[10px] font-semibold text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mt-0.5">
-                      {hoveredItem.percentage}% of total
+                      {hoveredItem.percentage}% {t('dashboard.ofTotal', 'of total')}
                     </span>
                   </div>
                 ) : (
@@ -122,7 +124,7 @@ export default function QuickActions({ distribution = [] }) {
                       {totalPlaces}
                     </span>
                     <span className="text-[11px] uppercase font-bold tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mt-0.5">
-                      Total Places
+                      {t('dashboard.totalPlaces', 'Total Places')}
                     </span>
                   </div>
                 )}

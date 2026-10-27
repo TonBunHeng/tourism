@@ -6,15 +6,12 @@ import {
   Check,
   Trash2,
   Eye,
-  Filter,
   Star,
   UserX,
   MessageCircle,
   ShieldAlert,
   Clock,
-  ChevronRight,
   ChevronDown,
-  Sparkles,
   Info,
   Users,
   Loader2,
@@ -23,12 +20,14 @@ import {
 } from 'lucide-react';
 import { useAlert } from '../../context/AlertContext';
 import { useSearch } from '../../context/SearchContext';
+import { useLanguage } from '../../i18n';
 import notificationService from '../../services/notificationService';
 import NotificationDetailsModal from './NotificationDetailsModal';
 import SimplePagination from '../../components/common/SimplePagination';
 import { getPageCache, setPageCache } from '../../utils/pageCache';
 
 export default function Notifications() {
+  const { t } = useLanguage();
   const { showConfirm, showSuccess, showError } = useAlert();
   const { searchTerm } = useSearch();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -42,10 +41,9 @@ export default function Notifications() {
     return 'All';
   });
 
-  const cachedNotifs = getPageCache('notifications_data');
-  const [notifications, setNotifications] = useState(() => cachedNotifs?.notifications || []);
-  const [unreadCount, setUnreadCount] = useState(() => cachedNotifs?.unreadCount || 0);
-  const [loading, setLoading] = useState(() => !cachedNotifs);
+  const [notifications, setNotifications] = useState(() => getPageCache('notifications_data')?.notifications || []);
+  const [unreadCount, setUnreadCount] = useState(() => getPageCache('notifications_data')?.unreadCount || 0);
+  const [loading, setLoading] = useState(() => !getPageCache('notifications_data'));
   const [statusFilter, setStatusFilter] = useState('all');
 
   // Pagination States (10 items per page standard)
@@ -57,6 +55,18 @@ export default function Notifications() {
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
 
   const categories = ['All', 'Alerts', 'Reviews', 'Messages', 'Users', 'System'];
+
+  const getCategoryLabel = (cat) => {
+    switch ((cat || '').toLowerCase()) {
+      case 'all': return t('notifications.catAll');
+      case 'alerts': return t('notifications.catAlerts');
+      case 'reviews': return t('notifications.catReviews');
+      case 'messages': return t('notifications.catMessages');
+      case 'users': return t('notifications.catUsers');
+      case 'system': return t('notifications.catSystem');
+      default: return cat || t('notifications.catGeneral');
+    }
+  };
 
   // Sync tab state to URL & Storage
   const handleCategoryChange = (cat) => {
@@ -72,20 +82,28 @@ export default function Notifications() {
   };
 
   const formatTimeAgo = (dateString) => {
-    if (!dateString) return 'Recent';
+    if (!dateString) return t('notifications.timeRecent');
     try {
       const now = new Date();
       const date = new Date(dateString);
       const diffSec = Math.floor((now - date) / 1000);
 
-      if (diffSec < 60) return 'Just now';
+      if (diffSec < 60) return t('notifications.timeJustNow');
       const diffMin = Math.floor(diffSec / 60);
-      if (diffMin < 60) return `${diffMin} min${diffMin > 1 ? 's' : ''} ago`;
+      if (diffMin < 60) {
+        return diffMin === 1
+          ? t('notifications.timeMinsAgo', { count: diffMin })
+          : t('notifications.timeMinsAgoPlural', { count: diffMin });
+      }
       const diffHour = Math.floor(diffMin / 60);
-      if (diffHour < 24) return `${diffHour} hour${diffHour > 1 ? 's' : ''} ago`;
+      if (diffHour < 24) {
+        return diffHour === 1
+          ? t('notifications.timeHoursAgo', { count: diffHour })
+          : t('notifications.timeHoursAgoPlural', { count: diffHour });
+      }
       const diffDays = Math.floor(diffHour / 24);
-      if (diffDays === 1) return 'Yesterday';
-      if (diffDays < 7) return `${diffDays} days ago`;
+      if (diffDays === 1) return t('notifications.timeYesterday');
+      if (diffDays < 7) return t('notifications.timeDaysAgo', { count: diffDays });
       
       return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
     } catch {
@@ -147,10 +165,6 @@ export default function Notifications() {
   };
 
   const fetchNotifications = useCallback(async () => {
-    if (!cachedNotifs && notifications.length === 0) {
-      setLoading(true);
-    }
-
     try {
       const params = {};
       if (filterCategory !== 'All') {
@@ -184,7 +198,7 @@ export default function Notifications() {
     } finally {
       setLoading(false);
     }
-  }, [filterCategory, statusFilter, cachedNotifs, notifications.length]);
+  }, [filterCategory, statusFilter]);
 
   useEffect(() => {
     fetchNotifications();
@@ -223,9 +237,9 @@ export default function Notifications() {
 
   const handleMarkAllRead = async () => {
     const confirmed = await showConfirm({
-      title: 'Mark All as Read',
-      message: 'Are you sure you want to mark all notifications as read?',
-      confirmText: 'Mark All Read',
+      title: t('notifications.markAllConfirmTitle'),
+      message: t('notifications.markAllConfirmMsg'),
+      confirmText: t('notifications.markAllConfirmBtn'),
       type: 'warning'
     });
 
@@ -244,9 +258,9 @@ export default function Notifications() {
   const handleDeleteNotification = async (id, e) => {
     if (e) e.stopPropagation();
     const confirmed = await showConfirm({
-      title: 'Delete Notification',
-      message: 'Are you sure you want to permanently remove this notification?',
-      confirmText: 'Delete',
+      title: t('notifications.deleteConfirmTitle'),
+      message: t('notifications.deleteConfirmMsg'),
+      confirmText: t('notifications.deleteConfirmBtn'),
       type: 'danger'
     });
 
@@ -258,7 +272,7 @@ export default function Notifications() {
           setIsDetailsModalOpen(false);
           setSelectedNotification(null);
         }
-        showSuccess('Notification deleted.', 'Success');
+        showSuccess(t('notifications.deleteSuccess'), t('common.success') || 'Success');
         window.dispatchEvent(new CustomEvent('notifications-updated'));
       } catch (err) {
         showError(err.message || 'Failed to delete notification.', 'Error');
@@ -268,9 +282,9 @@ export default function Notifications() {
 
   const handleClearAll = async () => {
     const confirmed = await showConfirm({
-      title: 'Clear All Notifications',
-      message: 'Are you sure you want to delete all notifications? This cannot be undone.',
-      confirmText: 'Clear All',
+      title: t('notifications.clearAllConfirmTitle'),
+      message: t('notifications.clearAllConfirmMsg'),
+      confirmText: t('notifications.clearAllConfirmBtn'),
       type: 'danger'
     });
 
@@ -279,7 +293,7 @@ export default function Notifications() {
         await notificationService.clearAll();
         setNotifications([]);
         setUnreadCount(0);
-        showSuccess('All notifications cleared.', 'Success');
+        showSuccess(t('notifications.clearAllSuccess'), t('common.success') || 'Success');
         window.dispatchEvent(new CustomEvent('notifications-updated'));
       } catch (err) {
         showError(err.message || 'Failed to clear notifications.', 'Error');
@@ -320,33 +334,33 @@ export default function Notifications() {
 
   const statsList = [
     {
-      label: 'Total Notifications',
+      label: t('notifications.statTotal'),
       value: notifications.length.toLocaleString(),
-      subtext: 'Logged system events',
+      subtext: t('notifications.subtextTotal'),
       icon: Bell,
       color: 'text-[var(--color-info-text)] dark:text-[var(--color-info-dark-text)]',
       bg: 'bg-[var(--color-info-bg)] dark:bg-[var(--color-info-dark-bg)]'
     },
     {
-      label: 'Unread Alerts',
+      label: t('notifications.statUnread'),
       value: unreadCount.toLocaleString(),
-      subtext: unreadCount === 0 ? 'All notifications read' : `${unreadCount} requiring attention`,
+      subtext: unreadCount === 0 ? t('notifications.subtextUnreadAllRead') : t('notifications.subtextUnreadCount', { count: unreadCount }),
       icon: AlertTriangle,
       color: 'text-[var(--color-warning-text)] dark:text-[var(--color-warning-dark-text)]',
       bg: 'bg-[var(--color-warning-bg)] dark:bg-[var(--color-warning-dark-bg)]'
     },
     {
-      label: 'Reviews & Feedback',
+      label: t('notifications.statReviews'),
       value: notifications.filter(n => (n.category || '').toLowerCase() === 'reviews' || (n.type || '').toLowerCase() === 'review').length.toLocaleString(),
-      subtext: 'Traveler ratings & comments',
+      subtext: t('notifications.subtextReviews'),
       icon: Star,
       color: 'text-[var(--color-success-text)] dark:text-[var(--color-success-dark-text)]',
       bg: 'bg-[var(--color-success-bg)] dark:bg-[var(--color-success-dark-bg)]'
     },
     {
-      label: 'Security & System',
+      label: t('notifications.statSecurity'),
       value: notifications.filter(n => ['security', 'alerts', 'system'].includes((n.category || '').toLowerCase()) || (n.type || '').toLowerCase() === 'security').length.toLocaleString(),
-      subtext: 'Infrastructure alarms & logs',
+      subtext: t('notifications.subtextSecurity'),
       icon: ShieldAlert,
       color: 'text-[var(--color-purple-badge-text)] dark:text-[var(--color-purple-badge-dark-text)]',
       bg: 'bg-[var(--color-purple-badge-bg)] dark:bg-[var(--color-purple-badge-dark-bg)]'
@@ -369,10 +383,10 @@ export default function Notifications() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <h1 className="text-xl sm:text-2xl font-bold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] tracking-tight">
-              Notifications Center
+              {t('notifications.title', 'Notifications')}
             </h1>
             <p className="text-xs sm:text-sm text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mt-1">
-              Real-time updates for security alerts, tourist reviews, chat messages, and system events
+              {t('notifications.subtitle')}
             </p>
           </div>
 
@@ -384,7 +398,7 @@ export default function Notifications() {
                 className="py-2 px-3.5 rounded-md bg-[#003E83] hover:bg-[#002e62] text-xs font-medium text-white flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs"
               >
                 <CheckCheck className="w-4 h-4 text-white" />
-                <span>Mark All Read</span>
+                <span>{t('notifications.markAllRead')}</span>
               </button>
             )}
 
@@ -395,7 +409,7 @@ export default function Notifications() {
                 className="py-2 px-3.5 rounded-md border border-red-200 dark:border-red-900/50 bg-red-50 dark:bg-red-950/30 hover:bg-red-100 text-xs font-medium text-red-600 dark:text-red-400 flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs"
               >
                 <Trash2 className="w-4 h-4" />
-                <span>Clear All</span>
+                <span>{t('notifications.clearAll')}</span>
               </button>
             )}
           </div>
@@ -439,11 +453,13 @@ export default function Notifications() {
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="flex items-center gap-2.5">
               <h2 className="text-lg md:text-xl font-bold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">
-                All Notifications
+                {t('notifications.sectionTitle')}
               </h2>
               {totalRecords !== undefined && (
                 <span className="text-xs font-semibold px-2 py-0.5 rounded-md bg-blue-50 text-[#003E83] dark:bg-blue-950/50 dark:text-blue-400 border border-blue-100 dark:border-blue-900/40">
-                  {totalRecords} {totalRecords === 1 ? 'notification' : 'notifications'}
+                  {totalRecords === 1
+                    ? t('notifications.pillCountSingle')
+                    : t('notifications.pillCount', { count: totalRecords })}
                 </span>
               )}
             </div>
@@ -458,7 +474,7 @@ export default function Notifications() {
                 >
                   {categories.map(cat => (
                     <option key={cat} value={cat}>
-                      {cat === 'All' ? 'All Categories' : cat}
+                      {cat === 'All' ? t('notifications.allCategories') : getCategoryLabel(cat)}
                     </option>
                   ))}
                 </select>
@@ -472,9 +488,9 @@ export default function Notifications() {
                   onChange={(e) => setStatusFilter(e.target.value)}
                   className="appearance-none w-full sm:w-auto pl-4 pr-9 py-2 border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--color-input)] focus:border-transparent bg-[var(--color-white)] dark:bg-[var(--color-bg-dark)] text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] text-sm cursor-pointer shadow-xs font-medium"
                 >
-                  <option value="all">All Status</option>
-                  <option value="unread">Unread Only ({unreadCount})</option>
-                  <option value="read">Read / Acknowledged</option>
+                  <option value="all">{t('notifications.allStatus')}</option>
+                  <option value="unread">{t('notifications.unreadOnly', { count: unreadCount })}</option>
+                  <option value="read">{t('notifications.readStatus')}</option>
                 </select>
                 <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--color-text-muted-light)] dark:text-[var(--color-text-secondary-dark)] pointer-events-none" />
               </div>
@@ -487,7 +503,7 @@ export default function Notifications() {
           <div className="p-12 text-center flex flex-col items-center justify-center space-y-3">
             <Loader2 className="w-8 h-8 text-[#003E83] dark:text-blue-500 animate-spin" />
             <p className="text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
-              Fetching real notifications from database...
+              {t('notifications.loadingNotifs')}
             </p>
           </div>
         ) : displayedNotifications.length > 0 ? (
@@ -517,7 +533,7 @@ export default function Notifications() {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between gap-2">
                           <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] bg-gray-100 dark:bg-zinc-800 px-2 py-0.5 rounded-md">
-                            {notification.category || 'General'}
+                            {getCategoryLabel(notification.category)}
                           </span>
                           <span className={`inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold rounded-md border shrink-0 ${
                             !notification.read
@@ -525,7 +541,7 @@ export default function Notifications() {
                               : 'bg-gray-100 dark:bg-zinc-800 text-gray-500 dark:text-zinc-400 border-gray-200 dark:border-zinc-700'
                           }`}>
                             {!notification.read && <span className="w-1.5 h-1.5 rounded-md bg-blue-600 animate-pulse shrink-0" />}
-                            {!notification.read ? 'Unread' : 'Read'}
+                            {!notification.read ? t('notifications.badgeUnread') : t('notifications.badgeRead')}
                           </span>
                         </div>
 
@@ -546,7 +562,7 @@ export default function Notifications() {
                               type="button"
                               onClick={(e) => handleOpenDetails(notification, e)}
                               className="p-1.5 text-[var(--color-purple-badge-text)] dark:text-[var(--color-purple-badge-dark-text)] hover:bg-[var(--color-purple-badge-bg)] dark:hover:bg-[var(--color-purple-badge-dark-bg)] rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
-                              title="View Details"
+                              title={t('notifications.tooltipViewDetails')}
                             >
                               <Eye className="w-4 h-4" />
                             </button>
@@ -555,7 +571,7 @@ export default function Notifications() {
                                 type="button"
                                 onClick={(e) => handleMarkAsRead(notification.id, e)}
                                 className="p-1.5 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/30 rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
-                                title="Mark as Read"
+                                title={t('notifications.tooltipMarkRead')}
                               >
                                 <Check className="w-4 h-4" />
                               </button>
@@ -564,7 +580,7 @@ export default function Notifications() {
                               type="button"
                               onClick={(e) => handleDeleteNotification(notification.id, e)}
                               className="p-1.5 text-[var(--color-danger-text)] dark:text-[var(--color-danger-dark-text)] hover:bg-[var(--color-danger-bg)] dark:hover:bg-[var(--color-danger-dark-bg)] rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
-                              title="Delete"
+                              title={t('notifications.tooltipDelete')}
                             >
                               <Trash2 className="w-4 h-4" />
                             </button>
@@ -583,22 +599,22 @@ export default function Notifications() {
                 <thead className="bg-[var(--color-surface-hover-light)]/50 dark:bg-[var(--color-surface-hover-dark)]/50">
                   <tr>
                     <th className="pl-4 pr-2 py-3.5 text-xs font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] uppercase tracking-wider w-10 text-center font-mono">
-                      #
+                      {t('notifications.thIndex')}
                     </th>
                     <th className="px-4 py-3.5 text-xs font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] uppercase tracking-wider">
-                      Notification & Event
+                      {t('notifications.thNotificationEvent')}
                     </th>
                     <th className="px-3 py-3.5 text-xs font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] uppercase tracking-wider whitespace-nowrap w-32">
-                      Category
+                      {t('notifications.thCategory')}
                     </th>
                     <th className="px-3 py-3.5 text-xs font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] uppercase tracking-wider whitespace-nowrap w-36">
-                      Time
+                      {t('notifications.thTime')}
                     </th>
                     <th className="px-3 py-3.5 text-xs font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] uppercase tracking-wider whitespace-nowrap w-28">
-                      Status
+                      {t('notifications.thStatus')}
                     </th>
                     <th className="pl-3 pr-4 py-3.5 text-right text-xs font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] uppercase tracking-wider w-24 whitespace-nowrap">
-                      Actions
+                      {t('notifications.thActions')}
                     </th>
                   </tr>
                 </thead>
@@ -640,7 +656,7 @@ export default function Notifications() {
 
                         <td className="px-3 py-3.5 whitespace-nowrap">
                           <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] bg-gray-100 dark:bg-zinc-800 px-2 py-0.5 rounded-md border border-gray-200 dark:border-zinc-700">
-                            {notification.category || 'General'}
+                            {getCategoryLabel(notification.category)}
                           </span>
                         </td>
 
@@ -658,7 +674,7 @@ export default function Notifications() {
                               : 'bg-gray-100 dark:bg-zinc-800 text-gray-500 dark:text-zinc-400 border-gray-200 dark:border-zinc-700'
                           }`}>
                             {!notification.read && <span className="w-1.5 h-1.5 rounded-md bg-blue-600 animate-pulse shrink-0" />}
-                            {!notification.read ? 'Unread' : 'Read'}
+                            {!notification.read ? t('notifications.badgeUnread') : t('notifications.badgeRead')}
                           </span>
                         </td>
 
@@ -668,7 +684,7 @@ export default function Notifications() {
                               type="button"
                               onClick={(e) => handleOpenDetails(notification, e)}
                               className="p-1.5 text-[var(--color-purple-badge-text)] dark:text-[var(--color-purple-badge-dark-text)] hover:bg-[var(--color-purple-badge-bg)] dark:hover:bg-[var(--color-purple-badge-dark-bg)] rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
-                              title="View Details"
+                              title={t('notifications.tooltipViewDetails')}
                             >
                               <Eye className="w-4 h-4" />
                             </button>
@@ -677,7 +693,7 @@ export default function Notifications() {
                                 type="button"
                                 onClick={(e) => handleMarkAsRead(notification.id, e)}
                                 className="p-1.5 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/30 rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
-                                title="Mark as Read"
+                                title={t('notifications.tooltipMarkRead')}
                               >
                                 <Check className="w-4 h-4" />
                               </button>
@@ -686,7 +702,7 @@ export default function Notifications() {
                               type="button"
                               onClick={(e) => handleDeleteNotification(notification.id, e)}
                               className="p-1.5 text-[var(--color-danger-text)] dark:text-[var(--color-danger-dark-text)] hover:bg-[var(--color-danger-bg)] dark:hover:bg-[var(--color-danger-dark-bg)] rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
-                              title="Delete Notification"
+                              title={t('notifications.tooltipDelete')}
                             >
                               <Trash2 className="w-4 h-4" />
                             </button>
@@ -705,10 +721,10 @@ export default function Notifications() {
               <Bell className="w-6 h-6" />
             </div>
             <h3 className="text-sm font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">
-              No {filterCategory !== 'All' ? filterCategory : ''} notifications found
+              {t('notifications.noNotificationsFound', { category: filterCategory !== 'All' ? getCategoryLabel(filterCategory) : '' })}
             </h3>
             <p className="text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mt-1">
-              You are all caught up with recent database events!
+              {t('notifications.allCaughtUp')}
             </p>
           </div>
         )}
@@ -721,7 +737,7 @@ export default function Notifications() {
           startIndex={startIndex}
           endIndex={endIndex}
           totalRecords={totalRecords}
-          label="notifications"
+          label={t('notifications.paginationLabel')}
         />
       </div>
     </div>

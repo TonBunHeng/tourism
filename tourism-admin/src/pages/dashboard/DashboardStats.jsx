@@ -4,17 +4,19 @@ import {
   Star, Tags, Map, CalendarDays, Heart, TrendingUp, TrendingDown,
   CalendarCheck, Sparkles
 } from 'lucide-react';
+import { useLanguage } from '../../i18n';
 
 export default function DashboardStats({ apiStats, timeRange = 'yearly' }) {
+  const { t } = useLanguage();
   const periodChanges = apiStats?.period_changes || {};
 
   const periodLabel = timeRange === 'today'
-    ? 'today'
+    ? t('dashboard.todayText', 'today')
     : timeRange === 'weekly'
-    ? 'this week'
+    ? t('dashboard.thisWeekText', 'this week')
     : timeRange === 'monthly'
-    ? 'this month'
-    : 'this year';
+    ? t('dashboard.thisMonthText', 'this month')
+    : t('dashboard.thisYearText', 'this year');
 
   const defaultRates = {
     today: {
@@ -82,20 +84,17 @@ export default function DashboardStats({ apiStats, timeRange = 'yearly' }) {
     return periodChanges[key]?.trend || fallback;
   };
 
-  const getSubtext = (key, defaultText, entityName) => {
-    if (periodChanges[key]?.current !== undefined && periodChanges[key]?.current > 0) {
-      return `+${periodChanges[key].current} ${entityName} ${periodLabel}`;
-    }
-    return defaultText;
-  };
-
   // Primary Platform KPIs (Row 1)
   const statsRow1 = [
     {
-      title: 'Bookings Queue',
+      title: t('dashboard.bookingsQueue', 'Bookings Queue'),
       value: apiStats?.total_bookings !== undefined ? apiStats.total_bookings.toLocaleString() : '0',
-      subtext: `${apiStats?.pending_bookings || 0} pending • $${Number(apiStats?.total_revenue || 0).toLocaleString()} vol`,
-      change: apiStats?.pending_bookings > 0 ? `${apiStats.pending_bookings} pending` : 'Active',
+      subtext: t('dashboard.pendingVol', '{count} pending • ${vol} vol')
+        .replace('{count}', apiStats?.pending_bookings || 0)
+        .replace('{vol}', Number(apiStats?.total_revenue || 0).toLocaleString()),
+      change: apiStats?.pending_bookings > 0
+        ? `${apiStats.pending_bookings} ${t('common.pending', 'pending')}`
+        : t('dashboard.activeStatus', 'Active'),
       trend: 'up',
       icon: CalendarCheck,
       color: 'text-blue-600 dark:text-blue-400',
@@ -103,9 +102,9 @@ export default function DashboardStats({ apiStats, timeRange = 'yearly' }) {
       border: 'border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]'
     },
     {
-      title: 'Tours & Guides',
-      value: `${apiStats?.total_tours !== undefined ? apiStats.total_tours : 0} Tours`,
-      subtext: `${apiStats?.total_guides || 0} accredited tour guides`,
+      title: t('dashboard.toursAndGuides', 'Tours & Guides'),
+      value: t('dashboard.toursCount', '{count} Tours').replace('{count}', apiStats?.total_tours !== undefined ? apiStats.total_tours : 0),
+      subtext: t('dashboard.accreditedGuides', '{count} accredited tour guides').replace('{count}', apiStats?.total_guides || 0),
       change: '+100%',
       trend: 'up',
       icon: Sparkles,
@@ -114,9 +113,11 @@ export default function DashboardStats({ apiStats, timeRange = 'yearly' }) {
       border: 'border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]'
     },
     {
-      title: 'Destinations',
+      title: t('dashboard.destinations', 'Destinations'),
       value: apiStats?.total_places !== undefined ? apiStats.total_places.toLocaleString() : '0',
-      subtext: `${apiStats?.active_places || 0} active • ${apiStats?.total_provinces || 0} provinces`,
+      subtext: t('dashboard.activeProvinces', '{count} active • {count2} provinces')
+        .replace('{count}', apiStats?.active_places || 0)
+        .replace('{count2}', apiStats?.total_provinces || 0),
       change: getChange('places', defaultRates.places),
       trend: getTrend('places'),
       icon: MapPinned,
@@ -125,9 +126,11 @@ export default function DashboardStats({ apiStats, timeRange = 'yearly' }) {
       border: 'border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]'
     },
     {
-      title: 'Traveler Community',
+      title: t('dashboard.travelerCommunity', 'Traveler Community'),
       value: apiStats?.total_users !== undefined ? apiStats.total_users.toLocaleString() : '0',
-      subtext: `${apiStats?.online_users || 0} online • +${apiStats?.new_this_week || 0} this week`,
+      subtext: t('dashboard.communityOnline', '{count} online • +{count2} this week')
+        .replace('{count}', apiStats?.online_users || 0)
+        .replace('{count2}', apiStats?.new_this_week || 0),
       change: getChange('users', defaultRates.users),
       trend: getTrend('users'),
       icon: Users,
@@ -136,9 +139,9 @@ export default function DashboardStats({ apiStats, timeRange = 'yearly' }) {
       border: 'border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]'
     },
     {
-      title: 'Avg Rating',
+      title: t('dashboard.avgRating', 'Avg Rating'),
       value: apiStats?.avg_rating !== undefined ? `${apiStats.avg_rating} ★` : '5.0 ★',
-      subtext: `${apiStats?.total_reviews || 0} reviews recorded`,
+      subtext: t('dashboard.reviewsRecorded', '{count} reviews recorded').replace('{count}', apiStats?.total_reviews || 0),
       change: defaultRates.rating,
       trend: 'up',
       icon: Star,
@@ -151,10 +154,12 @@ export default function DashboardStats({ apiStats, timeRange = 'yearly' }) {
   // Secondary Operational Metrics (Row 2)
   const statsRow2 = [
     {
-      title: "Pending Verifications",
+      title: t('dashboard.pendingVerifications', 'Pending Verifications'),
       value: apiStats?.pending_verifications !== undefined ? apiStats.pending_verifications.toLocaleString() : "0",
-      subtext: `${apiStats?.pending_businesses || 0} biz, ${apiStats?.pending_places || 0} places`,
-      change: `${apiStats?.pending_verifications || 0} req`,
+      subtext: t('dashboard.bizPlacesPending', '{count} biz, {count2} places')
+        .replace('{count}', apiStats?.pending_businesses || 0)
+        .replace('{count2}', apiStats?.pending_places || 0),
+      change: t('dashboard.reqCount', '{count} req').replace('{count}', apiStats?.pending_verifications || 0),
       trend: apiStats?.pending_verifications > 0 ? "up" : "down",
       icon: AlertCircle,
       color: "text-amber-600 dark:text-amber-400",
@@ -162,9 +167,9 @@ export default function DashboardStats({ apiStats, timeRange = 'yearly' }) {
       border: "border-amber-200 dark:border-amber-800"
     },
     {
-      title: 'Commercial Partners',
+      title: t('dashboard.commercialPartners', 'Commercial Partners'),
       value: apiStats?.total_businesses !== undefined ? apiStats.total_businesses.toLocaleString() : '0',
-      subtext: `${apiStats?.approved_businesses || 0} approved businesses`,
+      subtext: t('dashboard.approvedBiz', '{count} approved businesses').replace('{count}', apiStats?.approved_businesses || 0),
       change: getChange('businesses', defaultRates.businesses),
       trend: getTrend('businesses', 'up'),
       icon: Building2,
@@ -173,9 +178,9 @@ export default function DashboardStats({ apiStats, timeRange = 'yearly' }) {
       border: 'border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]'
     },
     {
-      title: 'Total Categories',
+      title: t('dashboard.totalCategories', 'Total Categories'),
       value: apiStats?.total_categories !== undefined ? apiStats.total_categories.toLocaleString() : '0',
-      subtext: 'Organized destination types',
+      subtext: t('dashboard.organizedTypes', 'Organized destination types'),
       change: '+0',
       trend: 'up',
       icon: Tags,
@@ -184,9 +189,9 @@ export default function DashboardStats({ apiStats, timeRange = 'yearly' }) {
       border: 'border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]'
     },
     {
-      title: 'Events & Festivals',
+      title: t('dashboard.eventsFestivals', 'Events & Festivals'),
       value: apiStats?.total_events !== undefined ? apiStats.total_events.toLocaleString() : '0',
-      subtext: 'Active cultural events',
+      subtext: t('dashboard.activeCulturalEvents', 'Active cultural events'),
       change: getChange('events', defaultRates.events),
       trend: getTrend('events'),
       icon: CalendarDays,
@@ -195,9 +200,9 @@ export default function DashboardStats({ apiStats, timeRange = 'yearly' }) {
       border: 'border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]'
     },
     {
-      title: 'Saved Favorites',
+      title: t('dashboard.savedFavorites', 'Saved Favorites'),
       value: apiStats?.total_favorites !== undefined ? apiStats.total_favorites.toLocaleString() : '0',
-      subtext: `${apiStats?.total_galleries || 0} media gallery items`,
+      subtext: t('dashboard.galleryItems', '{count} media gallery items').replace('{count}', apiStats?.total_galleries || 0),
       change: getChange('favorites', defaultRates.favorites),
       trend: getTrend('favorites'),
       icon: Heart,

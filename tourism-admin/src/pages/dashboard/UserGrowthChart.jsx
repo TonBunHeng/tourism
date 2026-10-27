@@ -1,20 +1,39 @@
 import { User, TrendingUp } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { useLanguage } from '../../i18n';
 
-const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-const weekDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-const monthWeeks = ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
-const todayHours = ['12 AM', '4 AM', '8 AM', '12 PM', '4 PM', '8 PM'];
+const monthNamesEn = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const monthNamesKh = ['មករា', 'កុម្ភៈ', 'មីនា', 'មេសា', 'ឧសភា', 'មិថុនា', 'កក្កដា', 'សីហា', 'កញ្ញា', 'តុលា', 'វិច្ឆិកា', 'ធ្នូ'];
+
+const weekDaysEn = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+const weekDaysKh = ['ច័ន្ទ', 'អង្គារ', 'ពុធ', 'ព្រហ', 'សុក្រ', 'សៅរ៍', 'អាទិត្យ'];
+
+const monthWeeksEn = ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
+const monthWeeksKh = ['សប្តាហ៍ទី ១', 'សប្តាហ៍ទី ២', 'សប្តាហ៍ទី ៣', 'សប្តាហ៍ទី ៤'];
+
+const todayHoursEn = ['12 AM', '4 AM', '8 AM', '12 PM', '4 PM', '8 PM'];
+const todayHoursKh = ['១២ យប់', '៤ ព្រឹក', '៨ ព្រឹក', '១២ ថ្ងៃ', '៤ រសៀល', '៨ យប់'];
+
+const labelMapKh = {
+  'Jan': 'មករា', 'Feb': 'កុម្ភៈ', 'Mar': 'មីនា', 'Apr': 'មេសា', 'May': 'ឧសភា', 'Jun': 'មិថុនា',
+  'Jul': 'កក្កដា', 'Aug': 'សីហា', 'Sep': 'កញ្ញា', 'Oct': 'តុលា', 'Nov': 'វិច្ឆិកា', 'Dec': 'ធ្នូ',
+  'Mon': 'ច័ន្ទ', 'Tue': 'អង្គារ', 'Wed': 'ពុធ', 'Thu': 'ព្រហ', 'Fri': 'សុក្រ', 'Sat': 'សៅរ៍', 'Sun': 'អាទិត្យ',
+  'Week 1': 'សប្តាហ៍ទី ១', 'Week 2': 'សប្តាហ៍ទី ២', 'Week 3': 'សប្តាហ៍ទី ៣', 'Week 4': 'សប្តាហ៍ទី ៤',
+  '12 AM': '១២ យប់', '4 AM': '៤ ព្រឹក', '8 AM': '៨ ព្រឹក', '12 PM': '១២ ថ្ងៃ', '4 PM': '៤ រសៀល', '8 PM': '៨ យប់',
+};
 
 export default function UserGrowthChart({ growthData, timeRange = 'yearly', isLoading = false }) {
+  const { t, currentLang } = useLanguage();
+  const isKh = currentLang === 'KH';
+
   // Purely database-driven: if growthData is empty or loading, fallback appropriately by timeRange
   const fallbackList = timeRange === 'today'
-    ? todayHours
+    ? (isKh ? todayHoursKh : todayHoursEn)
     : timeRange === 'weekly'
-    ? weekDays
+    ? (isKh ? weekDaysKh : weekDaysEn)
     : timeRange === 'monthly'
-    ? monthWeeks
-    : monthNames;
+    ? (isKh ? monthWeeksKh : monthWeeksEn)
+    : (isKh ? monthNamesKh : monthNamesEn);
 
   // Only use growthData if it matches the expected timeframe item count
   const isMatchingLength = Array.isArray(growthData) && (
@@ -25,11 +44,18 @@ export default function UserGrowthChart({ growthData, timeRange = 'yearly', isLo
   );
 
   const chartData = isMatchingLength
-    ? growthData.map(item => ({
-        ...item,
-        label: item.label || item.month || item.period,
-        fullLabel: item.fullLabel || item.label || item.month,
-      }))
+    ? growthData.map(item => {
+        const rawLabel = item.label || item.month || item.period;
+        const displayLabel = (isKh && labelMapKh[rawLabel]) ? labelMapKh[rawLabel] : rawLabel;
+        const rawFullLabel = item.fullLabel || item.label || item.month;
+        const displayFullLabel = (isKh && labelMapKh[rawFullLabel]) ? labelMapKh[rawFullLabel] : rawFullLabel;
+
+        return {
+          ...item,
+          label: displayLabel,
+          fullLabel: displayFullLabel,
+        };
+      })
     : fallbackList.map((label) => ({
         label,
         month: label,
@@ -44,28 +70,28 @@ export default function UserGrowthChart({ growthData, timeRange = 'yearly', isLo
   const getSubtitle = () => {
     switch (timeRange) {
       case 'today':
-        return 'Hourly active engagement and visits from database (Today)';
+        return t('dashboard.growthSubtitleToday', 'Hourly active engagement and visits from database (Today)');
       case 'weekly':
-        return 'Daily active engagement and visits from database (Last 7 Days)';
+        return t('dashboard.growthSubtitleWeekly', 'Daily active engagement and visits from database (Last 7 Days)');
       case 'monthly':
-        return 'Weekly active engagement and visits from database (This Month)';
+        return t('dashboard.growthSubtitleMonthly', 'Weekly active engagement and visits from database (This Month)');
       case 'yearly':
       default:
-        return 'Monthly active engagement and visits from database (2026)';
+        return t('dashboard.growthSubtitleYearly', 'Monthly active engagement and visits from database (2026)');
     }
   };
 
   const getBadgeLabel = () => {
     switch (timeRange) {
       case 'today':
-        return `${totalTravelers} Registered Travelers (Today)`;
+        return t('dashboard.registeredTravelersToday', '{count} Registered Travelers (Today)').replace('{count}', totalTravelers.toLocaleString());
       case 'weekly':
-        return `${totalTravelers} Registered Travelers (This Week)`;
+        return t('dashboard.registeredTravelersWeekly', '{count} Registered Travelers (This Week)').replace('{count}', totalTravelers.toLocaleString());
       case 'monthly':
-        return `${totalTravelers} Registered Travelers (This Month)`;
+        return t('dashboard.registeredTravelersMonthly', '{count} Registered Travelers (This Month)').replace('{count}', totalTravelers.toLocaleString());
       case 'yearly':
       default:
-        return `${totalTravelers} Registered Travelers (2026)`;
+        return t('dashboard.registeredTravelersYearly', '{count} Registered Travelers (2026)').replace('{count}', totalTravelers.toLocaleString());
     }
   };
 
@@ -75,7 +101,7 @@ export default function UserGrowthChart({ growthData, timeRange = 'yearly', isLo
         <div>
           <h3 className="font-semibold text-sm md:text-base text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] flex items-center gap-2">
             <User className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-            <span>User Growth & Platform Traffic</span>
+            <span>{t('dashboard.userGrowthTitle', 'User Growth & Platform Traffic')}</span>
           </h3>
           <p className="text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
             {getSubtitle()}
@@ -90,7 +116,7 @@ export default function UserGrowthChart({ growthData, timeRange = 'yearly', isLo
       </div>
 
       <div className="h-72 w-full">
-        <ResponsiveContainer width="100%" height="100%" key={`growth-${timeRange}`}>
+        <ResponsiveContainer width="100%" height="100%" key={`growth-${timeRange}-${currentLang}`}>
           <LineChart data={chartData} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" vertical={false} />
             <XAxis dataKey="label" tick={{ fontSize: 12, fill: '#6B7280' }} axisLine={{ stroke: '#D1D5DB' }} tickLine={false} />
@@ -115,7 +141,7 @@ export default function UserGrowthChart({ growthData, timeRange = 'yearly', isLo
             <Line
               type="monotone"
               dataKey="unitsSold"
-              name="New Travelers"
+              name={t('dashboard.newTravelers', 'New Travelers')}
               stroke="#4472C4"
               strokeWidth={3}
               dot={{ r: 3, fill: '#4472C4' }}
@@ -127,7 +153,7 @@ export default function UserGrowthChart({ growthData, timeRange = 'yearly', isLo
             <Line
               type="monotone"
               dataKey="totalTransaction"
-              name="Platform Activity"
+              name={t('dashboard.platformActivity', 'Platform Activity')}
               stroke="#ED7D31"
               strokeWidth={3}
               dot={{ r: 3, fill: '#ED7D31' }}

@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import uploadService from '../../services/uploadService';
 import { validateImageFile } from '../../utils/fileValidation';
+import { useLanguage } from '../../i18n';
 
 export default function PlaceModal({
   isOpen,
@@ -34,6 +35,7 @@ export default function PlaceModal({
   categories = [],
   statusOptions = []
 }) {
+  const { t } = useLanguage();
   const [mapMode, setMapMode] = useState('interactive'); // 'interactive' or 'google'
   const [pickedCoords, setPickedCoords] = useState(null);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
@@ -47,6 +49,14 @@ export default function PlaceModal({
   const safeStatuses = (statusOptions && statusOptions.length > 0)
     ? statusOptions
     : ['Active', 'Inactive', 'Closed', 'Under Renovation'];
+
+  const getStatusLabel = (st) => {
+    if (st === 'Active') return t('places.statusActive', 'Active');
+    if (st === 'Inactive') return t('places.statusInactive', 'Inactive');
+    if (st === 'Closed') return t('places.statusClosed', 'Closed');
+    if (st === 'Under Renovation') return t('places.statusRenovation', 'Under Renovation');
+    return st;
+  };
 
   const updateField = (field, value) => {
     if (onFormChange) {
@@ -180,6 +190,15 @@ export default function PlaceModal({
 
   if (!isOpen) return null;
 
+  const presets = [
+    { label: t('places.presetAngkorWat', 'Angkor Wat'), address: 'Angkor Archaeological Park, Siem Reap, Cambodia' },
+    { label: t('places.presetPhnomPenhPalace', 'Phnom Penh Palace'), address: 'Royal Palace & Silver Pagoda, Phnom Penh, Cambodia' },
+    { label: t('places.presetSiemReapCity', 'Siem Reap City'), address: 'Siem Reap City Center, Siem Reap, Cambodia' },
+    { label: t('places.presetBattambang', 'Battambang'), address: 'Battambang City, Battambang, Cambodia' },
+    { label: t('places.presetKampotRiverfront', 'Kampot Riverfront'), address: 'Kampot Riverfront, Kampot, Cambodia' },
+    { label: t('places.presetKohRong', 'Koh Rong'), address: 'Koh Rong Island, Preah Sihanouk, Cambodia' }
+  ];
+
   return (
     <div
       className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-alert-backdrop"
@@ -199,10 +218,14 @@ export default function PlaceModal({
             </div>
             <div>
               <h3 className="text-base font-bold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">
-                {editingPlace ? 'Edit Place Details' : 'Add New Place'}
+                {editingPlace
+                  ? t('places.modalEditTitle', 'Edit Place Details')
+                  : t('places.modalAddTitle', 'Add New Place')}
               </h3>
               <p className="text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mt-0.5">
-                {editingPlace ? 'Update destination details, pricing and location.' : 'Fill in attraction details and assign location coordinates below.'}
+                {editingPlace
+                  ? t('places.modalEditSubtitle', 'Update destination details, pricing and location.')
+                  : t('places.modalAddSubtitle', 'Fill in attraction details and assign location coordinates below.')}
               </p>
             </div>
           </div>
@@ -221,7 +244,7 @@ export default function PlaceModal({
             {/* Place Name */}
             <div>
               <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">
-                Place Name *
+                {t('places.placeNameLabel', 'Place Name')} <span className="text-rose-500">*</span>
               </label>
               <div className="relative">
                 <Landmark className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
@@ -229,7 +252,7 @@ export default function PlaceModal({
                   type="text"
                   value={safeFormData.name || ''}
                   onChange={(e) => updateField('name', e.target.value)}
-                  placeholder="e.g. Angkor Wat, Royal Palace, Bokor Mountain"
+                  placeholder={t('places.placeNamePlaceholder', 'e.g. Angkor Wat, Royal Palace, Bokor Mountain')}
                   className="w-full pl-9 pr-4 py-2.5 bg-[var(--color-bg-light)] dark:bg-[var(--color-input-dark-bg)] border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]/70 rounded-md text-sm text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] placeholder-[var(--color-text-muted-light)] focus:outline-none focus:ring-2 focus:ring-[var(--color-input)] transition-all"
                   required
                 />
@@ -239,7 +262,7 @@ export default function PlaceModal({
             {/* Place Image Upload */}
             <div>
               <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">
-                Place Picture / Photo (Max 5MB: JPG, PNG, WEBP)
+                {t('places.photoLabel', 'Place Picture / Photo (Max 5MB: JPG, PNG, WEBP)')}
               </label>
 
               {safeFormData.image_url ? (
@@ -251,7 +274,7 @@ export default function PlaceModal({
                       onClick={() => fileInputRef.current?.click()}
                       className="px-3 py-1.5 bg-[#003E83] hover:bg-[#002e62] text-white rounded-md text-xs font-medium transition-colors cursor-pointer"
                     >
-                      Change Photo
+                      {t('places.changePhotoBtn', 'Change Photo')}
                     </button>
                     <button
                       type="button"
@@ -259,7 +282,7 @@ export default function PlaceModal({
                       className="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-md text-xs flex items-center gap-1 font-medium transition-colors cursor-pointer"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
-                      Remove
+                      {t('places.removePhotoBtn', 'Remove')}
                     </button>
                   </div>
                 </div>
@@ -270,9 +293,13 @@ export default function PlaceModal({
                 >
                   <Upload className="w-5 h-5 text-gray-400 mx-auto mb-1" />
                   <p className="text-gray-800 dark:text-zinc-200 font-medium text-xs">
-                    {isUploadingImage ? 'Uploading picture...' : 'Click to select picture'}
+                    {isUploadingImage
+                      ? t('places.uploadingPicture', 'Uploading picture...')
+                      : t('places.clickSelectPicture', 'Click to select picture')}
                   </p>
-                  <p className="text-[11px] text-gray-500 dark:text-zinc-400">JPG, PNG, WEBP up to 5MB</p>
+                  <p className="text-[11px] text-gray-500 dark:text-zinc-400">
+                    {t('places.photoFormatHint', 'JPG, PNG, WEBP up to 5MB')}
+                  </p>
                 </div>
               )}
 
@@ -290,7 +317,7 @@ export default function PlaceModal({
                   type="text"
                   value={safeFormData.image_url || ''}
                   onChange={(e) => updateField('image_url', e.target.value)}
-                  placeholder="Or paste image URL (https://...)"
+                  placeholder={t('places.photoUrlPlaceholder', 'Or paste image URL (https://...)')}
                   className="w-full pl-9 pr-4 py-2 bg-[var(--color-bg-light)] dark:bg-[var(--color-input-dark-bg)] border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]/70 rounded-md text-xs text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] placeholder-[var(--color-text-muted-light)] focus:outline-none focus:ring-2 focus:ring-[var(--color-input)] transition-all"
                 />
               </div>
@@ -300,7 +327,7 @@ export default function PlaceModal({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">
-                  Category *
+                  {t('places.categoryLabel', 'Category')} <span className="text-rose-500">*</span>
                 </label>
                 <div className="relative">
                   <Layers className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
@@ -318,7 +345,7 @@ export default function PlaceModal({
               </div>
               <div>
                 <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">
-                  Status *
+                  {t('places.statusLabel', 'Status')} <span className="text-rose-500">*</span>
                 </label>
                 <div className="relative">
                   <CheckCircle2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
@@ -328,7 +355,7 @@ export default function PlaceModal({
                     className="appearance-none w-full bg-[var(--color-bg-light)] dark:bg-[var(--color-input-dark-bg)] border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]/70 rounded-md pl-9 pr-9 py-2.5 text-sm text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] focus:outline-none focus:ring-2 focus:ring-[var(--color-input)] cursor-pointer"
                   >
                     {safeStatuses.map(s => (
-                      <option key={s} value={s}>{s}</option>
+                      <option key={s} value={s}>{getStatusLabel(s)}</option>
                     ))}
                   </select>
                   <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
@@ -339,14 +366,14 @@ export default function PlaceModal({
             {/* Address */}
             <div>
               <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">
-                Address *
+                {t('places.addressLabel', 'Address')} <span className="text-rose-500">*</span>
               </label>
               <div className="relative">
                 <MapPin className="absolute left-3 top-3 w-4 h-4 text-gray-400 pointer-events-none" />
                 <textarea
                   value={safeFormData.address || ''}
                   onChange={(e) => updateField('address', e.target.value)}
-                  placeholder="Enter full address or select location preset below"
+                  placeholder={t('places.addressPlaceholder', 'Enter full address or select location preset below')}
                   rows={2}
                   className="w-full pl-9 pr-4 py-2.5 bg-[var(--color-bg-light)] dark:bg-[var(--color-input-dark-bg)] border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]/70 rounded-md text-sm text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] placeholder-[var(--color-text-muted-light)] focus:outline-none focus:ring-2 focus:ring-[var(--color-input)] resize-none transition-all"
                   required
@@ -357,14 +384,14 @@ export default function PlaceModal({
             {/* Description */}
             <div>
               <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">
-                Description
+                {t('places.descriptionLabel', 'Description')}
               </label>
               <div className="relative">
                 <FileText className="absolute left-3 top-3 w-4 h-4 text-gray-400 pointer-events-none" />
                 <textarea
                   value={safeFormData.description || ''}
                   onChange={(e) => updateField('description', e.target.value)}
-                  placeholder="Enter attraction history, highlights, and tourist details..."
+                  placeholder={t('places.descriptionPlaceholder', 'Enter attraction history, highlights, and tourist details...')}
                   rows={3}
                   className="w-full pl-9 pr-4 py-2.5 bg-[var(--color-bg-light)] dark:bg-[var(--color-input-dark-bg)] border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]/70 rounded-md text-sm text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] placeholder-[var(--color-text-muted-light)] focus:outline-none focus:ring-2 focus:ring-[var(--color-input)] resize-none transition-all"
                 />
@@ -375,7 +402,7 @@ export default function PlaceModal({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">
-                  Best Time to Visit
+                  {t('places.bestTimeLabel', 'Best Time to Visit')}
                 </label>
                 <div className="relative">
                   <Clock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
@@ -383,14 +410,14 @@ export default function PlaceModal({
                     type="text"
                     value={safeFormData.best_time || ''}
                     onChange={(e) => updateField('best_time', e.target.value)}
-                    placeholder="e.g. Sunrise (5:30 AM - 7:00 AM)"
+                    placeholder={t('places.bestTimePlaceholder', 'e.g. Sunrise (5:30 AM - 7:00 AM)')}
                     className="w-full pl-9 pr-4 py-2.5 bg-[var(--color-bg-light)] dark:bg-[var(--color-input-dark-bg)] border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]/70 rounded-md text-sm text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] placeholder-[var(--color-text-muted-light)] focus:outline-none focus:ring-2 focus:ring-[var(--color-input)] transition-all"
                   />
                 </div>
               </div>
               <div>
                 <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">
-                  Suggested Duration
+                  {t('places.durationLabel', 'Suggested Duration')}
                 </label>
                 <div className="relative">
                   <Clock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
@@ -398,7 +425,7 @@ export default function PlaceModal({
                     type="text"
                     value={safeFormData.duration || ''}
                     onChange={(e) => updateField('duration', e.target.value)}
-                    placeholder="e.g. 2 - 3 Hours"
+                    placeholder={t('places.durationPlaceholder', 'e.g. 2 - 3 Hours')}
                     className="w-full pl-9 pr-4 py-2.5 bg-[var(--color-bg-light)] dark:bg-[var(--color-input-dark-bg)] border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]/70 rounded-md text-sm text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] placeholder-[var(--color-text-muted-light)] focus:outline-none focus:ring-2 focus:ring-[var(--color-input)] transition-all"
                   />
                 </div>
@@ -409,7 +436,7 @@ export default function PlaceModal({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">
-                  Ticket Price / Entry Fee
+                  {t('places.priceLabel', 'Ticket Price / Entry Fee')}
                 </label>
                 <div className="relative">
                   <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
@@ -417,14 +444,14 @@ export default function PlaceModal({
                     type="text"
                     value={safeFormData.price || ''}
                     onChange={(e) => updateField('price', e.target.value)}
-                    placeholder="e.g. Free, $37 USD, $5 USD"
+                    placeholder={t('places.pricePlaceholder', 'e.g. Free, $37 USD, $5 USD')}
                     className="w-full pl-9 pr-4 py-2.5 bg-[var(--color-bg-light)] dark:bg-[var(--color-input-dark-bg)] border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]/70 rounded-md text-sm text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] placeholder-[var(--color-text-muted-light)] focus:outline-none focus:ring-2 focus:ring-[var(--color-input)] transition-all"
                   />
                 </div>
               </div>
               <div>
                 <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">
-                  Initial Rating Score
+                  {t('places.ratingLabel', 'Initial Rating Score')}
                 </label>
                 <div className="relative">
                   <Star className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-amber-500 fill-amber-500 pointer-events-none" />
@@ -446,7 +473,7 @@ export default function PlaceModal({
               <div className="flex items-center justify-between mb-2">
                 <label className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] flex items-center gap-1.5">
                   <MapPin className="w-3.5 h-3.5 text-[var(--color-primary)]" />
-                  <span>Select Location on Map</span>
+                  <span>{t('places.selectLocationMap', 'Select Location on Map')}</span>
                 </label>
                 <div className="flex items-center gap-1">
                   <button
@@ -455,7 +482,7 @@ export default function PlaceModal({
                     className={`px-2 py-0.5 text-xs rounded-md transition-colors flex items-center gap-1 cursor-pointer ${mapMode === 'interactive' ? 'bg-[#003E83] text-white font-semibold' : 'bg-[var(--color-surface-hover-light)] dark:bg-[var(--color-surface-hover-dark)] text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]'}`}
                   >
                     <MousePointerClick className="w-3 h-3" />
-                    Interactive Pick
+                    {t('places.interactivePick', 'Interactive Pick')}
                   </button>
                   <button
                     type="button"
@@ -463,23 +490,18 @@ export default function PlaceModal({
                     className={`px-2 py-0.5 text-xs rounded-md transition-colors flex items-center gap-1 cursor-pointer ${mapMode === 'google' ? 'bg-[#003E83] text-white font-semibold' : 'bg-[var(--color-surface-hover-light)] dark:bg-[var(--color-surface-hover-dark)] text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]'}`}
                   >
                     <MapIcon className="w-3 h-3" />
-                    Google View
+                    {t('places.googleView', 'Google View')}
                   </button>
                 </div>
               </div>
 
               {/* Quick Select Location Presets */}
               <div className="mb-2">
-                <span className="text-[11px] text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] block mb-1">Quick Presets:</span>
+                <span className="text-[11px] text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] block mb-1">
+                  {t('places.quickPresets', 'Quick Presets:')}
+                </span>
                 <div className="flex flex-wrap gap-1.5">
-                  {[
-                    { label: 'Angkor Wat', address: 'Angkor Archaeological Park, Siem Reap, Cambodia' },
-                    { label: 'Phnom Penh Palace', address: 'Royal Palace & Silver Pagoda, Phnom Penh, Cambodia' },
-                    { label: 'Siem Reap City', address: 'Siem Reap City Center, Siem Reap, Cambodia' },
-                    { label: 'Battambang', address: 'Battambang City, Battambang, Cambodia' },
-                    { label: 'Kampot Riverfront', address: 'Kampot Riverfront, Kampot, Cambodia' },
-                    { label: 'Koh Rong', address: 'Koh Rong Island, Preah Sihanouk, Cambodia' }
-                  ].map((loc, i) => (
+                  {presets.map((loc, i) => (
                     <button
                       key={i}
                       type="button"
@@ -502,12 +524,12 @@ export default function PlaceModal({
                 <div className="relative w-full h-48 rounded-md overflow-hidden border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] bg-[#0f172a] shadow-xs">
                   <div className="absolute top-2 left-2 z-10 bg-black/85 text-white text-[11px] px-2.5 py-1 rounded-md flex items-center gap-1.5 border border-white/15">
                     <MousePointerClick className="w-3.5 h-3.5 text-emerald-400" />
-                    <span>Click anywhere on map to pick location pin</span>
+                    <span>{t('places.clickMapPinHint', 'Click anywhere on map to pick location pin')}</span>
                   </div>
 
                   {pickedCoords && (
                     <div className="absolute bottom-2 right-2 z-10 bg-emerald-600 text-white text-[11px] font-medium px-2.5 py-1 rounded-md shadow-md">
-                      ✓ Pin Selected ({pickedCoords.lat.toFixed(4)}, {pickedCoords.lng.toFixed(4)})
+                      ✓ {t('places.pinSelected', 'Pin Selected ({lat}, {lng})').replace('{lat}', pickedCoords.lat.toFixed(4)).replace('{lng}', pickedCoords.lng.toFixed(4))}
                     </div>
                   )}
 
@@ -535,7 +557,7 @@ export default function PlaceModal({
 
               <div className="mt-1.5 flex items-center justify-between">
                 <span className="text-[11px] text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
-                  Move map and click any point to set address
+                  {t('places.moveMapHint', 'Move map and click any point to set address')}
                 </span>
                 <a
                   href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(safeFormData.address || safeFormData.name || 'Cambodia')}`}
@@ -543,7 +565,7 @@ export default function PlaceModal({
                   rel="noopener noreferrer"
                   className="text-[11px] text-[var(--color-info-text)] dark:text-[var(--color-info-dark-text)] hover:underline flex items-center gap-0.5"
                 >
-                  <span>Open Google Maps</span>
+                  <span>{t('places.openGoogleMaps', 'Open in Google Maps')}</span>
                   <ExternalLink className="w-3 h-3" />
                 </a>
               </div>
@@ -557,7 +579,7 @@ export default function PlaceModal({
               onClick={onClose}
               className="flex-1 py-2.5 px-4 rounded-md border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] hover:bg-[var(--color-surface-hover-light)] dark:hover:bg-[var(--color-surface-hover-dark)] font-medium text-sm transition-colors text-center cursor-pointer"
             >
-              Cancel
+              {t('places.cancelBtn', 'Cancel')}
             </button>
             <button
               type="submit"
@@ -567,12 +589,12 @@ export default function PlaceModal({
               {editingPlace ? (
                 <>
                   <Check className="w-4 h-4" />
-                  <span>Update Place</span>
+                  <span>{t('places.updateBtn', 'Update Place')}</span>
                 </>
               ) : (
                 <>
                   <Plus className="w-4 h-4" />
-                  <span>Add Place</span>
+                  <span>{t('places.addBtn', 'Add Place')}</span>
                 </>
               )}
             </button>

@@ -20,17 +20,18 @@ import placeService from "../../services/placeService";
 import categoryService from "../../services/categoryService";
 import { useAlert } from "../../context/AlertContext";
 import { useSearch } from "../../context/SearchContext";
+import { useLanguage } from "../../i18n";
 import { getPageCache, setPageCache } from "../../utils/pageCache";
 
 export default function Favorites() {
+  const { t } = useLanguage();
   const { showConfirm, showSuccess, showError } = useAlert();
   const { searchTerm, setSearchTerm } = useSearch();
 
-  const cachedFavorites = getPageCache('favorites_data');
-  const [favorites, setFavorites] = useState(() => cachedFavorites?.favorites || []);
-  const [categories, setCategories] = useState(() => cachedFavorites?.categories || ["All"]);
+  const [favorites, setFavorites] = useState(() => getPageCache('favorites_data')?.favorites || []);
+  const [categories, setCategories] = useState(() => getPageCache('favorites_data')?.categories || ["All"]);
   const [availablePlaces, setAvailablePlaces] = useState([]);
-  const [isLoading, setIsLoading] = useState(() => !cachedFavorites);
+  const [isLoading, setIsLoading] = useState(() => !getPageCache('favorites_data'));
 
   // Filter & Search States
   const [selectedCategory, setSelectedCategory] = useState("All");
@@ -99,7 +100,7 @@ export default function Favorites() {
 
   // Load Favorites from API
   const loadFavorites = async () => {
-    if (!cachedFavorites && favorites.length === 0) {
+    if (favorites.length === 0) {
       setIsLoading(true);
     }
     try {
@@ -175,11 +176,6 @@ export default function Favorites() {
   }, [searchTerm]);
 
   // Handlers
-  const handleSearchChange = (val) => {
-    setSearchTerm(val);
-    setCurrentPage(1);
-  };
-
   const handleCategoryChange = (val) => {
     setSelectedCategory(val);
     setCurrentPage(1);
@@ -226,9 +222,9 @@ export default function Favorites() {
     const fav = favorites.find(f => f.id === favId || f.place_id === favId);
     const placeName = fav?.name || 'this destination';
     const confirmed = await showConfirm({
-      title: 'Remove from Favorites',
-      message: `Are you sure you want to remove "${placeName}" from your saved favorites?`,
-      confirmText: 'Remove Favorite',
+      title: t('favorites.deleteConfirmTitle'),
+      message: t('favorites.deleteConfirmMsg', { name: placeName }),
+      confirmText: t('favorites.deleteConfirmBtn'),
       type: 'danger'
     });
     if (!confirmed) return;
@@ -237,18 +233,18 @@ export default function Favorites() {
       await favoriteService.deleteFavorite(favId);
       setFavorites((prev) => prev.filter((f) => f.id !== favId && f.place_id !== favId));
       setSelectedFavorites((prev) => prev.filter((id) => id !== favId));
-      showSuccess(`"${placeName}" has been removed from favorites.`, 'Favorite Removed');
+      showSuccess(t('favorites.deleteSuccess'), t('favorites.deleteSuccessTitle'));
     } catch (e) {
-      showError(e.message || "Failed to remove favorite.", 'Remove Failed');
+      showError(e.message || t('favorites.deleteFailed'), t('favorites.deleteConfirmTitle'));
     }
   };
 
   const handleBulkDelete = async () => {
     if (selectedFavorites.length === 0) return;
     const confirmed = await showConfirm({
-      title: 'Remove Multiple Favorites',
-      message: `Are you sure you want to remove ${selectedFavorites.length} selected places from your favorites?`,
-      confirmText: 'Remove Selected',
+      title: t('favorites.bulkDeleteConfirmTitle'),
+      message: t('favorites.bulkDeleteConfirmMsg', { count: selectedFavorites.length }),
+      confirmText: t('favorites.deleteConfirmBtn'),
       type: 'danger'
     });
     if (!confirmed) return;
@@ -259,9 +255,9 @@ export default function Favorites() {
       );
       setFavorites((prev) => prev.filter((f) => !selectedFavorites.includes(f.id)));
       setSelectedFavorites([]);
-      showSuccess(`${selectedFavorites.length} places have been removed from favorites.`, 'Favorites Removed');
+      showSuccess(t('favorites.bulkDeleteSuccess', { count: selectedFavorites.length }), t('favorites.deleteSuccessTitle'));
     } catch (e) {
-      showError(e.message || "Failed to remove selected favorites.", 'Bulk Remove Failed');
+      showError(e.message || t('favorites.deleteFailed'), t('favorites.bulkDeleteConfirmTitle'));
     }
   };
 
@@ -278,9 +274,9 @@ export default function Favorites() {
         )
       );
       setSelectedFavorites([]);
-      showSuccess("Selected places marked as visited successfully.", "Status Updated");
+      showSuccess(t('favorites.statusUpdateSuccess', { status: t('favorites.statusVisited') }), t('favorites.statusUpdateTitle'));
     } catch (e) {
-      showError(e.message || "Failed to update visit status.", "Update Failed");
+      showError(e.message || t('favorites.deleteFailed'), t('favorites.statusUpdateTitle'));
     }
   };
 
@@ -310,11 +306,11 @@ export default function Favorites() {
       const res = await favoriteService.addFavorite({ place_id: placeId });
       if (res.success) {
         setIsAddOpen(false);
-        showSuccess("Place added to favorites successfully.", "Favorite Added");
+        showSuccess(t('favorites.placeAddedSuccess', { name: 'Destination' }), t('favorites.placeAddedTitle'));
         loadFavorites();
       }
     } catch (e) {
-      showError(e.message || "Could not add place to favorites.", "Action Failed");
+      showError(e.message || t('favorites.deleteFailed'), t('favorites.placeAddedTitle'));
     }
   };
 
@@ -338,11 +334,11 @@ export default function Favorites() {
           rating: 5.0,
           tags: []
         });
-        showSuccess(`Place "${placeRes.data.name || newPlace.name}" created and added to favorites!`, "Place Created");
+        showSuccess(t('favorites.placeAddedSuccess', { name: placeRes.data.name || newPlace.name }), t('favorites.placeAddedTitle'));
         loadFavorites();
       }
     } catch (e) {
-      showError(e.message || "Failed to create place.", "Creation Failed");
+      showError(e.message || t('favorites.deleteFailed'), t('favorites.placeAddedTitle'));
     }
   };
 
@@ -414,7 +410,7 @@ export default function Favorites() {
             <div className="flex flex-col items-center justify-center py-20 px-4 text-center">
               <Loader2 className="w-8 h-8 text-[var(--color-primary)] animate-spin mb-3" />
               <p className="text-sm font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
-                Loading favorite destinations...
+                {t('common.loading') || 'Loading...'}
               </p>
             </div>
           ) : (
@@ -453,7 +449,7 @@ export default function Favorites() {
             startIndex={startIndex}
             endIndex={endIndex}
             totalRecords={filteredFavorites.length}
-            label="destinations"
+            label={t('favorites.paginationLabel')}
           />
         )}
       </div>

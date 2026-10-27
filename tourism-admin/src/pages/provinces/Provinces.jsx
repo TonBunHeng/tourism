@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Landmark } from 'lucide-react';
 import SimplePagination from '../../components/common/SimplePagination';
 import ProvincesHeader from './ProvincesHeader';
@@ -13,10 +13,12 @@ import authService, { isSuperAdminRole } from '../../services/authService';
 import { useAlert } from '../../context/AlertContext';
 import { useSearch } from '../../context/SearchContext';
 import { getPageCache, setPageCache } from '../../utils/pageCache';
+import { useLanguage } from '../../i18n';
 
 const PROVINCE_TYPES = ['All', 'Capital City', 'Province', 'Municipality'];
 
 export default function Provinces() {
+  const { t } = useLanguage();
   const { showConfirm, showSuccess, showError } = useAlert();
   const { searchTerm, setSearchTerm } = useSearch();
   const currentUser = authService.getCurrentUser();
@@ -48,7 +50,7 @@ export default function Provinces() {
     description: ''
   });
 
-  const loadProvinces = async () => {
+  const loadProvinces = useCallback(async () => {
     if (!getPageCache('provinces_data')) setIsLoading(true);
     try {
       const params = {
@@ -86,7 +88,7 @@ export default function Provinces() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [currentPage, searchTerm, selectedType, selectedStatus, itemsPerPage]);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -94,7 +96,7 @@ export default function Provinces() {
 
   useEffect(() => {
     loadProvinces();
-  }, [currentPage, searchTerm, selectedType, selectedStatus]);
+  }, [loadProvinces]);
 
   const handleSearchChange = (val) => { setSearchTerm(val); setCurrentPage(1); };
   const handleTypeChange = (val) => { setSelectedType(val); setCurrentPage(1); };
@@ -120,9 +122,9 @@ export default function Provinces() {
 
     if (isSuperAdmin) {
       const confirmed = await showConfirm({
-        title: 'Delete Province',
-        message: `Are you sure you want to permanently delete province "${provName}"?\n\nThis action cannot be undone.`,
-        confirmText: 'Delete Permanently',
+        title: t('provinces.deleteProvinceTitle', 'Delete Province'),
+        message: t('provinces.deletePermanentMessage', 'Are you sure you want to permanently delete province "{name}"?\n\nThis action cannot be undone.').replace('{name}', provName),
+        confirmText: t('provinces.deletePermanentlyBtn', 'Delete Permanently'),
         type: 'danger'
       });
 
@@ -130,18 +132,24 @@ export default function Provinces() {
 
       try {
         await provinceService.deleteProvince(targetId);
-        showSuccess(`Province "${provName}" has been permanently deleted.`, 'Province Deleted');
+        showSuccess(
+          t('provinces.deleteSuccessMsg', 'Province "{name}" has been permanently deleted.').replace('{name}', provName),
+          t('provinces.deleteSuccessTitle', 'Province Deleted')
+        );
         loadProvinces();
       } catch (e) {
-        showError(e.message || 'Failed to delete province.', 'Delete Failed');
+        showError(
+          e.message || t('provinces.deleteFailedMsg', 'Failed to delete province.'),
+          t('provinces.deleteFailedTitle', 'Delete Failed')
+        );
       }
       return;
     }
 
     const confirmed = await showConfirm({
-      title: 'Submit Deletion Request',
-      message: `Are you sure you want to submit a deletion request for province "${provName}"?\n\nThis will be submitted to the Super Administrator for review and approval.`,
-      confirmText: 'Submit Deletion',
+      title: t('provinces.deletionRequestTitle', 'Submit Deletion Request'),
+      message: t('provinces.deletionRequestMessage', 'Are you sure you want to submit a deletion request for province "{name}"?\n\nThis will be submitted to the Super Administrator for review and approval.').replace('{name}', provName),
+      confirmText: t('provinces.submitDeletionBtn', 'Submit Deletion'),
       type: 'danger'
     });
 
@@ -150,7 +158,7 @@ export default function Provinces() {
     try {
       await deletionRequestService.createRequest({
         request_type: 'item',
-        reason: `Request to delete province: ${provName}`,
+        reason: t('provinces.deletionRequestReason', 'Request to delete province: {name}').replace('{name}', provName),
         urgency: 'high',
         items: [{
           item_type: 'province',
@@ -159,9 +167,15 @@ export default function Provinces() {
           category: 'Province'
         }]
       });
-      showSuccess(`Deletion request for "${provName}" has been submitted to Super Admin for approval.`, 'Request Submitted');
+      showSuccess(
+        t('provinces.deletionRequestSuccessMsg', 'Deletion request for "{name}" has been submitted to Super Admin for approval.').replace('{name}', provName),
+        t('provinces.requestSubmittedTitle', 'Request Submitted')
+      );
     } catch (e) {
-      showError(e.message || 'Failed to submit deletion request.', 'Submission Failed');
+      showError(
+        e.message || t('provinces.submissionFailedMsg', 'Failed to submit deletion request.'),
+        t('provinces.submissionFailedTitle', 'Submission Failed')
+      );
     }
   };
 
@@ -216,15 +230,24 @@ export default function Provinces() {
     try {
       if (editingProvince) {
         await provinceService.updateProvince(editingProvince.id, formData);
-        showSuccess(`Province "${formData.name}" has been updated successfully.`, 'Province Updated');
+        showSuccess(
+          t('provinces.provinceUpdatedSuccess', 'Province "{name}" has been updated successfully.').replace('{name}', formData.name),
+          t('provinces.provinceUpdatedTitle', 'Province Updated')
+        );
       } else {
         await provinceService.createProvince(formData);
-        showSuccess(`Province "${formData.name}" has been created successfully.`, 'Province Created');
+        showSuccess(
+          t('provinces.provinceCreatedSuccess', 'Province "{name}" has been created successfully.').replace('{name}', formData.name),
+          t('provinces.provinceCreatedTitle', 'Province Created')
+        );
       }
       closeModal();
       loadProvinces();
     } catch (e) {
-      showError(e.message || 'Failed to save province.', 'Save Failed');
+      showError(
+        e.message || t('provinces.saveFailedMsg', 'Failed to save province.'),
+        t('provinces.saveFailedTitle', 'Save Failed')
+      );
     }
   };
 
@@ -249,11 +272,12 @@ export default function Provinces() {
           selectedStatus={selectedStatus}
           onStatusChange={handleStatusChange}
           provinceTypes={PROVINCE_TYPES}
+          totalCount={totalRecords}
         />
 
         {isLoading ? (
           <div className="p-12 text-center text-slate-500 dark:text-zinc-400 font-medium">
-            Loading provinces from API...
+            {t('provinces.loadingProvinces', 'Loading provinces from API...')}
           </div>
         ) : (
           <ProvincesList
@@ -273,7 +297,7 @@ export default function Provinces() {
           startIndex={startIndex}
           endIndex={endIndex}
           totalRecords={totalRecords}
-          label="provinces"
+          label={t('provinces.paginationLabel', 'provinces')}
         />
       </div>
 

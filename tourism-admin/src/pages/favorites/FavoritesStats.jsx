@@ -1,7 +1,9 @@
 import React from 'react';
 import { Heart, CheckCircle2, Star, Users } from 'lucide-react';
+import { useLanguage } from '../../i18n';
 
 export default function FavoritesStats({ favorites = [] }) {
+  const { t } = useLanguage();
   const safeFavorites = Array.isArray(favorites) ? favorites : [];
   const total = safeFavorites.length;
   const visited = safeFavorites.filter(f => Boolean(f.visited || f.status === 'Visited')).length;
@@ -15,35 +17,37 @@ export default function FavoritesStats({ favorites = [] }) {
     ? (safeFavorites.reduce((sum, f) => sum + (Number(f.rating || f.place?.rating) || 0), 0) / total).toFixed(1)
     : '0.0';
 
+  const pct = total > 0 ? Math.round((visited / total) * 100) : 0;
+
   const stats = [
     {
-      label: 'Total Favorites',
+      label: t('favorites.statTotalFavorites'),
       value: total.toLocaleString(),
-      subtext: 'Saved user destinations',
+      subtext: t('favorites.subtextTotalFavorites'),
       icon: Heart,
       color: 'text-[var(--color-rose-badge-text)] dark:text-[var(--color-rose-badge-dark-text)]',
       bg: 'bg-[var(--color-rose-badge-bg)] dark:bg-[var(--color-rose-badge-dark-bg)]'
     },
     {
-      label: 'Active Travelers',
+      label: t('favorites.statActiveTravelers'),
       value: uniqueUsers > 0 ? uniqueUsers.toLocaleString() : total > 0 ? '1' : '0',
-      subtext: 'Users with saved places',
+      subtext: t('favorites.subtextActiveTravelers'),
       icon: Users,
       color: 'text-[var(--color-info-text)] dark:text-[var(--color-info-dark-text)]',
       bg: 'bg-[var(--color-info-bg)] dark:bg-[var(--color-info-dark-bg)]'
     },
     {
-      label: 'Average Place Rating',
+      label: t('favorites.statAvgRating'),
       value: `${avgRating} ★`,
-      subtext: 'Destination score out of 5.0',
+      subtext: t('favorites.subtextAvgRating'),
       icon: Star,
       color: 'text-[var(--color-warning-text)] dark:text-[var(--color-warning-dark-text)]',
       bg: 'bg-[var(--color-warning-bg)] dark:bg-[var(--color-warning-dark-bg)]'
     },
     {
-      label: 'Visited Places',
+      label: t('favorites.statVisitedPlaces'),
       value: visited.toLocaleString(),
-      subtext: `${total > 0 ? Math.round((visited / total) * 100) : 0}% marked as visited`,
+      subtext: t('favorites.subtextVisitedPlaces', { pct }),
       icon: CheckCircle2,
       color: 'text-[var(--color-success-text)] dark:text-[var(--color-success-dark-text)]',
       bg: 'bg-[var(--color-success-bg)] dark:bg-[var(--color-success-dark-bg)]'

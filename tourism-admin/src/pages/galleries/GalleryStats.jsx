@@ -1,41 +1,46 @@
-import { Image, Video, Eye, CheckCircle2 } from 'lucide-react';
+import React from 'react';
+import { Image, Video, Eye } from 'lucide-react';
+import { useLanguage } from '../../i18n';
 
 export default function GalleryStats({ mediaItems, media }) {
+  const { t } = useLanguage();
   const items = Array.isArray(mediaItems) ? mediaItems : (Array.isArray(media) ? media : []);
   const total = items.length;
   const imageCount = items.filter(m => m.type === 'image' || !m.type).length;
   const videoCount = items.filter(m => m.type === 'video').length;
   const totalViews = items.reduce((sum, m) => sum + (Number(m.views || m.view_count) || 0), 0);
 
+  const photoPct = total > 0 ? Math.round((imageCount / total) * 100) : 0;
+
   const stats = [
     {
-      label: 'Total Media Assets',
+      label: t('gallery.statTotalMedia', 'Total Media Assets'),
       value: total.toLocaleString(),
-      subtext: 'High-res photos & video clips',
+      subtext: t('gallery.subtextTotalMedia', 'High-res photos & video clips'),
       icon: Image,
       color: 'text-[var(--color-info-text)] dark:text-[var(--color-info-dark-text)]',
       bg: 'bg-[var(--color-info-bg)] dark:bg-[var(--color-info-dark-bg)]'
     },
     {
-      label: 'Photo Gallery',
+      label: t('gallery.statPhotoGallery', 'Photo Gallery'),
       value: imageCount.toLocaleString(),
-      subtext: `${total > 0 ? Math.round((imageCount / total) * 100) : 0}% photo coverage`,
+      subtext: t('gallery.subtextPhotoGallery', '{pct}% photo coverage').replace('{pct}', photoPct),
       icon: Image,
       color: 'text-[var(--color-success-text)] dark:text-[var(--color-success-dark-text)]',
       bg: 'bg-[var(--color-success-bg)] dark:bg-[var(--color-success-dark-bg)]'
     },
     {
-      label: 'Video Highlights',
+      label: t('gallery.statVideoHighlights', 'Video Highlights'),
       value: videoCount.toLocaleString(),
-      subtext: `${videoCount} promotional clips`,
+      subtext: t('gallery.subtextVideoHighlights', '{count} promotional clips').replace('{count}', videoCount),
       icon: Video,
       color: 'text-[var(--color-purple-badge-text)] dark:text-[var(--color-purple-badge-dark-text)]',
       bg: 'bg-[var(--color-purple-badge-bg)] dark:bg-[var(--color-purple-badge-dark-bg)]'
     },
     {
-      label: 'Total Views',
+      label: t('gallery.statTotalViews', 'Total Views'),
       value: totalViews.toLocaleString(),
-      subtext: 'Traveler engagement impressions',
+      subtext: t('gallery.subtextTotalViews', 'Traveler engagement impressions'),
       icon: Eye,
       color: 'text-[var(--color-warning-text)] dark:text-[var(--color-warning-dark-text)]',
       bg: 'bg-[var(--color-warning-bg)] dark:bg-[var(--color-warning-dark-bg)]'

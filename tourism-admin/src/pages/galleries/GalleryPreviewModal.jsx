@@ -1,7 +1,10 @@
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { X, Edit } from 'lucide-react';
+import { useLanguage } from '../../i18n';
 
 export default function GalleryPreviewModal({ isOpen, media, onClose, onEdit }) {
+  const { t } = useLanguage();
+
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === 'Escape') onClose?.();
@@ -18,6 +21,17 @@ export default function GalleryPreviewModal({ isOpen, media, onClose, onEdit }) 
 
   if (!isOpen || !media) return null;
 
+  const getTypeLabel = (type) => {
+    if (type === 'video') return t('gallery.typeVideo', 'Video');
+    return t('gallery.typeImage', 'Image');
+  };
+
+  const getStatusLabel = (status) => {
+    if (status === 'Published') return t('gallery.statusPublished', 'Published');
+    if (status === 'Draft') return t('gallery.statusDraft', 'Draft');
+    return status;
+  };
+
   return (
     <div
       className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-alert-backdrop"
@@ -32,8 +46,12 @@ export default function GalleryPreviewModal({ isOpen, media, onClose, onEdit }) 
         {/* Modal Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-zinc-800 shrink-0">
           <div>
-            <h3 className="text-base font-bold text-gray-900 dark:text-zinc-100">Media Preview</h3>
-            <p className="text-xs text-gray-500 dark:text-zinc-400">ID: #{media.id}</p>
+            <h3 className="text-base font-bold text-gray-900 dark:text-zinc-100">
+              {t('gallery.previewTitle', 'Media Preview')}
+            </h3>
+            <p className="text-xs text-gray-500 dark:text-zinc-400">
+              {t('gallery.idLabel', 'ID: #{id}').replace('{id}', media.id)}
+            </p>
           </div>
           <button
             type="button"
@@ -58,7 +76,7 @@ export default function GalleryPreviewModal({ isOpen, media, onClose, onEdit }) 
                   className="w-full h-full object-contain bg-black"
                 >
                   <source src={media.url} type="video/mp4" />
-                  Your browser does not support playing this video.
+                  {t('gallery.videoNotSupported', 'Your browser does not support playing this video.')}
                 </video>
               ) : (
                 <img
@@ -71,35 +89,55 @@ export default function GalleryPreviewModal({ isOpen, media, onClose, onEdit }) 
           )}
 
           <div>
-            <span className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">Title</span>
+            <span className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
+              {t('gallery.labelTitle', 'Title')}
+            </span>
             <p className="text-base font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] mt-1">{media.title}</p>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="bg-[var(--color-surface-hover-light)] dark:bg-[var(--color-surface-hover-dark)]/50 p-3.5 rounded-md border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]">
-              <span className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">Category & Type</span>
-              <p className="text-sm font-medium text-[var(--color-info-text)] dark:text-[var(--color-info-dark-text)] mt-1">{media.category} · <span className="capitalize font-semibold">{media.type}</span></p>
+              <span className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
+                {t('gallery.labelCategoryType', 'Category & Type')}
+              </span>
+              <p className="text-sm font-medium text-[var(--color-info-text)] dark:text-[var(--color-info-dark-text)] mt-1">
+                {media.category} · <span className="capitalize font-semibold">{getTypeLabel(media.type)}</span>
+              </p>
             </div>
             <div className="bg-[var(--color-surface-hover-light)] dark:bg-[var(--color-surface-hover-dark)]/50 p-3.5 rounded-md border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]">
-              <span className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">Status</span>
-              <p className="text-sm font-medium text-[var(--color-success-text)] dark:text-[var(--color-success-dark-text)] mt-1">{media.status}</p>
+              <span className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
+                {t('gallery.labelStatus', 'Status')}
+              </span>
+              <p className="text-sm font-medium text-[var(--color-success-text)] dark:text-[var(--color-success-dark-text)] mt-1">
+                {getStatusLabel(media.status)}
+              </p>
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="bg-[var(--color-surface-hover-light)] dark:bg-[var(--color-surface-hover-dark)]/50 p-3.5 rounded-md border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]">
-              <span className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">Dimensions & Size</span>
+              <span className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
+                {t('gallery.labelDimensionsSize', 'Dimensions & Size')}
+              </span>
               <p className="text-sm font-medium text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] mt-1">{media.dimensions || '1920x1080'}</p>
               <p className="text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mt-0.5">{media.size || media.file_size || '2.4 MB'}</p>
             </div>
             <div className="bg-[var(--color-surface-hover-light)] dark:bg-[var(--color-surface-hover-dark)]/50 p-3.5 rounded-md border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]">
-              <span className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">Engagement</span>
-              <p className="text-sm font-medium text-[var(--color-warning-text)] dark:text-[var(--color-warning-dark-text)] mt-1">{(media.views || 0).toLocaleString()} views · {media.likes || 0} likes</p>
+              <span className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
+                {t('gallery.labelEngagement', 'Engagement')}
+              </span>
+              <p className="text-sm font-medium text-[var(--color-warning-text)] dark:text-[var(--color-warning-dark-text)] mt-1">
+                {t('gallery.engagementSummary', '{views} views · {likes} likes')
+                  .replace('{views}', (media.views || 0).toLocaleString())
+                  .replace('{likes}', (media.likes || 0).toLocaleString())}
+              </p>
             </div>
           </div>
 
           <div>
-            <span className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] block mb-1.5">Tags</span>
+            <span className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] block mb-1.5">
+              {t('gallery.labelTags', 'Tags')}
+            </span>
             <div className="flex flex-wrap gap-1.5">
               {media.tags?.map((tag, idx) => (
                 <span key={idx} className="px-2.5 py-1 bg-[var(--color-neutral-badge-bg)] dark:bg-[var(--color-bg-dark)] text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] rounded-md text-xs border border-[var(--color-neutral-badge-border)] dark:border-[var(--color-border-dark)]">
@@ -122,14 +160,14 @@ export default function GalleryPreviewModal({ isOpen, media, onClose, onEdit }) 
             className="py-2 px-4 rounded-md bg-[#003E83] hover:bg-[#002e62] text-white font-medium text-xs sm:text-sm transition-colors flex items-center gap-2 cursor-pointer"
           >
             <Edit className="w-4 h-4" />
-            Edit Media
+            {t('gallery.editMediaBtn', 'Edit Media')}
           </button>
           <button
             type="button"
             onClick={onClose}
             className="py-2 px-4 rounded-md border border-gray-300 dark:border-zinc-700 hover:bg-gray-50 dark:hover:bg-zinc-800 text-gray-700 dark:text-zinc-200 font-medium text-xs sm:text-sm transition-colors cursor-pointer"
           >
-            Close
+            {t('gallery.closeBtn', 'Close')}
           </button>
         </div>
       </div>

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import SimplePagination from "../../components/common/SimplePagination";
 import RatingsHeader from "./RatingsHeader";
 import RatingsStats from "./RatingsStats";
@@ -12,17 +12,18 @@ import reviewService from "../../services/reviewService";
 import placeService from "../../services/placeService";
 import { useAlert } from "../../context/AlertContext";
 import { useSearch } from "../../context/SearchContext";
+import { useLanguage } from "../../i18n";
 import { getPageCache, setPageCache } from "../../utils/pageCache";
 
 export default function Ratings() {
+  const { t } = useLanguage();
   const { showConfirm, showSuccess, showError } = useAlert();
   const { searchTerm, setSearchTerm } = useSearch();
 
-  const cachedRatings = getPageCache('ratings_data');
-  const [reviews, setReviews] = useState(() => cachedRatings?.reviews || []);
-  const [places, setPlaces] = useState(() => cachedRatings?.places || ["All"]);
-  const [isLoading, setIsLoading] = useState(() => !cachedRatings);
-  const [analyticsData, setAnalyticsData] = useState(() => cachedRatings?.analyticsData || null);
+  const [reviews, setReviews] = useState(() => getPageCache('ratings_data')?.reviews || []);
+  const [places, setPlaces] = useState(() => getPageCache('ratings_data')?.places || ["All"]);
+  const [isLoading, setIsLoading] = useState(() => !getPageCache('ratings_data'));
+  const [analyticsData, setAnalyticsData] = useState(() => getPageCache('ratings_data')?.analyticsData || null);
 
   const [selectedStatus, setSelectedStatus] = useState("All");
   const [selectedRating, setSelectedRating] = useState("All");
@@ -35,8 +36,8 @@ export default function Ratings() {
   const [sortBy, setSortBy] = useState("newest");
 
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalRecords, setTotalRecords] = useState(() => cachedRatings?.totalRecords || 0);
-  const [totalPages, setTotalPages] = useState(() => cachedRatings?.totalPages || 1);
+  const [totalRecords, setTotalRecords] = useState(() => getPageCache('ratings_data')?.totalRecords || 0);
+  const [totalPages, setTotalPages] = useState(() => getPageCache('ratings_data')?.totalPages || 1);
   const itemsPerPage = 10;
 
   const statuses = ["All", "Approved", "Pending", "Rejected"];
@@ -74,10 +75,7 @@ export default function Ratings() {
     fetchAnalyticsOverview();
   }, []);
 
-  const loadReviews = async () => {
-    if (!cachedRatings && reviews.length === 0) {
-      setIsLoading(true);
-    }
+  const loadReviews = useCallback(async () => {
     try {
       const params = {
         page: currentPage,
@@ -91,8 +89,8 @@ export default function Ratings() {
       if (res.success && res.data) {
         const formatted = res.data.map((r) => ({
           ...r,
-          user: r.user || { name: "Anonymous Traveler", email: "user@example.com" },
-          place: r.place || { name: "General Attraction" },
+          user: r.user || { name: r.user_name || "Traveler", email: r.user_email || "user@example.com" },
+          place: r.place || { name: r.place_name || "Attraction" },
           title: r.title || "User Review",
           comment: r.comment || "",
           status: r.status || "Approved",
@@ -114,7 +112,7 @@ export default function Ratings() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [currentPage, itemsPerPage, searchTerm, selectedRating, selectedStatus]);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -122,7 +120,7 @@ export default function Ratings() {
 
   useEffect(() => {
     loadReviews();
-  }, [currentPage, searchTerm, selectedStatus, selectedRating]);
+  }, [currentPage, searchTerm, selectedStatus, selectedRating, loadReviews]);
 
   // Client side filtering for places & sorting
   const filteredReviews = reviews
@@ -141,28 +139,40 @@ export default function Ratings() {
   const handleStatusChange = async (id, newStatus) => {
     try {
       await reviewService.updateReviewStatus(id, newStatus);
-      showSuccess(`Review status updated to "${newStatus}".`, "Status Updated");
+      showSuccess(
+        t('ratings.statusUpdatedSuccess', 'Review status updated to "{status}".').replace('{status}', newStatus),
+        t('ratings.statusUpdatedTitle', 'Status Updated')
+      );
       loadReviews();
     } catch (e) {
-      showError(e.message || "Failed to update review status", "Update Failed");
+      showError(
+        e.message || t('ratings.statusUpdateFailed', 'Failed to update review status'),
+        t('ratings.updateFailedTitle', 'Update Failed')
+      );
     }
   };
 
   const handleDelete = async (id) => {
     const confirmed = await showConfirm({
-      title: "Delete Review",
-      message: "Are you sure you want to delete this tourist review permanently?",
-      confirmText: "Delete Review",
+      title: t('ratings.deleteConfirmTitle', 'Delete Review'),
+      message: t('ratings.deleteConfirmMsg', 'Are you sure you want to delete this tourist review permanently?'),
+      confirmText: t('ratings.deleteConfirmBtn', 'Delete Review'),
       type: "danger"
     });
     if (!confirmed) return;
 
     try {
       await reviewService.deleteReview(id);
-      showSuccess("Review has been deleted successfully.", "Review Deleted");
+      showSuccess(
+        t('ratings.deleteSuccess', 'Review has been deleted successfully.'),
+        t('ratings.deleteSuccessTitle', 'Review Deleted')
+      );
       loadReviews();
     } catch (e) {
-      showError(e.message || "Failed to delete review", "Delete Failed");
+      showError(
+        e.message || t('ratings.deleteFailed', 'Failed to delete review'),
+        t('ratings.deleteFailedTitle', 'Delete Failed')
+      );
     }
   };
 
@@ -173,10 +183,16 @@ export default function Ratings() {
       await reviewService.replyToReview(selectedReview.id, { comment: replyText });
       setReplyText("");
       setIsReplyModalOpen(false);
-      showSuccess("Your reply has been posted successfully.", "Reply Submitted");
+      showSuccess(
+        t('ratings.replySuccess', 'Your reply has been posted successfully.'),
+        t('ratings.replySuccessTitle', 'Reply Submitted')
+      );
       loadReviews();
     } catch (e) {
-      showError(e.message || "Failed to reply to review", "Reply Failed");
+      showError(
+        e.message || t('ratings.replyFailed', 'Failed to reply to review'),
+        t('ratings.replyFailedTitle', 'Reply Failed')
+      );
     }
   };
 
@@ -221,7 +237,7 @@ export default function Ratings() {
           startIndex={startIndex}
           endIndex={endIndex}
           totalRecords={totalRecords}
-          label="reviews"
+          label={t('ratings.paginationLabel', 'reviews')}
         />
       </div>
 
@@ -253,8 +269,6 @@ export default function Ratings() {
         setReplyText={setReplyText}
         onSubmit={handleReplySubmit}
       />
-
-
     </div>
   );
 }

@@ -1,9 +1,11 @@
-import { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Upload, Trash2, Video, Image as ImageIcon, AlertCircle, Type, Layers, ChevronDown } from 'lucide-react';
 import uploadService from '../../services/uploadService';
 import { validateImageFile, DANGEROUS_EXTENSIONS } from '../../utils/fileValidation';
+import { useLanguage } from '../../i18n';
 
 export default function GalleryUploadModal({ isOpen, onClose, categories = [], onAddMedia }) {
+  const { t } = useLanguage();
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState(categories.find(c => c !== 'All') || 'Temple');
   const [fileUrl, setFileUrl] = useState('');
@@ -40,7 +42,7 @@ export default function GalleryUploadModal({ isOpen, onClose, categories = [], o
     const fileName = file.name || '';
     const ext = fileName.includes('.') ? fileName.split('.').pop().toLowerCase() : '';
     if (DANGEROUS_EXTENSIONS.includes(ext)) {
-      setUploadError(`File type .${ext} is blocked for security reasons.`);
+      setUploadError(t('gallery.errorSecurityBlocked', 'File type .{ext} is blocked for security reasons.').replace('{ext}', ext));
       if (e.target) e.target.value = '';
       return;
     }
@@ -49,7 +51,7 @@ export default function GalleryUploadModal({ isOpen, onClose, categories = [], o
     const isVideo = file.type.startsWith('video/');
     if (isVideo) {
       if (file.size > 25 * 1024 * 1024) {
-        setUploadError('Video file exceeds maximum limit of 25MB.');
+        setUploadError(t('gallery.errorVideoLimit', 'Video file exceeds maximum limit of 25MB.'));
         if (e.target) e.target.value = '';
         return;
       }
@@ -128,10 +130,10 @@ export default function GalleryUploadModal({ isOpen, onClose, categories = [], o
             </div>
             <div>
               <h3 className="text-base font-bold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">
-                Upload Media (Photo / Video)
+                {t('gallery.uploadModalTitle', 'Upload Media (Photo / Video)')}
               </h3>
               <p className="text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mt-0.5">
-                Upload high resolution photos and video files to the gallery
+                {t('gallery.uploadModalSubtitle', 'Upload high resolution photos and video files to the gallery')}
               </p>
             </div>
           </div>
@@ -149,7 +151,7 @@ export default function GalleryUploadModal({ isOpen, onClose, categories = [], o
 
             <div>
               <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">
-                Media Title *
+                {t('gallery.labelMediaTitleInput', 'Media Title *')}
               </label>
               <div className="relative">
                 <Type className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
@@ -157,7 +159,7 @@ export default function GalleryUploadModal({ isOpen, onClose, categories = [], o
                   type="text"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  placeholder="Enter media title or caption"
+                  placeholder={t('gallery.placeholderMediaTitle', 'Enter media title or caption')}
                   className="w-full pl-9 pr-4 py-2.5 bg-[var(--color-bg-light)] dark:bg-[var(--color-input-dark-bg)] border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]/70 rounded-md text-sm text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] placeholder-[var(--color-text-muted-light)] focus:outline-none focus:ring-2 focus:ring-[var(--color-input)] transition-all"
                   required
                 />
@@ -166,7 +168,7 @@ export default function GalleryUploadModal({ isOpen, onClose, categories = [], o
 
             <div>
               <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">
-                Category *
+                {t('gallery.labelCategorySelect', 'Category *')}
               </label>
               <div className="relative">
                 <Layers className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
@@ -186,7 +188,7 @@ export default function GalleryUploadModal({ isOpen, onClose, categories = [], o
             {/* Media Upload Area */}
             <div>
               <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">
-                Upload File (JPG, PNG, WEBP, MP4)
+                {t('gallery.labelUploadFile', 'Upload File (JPG, PNG, WEBP, MP4)')}
               </label>
 
               {fileUrl ? (
@@ -203,7 +205,7 @@ export default function GalleryUploadModal({ isOpen, onClose, categories = [], o
                       onClick={() => fileInputRef.current?.click()}
                       className="px-2.5 py-1 bg-white/90 dark:bg-zinc-900/90 text-xs font-medium rounded-md border border-gray-200 dark:border-zinc-700 shadow-sm hover:bg-white transition-colors cursor-pointer"
                     >
-                      Replace
+                      {t('gallery.replaceBtn', 'Replace')}
                     </button>
                     <button
                       type="button"
@@ -221,10 +223,10 @@ export default function GalleryUploadModal({ isOpen, onClose, categories = [], o
                 >
                   <Upload className="w-6 h-6 text-gray-400 mx-auto mb-1.5" />
                   <p className="text-gray-800 dark:text-zinc-200 font-medium text-xs">
-                    {isUploading ? 'Uploading to storage...' : 'Click to select image or video'}
+                    {isUploading ? t('gallery.uploadingStorageText', 'Uploading to storage...') : t('gallery.clickSelectPrompt', 'Click to select image or video')}
                   </p>
                   <p className="text-[11px] text-gray-500 dark:text-zinc-400 mt-0.5">
-                    Images up to 5MB (JPG, PNG, WEBP), Videos up to 25MB (MP4)
+                    {t('gallery.fileLimitsPrompt', 'Images up to 5MB (JPG, PNG, WEBP), Videos up to 25MB (MP4)')}
                   </p>
                 </div>
               )}
@@ -243,7 +245,7 @@ export default function GalleryUploadModal({ isOpen, onClose, categories = [], o
                   type="text"
                   value={fileUrl}
                   onChange={(e) => setFileUrl(e.target.value)}
-                  placeholder="Or enter image/video URL (https://...)"
+                  placeholder={t('gallery.enterImageUrlPlaceholder', 'Or enter image/video URL (https://...)')}
                   className="w-full pl-9 pr-4 py-2 bg-[var(--color-bg-light)] dark:bg-[var(--color-input-dark-bg)] border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]/70 rounded-md text-xs text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] placeholder-[var(--color-text-muted-light)] focus:outline-none focus:ring-2 focus:ring-[var(--color-input)] transition-all"
                 />
               </div>
@@ -257,7 +259,7 @@ export default function GalleryUploadModal({ isOpen, onClose, categories = [], o
               onClick={onClose}
               className="flex-1 py-2.5 px-4 rounded-md border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] hover:bg-[var(--color-surface-hover-light)] dark:hover:bg-[var(--color-surface-hover-dark)] font-medium text-xs sm:text-sm transition-colors text-center cursor-pointer"
             >
-              Cancel
+              {t('gallery.cancelBtn', 'Cancel')}
             </button>
             <button 
               type="submit"
@@ -265,7 +267,7 @@ export default function GalleryUploadModal({ isOpen, onClose, categories = [], o
               className="flex-1 py-2.5 px-4 rounded-md bg-[#003E83] hover:bg-[#002e62] active:scale-[0.98] text-white font-medium text-xs sm:text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed text-center cursor-pointer shadow-xs flex items-center justify-center gap-1.5"
             >
               <Upload className="w-4 h-4" />
-              <span>{isUploading ? 'Uploading Media...' : 'Upload Media'}</span>
+              <span>{isUploading ? t('gallery.uploadingMediaText', 'Uploading Media...') : t('gallery.uploadMediaSubmitBtn', 'Upload Media')}</span>
             </button>
           </div>
         </form>

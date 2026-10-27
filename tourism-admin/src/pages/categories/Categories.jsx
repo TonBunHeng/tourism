@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useLocation } from "react-router-dom";
 import { Landmark } from "lucide-react";
 import SimplePagination from "../../components/common/SimplePagination";
@@ -13,10 +13,12 @@ import deletionRequestService from "../../services/deletionRequestService";
 import authService, { isSuperAdminRole } from "../../services/authService";
 import { useAlert } from "../../context/AlertContext";
 import { useSearch } from "../../context/SearchContext";
+import { useLanguage } from "../../i18n";
 import { getPageCache, setPageCache } from "../../utils/pageCache";
 
 export default function Categories() {
   const location = useLocation();
+  const { t } = useLanguage();
   const { showConfirm, showSuccess, showError } = useAlert();
   const { searchTerm } = useSearch();
   const currentUser = authService.getCurrentUser();
@@ -43,7 +45,7 @@ export default function Categories() {
     color: "#8B5CF6"
   });
 
-  const loadCategories = async () => {
+  const loadCategories = useCallback(async () => {
     if (!getPageCache('categories_data')) setIsLoading(true);
     try {
       const params = {
@@ -74,7 +76,7 @@ export default function Categories() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [currentPage, itemsPerPage, searchTerm, statusFilter]);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -82,7 +84,7 @@ export default function Categories() {
 
   useEffect(() => {
     loadCategories();
-  }, [currentPage, searchTerm, statusFilter]);
+  }, [loadCategories]);
 
   const handleStatusChange = (val) => { setStatusFilter(val); setCurrentPage(1); };
 
@@ -96,9 +98,9 @@ export default function Categories() {
 
     if (isSuperAdmin) {
       const confirmed = await showConfirm({
-        title: 'Delete Category',
-        message: `Are you sure you want to permanently delete category "${categoryName}"?\n\nThis action cannot be undone.`,
-        confirmText: 'Delete Permanently',
+        title: t('categories.deleteTitle', 'Delete Category'),
+        message: t('categories.deletePermanentConfirm', 'Are you sure you want to permanently delete category "{name}"?\n\nThis action cannot be undone.').replace('{name}', categoryName),
+        confirmText: t('categories.deletePermanentBtn', 'Delete Permanently'),
         type: 'danger'
       });
 
@@ -106,18 +108,21 @@ export default function Categories() {
 
       try {
         await categoryService.deleteCategory(id);
-        showSuccess(`Category "${categoryName}" has been permanently deleted.`, 'Category Deleted');
+        showSuccess(
+          t('categories.deleteSuccess', 'Category "{name}" has been permanently deleted.').replace('{name}', categoryName),
+          t('categories.deleteSuccessTitle', 'Category Deleted')
+        );
         loadCategories();
       } catch (e) {
-        showError(e.message || 'Failed to delete category.', 'Delete Failed');
+        showError(e.message || t('categories.deleteFailed', 'Failed to delete category.'), t('categories.deleteFailedTitle', 'Delete Failed'));
       }
       return;
     }
 
     const confirmed = await showConfirm({
-      title: 'Submit Deletion Request',
-      message: `Are you sure you want to submit a deletion request for category "${categoryName}"?\n\nThis will be submitted to the Super Administrator for review and approval.`,
-      confirmText: 'Submit Deletion',
+      title: t('categories.deletionRequestTitle', 'Submit Deletion Request'),
+      message: t('categories.deletionRequestMessage', 'Are you sure you want to submit a deletion request for category "{name}"?\n\nThis will be submitted to the Super Administrator for review and approval.').replace('{name}', categoryName),
+      confirmText: t('categories.submitDeletionBtn', 'Submit Deletion'),
       type: 'danger'
     });
 
@@ -126,7 +131,7 @@ export default function Categories() {
     try {
       await deletionRequestService.createRequest({
         request_type: 'item',
-        reason: `Request to delete category: ${categoryName}`,
+        reason: t('categories.deletionRequestReason', 'Request to delete category: {name}').replace('{name}', categoryName),
         urgency: 'medium',
         items: [{
           item_type: 'category',
@@ -135,9 +140,12 @@ export default function Categories() {
           category: 'Category'
         }]
       });
-      showSuccess(`Deletion request for "${categoryName}" has been submitted to Super Admin for approval.`, 'Request Submitted');
+      showSuccess(
+        t('categories.deletionRequestSuccess', 'Deletion request for "{name}" has been submitted to Super Admin for approval.').replace('{name}', categoryName),
+        t('categories.requestSubmittedTitle', 'Request Submitted')
+      );
     } catch (e) {
-      showError(e.message || "Failed to submit deletion request.", 'Submission Failed');
+      showError(e.message || t('categories.submissionFailed', "Failed to submit deletion request."), t('categories.submissionFailedTitle', 'Submission Failed'));
     }
   };
 
@@ -185,15 +193,21 @@ export default function Categories() {
     try {
       if (editingCategory) {
         await categoryService.updateCategory(editingCategory.id, formData);
-        showSuccess(`Category "${formData.name}" has been updated successfully.`, 'Category Updated');
+        showSuccess(
+          t('categories.categoryUpdatedSuccess', 'Category "{name}" has been updated successfully.').replace('{name}', formData.name),
+          t('categories.categoryUpdatedTitle', 'Category Updated')
+        );
       } else {
         await categoryService.createCategory(formData);
-        showSuccess(`Category "${formData.name}" has been created successfully.`, 'Category Created');
+        showSuccess(
+          t('categories.categoryCreatedSuccess', 'Category "{name}" has been created successfully.').replace('{name}', formData.name),
+          t('categories.categoryCreatedTitle', 'Category Created')
+        );
       }
       closeModal();
       loadCategories();
     } catch (e) {
-      showError(e.message || "Failed to save category.", 'Save Failed');
+      showError(e.message || t('categories.saveFailed', "Failed to save category."), t('categories.saveFailedTitle', 'Save Failed'));
     }
   };
 
@@ -218,7 +232,7 @@ export default function Categories() {
 
         {isLoading ? (
           <div className="p-12 text-center text-slate-500 dark:text-zinc-400 font-medium">
-            Loading categories from database...
+            {t('categories.loadingCategories', 'Loading categories from database...')}
           </div>
         ) : (
           <CategoriesList
@@ -241,7 +255,7 @@ export default function Categories() {
           startIndex={startIndex}
           endIndex={endIndex}
           totalRecords={totalRecords}
-          label="categories"
+          label={t('categories.categoryCountPlural', 'categories')}
         />
       </div>
 

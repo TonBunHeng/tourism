@@ -6,7 +6,6 @@ import {
   Mail,
   Globe,
   AlertOctagon,
-  CheckCircle,
   Trash2,
   ExternalLink,
   Laptop,
@@ -19,6 +18,7 @@ import {
   Info
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useLanguage } from '../../i18n';
 
 export default function NotificationDetailsModal({
   isOpen,
@@ -27,6 +27,8 @@ export default function NotificationDetailsModal({
   onMarkRead,
   onDelete
 }) {
+  const { t } = useLanguage();
+
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === 'Escape' && isOpen) {
@@ -61,6 +63,17 @@ export default function NotificationDetailsModal({
     return 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20';
   };
 
+  const getCategoryLabel = (category) => {
+    const cat = (category || '').toLowerCase();
+    if (cat === 'all') return t('notifications.catAll');
+    if (cat === 'alerts') return t('notifications.catAlerts');
+    if (cat === 'reviews') return t('notifications.catReviews');
+    if (cat === 'messages') return t('notifications.catMessages');
+    if (cat === 'users') return t('notifications.catUsers');
+    if (cat === 'system') return t('notifications.catSystem');
+    return category || t('notifications.catGeneral');
+  };
+
   const getIcon = (category, type) => {
     const cat = (category || '').toLowerCase();
     const typ = (type || '').toLowerCase();
@@ -88,7 +101,7 @@ export default function NotificationDetailsModal({
         dateStyle: 'medium',
         timeStyle: 'short'
       })
-    : 'Recent';
+    : t('notifications.timeRecent');
 
   return (
     <div
@@ -109,10 +122,10 @@ export default function NotificationDetailsModal({
             </div>
             <div className="min-w-0">
               <span className={`inline-block text-[11px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-md border ${getCategoryBadgeColor(notification.category, notification.type)} mb-1`}>
-                {notification.category || 'General'}
+                {getCategoryLabel(notification.category)}
               </span>
               <h2 className="text-sm font-bold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] truncate">
-                Notification Details
+                {t('notifications.modalTitle')}
               </h2>
             </div>
           </div>
@@ -121,7 +134,7 @@ export default function NotificationDetailsModal({
             type="button"
             onClick={onClose}
             className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-zinc-300 rounded-md transition-colors cursor-pointer"
-            title="Close modal"
+            title={t('notifications.closeModal')}
           >
             <X className="w-5 h-5" />
           </button>
@@ -141,14 +154,14 @@ export default function NotificationDetailsModal({
               </span>
               <span className="w-1 h-1 rounded-md bg-slate-300 dark:bg-zinc-700" />
               <span className={`font-semibold ${notification.read ? 'text-slate-500 dark:text-zinc-400' : 'text-blue-600 dark:text-blue-400'}`}>
-                {notification.read ? 'Read' : 'Unread'}
+                {notification.read ? t('notifications.badgeRead') : t('notifications.badgeUnread')}
               </span>
             </div>
           </div>
 
           {/* Description */}
           <div className="p-4 rounded-md bg-slate-100/70 dark:bg-zinc-800/60 border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] text-slate-700 dark:text-zinc-300 leading-relaxed text-sm">
-            {notification.description || 'No additional description provided.'}
+            {notification.description || t('notifications.noDescription')}
           </div>
 
           {/* Security Alert Payload Card */}
@@ -156,7 +169,7 @@ export default function NotificationDetailsModal({
             <div className="rounded-md border border-red-500/30 bg-red-500/5 dark:bg-red-950/20 p-4 space-y-3">
               <div className="flex items-center gap-2 text-red-600 dark:text-red-400 font-semibold text-xs uppercase tracking-wider">
                 <AlertOctagon className="w-4 h-4" />
-                Security Incident Parameters
+                {t('notifications.incidentParams')}
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
@@ -164,7 +177,7 @@ export default function NotificationDetailsModal({
                   <div className="p-2.5 rounded-md bg-white/80 dark:bg-zinc-900/80 border border-slate-200/60 dark:border-zinc-800 flex items-center gap-2.5">
                     <Mail className="w-4 h-4 text-slate-400 shrink-0" />
                     <div className="min-w-0">
-                      <p className="text-[10px] text-slate-400 font-medium">Target Account</p>
+                      <p className="text-[10px] text-slate-400 font-medium">{t('notifications.targetAccount')}</p>
                       <p className="font-semibold text-slate-800 dark:text-zinc-200 truncate">{data.email}</p>
                     </div>
                   </div>
@@ -174,7 +187,7 @@ export default function NotificationDetailsModal({
                   <div className="p-2.5 rounded-md bg-white/80 dark:bg-zinc-900/80 border border-slate-200/60 dark:border-zinc-800 flex items-center gap-2.5">
                     <Globe className="w-4 h-4 text-slate-400 shrink-0" />
                     <div className="min-w-0">
-                      <p className="text-[10px] text-slate-400 font-medium">Source IP</p>
+                      <p className="text-[10px] text-slate-400 font-medium">{t('notifications.sourceIP')}</p>
                       <p className="font-semibold text-slate-800 dark:text-zinc-200">{data.ip_address}</p>
                     </div>
                   </div>
@@ -184,8 +197,8 @@ export default function NotificationDetailsModal({
                   <div className="p-2.5 rounded-md bg-white/80 dark:bg-zinc-900/80 border border-slate-200/60 dark:border-zinc-800 flex items-center gap-2.5">
                     <ShieldAlert className="w-4 h-4 text-red-500 shrink-0" />
                     <div className="min-w-0">
-                      <p className="text-[10px] text-slate-400 font-medium">Failed Attempts</p>
-                      <p className="font-bold text-red-600 dark:text-red-400">{data.attempts} Failed Tries</p>
+                      <p className="text-[10px] text-slate-400 font-medium">{t('notifications.failedAttempts')}</p>
+                      <p className="font-bold text-red-600 dark:text-red-400">{t('notifications.failedTries', { count: data.attempts })}</p>
                     </div>
                   </div>
                 )}
@@ -194,7 +207,7 @@ export default function NotificationDetailsModal({
                   <div className="p-2.5 rounded-md bg-white/80 dark:bg-zinc-900/80 border border-slate-200/60 dark:border-zinc-800 flex items-center gap-2.5 sm:col-span-2">
                     <Laptop className="w-4 h-4 text-slate-400 shrink-0" />
                     <div className="min-w-0">
-                      <p className="text-[10px] text-slate-400 font-medium">Client User Agent</p>
+                      <p className="text-[10px] text-slate-400 font-medium">{t('notifications.clientUserAgent')}</p>
                       <p className="font-medium text-slate-700 dark:text-zinc-300 text-[11px] truncate">{data.user_agent}</p>
                     </div>
                   </div>
@@ -207,7 +220,7 @@ export default function NotificationDetailsModal({
           {!isSecurity && Object.keys(data).length > 0 && (
             <div className="space-y-2">
               <h4 className="text-xs font-semibold text-slate-500 dark:text-zinc-400 uppercase tracking-wider">
-                Event Data
+                {t('notifications.eventData')}
               </h4>
               <div className="p-3 rounded-md bg-slate-50 dark:bg-zinc-800/40 border border-slate-200 dark:border-zinc-800 space-y-1.5 text-xs">
                 {Object.entries(data).map(([key, val]) => (
@@ -229,7 +242,7 @@ export default function NotificationDetailsModal({
             className="py-2 px-3.5 rounded-md border border-red-200 dark:border-red-900/40 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 text-xs font-medium flex items-center gap-1.5 transition-colors cursor-pointer"
           >
             <Trash2 className="w-4 h-4" />
-            Delete
+            {t('notifications.tooltipDelete')}
           </button>
 
           <div className="flex items-center gap-2">
@@ -240,7 +253,7 @@ export default function NotificationDetailsModal({
                 className="py-2 px-3.5 rounded-md border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-700 dark:text-zinc-200 hover:bg-gray-50 dark:hover:bg-zinc-700 text-xs font-medium flex items-center gap-1.5 transition-colors cursor-pointer"
               >
                 <Check className="w-3.5 h-3.5 text-blue-600" />
-                Mark as Read
+                {t('notifications.tooltipMarkRead')}
               </button>
             )}
 
@@ -250,7 +263,7 @@ export default function NotificationDetailsModal({
                 onClick={onClose}
                 className="py-2 px-3.5 rounded-md bg-[#003E83] hover:bg-[#002e62] text-white text-xs font-medium flex items-center gap-1.5 transition-colors cursor-pointer"
               >
-                <span>Go to Page</span>
+                <span>{t('notifications.goToPage')}</span>
                 <ExternalLink className="w-3.5 h-3.5" />
               </Link>
             )}
@@ -260,7 +273,7 @@ export default function NotificationDetailsModal({
               onClick={onClose}
               className="py-2 px-3.5 rounded-md bg-gray-200 dark:bg-zinc-800 hover:bg-gray-300 dark:hover:bg-zinc-700 text-gray-800 dark:text-zinc-200 text-xs font-medium transition-colors cursor-pointer"
             >
-              Close
+              {t('notifications.closeModal')}
             </button>
           </div>
         </div>
