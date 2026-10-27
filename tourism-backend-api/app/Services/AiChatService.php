@@ -475,4 +475,148 @@ class AiChatService
             ];
         }
     }
+
+    /**
+     * Get dynamic context-aware suggestions from aichatbot microservice with local fallback.
+     */
+    public function getSuggestions(array $payload = []): array
+    {
+        // 1. Attempt connection to aichatbot microservice (Port 8001)
+        try {
+            $response = $this->client()->post('/api/chat/suggestions', $payload);
+            if ($response->successful()) {
+                $data = $response->json();
+                return [
+                    'success' => true,
+                    'topic' => $data['topic'] ?? 'Suggested Topics',
+                    'suggestions' => $data['suggestions'] ?? [],
+                    'data' => $data,
+                ];
+            }
+        } catch (\Throwable $e) {
+            // microservice offline, proceed to fallback
+        }
+
+        // 2. Local dynamic fallback engine
+        return $this->generateLocalSuggestions($payload);
+    }
+
+    /**
+     * Generate dynamic contextual suggestions locally.
+     */
+    public function generateLocalSuggestions(array $payload = []): array
+    {
+        $message = strtolower(trim($payload['message'] ?? ''));
+        $answer = strtolower(trim($payload['answer'] ?? ''));
+        $refresh = (bool) ($payload['refresh'] ?? false);
+        $exclude = array_flip($payload['current_suggestions'] ?? []);
+
+        // Categories
+        $categories = [
+            'temples' => [
+                'Explore Angkor Wat & best sunrise spots',
+                'What is the official Angkor Pass ticket cost?',
+                'What is the dress code for visiting ancient temples?',
+                'Discover the smiling stone faces of Bayon Temple',
+                'Explore the jungle-entangled ruins of Ta Prohm',
+                'Visit Banteay Srei pink sandstone carvings',
+            ],
+            'itineraries' => [
+                'Plan a 3-day trip to Siem Reap and Angkor',
+                'Take a Tonle Sap floating village boat cruise',
+                'Experience Phare Circus and Siem Reap night markets',
+                'Kulen Mountain sacred waterfall and River of a Thousand Lingas',
+                'What is the best 1-day Angkor express tour?',
+            ],
+            'cities' => [
+                'Visit Phnom Penh Royal Palace and Silver Pagoda',
+                'Take a relaxing sunset cruise along the Mekong River',
+                'Explore National Museum of Cambodia ancient statues',
+                'Phnom Penh French colonial architecture along the river',
+            ],
+            'coastal' => [
+                'How to take speed ferries to Koh Rong and Sanloem islands',
+                'Taste fresh Kep crab with Kampot green pepper',
+                'Visit Bokor Mountain national park and historic hill station',
+                'Tour organic Kampot pepper farms and salt fields',
+            ],
+            'nature' => [
+                'Battambang Bamboo Train & evening bat caves',
+                'Visit Mondulkiri Bousra Waterfall & elephant sanctuary',
+                'Swim in volcanic Lake Yeak Laom in Ratanakiri',
+                'See rare freshwater Irrawaddy dolphins in Kratie',
+            ],
+            'cuisine' => [
+                'What authentic Khmer dishes should I try in Cambodia?',
+                'Taste traditional Fish Amok and Beef Lok Lak',
+                'Experience Nom Banh Chok Khmer noodles for breakfast',
+                'Best street food specialties at local night markets',
+            ],
+            'budget' => [
+                'Cambodia travel budget and currency tips (USD vs KHR)',
+                'How to use PassApp and tuk-tuks for getting around',
+                'Best time to visit Cambodia for good weather and festivals',
+                'Using Bakong Tourist App for QR code digital payments',
+            ],
+        ];
+
+        // If contextual match
+        $selectedPool = null;
+        if (str_contains($message, 'temple') || str_contains($message, 'angkor') || str_contains($answer, 'angkor') || str_contains($answer, 'temple')) {
+            $selectedPool = $categories['temples'];
+        } elseif (str_contains($message, 'food') || str_contains($message, 'eat') || str_contains($message, 'amok') || str_contains($answer, 'food')) {
+            $selectedPool = $categories['cuisine'];
+        } elseif (str_contains($message, 'hotel') || str_contains($message, 'itinerary') || str_contains($message, '3-day') || str_contains($answer, 'itinerary')) {
+            $selectedPool = $categories['itineraries'];
+        } elseif (str_contains($message, 'beach') || str_contains($message, 'island') || str_contains($message, 'kampot') || str_contains($answer, 'island')) {
+            $selectedPool = $categories['coastal'];
+        } elseif (str_contains($message, 'nature') || str_contains($message, 'waterfall') || str_contains($message, 'battambang') || str_contains($answer, 'waterfall')) {
+            $selectedPool = $categories['nature'];
+        } elseif (str_contains($message, 'budget') || str_contains($message, 'currency') || str_contains($message, 'cost') || str_contains($answer, 'budget')) {
+            $selectedPool = $categories['budget'];
+        }
+
+        $chosen = [];
+        if ($selectedPool) {
+            $available = array_values(array_filter($selectedPool, fn($s) => !isset($exclude[$s])));
+            if (count($available) < 4) {
+                $available = $selectedPool;
+            }
+            if ($refresh) {
+                shuffle($available);
+            }
+            $chosen = array_slice($available, 0, 4);
+        }
+
+        if (count($chosen) < 4) {
+            // Pick from diverse categories
+            $shuffledCategories = array_values($categories);
+            shuffle($shuffledCategories);
+            foreach ($shuffledCategories as $cat) {
+                $cand = array_values(array_filter($cat, fn($s) => !isset($exclude[$s]) && !in_array($s, $chosen)));
+                if (!empty($cand)) {
+                    $chosen[] = $cand[array_rand($cand)];
+                }
+                if (count($chosen) === 4) break;
+            }
+
+            if (count($chosen) < 4) {
+                $all = array_merge(...array_values($categories));
+                shuffle($all);
+                foreach ($all as $item) {
+                    if (!in_array($item, $chosen)) {
+                        $chosen[] = $item;
+                    }
+                    if (count($chosen) === 4) break;
+                }
+            }
+        }
+
+        return [
+            'success' => true,
+            'topic' => 'Suggested Topics',
+            'suggestions' => array_slice($chosen, 0, 4),
+        ];
+    }
 }
+

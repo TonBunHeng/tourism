@@ -427,9 +427,13 @@ class SuggestionService:
             ]
 
         # -------------------------------------------------------------
+        # -------------------------------------------------------------
         # DOMAIN 9: CAMBODIA 25 PROVINCES & CULTURAL DISCOVERY (DEFAULT)
         # -------------------------------------------------------------
         else:
+            if not user_msg and not ai_ans:
+                return self._generate_dynamic_initial_suggestions(is_km, exclude, refresh)
+
             topic = "ទេសចរណ៍ និងវប្បធម៌កម្ពុជា" if is_km else "Cambodia Tourism & Culture"
             primary_en = [
                 "Explore Cambodia's top tourist destinations",
@@ -457,6 +461,117 @@ class SuggestionService:
             ]
 
         return self._select_candidates(topic, primary_km if is_km else primary_en, alt_km if is_km else alt_en, exclude, refresh)
+
+    def _generate_dynamic_initial_suggestions(self, is_km: bool, exclude: set, refresh: bool) -> Dict[str, Any]:
+        """Generate balanced, dynamic initial suggestions spanning diverse Cambodia travel categories."""
+        import random
+
+        pools_en = [
+            ("Temples & Heritage", [
+                "Explore Angkor Wat & best sunrise spots",
+                "What is the official Angkor Pass ticket cost?",
+                "What is the dress code for visiting ancient temples?",
+                "Discover the smiling stone faces of Bayon Temple"
+            ]),
+            ("Siem Reap & Itineraries", [
+                "Plan a 3-day trip to Siem Reap and Angkor",
+                "Take a Tonle Sap floating village boat cruise",
+                "Experience Phare Cambodian Circus and night markets",
+                "Sacred Kulen Mountain waterfall and River of a Thousand Lingas"
+            ]),
+            ("Phnom Penh & Mekong", [
+                "Visit Phnom Penh Royal Palace and Silver Pagoda",
+                "Take a sunset boat cruise along the Mekong River",
+                "Discover Phnom Penh riverside cafes and street food",
+                "National Museum of Cambodia ancient stone sculptures"
+            ]),
+            ("Beaches & Coastal", [
+                "How to take speed ferries to Koh Rong and Sanloem islands",
+                "Taste fresh Kep crab with Kampot green pepper",
+                "Visit Bokor National Park historic hill station",
+                "Tour organic Kampot pepper farms and salt fields"
+            ]),
+            ("Heritage & Nature", [
+                "Battambang Bamboo Train (Norry) & evening bat caves",
+                "Visit Mondulkiri Bousra Waterfall & elephant sanctuary",
+                "Swim in volcanic Lake Yeak Laom in Ratanakiri",
+                "See rare freshwater Irrawaddy dolphins in Kratie"
+            ]),
+            ("Cuisine & Budget", [
+                "What authentic Khmer dishes should I try in Cambodia?",
+                "Taste traditional Fish Amok and Beef Lok Lak",
+                "Cambodia travel budget and currency tips (USD vs KHR)",
+                "How to use PassApp and tuk-tuks for getting around"
+            ]),
+        ]
+
+        pools_km = [
+            ("ប្រាសាទ និងបេតិកភណ្ឌ", [
+                "ស្វែងរកទីតាំងមើលថ្ងៃរះស្អាតបំផុតនៅអង្គរវត្ត",
+                "ស្វែងយល់ពីតម្លៃសំបុត្រចូលទស្សនាអង្គរវត្ត (Angkor Pass)",
+                "ការស្លៀកពាក់ត្រឹមត្រូវពេលចូលទស្សនាប្រាសាទបុរាណ",
+                "ទស្សនាព្រះភ័ក្ត្រញញឹមទាំង ៥៤ នៃប្រាសាទបាយ័ន"
+            ]),
+            ("សៀមរាប និងដំណើរកម្សាន្ត", [
+                "រៀបចំគម្រោងដំណើរកម្សាន្ត ៣ ថ្ងៃនៅសៀមរាប",
+                "ជិះទូកកម្សាន្តទស្សនាភូមិបណ្តែតទឹកបឹងទន្លេសាប",
+                "ទស្សនាសៀកហ្វារ និងផ្សាររាត្រីនៅសៀមរាប",
+                "ដើរលេងឧទ្យានជាតិភ្នំគូលែន និងស្ទឹងលិង្គមួយពាន់"
+            ]),
+            ("រាជធានីភ្នំពេញ", [
+                "ទស្សនាព្រះបរមរាជវាំង និងវត្តព្រះកែវមរកត",
+                "ជិះទូកកម្សាន្តមើលថ្ងៃលិចតាមដងទន្លេមេគង្គ",
+                "ស្វែងរកហាងកាហ្វេ និងអាហារឆ្ងាញ់ៗតាមមាត់ទន្លេភ្នំពេញ",
+                "ទស្សនាសារមន្ទីរជាតិកម្ពុជា"
+            ]),
+            ("ឆ្នេរសមុទ្រ និងកោះ", [
+                "របៀបជិះអូប័រល្បឿនលឿនទៅកោះរ៉ុង និងកោះរ៉ុងសន្លឹម",
+                "ភ្លក្សរសជាតិក្តាមឆាម្រេចខ្ចីនៅផ្សារក្តាមកែប",
+                "ដើរលេងឧទ្យានជាតិភ្នំបូកគោ និងសំណង់ប្រវត្តិសាស្ត្រ",
+                "ទស្សនាចម្ការម្រេចសរីរាង្គកំពត និងវាលស្រែអំបិល"
+            ]),
+            ("វប្បធម៌ និងធម្មជាតិ", [
+                "ជិះឡូរី (Bamboo Train) និងមើលហ្វូងប្រចៀវភ្នំសំពៅ",
+                "ទស្សនាទឹកធ្លាក់ប៊ូស្រា និងជម្រកដំរីមណ្ឌលគិរី",
+                "ហែលទឹកបឹងយក្សឡោមដ៏ថ្លាឈ្វេងនៅរតនគិរី",
+                "ទស្សនាសត្វផ្សោតទឹកសាបកម្រនៅខេត្តក្រចេះ"
+            ]),
+            ("ម្ហូបអាហារ និងថវិកា", [
+                "តើម្ហូបខ្មែរប្រពៃណីណាខ្លះដែលមិនគួររំលង?",
+                "ភ្លក្សរសជាតិអាមុកត្រី និងឡុកឡាក់សាច់គោកំពត",
+                "ការណែនាំពីការចាយលុយដុល្លារ និងប្រាក់រៀល (KHR)",
+                "របៀបធ្វើដំណើរដោយប្រើ PassApp និងរ៉ឺម៉កកង់បី"
+            ]),
+        ]
+
+        active_pools = pools_km if is_km else pools_en
+        
+        # Build 4 diverse suggestions by picking 1 item from distinct categories
+        chosen = []
+        # Filter pools where items are not already in exclude
+        candidate_items = []
+        for cat_name, items in active_pools:
+            available = [it for it in items if it not in exclude]
+            if available:
+                candidate_items.append((cat_name, available))
+
+        if len(candidate_items) >= 4:
+            # Pick 4 items from 4 different categories
+            selected_categories = random.sample(candidate_items, 4)
+            for _, items in selected_categories:
+                chosen.append(random.choice(items))
+        else:
+            # Fallback across all available items
+            all_items = [it for _, items in active_pools for it in items if it not in exclude]
+            if len(all_items) < 4:
+                all_items = [it for _, items in active_pools for it in items]
+            chosen = random.sample(all_items, min(4, len(all_items)))
+
+        topic_title = "ប្រធានបទណែនាំ" if is_km else "Suggested Topics"
+        return {
+            "topic": topic_title,
+            "suggestions": chosen[:4]
+        }
 
     def _select_candidates(
         self,

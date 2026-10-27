@@ -141,6 +141,35 @@ def get_chat_suggestions(payload: SuggestionRequest):
         "suggestions": res.get("suggestions", [])
     }
 
+@router.get("/chat/suggestions")
+@router.get("/chats/{session_id}/suggestions")
+def get_chat_suggestions_get(
+    message: Optional[str] = "",
+    answer: Optional[str] = "",
+    session_id: Optional[str] = None,
+    language: Optional[str] = "en",
+    refresh: Optional[bool] = False
+):
+    """
+    GET endpoint to retrieve 4 dynamic suggestions for quick initial fetching or refreshing.
+    """
+    clean_msg = security_service.sanitize_input(message) if message else ""
+    clean_ans = security_service.sanitize_input(answer) if answer else ""
+
+    res = suggestion_service.generate_context_suggestions(
+        message=clean_msg,
+        answer=clean_ans,
+        conversation_history=None,
+        language=language or "en",
+        exclude=[],
+        refresh=bool(refresh)
+    )
+    return {
+        "success": True,
+        "topic": res.get("topic", "Suggested Topics"),
+        "suggestions": res.get("suggestions", [])
+    }
+
 @router.get("/chat/sessions")
 @router.get("/chats")
 @router.get("/travel/chats")

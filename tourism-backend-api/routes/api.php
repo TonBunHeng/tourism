@@ -89,6 +89,8 @@ Route::middleware($aiThrottle)->group(function () {
     Route::post('/chat', [TravelAiChatController::class, 'chat']);
     Route::post('/ai/chat', [TravelAiChatController::class, 'chat']);
     Route::get('/ai/status', [TravelAiChatController::class, 'status']);
+    Route::match(['get', 'post'], '/ai/suggestions', [TravelAiChatController::class, 'suggestions']);
+    Route::match(['get', 'post'], '/ai/chat/suggestions', [TravelAiChatController::class, 'suggestions']);
 });
 
 /*
@@ -207,6 +209,9 @@ Route::prefix('travel')->group(function () use ($travelReadThrottle, $travelAuth
         Route::post('/currency/convert', [TravelAiChatController::class, 'convertCurrency']);
         Route::post('/ai/search', [TravelAiChatController::class, 'search']);
         Route::post('/ai/summary', [TravelAiChatController::class, 'summary']);
+        Route::match(['get', 'post'], '/ai/suggestions', [TravelAiChatController::class, 'suggestions']);
+        Route::match(['get', 'post'], '/ai/chat/suggestions', [TravelAiChatController::class, 'suggestions']);
+        Route::match(['get', 'post'], '/suggestions', [TravelAiChatController::class, 'suggestions']);
     });
 
     // 1.12 Authenticated Tourist Endpoints (Sanctum Auth)

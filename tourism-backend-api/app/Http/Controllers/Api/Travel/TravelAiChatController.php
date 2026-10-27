@@ -251,6 +251,29 @@ class TravelAiChatController extends Controller
     }
 
     /**
+     * Get dynamic context-aware suggestions.
+     * GET/POST /api/travel/ai/suggestions or /api/travel/ai/chat/suggestions
+     */
+    public function suggestions(Request $request): JsonResponse
+    {
+        $message = (string) ($request->input('message') ?? $request->query('message') ?? '');
+        $answer = (string) ($request->input('answer') ?? $request->query('answer') ?? '');
+        $language = (string) ($request->input('language') ?? $request->query('language') ?? 'en');
+        $refresh = filter_var($request->input('refresh', $request->query('refresh', false)), FILTER_VALIDATE_BOOLEAN);
+        $currentSuggestions = $request->input('current_suggestions', []);
+
+        $result = $this->aiService->getSuggestions([
+            'message' => $message,
+            'answer' => $answer,
+            'language' => $language,
+            'refresh' => $refresh,
+            'current_suggestions' => is_array($currentSuggestions) ? $currentSuggestions : [],
+        ]);
+
+        return response()->json($result);
+    }
+
+    /**
      * Get weather forecast and travel suitability advice.
      */
     public function weather(Request $request): JsonResponse
