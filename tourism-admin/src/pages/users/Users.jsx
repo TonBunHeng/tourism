@@ -12,13 +12,14 @@ import { useAlert } from '../../context/AlertContext';
 import { useSearch } from '../../context/SearchContext';
 import SimplePagination from '../../components/common/SimplePagination';
 import { getPageCache, setPageCache } from '../../utils/pageCache';
+import { useLanguage } from '../../i18n';
 
 export default function Users() {
+  const { t } = useLanguage();
   const { showConfirm, showSuccess, showError } = useAlert();
   const { searchTerm, setSearchTerm } = useSearch();
-  const cachedData = getPageCache('users_data');
-  const [users, setUsers] = useState(() => cachedData?.users || []);
-  const [isLoading, setIsLoading] = useState(() => !cachedData);
+  const [users, setUsers] = useState(() => getPageCache('users_data')?.users || []);
+  const [isLoading, setIsLoading] = useState(() => !getPageCache('users_data'));
 
   const [selectedRole, setSelectedRole] = useState("All");
   const [selectedStatus, setSelectedStatus] = useState("All");
@@ -29,8 +30,8 @@ export default function Users() {
   const [viewingUser, setViewingUser] = useState(null);
 
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalRecords, setTotalRecords] = useState(() => cachedData?.totalRecords || 0);
-  const [totalPages, setTotalPages] = useState(() => cachedData?.totalPages || 1);
+  const [totalRecords, setTotalRecords] = useState(() => getPageCache('users_data')?.totalRecords || 0);
+  const [totalPages, setTotalPages] = useState(() => getPageCache('users_data')?.totalPages || 1);
   const itemsPerPage = 10;
 
   const currentUser = authService.getCurrentUser();
@@ -86,7 +87,7 @@ export default function Users() {
             status: capitalizedStatus,
             onlineStatus: isOnline ? "Online" : "Offline",
             joinDate: u.created_at ? u.created_at.split("T")[0] : "2024-01-01",
-            lastActive: u.last_active_human || (u.last_active_at ? u.last_active_at.replace("T", " ").substring(0, 16) : (isOnline ? "Online Now" : "Offline")),
+            lastActive: u.last_active_human || (u.last_active_at ? u.last_active_at.replace("T", " ").substring(0, 16) : (isOnline ? t('users.timeOnlineNow', 'Online Now') : t('users.statusOffline', 'Offline'))),
             reviews: u.reviews_count || u.reviews || 0,
             favorites: u.favorites_count || u.favorites || 0,
             places: 0,
@@ -135,7 +136,6 @@ export default function Users() {
     setCurrentPage(1);
   }, [searchTerm]);
 
-  const handleSearchChange = (val) => { setSearchTerm(val); setCurrentPage(1); };
   const handleRoleChange = (val) => { setSelectedRole(val); setCurrentPage(1); };
   const handleStatusChange = (val) => { setSelectedStatus(val); setCurrentPage(1); };
   const handleQuickFilterChange = (val) => { setQuickFilter(val); setCurrentPage(1); };
@@ -152,20 +152,30 @@ export default function Users() {
     if (!targetUser) return;
 
     if (currentUser && Number(currentUser.id) === Number(id)) {
-      showError("You cannot delete your own logged-in account.", "Action Blocked");
+      showError(
+        t('users.cannotDeleteOwnAccount', 'You cannot delete your own logged-in account.'),
+        t('users.actionBlocked', 'Action Blocked')
+      );
       return;
     }
 
     const isTargetSuperAdmin = normalizeRole(targetUser.role) === 'super_admin';
     if (isTargetSuperAdmin && !isSuperAdmin) {
-      showError("Only Super Administrators can delete Super Admin accounts.", "Access Denied");
+      showError(
+        t('users.superAdminDeleteDenied', 'Only Super Administrators can delete Super Admin accounts.'),
+        t('users.accessDenied', 'Access Denied')
+      );
       return;
     }
 
     const confirmed = await showConfirm({
-      title: 'Delete User Account',
-      message: `Are you sure you want to permanently delete user account "${targetUser.name}" (${targetUser.email})?\n\nThis action cannot be undone.`,
-      confirmText: 'Delete User',
+      title: t('users.deleteConfirmTitle', 'Delete User Account'),
+      message: t(
+        'users.deleteConfirmMsg',
+        'Are you sure you want to permanently delete user account "{name}" ({email})?\n\nThis action cannot be undone.',
+        { name: targetUser.name, email: targetUser.email }
+      ),
+      confirmText: t('users.deleteConfirmBtn', 'Delete User'),
       type: 'danger'
     });
 
@@ -174,13 +184,16 @@ export default function Users() {
     try {
       const res = await userService.deleteUser(id);
       if (res?.success !== false) {
-        showSuccess(`User account "${targetUser.name}" has been deleted successfully.`, 'User Deleted');
+        showSuccess(
+          t('users.deleteSuccess', 'User account "{name}" has been deleted successfully.', { name: targetUser.name }),
+          t('users.deleteSuccessTitle', 'User Deleted')
+        );
         loadUsers();
       } else {
-        showError(res.message || "Failed to delete user.", 'Delete Failed');
+        showError(res?.message || t('users.deleteFailed', 'Failed to delete user.'), t('users.deleteFailed', 'Failed to delete user.'));
       }
     } catch (e) {
-      showError(e.message || "Failed to delete user.", 'Delete Failed');
+      showError(e?.message || t('users.deleteFailed', 'Failed to delete user.'), t('users.deleteFailed', 'Failed to delete user.'));
     }
   };
 
@@ -203,7 +216,10 @@ export default function Users() {
   const openEditModal = (user) => {
     const isTargetSuperAdmin = normalizeRole(user.role) === 'super_admin';
     if (isTargetSuperAdmin && !isSuperAdmin) {
-      showError("Only Super Administrators can modify Super Admin accounts.", "Access Denied");
+      showError(
+        t('users.superAdminEditDenied', 'Only Super Administrators can modify Super Admin accounts.'),
+        t('users.accessDenied', 'Access Denied')
+      );
       return;
     }
 
@@ -234,7 +250,10 @@ export default function Users() {
   const handleSubmit = async (e) => {
     if (e && e.preventDefault) e.preventDefault();
     if (!formData.name.trim() || !formData.email.trim()) {
-      showError("Please enter full name and email address.", "Validation Failed");
+      showError(
+        t('users.validationErrorRequired', 'Please enter full name and email address.'),
+        t('users.actionBlocked', 'Action Blocked')
+      );
       return;
     }
 
@@ -247,15 +266,21 @@ export default function Users() {
       if (editingUser) {
         if (!payload.password) delete payload.password;
         await userService.updateUser(editingUser.id, payload);
-        showSuccess(`User account "${formData.name}" updated successfully.`, 'User Updated');
+        showSuccess(
+          t('users.updateSuccess', 'User account "{name}" updated successfully.', { name: formData.name }),
+          t('users.updateSuccessTitle', 'User Updated')
+        );
       } else {
         await userService.createUser(payload);
-        showSuccess(`User account "${formData.name}" created successfully.`, 'User Created');
+        showSuccess(
+          t('users.createSuccess', 'User account "{name}" created successfully.', { name: formData.name }),
+          t('users.createSuccessTitle', 'User Created')
+        );
       }
       closeModal();
       loadUsers();
     } catch (e) {
-      showError(e.message || "Failed to save user.", 'Save Failed');
+      showError(e?.message || t('users.saveFailed', 'Failed to save user.'), t('users.saveFailed', 'Failed to save user.'));
     }
   };
 
@@ -290,7 +315,9 @@ export default function Users() {
           <div className="flex items-center justify-center py-20">
             <div className="flex flex-col items-center gap-3">
               <Loader2 className="w-8 h-8 text-[#003E83] dark:text-blue-500 animate-spin" />
-              <p className="text-xs font-medium text-gray-500 dark:text-zinc-400">Loading user accounts...</p>
+              <p className="text-xs font-medium text-gray-500 dark:text-zinc-400">
+                {t('users.loadingUsers', 'Loading user accounts...')}
+              </p>
             </div>
           </div>
         ) : (
@@ -311,7 +338,7 @@ export default function Users() {
           startIndex={startIndex}
           endIndex={endIndex}
           totalRecords={totalRecords}
-          label="users"
+          label={t('users.paginationLabel', 'users')}
         />
       </div>
 

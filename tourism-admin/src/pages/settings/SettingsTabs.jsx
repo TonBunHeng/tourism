@@ -1,8 +1,11 @@
 import { ChevronDown, Sliders } from 'lucide-react';
+import { useLanguage } from '../../i18n';
 
 export default function SettingsTabs({ tabs, activeTab, onTabChange, searchMatchCounts = {} }) {
+  const { t } = useLanguage();
   const currentTab = tabs.find((t) => t.id === activeTab) || tabs[0];
   const CurrentIcon = currentTab?.icon || Sliders;
+  const currentIndex = Math.max(1, tabs.findIndex((t) => t.id === activeTab) + 1);
 
   return (
     <div className="px-4 md:px-6 py-4 border-b border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]">
@@ -13,10 +16,10 @@ export default function SettingsTabs({ tabs, activeTab, onTabChange, searchMatch
             <CurrentIcon className="w-4 h-4" />
           </div>
           <h2 className="text-lg md:text-xl font-bold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">
-            {currentTab?.label?.includes('Settings') ? currentTab.label : `${currentTab?.label || 'General'} Settings`}
+            {currentTab?.label}
           </h2>
           <span className="text-xs font-semibold px-2 py-0.5 rounded-md bg-blue-50 text-[#003E83] dark:bg-blue-950/50 dark:text-blue-400 border border-blue-100 dark:border-blue-900/40">
-            Section {Math.max(1, tabs.findIndex((t) => t.id === activeTab) + 1)} of {tabs.length}
+            {t('settings.sectionCounter', { current: currentIndex, total: tabs.length }, `Section ${currentIndex} of ${tabs.length}`)}
           </span>
         </div>
 
@@ -30,10 +33,12 @@ export default function SettingsTabs({ tabs, activeTab, onTabChange, searchMatch
             >
               {tabs.map((tab) => {
                 const matchCount = searchMatchCounts[tab.id];
-                const labelSuffix = !tab.label.includes('Settings') ? ' Settings' : '';
+                const matchText = matchCount
+                  ? ` ${t('settings.searchMatches', { count: matchCount }, `(${matchCount} matches)`)}`
+                  : '';
                 return (
                   <option key={tab.id} value={tab.id}>
-                    {tab.label}{labelSuffix}{matchCount ? ` (${matchCount} matches)` : ''}
+                    {tab.label}{matchText}
                   </option>
                 );
               })}

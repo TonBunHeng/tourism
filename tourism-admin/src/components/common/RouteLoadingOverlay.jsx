@@ -3,7 +3,7 @@ import { useLocation } from 'react-router-dom';
 import tourismLogo from '../../assets/images/tourism_logo.png';
 import { useLanguage } from '../../i18n';
 
-const MINIMUM_LOADING_TIME = 900;
+const MINIMUM_LOADING_TIME = 800;
 
 export default function RouteLoadingOverlay() {
   const { pathname } = useLocation();

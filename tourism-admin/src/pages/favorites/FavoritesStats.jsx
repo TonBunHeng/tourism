@@ -7,7 +7,7 @@ export default function FavoritesStats({ favorites = [] }) {
   const safeFavorites = Array.isArray(favorites) ? favorites : [];
   const total = safeFavorites.length;
   const visited = safeFavorites.filter(f => Boolean(f.visited || f.status === 'Visited')).length;
-  
+
   // Count unique users who favorited
   const uniqueUsers = new Set(
     safeFavorites.map(f => f.user?.id || f.user_id || f.user_name || f.user?.email).filter(Boolean)

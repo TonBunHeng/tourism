@@ -5,6 +5,7 @@ import {
   Landmark, User, X, Database, Compass, CalendarCheck, DollarSign
 } from 'lucide-react';
 import SimplePagination from '../../components/common/SimplePagination';
+import { useLanguage } from '../../i18n';
 
 export default function ReportsTable({
   activeTab,
@@ -16,6 +17,7 @@ export default function ReportsTable({
   data = [],
   isLoading = false
 }) {
+  const { t } = useLanguage();
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedItem, setSelectedItem] = useState(null);
   const itemsPerPage = 10;
@@ -37,14 +39,14 @@ export default function ReportsTable({
   }, [selectedItem]);
 
   const tabs = [
-    { id: 'all', label: 'All Records', icon: Database },
-    { id: 'places', label: 'Places Report', icon: MapPin },
-    { id: 'events', label: 'Events Report', icon: Calendar },
-    { id: 'tours', label: 'Tours Report', icon: Compass },
-    { id: 'bookings', label: 'Bookings Report', icon: CalendarCheck },
-    { id: 'users', label: 'Users Report', icon: Users },
-    { id: 'reviews', label: 'Reviews Report', icon: Star },
-    { id: 'categories', label: 'Categories Report', icon: FolderTree }
+    { id: 'all', label: t('reports.tabAllRecords', 'All Records'), icon: Database },
+    { id: 'places', label: t('reports.tabPlaces', 'Places Report'), icon: MapPin },
+    { id: 'events', label: t('reports.tabEvents', 'Events Report'), icon: Calendar },
+    { id: 'tours', label: t('reports.tabTours', 'Tours Report'), icon: Compass },
+    { id: 'bookings', label: t('reports.tabBookings', 'Bookings Report'), icon: CalendarCheck },
+    { id: 'users', label: t('reports.tabUsers', 'Users Report'), icon: Users },
+    { id: 'reviews', label: t('reports.tabReviews', 'Reviews Report'), icon: Star },
+    { id: 'categories', label: t('reports.tabCategories', 'Categories Report'), icon: FolderTree }
   ];
 
   const totalRecords = data.length;
@@ -59,36 +61,60 @@ export default function ReportsTable({
       case 'approved':
       case 'completed':
       case 'confirmed':
-      case 'published':
+      case 'published': {
+        const text = status ? (
+          status.toLowerCase() === 'active' ? t('reports.badgeActive', 'Active') :
+          status.toLowerCase() === 'approved' ? t('reports.badgeApproved', 'Approved') :
+          status.toLowerCase() === 'completed' ? t('reports.badgeCompleted', 'Completed') :
+          status.toLowerCase() === 'confirmed' ? t('reports.badgeConfirmed', 'Confirmed') :
+          t('reports.badgePublished', 'Published')
+        ) : t('reports.badgeActive', 'Active');
         return (
           <span className="inline-flex items-center gap-1 px-2.5 py-0.5 text-xs font-semibold rounded-md bg-[var(--color-success-bg)] dark:bg-[var(--color-success-dark-bg)] text-[var(--color-success-text)] dark:text-[var(--color-success-dark-text)] border border-[var(--color-success-border)] dark:border-[var(--color-success-dark-border)]">
-            {status || 'Active'}
+            {text}
           </span>
         );
+      }
       case 'pending':
       case 'upcoming':
       case 'scheduled':
       case 'draft':
-      case 'under_review':
+      case 'under_review': {
+        const text = status ? (
+          status.toLowerCase() === 'pending' ? t('reports.badgePending', 'Pending') :
+          status.toLowerCase() === 'upcoming' ? t('reports.badgeUpcoming', 'Upcoming') :
+          status.toLowerCase() === 'scheduled' ? t('reports.badgeScheduled', 'Scheduled') :
+          status.toLowerCase() === 'draft' ? t('reports.badgeDraft', 'Draft') :
+          t('reports.badgeUnderReview', 'Under Review')
+        ) : t('reports.badgePending', 'Pending');
         return (
           <span className="inline-flex items-center gap-1 px-2.5 py-0.5 text-xs font-semibold rounded-md bg-[var(--color-warning-bg)] dark:bg-[var(--color-warning-dark-bg)] text-[var(--color-warning-text)] dark:text-[var(--color-warning-dark-text)] border border-[var(--color-warning-border)] dark:border-[var(--color-warning-dark-border)]">
-            {status || 'Pending'}
+            {text}
           </span>
         );
+      }
       case 'suspended':
       case 'flagged':
       case 'inactive':
       case 'rejected':
-      case 'cancelled':
+      case 'cancelled': {
+        const text = status ? (
+          status.toLowerCase() === 'suspended' ? t('reports.badgeSuspended', 'Suspended') :
+          status.toLowerCase() === 'flagged' ? t('reports.badgeFlagged', 'Flagged') :
+          status.toLowerCase() === 'inactive' ? t('reports.badgeInactive', 'Inactive') :
+          status.toLowerCase() === 'rejected' ? t('reports.badgeRejected', 'Rejected') :
+          t('reports.badgeCancelled', 'Cancelled')
+        ) : t('reports.badgeInactive', 'Inactive');
         return (
           <span className="inline-flex items-center gap-1 px-2.5 py-0.5 text-xs font-semibold rounded-md bg-[var(--color-danger-bg)] dark:bg-[var(--color-danger-dark-bg)] text-[var(--color-danger-text)] dark:text-[var(--color-danger-dark-text)] border border-[var(--color-danger-border)] dark:border-[var(--color-danger-dark-border)]">
-            {status || 'Inactive'}
+            {text}
           </span>
         );
+      }
       default:
         return (
           <span className="inline-flex items-center gap-1 px-2.5 py-0.5 text-xs font-semibold rounded-md bg-[var(--color-neutral-badge-bg)] dark:bg-[var(--color-neutral-badge-dark-bg)] text-[var(--color-neutral-badge-text)] dark:text-[var(--color-neutral-badge-dark-text)] border border-[var(--color-neutral-badge-border)] dark:border-[var(--color-neutral-badge-dark-border)]">
-            {status || 'Standard'}
+            {status || t('reports.badgeStandard', 'Standard')}
           </span>
         );
     }
@@ -100,55 +126,55 @@ export default function ReportsTable({
         return (
           <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[11px] font-semibold rounded-md bg-blue-50 dark:bg-blue-950/50 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-900/40">
             <Landmark className="w-3 h-3 shrink-0" />
-            Place
+            {t('reports.entityPlace', 'Place')}
           </span>
         );
       case 'Event':
         return (
           <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[11px] font-semibold rounded-md bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-900/40">
             <Calendar className="w-3 h-3 shrink-0" />
-            Event
+            {t('reports.entityEvent', 'Event')}
           </span>
         );
       case 'Tour':
         return (
           <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[11px] font-semibold rounded-md bg-purple-50 dark:bg-purple-950/50 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-900/40">
             <Compass className="w-3 h-3 shrink-0" />
-            Tour
+            {t('reports.entityTour', 'Tour')}
           </span>
         );
       case 'Booking':
         return (
           <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[11px] font-semibold rounded-md bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-900/40">
             <CalendarCheck className="w-3 h-3 shrink-0" />
-            Booking
+            {t('reports.entityBooking', 'Booking')}
           </span>
         );
       case 'User':
         return (
           <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[11px] font-semibold rounded-md bg-sky-50 dark:bg-sky-950/50 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-900/40">
             <Users className="w-3 h-3 shrink-0" />
-            User
+            {t('reports.entityUser', 'User')}
           </span>
         );
       case 'Review':
         return (
           <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[11px] font-semibold rounded-md bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-900/40">
             <Star className="w-3 h-3 shrink-0" />
-            Review
+            {t('reports.entityReview', 'Review')}
           </span>
         );
       case 'Category':
         return (
           <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[11px] font-semibold rounded-md bg-teal-50 dark:bg-teal-950/50 text-teal-700 dark:text-teal-300 border border-teal-200 dark:border-teal-900/40">
             <FolderTree className="w-3 h-3 shrink-0" />
-            Category
+            {t('reports.entityCategory', 'Category')}
           </span>
         );
       default:
         return (
           <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[11px] font-semibold rounded-md bg-gray-100 dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 border border-gray-200 dark:border-zinc-700">
-            {type || 'Record'}
+            {type || t('reports.entityRecord', 'Record')}
           </span>
         );
     }
@@ -161,10 +187,10 @@ export default function ReportsTable({
       <div className="px-4 md:px-6 py-4 border-b border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div className="flex items-center gap-2.5">
           <h2 className="text-lg md:text-xl font-bold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">
-            {activeTab === 'all' ? 'All Platform Records' : tabs.find(t => t.id === activeTab)?.label || 'All Reports'}
+            {activeTab === 'all' ? t('reports.allPlatformRecords', 'All Platform Records') : tabs.find(t => t.id === activeTab)?.label || t('reports.allPlatformRecords', 'All Reports')}
           </h2>
           <span className="text-xs font-semibold px-2.5 py-0.5 rounded-md bg-blue-50 text-[#003E83] dark:bg-blue-950/50 dark:text-blue-400 border border-blue-100 dark:border-blue-900/40">
-            {totalRecords.toLocaleString()} {totalRecords === 1 ? 'record' : 'records'}
+            {totalRecords.toLocaleString()} {totalRecords === 1 ? t('reports.recordSingle', 'record') : t('reports.recordPlural', 'records')}
           </span>
         </div>
 
@@ -192,10 +218,10 @@ export default function ReportsTable({
               onChange={(e) => { setStatusFilter(e.target.value); setCurrentPage(1); }}
               className="appearance-none w-full sm:w-auto pl-4 pr-9 py-2 border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--color-input)] focus:border-transparent bg-[var(--color-white)] dark:bg-[var(--color-bg-dark)] text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] text-sm cursor-pointer shadow-xs font-medium"
             >
-              <option value="All">All Statuses</option>
-              <option value="Active">Active / Approved</option>
-              <option value="Pending">Pending / Scheduled</option>
-              <option value="Suspended">Flagged / Suspended</option>
+              <option value="All">{t('reports.statusAll', 'All Statuses')}</option>
+              <option value="Active">{t('reports.statusActive', 'Active / Approved')}</option>
+              <option value="Pending">{t('reports.statusPending', 'Pending / Scheduled')}</option>
+              <option value="Suspended">{t('reports.statusSuspended', 'Flagged / Suspended')}</option>
             </select>
             <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--color-text-muted-light)] dark:text-[var(--color-text-secondary-dark)] pointer-events-none" />
           </div>
@@ -218,7 +244,7 @@ export default function ReportsTable({
           ))
         ) : paginatedData.length === 0 ? (
           <div className="py-10 px-4 text-center text-[var(--color-text-muted-light)] dark:text-[var(--color-text-muted-dark)] font-medium text-xs">
-            No report data matching selected search or status filters.
+            {t('reports.noDataFound', 'No report data matching selected search or status filters.')}
           </div>
         ) : (
           paginatedData.map((row, i) => (
@@ -240,8 +266,8 @@ export default function ReportsTable({
                     {row.primaryName || row.name || row.title || row.booking_code || row.userName || 'Unnamed Record'}
                   </h4>
                   <div className="grid grid-cols-2 gap-x-2 gap-y-1 text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
-                    <div><span className="font-semibold text-[var(--color-text-muted-light)]">Detail:</span> {row.secondaryDetail || row.category || row.destination || row.province || row.role || 'N/A'}</div>
-                    <div><span className="font-semibold text-[var(--color-text-muted-light)]">Date:</span> {row.date || row.createdAt || row.startDate || 'N/A'}</div>
+                    <div><span className="font-semibold text-[var(--color-text-muted-light)]">{t('reports.labelDetail', 'Detail:')}</span> {row.secondaryDetail || row.category || row.destination || row.province || row.role || 'N/A'}</div>
+                    <div><span className="font-semibold text-[var(--color-text-muted-light)]">{t('reports.labelDate', 'Date:')}</span> {row.date || row.createdAt || row.startDate || 'N/A'}</div>
                   </div>
                 </>
               )}
@@ -252,12 +278,12 @@ export default function ReportsTable({
                     {row.name}
                   </h4>
                   <div className="grid grid-cols-2 gap-x-2 gap-y-1 text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
-                    <div><span className="font-semibold text-[var(--color-text-muted-light)]">Cat:</span> {row.category}</div>
-                    <div><span className="font-semibold text-[var(--color-text-muted-light)]">Province:</span> {row.province}</div>
+                    <div><span className="font-semibold text-[var(--color-text-muted-light)]">{t('reports.labelCategoryShort', 'Cat:')}</span> {row.category}</div>
+                    <div><span className="font-semibold text-[var(--color-text-muted-light)]">{t('reports.labelProvince', 'Province:')}</span> {row.province}</div>
                     <div className="inline-flex items-center gap-1 font-semibold text-amber-500">
-                      <Star className="w-3 h-3 fill-amber-400" /> {row.rating} ({row.reviews} revs)
+                      <Star className="w-3 h-3 fill-amber-400" /> {row.rating} ({row.reviews} {t('reports.thReviews', 'revs')})
                     </div>
-                    <div><span className="font-semibold text-[var(--color-text-muted-light)]">Date:</span> {row.createdAt}</div>
+                    <div><span className="font-semibold text-[var(--color-text-muted-light)]">{t('reports.labelDate', 'Date:')}</span> {row.createdAt}</div>
                   </div>
                 </>
               )}
@@ -268,10 +294,10 @@ export default function ReportsTable({
                     {row.title}
                   </h4>
                   <div className="grid grid-cols-2 gap-x-2 gap-y-1 text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
-                    <div><span className="font-semibold text-[var(--color-text-muted-light)]">Loc:</span> {row.location}</div>
-                    <div><span className="font-semibold text-[var(--color-text-muted-light)]">Attended:</span> {row.attendees?.toLocaleString()}</div>
-                    <div><span className="font-semibold text-[var(--color-text-muted-light)]">Start:</span> {row.startDate}</div>
-                    <div><span className="font-semibold text-[var(--color-text-muted-light)]">End:</span> {row.endDate}</div>
+                    <div><span className="font-semibold text-[var(--color-text-muted-light)]">{t('reports.labelLocationShort', 'Loc:')}</span> {row.location}</div>
+                    <div><span className="font-semibold text-[var(--color-text-muted-light)]">{t('reports.labelAttended', 'Attended:')}</span> {row.attendees?.toLocaleString()}</div>
+                    <div><span className="font-semibold text-[var(--color-text-muted-light)]">{t('reports.labelStart', 'Start:')}</span> {row.startDate}</div>
+                    <div><span className="font-semibold text-[var(--color-text-muted-light)]">{t('reports.labelEnd', 'End:')}</span> {row.endDate}</div>
                   </div>
                 </>
               )}
@@ -282,8 +308,8 @@ export default function ReportsTable({
                     {row.title}
                   </h4>
                   <div className="grid grid-cols-2 gap-x-2 gap-y-1 text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
-                    <div><span className="font-semibold text-[var(--color-text-muted-light)]">Dest:</span> {row.destination}</div>
-                    <div><span className="font-semibold text-[var(--color-text-muted-light)]">Duration:</span> {row.duration}</div>
+                    <div><span className="font-semibold text-[var(--color-text-muted-light)]">{t('reports.labelDestinationShort', 'Dest:')}</span> {row.destination}</div>
+                    <div><span className="font-semibold text-[var(--color-text-muted-light)]">{t('reports.labelDuration', 'Duration:')}</span> {row.duration}</div>
                     <div className="font-semibold text-emerald-600 dark:text-emerald-400">${row.price_per_person} / person</div>
                     <div className="inline-flex items-center gap-1 font-semibold text-amber-500">
                       <Star className="w-3 h-3 fill-amber-400" /> {row.rating}
@@ -298,10 +324,10 @@ export default function ReportsTable({
                     Booking #{row.booking_code}
                   </h4>
                   <div className="grid grid-cols-2 gap-x-2 gap-y-1 text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
-                    <div><span className="font-semibold text-[var(--color-text-muted-light)]">Guest:</span> {row.user?.name || row.customer_name || 'Traveler'}</div>
-                    <div><span className="font-semibold text-[var(--color-text-muted-light)]">Service:</span> {row.service_name}</div>
-                    <div><span className="font-semibold text-[var(--color-text-muted-light)]">Amount:</span> ${row.total_price}</div>
-                    <div><span className="font-semibold text-[var(--color-text-muted-light)]">Date:</span> {row.booking_date || row.date}</div>
+                    <div><span className="font-semibold text-[var(--color-text-muted-light)]">{t('reports.labelGuest', 'Guest:')}</span> {row.user?.name || row.customer_name || 'Traveler'}</div>
+                    <div><span className="font-semibold text-[var(--color-text-muted-light)]">{t('reports.labelService', 'Service:')}</span> {row.service_name}</div>
+                    <div><span className="font-semibold text-[var(--color-text-muted-light)]">{t('reports.labelAmount', 'Amount:')}</span> ${row.total_price}</div>
+                    <div><span className="font-semibold text-[var(--color-text-muted-light)]">{t('reports.labelDate', 'Date:')}</span> {row.booking_date || row.date}</div>
                   </div>
                 </>
               )}
@@ -315,9 +341,9 @@ export default function ReportsTable({
                     {row.email}
                   </p>
                   <div className="grid grid-cols-2 gap-x-2 gap-y-1 text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] pt-1">
-                    <div><span className="font-semibold text-[var(--color-text-muted-light)]">Role:</span> {row.role}</div>
-                    <div><span className="font-semibold text-[var(--color-text-muted-light)]">Joined:</span> {row.joinedDate}</div>
-                    <div><span className="font-semibold text-[var(--color-text-muted-light)]">Reviews:</span> {row.reviewsCount}</div>
+                    <div><span className="font-semibold text-[var(--color-text-muted-light)]">{t('reports.labelRole', 'Role:')}</span> {row.role}</div>
+                    <div><span className="font-semibold text-[var(--color-text-muted-light)]">{t('reports.labelJoined', 'Joined:')}</span> {row.joinedDate}</div>
+                    <div><span className="font-semibold text-[var(--color-text-muted-light)]">{t('reports.labelReviews', 'Reviews:')}</span> {row.reviewsCount}</div>
                   </div>
                 </>
               )}
@@ -359,7 +385,7 @@ export default function ReportsTable({
                     {row.description}
                   </p>
                   <div className="text-xs font-semibold text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] pt-1">
-                    Total Places: <span className="text-[#003E83] dark:text-blue-400">{row.totalPlaces}</span>
+                    {t('reports.labelTotalPlaces', 'Total Places:')} <span className="text-[#003E83] dark:text-blue-400">{row.totalPlaces}</span>
                   </div>
                 </>
               )}
@@ -369,7 +395,7 @@ export default function ReportsTable({
                   type="button"
                   onClick={() => setSelectedItem(row)}
                   className="p-1.5 text-[var(--color-purple-badge-text)] dark:text-[var(--color-purple-badge-dark-text)] hover:bg-[var(--color-purple-badge-bg)] dark:hover:bg-[var(--color-purple-badge-dark-bg)] rounded-md transition-colors cursor-pointer"
-                  title="View Details"
+                  title={t('reports.tooltipViewDetails', 'View Details')}
                 >
                   <Eye className="w-4 h-4" />
                 </button>
@@ -385,91 +411,91 @@ export default function ReportsTable({
           <thead className="bg-[var(--color-surface-hover-light)]/50 dark:bg-[var(--color-surface-hover-dark)]/50 text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] uppercase tracking-wider text-xs font-medium">
             {activeTab === 'all' && (
               <tr>
-                <th className="pl-4 pr-2 py-3.5 text-xs font-medium uppercase tracking-wider w-12 text-center">#</th>
-                <th className="px-3 py-3.5 whitespace-nowrap w-32">Type</th>
-                <th className="px-4 py-3.5">Title / Subject</th>
-                <th className="px-3 py-3.5 whitespace-nowrap w-48">Detail / Scope</th>
-                <th className="px-3 py-3.5 whitespace-nowrap w-28">Status</th>
-                <th className="px-3 py-3.5 whitespace-nowrap w-32">Date</th>
-                <th className="pl-3 pr-4 py-3.5 text-right w-20 whitespace-nowrap">Actions</th>
+                <th className="pl-4 pr-2 py-3.5 text-xs font-medium uppercase tracking-wider w-12 text-center">{t('reports.thIndex', '#')}</th>
+                <th className="px-3 py-3.5 whitespace-nowrap w-32">{t('reports.thType', 'Type')}</th>
+                <th className="px-4 py-3.5">{t('reports.thTitleSubject', 'Title / Subject')}</th>
+                <th className="px-3 py-3.5 whitespace-nowrap w-48">{t('reports.thDetailScope', 'Detail / Scope')}</th>
+                <th className="px-3 py-3.5 whitespace-nowrap w-28">{t('reports.thStatus', 'Status')}</th>
+                <th className="px-3 py-3.5 whitespace-nowrap w-32">{t('reports.thDate', 'Date')}</th>
+                <th className="pl-3 pr-4 py-3.5 text-right w-20 whitespace-nowrap">{t('reports.thActions', 'Actions')}</th>
               </tr>
             )}
             {activeTab === 'places' && (
               <tr>
-                <th className="pl-4 pr-2 py-3.5 text-xs font-medium uppercase tracking-wider w-12 text-center">#</th>
-                <th className="px-4 py-3.5">Place & Category</th>
-                <th className="px-3 py-3.5 whitespace-nowrap w-44">Province</th>
-                <th className="px-3 py-3.5 whitespace-nowrap w-28">Rating</th>
-                <th className="px-3 py-3.5 whitespace-nowrap w-24">Reviews</th>
-                <th className="px-3 py-3.5 whitespace-nowrap w-28">Status</th>
-                <th className="px-3 py-3.5 whitespace-nowrap w-32">Created Date</th>
-                <th className="pl-3 pr-4 py-3.5 text-right w-20 whitespace-nowrap">Actions</th>
+                <th className="pl-4 pr-2 py-3.5 text-xs font-medium uppercase tracking-wider w-12 text-center">{t('reports.thIndex', '#')}</th>
+                <th className="px-4 py-3.5">{t('reports.thPlaceCategory', 'Place & Category')}</th>
+                <th className="px-3 py-3.5 whitespace-nowrap w-44">{t('reports.thProvince', 'Province')}</th>
+                <th className="px-3 py-3.5 whitespace-nowrap w-28">{t('reports.thRating', 'Rating')}</th>
+                <th className="px-3 py-3.5 whitespace-nowrap w-24">{t('reports.thReviews', 'Reviews')}</th>
+                <th className="px-3 py-3.5 whitespace-nowrap w-28">{t('reports.thStatus', 'Status')}</th>
+                <th className="px-3 py-3.5 whitespace-nowrap w-32">{t('reports.thCreatedDate', 'Created Date')}</th>
+                <th className="pl-3 pr-4 py-3.5 text-right w-20 whitespace-nowrap">{t('reports.thActions', 'Actions')}</th>
               </tr>
             )}
             {activeTab === 'events' && (
               <tr>
-                <th className="pl-4 pr-2 py-3.5 text-xs font-medium uppercase tracking-wider w-12 text-center">#</th>
-                <th className="px-4 py-3.5">Event & Location</th>
-                <th className="px-3 py-3.5 whitespace-nowrap w-32">Start Date</th>
-                <th className="px-3 py-3.5 whitespace-nowrap w-32">End Date</th>
-                <th className="px-3 py-3.5 whitespace-nowrap w-28">Attendees</th>
-                <th className="px-3 py-3.5 whitespace-nowrap w-28">Status</th>
-                <th className="pl-3 pr-4 py-3.5 text-right w-20 whitespace-nowrap">Actions</th>
+                <th className="pl-4 pr-2 py-3.5 text-xs font-medium uppercase tracking-wider w-12 text-center">{t('reports.thIndex', '#')}</th>
+                <th className="px-4 py-3.5">{t('reports.thEventLocation', 'Event & Location')}</th>
+                <th className="px-3 py-3.5 whitespace-nowrap w-32">{t('reports.thStartDate', 'Start Date')}</th>
+                <th className="px-3 py-3.5 whitespace-nowrap w-32">{t('reports.thEndDate', 'End Date')}</th>
+                <th className="px-3 py-3.5 whitespace-nowrap w-28">{t('reports.thAttendees', 'Attendees')}</th>
+                <th className="px-3 py-3.5 whitespace-nowrap w-28">{t('reports.thStatus', 'Status')}</th>
+                <th className="pl-3 pr-4 py-3.5 text-right w-20 whitespace-nowrap">{t('reports.thActions', 'Actions')}</th>
               </tr>
             )}
             {activeTab === 'tours' && (
               <tr>
-                <th className="pl-4 pr-2 py-3.5 text-xs font-medium uppercase tracking-wider w-12 text-center">#</th>
-                <th className="px-4 py-3.5">Tour Package & Category</th>
-                <th className="px-3 py-3.5 whitespace-nowrap w-40">Destination</th>
-                <th className="px-3 py-3.5 whitespace-nowrap w-28">Duration</th>
-                <th className="px-3 py-3.5 whitespace-nowrap w-32">Price / Person</th>
-                <th className="px-3 py-3.5 whitespace-nowrap w-28">Rating</th>
-                <th className="px-3 py-3.5 whitespace-nowrap w-28">Status</th>
-                <th className="pl-3 pr-4 py-3.5 text-right w-20 whitespace-nowrap">Actions</th>
+                <th className="pl-4 pr-2 py-3.5 text-xs font-medium uppercase tracking-wider w-12 text-center">{t('reports.thIndex', '#')}</th>
+                <th className="px-4 py-3.5">{t('reports.thTourPackageCategory', 'Tour Package & Category')}</th>
+                <th className="px-3 py-3.5 whitespace-nowrap w-40">{t('reports.thDestination', 'Destination')}</th>
+                <th className="px-3 py-3.5 whitespace-nowrap w-28">{t('reports.thDuration', 'Duration')}</th>
+                <th className="px-3 py-3.5 whitespace-nowrap w-32">{t('reports.thPricePerson', 'Price / Person')}</th>
+                <th className="px-3 py-3.5 whitespace-nowrap w-28">{t('reports.thRating', 'Rating')}</th>
+                <th className="px-3 py-3.5 whitespace-nowrap w-28">{t('reports.thStatus', 'Status')}</th>
+                <th className="pl-3 pr-4 py-3.5 text-right w-20 whitespace-nowrap">{t('reports.thActions', 'Actions')}</th>
               </tr>
             )}
             {activeTab === 'bookings' && (
               <tr>
-                <th className="pl-4 pr-2 py-3.5 text-xs font-medium uppercase tracking-wider w-12 text-center">#</th>
-                <th className="px-4 py-3.5">Booking Code & Guest</th>
-                <th className="px-3 py-3.5 whitespace-nowrap w-48">Service & Business</th>
-                <th className="px-3 py-3.5 whitespace-nowrap w-32">Booking Date</th>
-                <th className="px-3 py-3.5 whitespace-nowrap w-28">Amount</th>
-                <th className="px-3 py-3.5 whitespace-nowrap w-28">Status</th>
-                <th className="pl-3 pr-4 py-3.5 text-right w-20 whitespace-nowrap">Actions</th>
+                <th className="pl-4 pr-2 py-3.5 text-xs font-medium uppercase tracking-wider w-12 text-center">{t('reports.thIndex', '#')}</th>
+                <th className="px-4 py-3.5">{t('reports.thBookingCodeGuest', 'Booking Code & Guest')}</th>
+                <th className="px-3 py-3.5 whitespace-nowrap w-48">{t('reports.thServiceBusiness', 'Service & Business')}</th>
+                <th className="px-3 py-3.5 whitespace-nowrap w-32">{t('reports.thBookingDate', 'Booking Date')}</th>
+                <th className="px-3 py-3.5 whitespace-nowrap w-28">{t('reports.thAmount', 'Amount')}</th>
+                <th className="px-3 py-3.5 whitespace-nowrap w-28">{t('reports.thStatus', 'Status')}</th>
+                <th className="pl-3 pr-4 py-3.5 text-right w-20 whitespace-nowrap">{t('reports.thActions', 'Actions')}</th>
               </tr>
             )}
             {activeTab === 'users' && (
               <tr>
-                <th className="pl-4 pr-2 py-3.5 text-xs font-medium uppercase tracking-wider w-12 text-center">#</th>
-                <th className="px-4 py-3.5">User & Email</th>
-                <th className="px-3 py-3.5 whitespace-nowrap w-32">Role</th>
-                <th className="px-3 py-3.5 whitespace-nowrap w-32">Joined Date</th>
-                <th className="px-3 py-3.5 whitespace-nowrap w-28">Reviews</th>
-                <th className="px-3 py-3.5 whitespace-nowrap w-28">Status</th>
-                <th className="pl-3 pr-4 py-3.5 text-right w-20 whitespace-nowrap">Actions</th>
+                <th className="pl-4 pr-2 py-3.5 text-xs font-medium uppercase tracking-wider w-12 text-center">{t('reports.thIndex', '#')}</th>
+                <th className="px-4 py-3.5">{t('reports.thUserEmail', 'User & Email')}</th>
+                <th className="px-3 py-3.5 whitespace-nowrap w-32">{t('reports.thRole', 'Role')}</th>
+                <th className="px-3 py-3.5 whitespace-nowrap w-32">{t('reports.thJoinedDate', 'Joined Date')}</th>
+                <th className="px-3 py-3.5 whitespace-nowrap w-28">{t('reports.thReviews', 'Reviews')}</th>
+                <th className="px-3 py-3.5 whitespace-nowrap w-28">{t('reports.thStatus', 'Status')}</th>
+                <th className="pl-3 pr-4 py-3.5 text-right w-20 whitespace-nowrap">{t('reports.thActions', 'Actions')}</th>
               </tr>
             )}
             {activeTab === 'reviews' && (
               <tr>
-                <th className="pl-4 pr-2 py-3.5 text-xs font-medium uppercase tracking-wider w-12 text-center">#</th>
-                <th className="px-4 py-3.5">User & Review</th>
-                <th className="px-3 py-3.5 whitespace-nowrap w-44">Target Place</th>
-                <th className="px-3 py-3.5 whitespace-nowrap w-28">Rating</th>
-                <th className="px-3 py-3.5 whitespace-nowrap w-32">Date</th>
-                <th className="px-3 py-3.5 whitespace-nowrap w-28">Status</th>
-                <th className="pl-3 pr-4 py-3.5 text-right w-20 whitespace-nowrap">Actions</th>
+                <th className="pl-4 pr-2 py-3.5 text-xs font-medium uppercase tracking-wider w-12 text-center">{t('reports.thIndex', '#')}</th>
+                <th className="px-4 py-3.5">{t('reports.thUserReview', 'User & Review')}</th>
+                <th className="px-3 py-3.5 whitespace-nowrap w-44">{t('reports.thTargetPlace', 'Target Place')}</th>
+                <th className="px-3 py-3.5 whitespace-nowrap w-28">{t('reports.thRating', 'Rating')}</th>
+                <th className="px-3 py-3.5 whitespace-nowrap w-32">{t('reports.thDate', 'Date')}</th>
+                <th className="px-3 py-3.5 whitespace-nowrap w-28">{t('reports.thStatus', 'Status')}</th>
+                <th className="pl-3 pr-4 py-3.5 text-right w-20 whitespace-nowrap">{t('reports.thActions', 'Actions')}</th>
               </tr>
             )}
             {activeTab === 'categories' && (
               <tr>
-                <th className="pl-4 pr-2 py-3.5 text-xs font-medium uppercase tracking-wider w-12 text-center">#</th>
-                <th className="px-4 py-3.5">Category Name</th>
-                <th className="px-3 py-3.5">Description</th>
-                <th className="px-3 py-3.5 whitespace-nowrap w-32">Total Places</th>
-                <th className="px-3 py-3.5 whitespace-nowrap w-28">Status</th>
-                <th className="pl-3 pr-4 py-3.5 text-right w-20 whitespace-nowrap">Actions</th>
+                <th className="pl-4 pr-2 py-3.5 text-xs font-medium uppercase tracking-wider w-12 text-center">{t('reports.thIndex', '#')}</th>
+                <th className="px-4 py-3.5">{t('reports.thCategoryName', 'Category Name')}</th>
+                <th className="px-3 py-3.5">{t('reports.thDescription', 'Description')}</th>
+                <th className="px-3 py-3.5 whitespace-nowrap w-32">{t('reports.thTotalPlaces', 'Total Places')}</th>
+                <th className="px-3 py-3.5 whitespace-nowrap w-28">{t('reports.thStatus', 'Status')}</th>
+                <th className="pl-3 pr-4 py-3.5 text-right w-20 whitespace-nowrap">{t('reports.thActions', 'Actions')}</th>
               </tr>
             )}
           </thead>
@@ -490,7 +516,7 @@ export default function ReportsTable({
             ) : paginatedData.length === 0 ? (
               <tr>
                 <td colSpan={8} className="py-12 text-center text-[var(--color-text-muted-light)] dark:text-[var(--color-text-muted-dark)] font-medium">
-                  No report data matching selected search or status filters.
+                  {t('reports.noDataFound', 'No report data matching selected search or status filters.')}
                 </td>
               </tr>
             ) : (
@@ -530,7 +556,7 @@ export default function ReportsTable({
                           type="button"
                           onClick={() => setSelectedItem(row)}
                           className="p-1.5 text-[var(--color-purple-badge-text)] dark:text-[var(--color-purple-badge-dark-text)] hover:bg-[var(--color-purple-badge-bg)] dark:hover:bg-[var(--color-purple-badge-dark-bg)] rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
-                          title="View Details"
+                          title={t('reports.tooltipViewDetails', 'View Details')}
                         >
                           <Eye className="w-4 h-4" />
                         </button>
@@ -587,7 +613,7 @@ export default function ReportsTable({
                           type="button"
                           onClick={() => setSelectedItem(row)}
                           className="p-1.5 text-[var(--color-purple-badge-text)] dark:text-[var(--color-purple-badge-dark-text)] hover:bg-[var(--color-purple-badge-bg)] dark:hover:bg-[var(--color-purple-badge-dark-bg)] rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
-                          title="View Details"
+                          title={t('reports.tooltipViewDetails', 'View Details')}
                         >
                           <Eye className="w-4 h-4" />
                         </button>
@@ -634,7 +660,7 @@ export default function ReportsTable({
                           type="button"
                           onClick={() => setSelectedItem(row)}
                           className="p-1.5 text-[var(--color-purple-badge-text)] dark:text-[var(--color-purple-badge-dark-text)] hover:bg-[var(--color-purple-badge-bg)] dark:hover:bg-[var(--color-purple-badge-dark-bg)] rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
-                          title="View Details"
+                          title={t('reports.tooltipViewDetails', 'View Details')}
                         >
                           <Eye className="w-4 h-4" />
                         </button>
@@ -691,7 +717,7 @@ export default function ReportsTable({
                           type="button"
                           onClick={() => setSelectedItem(row)}
                           className="p-1.5 text-[var(--color-purple-badge-text)] dark:text-[var(--color-purple-badge-dark-text)] hover:bg-[var(--color-purple-badge-bg)] dark:hover:bg-[var(--color-purple-badge-dark-bg)] rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
-                          title="View Details"
+                          title={t('reports.tooltipViewDetails', 'View Details')}
                         >
                           <Eye className="w-4 h-4" />
                         </button>
@@ -738,7 +764,7 @@ export default function ReportsTable({
                           type="button"
                           onClick={() => setSelectedItem(row)}
                           className="p-1.5 text-[var(--color-purple-badge-text)] dark:text-[var(--color-purple-badge-dark-text)] hover:bg-[var(--color-purple-badge-bg)] dark:hover:bg-[var(--color-purple-badge-dark-bg)] rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
-                          title="View Details"
+                          title={t('reports.tooltipViewDetails', 'View Details')}
                         >
                           <Eye className="w-4 h-4" />
                         </button>
@@ -786,7 +812,7 @@ export default function ReportsTable({
                           type="button"
                           onClick={() => setSelectedItem(row)}
                           className="p-1.5 text-[var(--color-purple-badge-text)] dark:text-[var(--color-purple-badge-dark-text)] hover:bg-[var(--color-purple-badge-bg)] dark:hover:bg-[var(--color-purple-badge-dark-bg)] rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
-                          title="View Details"
+                          title={t('reports.tooltipViewDetails', 'View Details')}
                         >
                           <Eye className="w-4 h-4" />
                         </button>
@@ -844,7 +870,7 @@ export default function ReportsTable({
                           type="button"
                           onClick={() => setSelectedItem(row)}
                           className="p-1.5 text-[var(--color-purple-badge-text)] dark:text-[var(--color-purple-badge-dark-text)] hover:bg-[var(--color-purple-badge-bg)] dark:hover:bg-[var(--color-purple-badge-dark-bg)] rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
-                          title="View Details"
+                          title={t('reports.tooltipViewDetails', 'View Details')}
                         >
                           <Eye className="w-4 h-4" />
                         </button>
@@ -882,7 +908,7 @@ export default function ReportsTable({
                           type="button"
                           onClick={() => setSelectedItem(row)}
                           className="p-1.5 text-[var(--color-purple-badge-text)] dark:text-[var(--color-purple-badge-dark-text)] hover:bg-[var(--color-purple-badge-bg)] dark:hover:bg-[var(--color-purple-badge-dark-bg)] rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
-                          title="View Details"
+                          title={t('reports.tooltipViewDetails', 'View Details')}
                         >
                           <Eye className="w-4 h-4" />
                         </button>
@@ -904,7 +930,7 @@ export default function ReportsTable({
         startIndex={startIndex}
         endIndex={endIndex}
         totalRecords={totalRecords}
-        label="records"
+        label={t('reports.paginationLabel', 'records')}
       />
 
       {/* Details View Modal */}
@@ -944,7 +970,7 @@ export default function ReportsTable({
                     {selectedItem.primaryName || selectedItem.name || selectedItem.title || selectedItem.booking_code || selectedItem.userName}
                   </h3>
                   <p className="text-xs text-[var(--color-text-muted-light)] dark:text-zinc-400 font-mono">
-                    ID #{selectedItem.id} • {(selectedItem.entityType || activeTab).toUpperCase()} REPORT
+                    {t('reports.recordId', { id: selectedItem.id }, `ID #${selectedItem.id}`)} • {(selectedItem.entityType || activeTab).toUpperCase()}
                   </p>
                 </div>
               </div>
@@ -952,6 +978,7 @@ export default function ReportsTable({
                 type="button"
                 onClick={() => setSelectedItem(null)}
                 className="p-1.5 rounded-md text-[var(--color-text-muted-light)] hover:text-[var(--color-text-primary-light)] dark:hover:text-white hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+                aria-label={t('reports.btnClose', 'Close')}
               >
                 <X className="w-4 h-4" />
               </button>
@@ -964,29 +991,31 @@ export default function ReportsTable({
                 <div className="space-y-3">
                   <div className="grid grid-cols-2 gap-3 p-3 rounded-md bg-[var(--color-surface-hover-light)]/40 dark:bg-zinc-900/40 border border-[var(--color-border-subtle-light)] dark:border-zinc-800">
                     <div>
-                      <span className="text-[11px] font-medium text-[var(--color-text-muted-light)] dark:text-zinc-400 block">Category</span>
+                      <span className="text-[11px] font-medium text-[var(--color-text-muted-light)] dark:text-zinc-400 block">{t('reports.modalCategory', 'Category')}</span>
                       <span className="font-semibold text-[var(--color-text-primary-light)] dark:text-white">{selectedItem.category}</span>
                     </div>
                     <div>
-                      <span className="text-[11px] font-medium text-[var(--color-text-muted-light)] dark:text-zinc-400 block">Province</span>
+                      <span className="text-[11px] font-medium text-[var(--color-text-muted-light)] dark:text-zinc-400 block">{t('reports.thProvince', 'Province')}</span>
                       <span className="font-semibold text-[var(--color-text-primary-light)] dark:text-white">{selectedItem.province}</span>
                     </div>
                     <div>
-                      <span className="text-[11px] font-medium text-[var(--color-text-muted-light)] dark:text-zinc-400 block">Rating & Score</span>
+                      <span className="text-[11px] font-medium text-[var(--color-text-muted-light)] dark:text-zinc-400 block">{t('reports.modalRatingScore', 'Rating Score')}</span>
                       <span className="font-semibold text-amber-500 inline-flex items-center gap-1">
                         <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-                        {Number(selectedItem.rating || 0).toFixed(1)} ({selectedItem.reviews} reviews)
+                        {Number(selectedItem.rating || 0).toFixed(1)} ({selectedItem.reviews} {t('reports.thReviews', 'reviews')})
                       </span>
                     </div>
                     <div>
-                      <span className="text-[11px] font-medium text-[var(--color-text-muted-light)] dark:text-zinc-400 block">Status</span>
+                      <span className="text-[11px] font-medium text-[var(--color-text-muted-light)] dark:text-zinc-400 block">{t('reports.modalStatus', 'Status')}</span>
                       <div className="mt-0.5">{getStatusBadge(selectedItem.status)}</div>
                     </div>
                   </div>
                   <div className="p-3 rounded-md bg-[var(--color-surface-hover-light)]/40 dark:bg-zinc-900/40 border border-[var(--color-border-subtle-light)] dark:border-zinc-800 space-y-1">
-                    <span className="text-[11px] font-medium text-[var(--color-text-muted-light)] dark:text-zinc-400 block">Location Address</span>
+                    <span className="text-[11px] font-medium text-[var(--color-text-muted-light)] dark:text-zinc-400 block">{t('reports.modalLocationAddress', 'Location Address')}</span>
                     <p className="font-medium text-[var(--color-text-primary-light)] dark:text-white">{selectedItem.location || 'Cambodia'}</p>
-                    <span className="text-[11px] text-[var(--color-text-muted-light)] dark:text-zinc-400 block pt-1 font-mono">Created Date: {selectedItem.createdAt || selectedItem.date}</span>
+                    <span className="text-[11px] text-[var(--color-text-muted-light)] dark:text-zinc-400 block pt-1 font-mono">
+                      {t('reports.modalCreatedDate', { date: selectedItem.createdAt || selectedItem.date }, `Created Date: ${selectedItem.createdAt || selectedItem.date}`)}
+                    </span>
                   </div>
                 </div>
               )}
@@ -996,24 +1025,24 @@ export default function ReportsTable({
                 <div className="space-y-3">
                   <div className="grid grid-cols-2 gap-3 p-3 rounded-md bg-[var(--color-surface-hover-light)]/40 dark:bg-zinc-900/40 border border-[var(--color-border-subtle-light)] dark:border-zinc-800">
                     <div>
-                      <span className="text-[11px] font-medium text-[var(--color-text-muted-light)] dark:text-zinc-400 block">Location</span>
+                      <span className="text-[11px] font-medium text-[var(--color-text-muted-light)] dark:text-zinc-400 block">{t('reports.modalLocation', 'Location')}</span>
                       <span className="font-semibold text-[var(--color-text-primary-light)] dark:text-white">{selectedItem.location}</span>
                     </div>
                     <div>
-                      <span className="text-[11px] font-medium text-[var(--color-text-muted-light)] dark:text-zinc-400 block">Status</span>
+                      <span className="text-[11px] font-medium text-[var(--color-text-muted-light)] dark:text-zinc-400 block">{t('reports.modalStatus', 'Status')}</span>
                       <div className="mt-0.5">{getStatusBadge(selectedItem.status)}</div>
                     </div>
                     <div>
-                      <span className="text-[11px] font-medium text-[var(--color-text-muted-light)] dark:text-zinc-400 block">Start Date</span>
+                      <span className="text-[11px] font-medium text-[var(--color-text-muted-light)] dark:text-zinc-400 block">{t('reports.thStartDate', 'Start Date')}</span>
                       <span className="font-semibold font-mono text-[var(--color-text-primary-light)] dark:text-white">{selectedItem.startDate}</span>
                     </div>
                     <div>
-                      <span className="text-[11px] font-medium text-[var(--color-text-muted-light)] dark:text-zinc-400 block">End Date</span>
+                      <span className="text-[11px] font-medium text-[var(--color-text-muted-light)] dark:text-zinc-400 block">{t('reports.thEndDate', 'End Date')}</span>
                       <span className="font-semibold font-mono text-[var(--color-text-primary-light)] dark:text-white">{selectedItem.endDate}</span>
                     </div>
                   </div>
                   <div className="p-3 rounded-md bg-blue-50/50 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900/30 flex items-center justify-between">
-                    <span className="text-xs font-medium text-blue-900 dark:text-blue-300">Total Registered Attendees</span>
+                    <span className="text-xs font-medium text-blue-900 dark:text-blue-300">{t('reports.modalTotalRegisteredAttendees', 'Total Registered Attendees')}</span>
                     <span className="text-sm font-bold text-blue-700 dark:text-blue-400">{selectedItem.attendees?.toLocaleString()}</span>
                   </div>
                 </div>
@@ -1024,19 +1053,19 @@ export default function ReportsTable({
                 <div className="space-y-3">
                   <div className="grid grid-cols-2 gap-3 p-3 rounded-md bg-[var(--color-surface-hover-light)]/40 dark:bg-zinc-900/40 border border-[var(--color-border-subtle-light)] dark:border-zinc-800">
                     <div>
-                      <span className="text-[11px] font-medium text-[var(--color-text-muted-light)] dark:text-zinc-400 block">Destination</span>
+                      <span className="text-[11px] font-medium text-[var(--color-text-muted-light)] dark:text-zinc-400 block">{t('reports.modalDestination', 'Destination')}</span>
                       <span className="font-semibold text-[var(--color-text-primary-light)] dark:text-white">{selectedItem.destination}</span>
                     </div>
                     <div>
-                      <span className="text-[11px] font-medium text-[var(--color-text-muted-light)] dark:text-zinc-400 block">Duration</span>
+                      <span className="text-[11px] font-medium text-[var(--color-text-muted-light)] dark:text-zinc-400 block">{t('reports.modalDuration', 'Duration')}</span>
                       <span className="font-semibold text-[var(--color-text-primary-light)] dark:text-white">{selectedItem.duration}</span>
                     </div>
                     <div>
-                      <span className="text-[11px] font-medium text-[var(--color-text-muted-light)] dark:text-zinc-400 block">Price / Person</span>
+                      <span className="text-[11px] font-medium text-[var(--color-text-muted-light)] dark:text-zinc-400 block">{t('reports.modalPricePerson', 'Price / Person')}</span>
                       <span className="font-bold text-emerald-600 dark:text-emerald-400">${selectedItem.price_per_person}</span>
                     </div>
                     <div>
-                      <span className="text-[11px] font-medium text-[var(--color-text-muted-light)] dark:text-zinc-400 block">Rating</span>
+                      <span className="text-[11px] font-medium text-[var(--color-text-muted-light)] dark:text-zinc-400 block">{t('reports.modalRating', 'Rating')}</span>
                       <span className="font-bold text-amber-500 inline-flex items-center gap-1">
                         <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
                         {Number(selectedItem.rating || 5.0).toFixed(1)}
@@ -1044,7 +1073,7 @@ export default function ReportsTable({
                     </div>
                   </div>
                   <div className="p-3 rounded-md bg-[var(--color-surface-hover-light)]/40 dark:bg-zinc-900/40 border border-[var(--color-border-subtle-light)] dark:border-zinc-800">
-                    <span className="text-[11px] font-medium text-[var(--color-text-muted-light)] dark:text-zinc-400 block mb-1">Package Summary</span>
+                    <span className="text-[11px] font-medium text-[var(--color-text-muted-light)] dark:text-zinc-400 block mb-1">{t('reports.modalPackageSummary', 'Package Summary')}</span>
                     <p className="text-xs text-[var(--color-text-secondary-light)] dark:text-zinc-300 leading-relaxed">
                       {selectedItem.description || 'Curated high-standard tour experience in Cambodia.'}
                     </p>
@@ -1057,26 +1086,28 @@ export default function ReportsTable({
                 <div className="space-y-3">
                   <div className="grid grid-cols-2 gap-3 p-3 rounded-md bg-[var(--color-surface-hover-light)]/40 dark:bg-zinc-900/40 border border-[var(--color-border-subtle-light)] dark:border-zinc-800">
                     <div>
-                      <span className="text-[11px] font-medium text-[var(--color-text-muted-light)] dark:text-zinc-400 block">Booking Reference</span>
+                      <span className="text-[11px] font-medium text-[var(--color-text-muted-light)] dark:text-zinc-400 block">{t('reports.modalBookingReference', 'Booking Reference')}</span>
                       <span className="font-bold font-mono text-[#003E83] dark:text-blue-400">#{selectedItem.booking_code}</span>
                     </div>
                     <div>
-                      <span className="text-[11px] font-medium text-[var(--color-text-muted-light)] dark:text-zinc-400 block">Status</span>
+                      <span className="text-[11px] font-medium text-[var(--color-text-muted-light)] dark:text-zinc-400 block">{t('reports.modalStatus', 'Status')}</span>
                       <div className="mt-0.5">{getStatusBadge(selectedItem.status)}</div>
                     </div>
                     <div>
-                      <span className="text-[11px] font-medium text-[var(--color-text-muted-light)] dark:text-zinc-400 block">Total Amount</span>
+                      <span className="text-[11px] font-medium text-[var(--color-text-muted-light)] dark:text-zinc-400 block">{t('reports.modalTotalAmount', 'Total Amount')}</span>
                       <span className="font-bold text-emerald-600 dark:text-emerald-400">${selectedItem.total_price}</span>
                     </div>
                     <div>
-                      <span className="text-[11px] font-medium text-[var(--color-text-muted-light)] dark:text-zinc-400 block">Booking Date</span>
+                      <span className="text-[11px] font-medium text-[var(--color-text-muted-light)] dark:text-zinc-400 block">{t('reports.modalBookingDate', 'Booking Date')}</span>
                       <span className="font-semibold font-mono text-[var(--color-text-primary-light)] dark:text-white">{selectedItem.booking_date || selectedItem.date}</span>
                     </div>
                   </div>
                   <div className="p-3 rounded-md bg-[var(--color-surface-hover-light)]/40 dark:bg-zinc-900/40 border border-[var(--color-border-subtle-light)] dark:border-zinc-800 space-y-1">
-                    <span className="text-[11px] font-medium text-[var(--color-text-muted-light)] dark:text-zinc-400 block">Service & Experience</span>
+                    <span className="text-[11px] font-medium text-[var(--color-text-muted-light)] dark:text-zinc-400 block">{t('reports.modalServiceExperience', 'Service & Experience')}</span>
                     <p className="font-semibold text-[var(--color-text-primary-light)] dark:text-white">{selectedItem.service_name}</p>
-                    <p className="text-xs text-[var(--color-text-muted-light)] dark:text-zinc-400">Provided by {selectedItem.business_name}</p>
+                    <p className="text-xs text-[var(--color-text-muted-light)] dark:text-zinc-400">
+                      {t('reports.modalProvidedBy', { name: selectedItem.business_name }, `Provided by ${selectedItem.business_name}`)}
+                    </p>
                   </div>
                 </div>
               )}
@@ -1086,26 +1117,26 @@ export default function ReportsTable({
                 <div className="space-y-3">
                   <div className="grid grid-cols-2 gap-3 p-3 rounded-md bg-[var(--color-surface-hover-light)]/40 dark:bg-zinc-900/40 border border-[var(--color-border-subtle-light)] dark:border-zinc-800">
                     <div>
-                      <span className="text-[11px] font-medium text-[var(--color-text-muted-light)] dark:text-zinc-400 block">Email Address</span>
+                      <span className="text-[11px] font-medium text-[var(--color-text-muted-light)] dark:text-zinc-400 block">{t('reports.modalEmailAddress', 'Email Address')}</span>
                       <span className="font-semibold text-[var(--color-text-primary-light)] dark:text-white truncate block">{selectedItem.email}</span>
                     </div>
                     <div>
-                      <span className="text-[11px] font-medium text-[var(--color-text-muted-light)] dark:text-zinc-400 block">User Role</span>
+                      <span className="text-[11px] font-medium text-[var(--color-text-muted-light)] dark:text-zinc-400 block">{t('reports.modalUserRole', 'User Role')}</span>
                       <span className="px-2 py-0.5 rounded-md text-xs font-semibold bg-gray-100 dark:bg-zinc-800 text-[var(--color-text-primary-light)] dark:text-white border border-gray-200 dark:border-zinc-700 inline-block mt-0.5">
                         {selectedItem.role}
                       </span>
                     </div>
                     <div>
-                      <span className="text-[11px] font-medium text-[var(--color-text-muted-light)] dark:text-zinc-400 block">Joined Date</span>
+                      <span className="text-[11px] font-medium text-[var(--color-text-muted-light)] dark:text-zinc-400 block">{t('reports.modalJoinedDate', 'Joined Date')}</span>
                       <span className="font-semibold font-mono text-[var(--color-text-primary-light)] dark:text-white">{selectedItem.joinedDate}</span>
                     </div>
                     <div>
-                      <span className="text-[11px] font-medium text-[var(--color-text-muted-light)] dark:text-zinc-400 block">Reviews Written</span>
+                      <span className="text-[11px] font-medium text-[var(--color-text-muted-light)] dark:text-zinc-400 block">{t('reports.modalReviewsWritten', 'Reviews Written')}</span>
                       <span className="font-semibold text-[var(--color-text-primary-light)] dark:text-white">{selectedItem.reviewsCount}</span>
                     </div>
                   </div>
                   <div className="flex items-center justify-between p-3 rounded-md bg-[var(--color-surface-hover-light)]/40 dark:bg-zinc-900/40 border border-[var(--color-border-subtle-light)] dark:border-zinc-800">
-                    <span className="text-xs font-medium text-[var(--color-text-muted-light)] dark:text-zinc-400">Account Status</span>
+                    <span className="text-xs font-medium text-[var(--color-text-muted-light)] dark:text-zinc-400">{t('reports.modalAccountStatus', 'Account Status')}</span>
                     <div>{getStatusBadge(selectedItem.status)}</div>
                   </div>
                 </div>
@@ -1127,7 +1158,7 @@ export default function ReportsTable({
                         {selectedItem.userName}
                       </h4>
                       <p className="text-xs text-[var(--color-text-muted-light)] dark:text-zinc-400 font-mono">
-                        Submitted on {selectedItem.date}
+                        {t('reports.modalSubmittedOn', { date: selectedItem.date }, `Submitted on ${selectedItem.date}`)}
                       </p>
                     </div>
                     <div>{getStatusBadge(selectedItem.status)}</div>
@@ -1135,14 +1166,14 @@ export default function ReportsTable({
 
                   <div className="grid grid-cols-2 gap-3 p-3 rounded-md bg-[var(--color-surface-hover-light)]/40 dark:bg-zinc-900/40 border border-[var(--color-border-subtle-light)] dark:border-zinc-800">
                     <div>
-                      <span className="text-[11px] font-medium text-[var(--color-text-muted-light)] dark:text-zinc-400 block">Target Place</span>
+                      <span className="text-[11px] font-medium text-[var(--color-text-muted-light)] dark:text-zinc-400 block">{t('reports.modalTargetPlace', 'Target Place')}</span>
                       <span className="font-semibold text-[var(--color-text-primary-light)] dark:text-white flex items-center gap-1.5 mt-0.5 truncate" title={selectedItem.placeName}>
                         <MapPin className="w-3.5 h-3.5 text-rose-500 shrink-0" />
                         <span className="truncate">{selectedItem.placeName}</span>
                       </span>
                     </div>
                     <div>
-                      <span className="text-[11px] font-medium text-[var(--color-text-muted-light)] dark:text-zinc-400 block">Rating Score</span>
+                      <span className="text-[11px] font-medium text-[var(--color-text-muted-light)] dark:text-zinc-400 block">{t('reports.modalRatingScore', 'Rating Score')}</span>
                       <span className="font-bold text-amber-500 inline-flex items-center gap-1 mt-0.5">
                         <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
                         {Number(selectedItem.rating || 0).toFixed(1)} / 5.0
@@ -1151,7 +1182,7 @@ export default function ReportsTable({
                   </div>
 
                   <div className="p-3 rounded-md bg-[var(--color-surface-hover-light)]/40 dark:bg-zinc-900/40 border border-[var(--color-border-subtle-light)] dark:border-zinc-800">
-                    <span className="text-[11px] font-medium text-[var(--color-text-muted-light)] dark:text-zinc-400 block mb-1">Tourist Feedback</span>
+                    <span className="text-[11px] font-medium text-[var(--color-text-muted-light)] dark:text-zinc-400 block mb-1">{t('reports.modalTouristFeedback', 'Tourist Feedback')}</span>
                     <p className="italic text-xs text-[var(--color-text-secondary-light)] dark:text-zinc-300 leading-relaxed bg-[var(--color-white)] dark:bg-zinc-800/80 p-2.5 rounded-md border border-[var(--color-border-subtle-light)] dark:border-zinc-700">
                       "{selectedItem.comment || 'No comment text provided.'}"
                     </p>
@@ -1164,16 +1195,16 @@ export default function ReportsTable({
                 <div className="space-y-3">
                   <div className="grid grid-cols-2 gap-3 p-3 rounded-md bg-[var(--color-surface-hover-light)]/40 dark:bg-zinc-900/40 border border-[var(--color-border-subtle-light)] dark:border-zinc-800">
                     <div>
-                      <span className="text-[11px] font-medium text-[var(--color-text-muted-light)] dark:text-zinc-400 block">Total Places Listed</span>
+                      <span className="text-[11px] font-medium text-[var(--color-text-muted-light)] dark:text-zinc-400 block">{t('reports.modalTotalPlacesListed', 'Total Places Listed')}</span>
                       <span className="text-base font-bold text-[#003E83] dark:text-blue-400">{selectedItem.totalPlaces} Places</span>
                     </div>
                     <div>
-                      <span className="text-[11px] font-medium text-[var(--color-text-muted-light)] dark:text-zinc-400 block">Status</span>
+                      <span className="text-[11px] font-medium text-[var(--color-text-muted-light)] dark:text-zinc-400 block">{t('reports.modalStatus', 'Status')}</span>
                       <div className="mt-0.5">{getStatusBadge(selectedItem.status)}</div>
                     </div>
                   </div>
                   <div className="p-3 rounded-md bg-[var(--color-surface-hover-light)]/40 dark:bg-zinc-900/40 border border-[var(--color-border-subtle-light)] dark:border-zinc-800">
-                    <span className="text-[11px] font-medium text-[var(--color-text-muted-light)] dark:text-zinc-400 block mb-1">Description</span>
+                    <span className="text-[11px] font-medium text-[var(--color-text-muted-light)] dark:text-zinc-400 block mb-1">{t('reports.modalDescription', 'Description')}</span>
                     <p className="text-xs text-[var(--color-text-secondary-light)] dark:text-zinc-300 leading-relaxed">
                       {selectedItem.description}
                     </p>
@@ -1189,7 +1220,7 @@ export default function ReportsTable({
                 onClick={() => setSelectedItem(null)}
                 className="px-4 py-2 text-xs md:text-sm font-medium rounded-md bg-[#003E83] hover:bg-[#002e62] text-white transition-colors cursor-pointer"
               >
-                Close
+                {t('reports.btnClose', 'Close')}
               </button>
             </div>
           </div>

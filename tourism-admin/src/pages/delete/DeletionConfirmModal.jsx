@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { X, AlertTriangle, Check } from 'lucide-react';
+import { useLanguage } from '../../i18n';
 
 export default function DeletionConfirmModal({
   isOpen,
@@ -9,6 +10,8 @@ export default function DeletionConfirmModal({
   onClose,
   onConfirm
 }) {
+  const { t } = useLanguage();
+
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === 'Escape') onClose?.();
@@ -26,6 +29,13 @@ export default function DeletionConfirmModal({
   if (!isOpen || !request) return null;
 
   const isApprove = confirmAction === 'approve';
+  const typeText = request.type === 'account' 
+    ? t('deletion.labelAccountDeletion', 'Account Deletion') 
+    : t('deletion.labelItemDeletion', 'Item Deletion');
+  const actionText = isApprove 
+    ? t('deletion.actionApproveText', 'approve') 
+    : t('deletion.actionRejectText', 'reject');
+  const userName = request.user?.name || t('deletion.userDefault', 'User');
 
   return (
     <div
@@ -52,17 +62,23 @@ export default function DeletionConfirmModal({
         </div>
 
         <h3 className="text-lg font-bold text-gray-900 dark:text-white text-center mb-2 tracking-tight">
-          Confirm {confirmType}
+          {isApprove 
+            ? t('deletion.confirmTitleApprove', 'Confirm Approval') 
+            : t('deletion.confirmTitleReject', 'Confirm Rejection')}
         </h3>
 
         <p className="text-sm text-gray-500 dark:text-zinc-400 text-center mb-4 leading-relaxed whitespace-pre-line px-1">
-          Are you sure you want to <strong className="text-gray-900 dark:text-white capitalize">{confirmAction}</strong> this {confirmType.toLowerCase()} request for <strong className="text-gray-900 dark:text-white">{request.user?.name || 'User'}</strong>?
+          {t('deletion.confirmMessage', {
+            action: actionText,
+            type: typeText,
+            name: userName
+          })}
         </p>
 
         {isApprove && (
           <div className="p-3 mb-5 bg-red-500/10 border border-red-500/20 rounded-md text-xs text-red-600 dark:text-red-400 flex items-start gap-2">
             <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
-            <span>This action will permanently execute the deletion. This cannot be undone.</span>
+            <span>{t('deletion.permanentWarning', 'This action will permanently execute the deletion. This cannot be undone.')}</span>
           </div>
         )}
 
@@ -72,7 +88,7 @@ export default function DeletionConfirmModal({
             onClick={onClose}
             className="flex-1 py-2.5 px-4 rounded-md border border-gray-300 dark:border-zinc-800 bg-transparent hover:bg-gray-100 dark:hover:bg-zinc-800/80 text-gray-700 dark:text-zinc-300 font-medium text-sm transition-colors text-center cursor-pointer"
           >
-            Cancel
+            {t('deletion.btnCancel', 'Cancel')}
           </button>
           <button 
             type="button"
@@ -84,7 +100,9 @@ export default function DeletionConfirmModal({
             }`}
           >
             {isApprove ? <Check className="w-4 h-4" /> : <X className="w-4 h-4" />}
-            Confirm {isApprove ? 'Approve' : 'Reject'}
+            {isApprove 
+              ? t('deletion.btnConfirmApprove', 'Confirm Approve') 
+              : t('deletion.btnConfirmReject', 'Confirm Reject')}
           </button>
         </div>
       </div>

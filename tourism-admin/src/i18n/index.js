@@ -16,7 +16,9 @@ const LanguageContext = createContext({
   setLanguage: () => { },
   t: (key, fallbackOrParams, maybeParams) => {
     const fallback = typeof fallbackOrParams === 'string' ? fallbackOrParams : key;
-    const params = typeof fallbackOrParams === 'object' && fallbackOrParams !== null ? fallbackOrParams : maybeParams;
+    let params = typeof fallbackOrParams === 'object' && fallbackOrParams !== null ? fallbackOrParams : maybeParams;
+    if (typeof fallbackOrParams === 'number') params = { count: fallbackOrParams };
+    if (typeof maybeParams === 'number') params = { count: maybeParams };
     return interpolate(fallback, params);
   },
 });
@@ -29,12 +31,12 @@ export const normalizeLang = (l) => {
 };
 
 export const interpolate = (str, params) => {
-  if (typeof str !== 'string' || !params || typeof params !== 'object') {
-    return str;
-  }
-  return str.replace(/\{(\w+)\}/g, (match, paramKey) => {
-    return params[paramKey] !== undefined && params[paramKey] !== null
-      ? String(params[paramKey])
+  if (typeof str !== 'string') return str;
+  const p = (typeof params === 'number' || typeof params === 'string') ? { count: params } : params;
+  if (!p || typeof p !== 'object') return str;
+  return str.replace(/\{\{?(\w+)\}?\}/g, (match, paramKey) => {
+    return p[paramKey] !== undefined && p[paramKey] !== null
+      ? String(p[paramKey])
       : match;
   });
 };
@@ -45,10 +47,14 @@ export const translate = (key, lang = 'EN', fallbackOrParams, maybeParams) => {
 
   if (fallbackOrParams && typeof fallbackOrParams === 'object' && !Array.isArray(fallbackOrParams)) {
     params = fallbackOrParams;
+  } else if (typeof fallbackOrParams === 'number') {
+    params = { count: fallbackOrParams };
   } else {
     fallback = fallbackOrParams;
     if (maybeParams && typeof maybeParams === 'object' && !Array.isArray(maybeParams)) {
       params = maybeParams;
+    } else if (typeof maybeParams === 'number') {
+      params = { count: maybeParams };
     }
   }
 
@@ -125,10 +131,14 @@ export function LanguageProvider({ children }) {
 
     if (fallbackOrParams && typeof fallbackOrParams === 'object' && !Array.isArray(fallbackOrParams)) {
       params = fallbackOrParams;
+    } else if (typeof fallbackOrParams === 'number') {
+      params = { count: fallbackOrParams };
     } else {
       fallback = fallbackOrParams;
       if (maybeParams && typeof maybeParams === 'object' && !Array.isArray(maybeParams)) {
         params = maybeParams;
+      } else if (typeof maybeParams === 'number') {
+        params = { count: maybeParams };
       }
     }
 

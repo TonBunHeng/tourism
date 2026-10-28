@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { User, Camera, Trash2, AlertCircle, Mail, Phone, MapPin, UserCog, Check } from 'lucide-react';
 import { validateImageFile } from '../../utils/fileValidation';
+import { useLanguage } from '../../i18n';
 
 export default function EditProfileModal({
   isOpen,
@@ -10,6 +11,7 @@ export default function EditProfileModal({
   onSave,
   onSelectFileForCrop
 }) {
+  const { t } = useLanguage();
   const [prevIsOpen, setPrevIsOpen] = useState(isOpen);
   const [formData, setFormData] = useState({
     name: userData?.name || '',
@@ -96,10 +98,10 @@ export default function EditProfileModal({
             </div>
             <div>
               <h3 className="text-base font-bold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">
-                Edit Profile
+                {t('profile.editProfileTitle', 'Edit Profile')}
               </h3>
               <p className="text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mt-0.5">
-                Update personal profile information and avatar
+                {t('profile.editProfileSubtitle', 'Update personal profile information and avatar')}
               </p>
             </div>
           </div>
@@ -141,7 +143,7 @@ export default function EditProfileModal({
                   onClick={() => fileInputRef.current?.click()}
                   className="text-xs font-semibold text-[#003E83] dark:text-blue-400 hover:underline cursor-pointer"
                 >
-                  {imagePreview ? 'Change & Crop Photo' : 'Upload & Crop Photo'}
+                  {imagePreview ? t('profile.changeCropPhoto', 'Change & Crop Photo') : t('profile.uploadCropPhoto', 'Upload & Crop Photo')}
                 </button>
                 {imagePreview && (
                   <button
@@ -150,7 +152,7 @@ export default function EditProfileModal({
                     className="flex items-center gap-1 text-xs font-semibold text-red-600 hover:underline cursor-pointer"
                   >
                     <Trash2 className="w-3 h-3" />
-                    Remove
+                    {t('profile.removeAvatar', 'Remove')}
                   </button>
                 )}
               </div>
@@ -166,7 +168,7 @@ export default function EditProfileModal({
             {/* Full Name */}
             <div>
               <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">
-                Full Name *
+                {t('profile.fullNameLabel', 'Full Name *')}
               </label>
               <div className="relative">
                 <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
@@ -175,7 +177,7 @@ export default function EditProfileModal({
                   required
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  placeholder="Enter your full name"
+                  placeholder={t('profile.fullNamePlaceholder', 'Enter your full name')}
                   className="w-full pl-9 pr-4 py-2.5 bg-[var(--color-bg-light)] dark:bg-[var(--color-input-dark-bg)] border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]/70 rounded-md text-sm text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] placeholder-[var(--color-text-muted-light)] focus:outline-none focus:ring-2 focus:ring-[var(--color-input)] transition-all"
                 />
               </div>
@@ -184,7 +186,7 @@ export default function EditProfileModal({
             {/* Email Address */}
             <div>
               <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">
-                Email Address *
+                {t('profile.emailLabel', 'Email Address *')}
               </label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
@@ -202,7 +204,7 @@ export default function EditProfileModal({
             {/* Phone Number */}
             <div>
               <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">
-                Phone Number
+                {t('profile.phoneLabel', 'Phone Number')}
               </label>
               <div className="relative">
                 <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
@@ -219,7 +221,7 @@ export default function EditProfileModal({
             {/* Address */}
             <div>
               <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">
-                Address / Location
+                {t('profile.addressLabel', 'Address / Location')}
               </label>
               <div className="relative">
                 <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
@@ -241,14 +243,14 @@ export default function EditProfileModal({
               onClick={onClose}
               className="flex-1 py-2.5 px-4 rounded-md border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] hover:bg-[var(--color-surface-hover-light)] dark:hover:bg-[var(--color-surface-hover-dark)] font-medium text-sm transition-colors text-center cursor-pointer"
             >
-              Cancel
+              {t('common.cancel', 'Cancel')}
             </button>
             <button
               type="submit"
               className="flex-1 py-2.5 px-4 rounded-md bg-[#003E83] hover:bg-[#002e62] active:scale-[0.98] text-white font-medium text-sm transition-all text-center cursor-pointer shadow-xs flex items-center justify-center gap-1.5"
             >
               <Check className="w-4 h-4" />
-              <span>Update Profile</span>
+              <span>{t('profile.btnUpdateProfile', 'Update Profile')}</span>
             </button>
           </div>
         </form>

@@ -27,6 +27,7 @@ import BackupTab from "./BackupTab";
 import settingService from "../../services/settingService";
 import { useAlert } from "../../context/AlertContext";
 import { useSearch } from "../../context/SearchContext";
+import { useLanguage } from "../../i18n";
 
 const KEY_GROUP_MAP = {
   // General
@@ -166,24 +167,27 @@ const BOOLEAN_KEYS = new Set([
   'two_factor_auth'
 ]);
 
-const SETTING_TABS = [
-  { id: "general", label: "General", icon: SettingsIcon },
-  { id: "appearance", label: "Appearance", icon: Palette },
-  { id: "notifications", label: "Notifications", icon: Bell },
-  { id: "security", label: "Security", icon: Shield },
-  { id: "backup", label: "Backup & Restore", icon: Database }
-];
+const SETTING_TAB_IDS = ["general", "appearance", "notifications", "security", "backup"];
 
 export default function Settings() {
+  const { t } = useLanguage();
   const { showConfirm, showSuccess, showError } = useAlert();
   const [searchParams, setSearchParams] = useSearchParams();
+
+  const settingTabs = useMemo(() => [
+    { id: "general", label: t('settings.tabGeneral', 'General'), icon: SettingsIcon },
+    { id: "appearance", label: t('settings.tabAppearance', 'Appearance'), icon: Palette },
+    { id: "notifications", label: t('settings.tabNotifications', 'Notifications'), icon: Bell },
+    { id: "security", label: t('settings.tabSecurity', 'Security'), icon: Shield },
+    { id: "backup", label: t('settings.tabBackup', 'Backup & Restore'), icon: Database }
+  ], [t]);
 
   // Tab persistence via search param + sessionStorage
   const [activeTab, setActiveTab] = useState(() => {
     const tabFromUrl = searchParams.get('tab');
-    if (tabFromUrl && SETTING_TABS.some(t => t.id === tabFromUrl)) return tabFromUrl;
+    if (tabFromUrl && SETTING_TAB_IDS.includes(tabFromUrl)) return tabFromUrl;
     const tabFromStorage = sessionStorage.getItem('settings_active_tab');
-    if (tabFromStorage && SETTING_TABS.some(t => t.id === tabFromStorage)) return tabFromStorage;
+    if (tabFromStorage && SETTING_TAB_IDS.includes(tabFromStorage)) return tabFromStorage;
     return "general";
   });
 
@@ -195,7 +199,7 @@ export default function Settings() {
   // Keep activeTab reactive to browser search param changes
   useEffect(() => {
     const tabFromUrl = searchParams.get('tab');
-    if (tabFromUrl && tabFromUrl !== activeTab && SETTING_TABS.some(t => t.id === tabFromUrl)) {
+    if (tabFromUrl && tabFromUrl !== activeTab && SETTING_TAB_IDS.includes(tabFromUrl)) {
       setActiveTab(tabFromUrl);
       sessionStorage.setItem('settings_active_tab', tabFromUrl);
     }
@@ -308,13 +312,19 @@ export default function Settings() {
         loaded.theme = getInitialTheme();
         setSettings(loaded);
         if (!silent) {
-          showSuccess("Settings reloaded and synchronized with server.", "Settings Synced");
+          showSuccess(
+            t('settings.settingsSyncedMsg', 'Settings reloaded and synchronized with server.'),
+            t('settings.settingsSyncedTitle', 'Settings Synced')
+          );
         }
       }
     } catch (e) {
       console.error("Failed to load settings from API:", e);
       if (!silent) {
-        showError(e.message || "Failed to load settings from server.", "Sync Failed");
+        showError(
+          e.message || t('settings.syncFailedMsg', 'Failed to load settings from server.'),
+          t('settings.syncFailedTitle', 'Sync Failed')
+        );
       }
     }
   };
@@ -344,7 +354,7 @@ export default function Settings() {
     const q = searchQuery.toLowerCase();
     const counts = {};
 
-    SETTING_TABS.forEach((tab) => {
+    settingTabs.forEach((tab) => {
       let count = 0;
       if (tab.label.toLowerCase().includes(q)) count += 1;
 
@@ -361,7 +371,7 @@ export default function Settings() {
     });
 
     return counts;
-  }, [searchQuery, settings]);
+  }, [searchQuery, settings, settingTabs]);
 
   const handleSave = async () => {
     setSaving(true);
@@ -415,9 +425,15 @@ export default function Settings() {
 
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 3000);
-      showSuccess("System settings have been saved and applied successfully.", "Settings Saved");
+      showSuccess(
+        t('settings.saveSuccessMsg', 'System settings have been saved and applied successfully.'),
+        t('settings.saveSuccessTitle', 'Settings Saved')
+      );
     } catch (e) {
-      showError(e.message || "Failed to save settings to backend.", "Save Failed");
+      showError(
+        e.message || t('settings.saveFailedMsg', 'Failed to save settings to backend.'),
+        t('settings.saveFailedTitle', 'Save Failed')
+      );
     } finally {
       setSaving(false);
     }
@@ -425,15 +441,18 @@ export default function Settings() {
 
   const handleReset = async () => {
     const confirmed = await showConfirm({
-      title: "Reset System Settings",
-      message: "Are you sure you want to restore default administrative settings? Unsaved changes will be discarded.",
-      confirmText: "Reset to Default",
+      title: t('settings.resetConfirmTitle', 'Reset Settings'),
+      message: t('settings.resetConfirmMsg', 'Are you sure you want to restore default administrative settings? Unsaved changes will be discarded.'),
+      confirmText: t('settings.btnConfirmReset', 'Reset to Default'),
       type: "warning"
     });
     if (confirmed) {
       setSettings(defaultSettings);
       applyTheme('system');
-      showSuccess("Settings restored to system defaults.", "Settings Reset");
+      showSuccess(
+        t('settings.resetSuccessMsg', 'Settings restored to system defaults.'),
+        t('settings.resetSuccessTitle', 'Settings Reset')
+      );
     }
   };
 
@@ -466,7 +485,7 @@ export default function Settings() {
       <div className="bg-[var(--color-white)] dark:bg-[var(--color-bg-dark)] rounded-md shadow-xs border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] overflow-hidden flex flex-col min-h-[550px]">
         {/* Top Header Navigation Tabs */}
         <SettingsTabs
-          tabs={SETTING_TABS}
+          tabs={settingTabs}
           activeTab={activeTab}
           onTabChange={handleTabChange}
           searchMatchCounts={searchMatchCounts}
@@ -480,7 +499,7 @@ export default function Settings() {
         {/* Card Footer Action Bar */}
         <div className="px-4 md:px-6 py-4 border-t border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] bg-[var(--color-surface-hover-light)]/40 dark:bg-[var(--color-surface-hover-dark)]/20 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
           <div className="text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
-            Active Section: <strong className="text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] font-semibold">{SETTING_TABS.find(t => t.id === activeTab)?.label || 'General'}</strong>
+            {t('settings.activeSectionLabel', 'Active Section:')} <strong className="text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] font-semibold">{settingTabs.find(t => t.id === activeTab)?.label || t('settings.tabGeneral', 'General')}</strong>
           </div>
           <div className="flex items-center gap-2 justify-end">
             <button
@@ -490,7 +509,7 @@ export default function Settings() {
               className="p-2 sm:px-3.5 sm:py-2 rounded-md border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] hover:bg-[var(--color-surface-hover-light)] dark:hover:bg-[var(--color-surface-hover-dark)] text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] text-xs md:text-sm font-medium inline-flex items-center gap-1.5 transition-colors cursor-pointer shrink-0 disabled:opacity-50"
             >
               <RotateCcw className="w-4 h-4 shrink-0" />
-              <span>Reset</span>
+              <span>{t('settings.btnReset', 'Reset')}</span>
             </button>
             <button
               type="button"
@@ -501,17 +520,17 @@ export default function Settings() {
               {saving ? (
                 <>
                   <RefreshCw className="w-4 h-4 animate-spin shrink-0" />
-                  <span>Saving...</span>
+                  <span>{t('settings.saving', 'Saving...')}</span>
                 </>
               ) : saveSuccess ? (
                 <>
                   <CheckCircle2 className="w-4 h-4 text-emerald-300 shrink-0" />
-                  <span>Saved!</span>
+                  <span>{t('settings.saved', 'Saved!')}</span>
                 </>
               ) : (
                 <>
                   <Save className="w-4 h-4 shrink-0" />
-                  <span>Save Changes</span>
+                  <span>{t('settings.btnSaveChanges', 'Save Changes')}</span>
                 </>
               )}
             </button>

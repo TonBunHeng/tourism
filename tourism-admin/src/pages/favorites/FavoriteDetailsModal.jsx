@@ -135,11 +135,10 @@ export default function FavoriteDetailsModal({
               </span>
 
               <span
-                className={`inline-flex items-center gap-1.5 px-3 py-1 text-xs font-semibold rounded-md border ${
-                  isVisited
-                    ? 'bg-emerald-600 text-white border-emerald-500'
-                    : 'bg-[#003E83] text-white border-blue-800'
-                }`}
+                className={`inline-flex items-center gap-1.5 px-3 py-1 text-xs font-semibold rounded-md border ${isVisited
+                  ? 'bg-emerald-600 text-white border-emerald-500'
+                  : 'bg-[#003E83] text-white border-blue-800'
+                  }`}
               >
                 {isVisited ? (
                   <>

@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect } from "react";
 import {
-  X,
   User,
   Mail,
   Phone,
@@ -20,6 +19,7 @@ import {
 import uploadService from "../../services/uploadService";
 import { validateImageFile } from "../../utils/fileValidation";
 import authService, { normalizeRole } from "../../services/authService";
+import { useLanguage } from "../../i18n";
 
 export default function UserModal({
   isOpen,
@@ -31,6 +31,7 @@ export default function UserModal({
   onClose,
   onSubmit
 }) {
+  const { t } = useLanguage();
   const [isUploading, setIsUploading] = useState(false);
   const [fileValidationError, setFileValidationError] = useState('');
   const fileInputRef = useRef(null);
@@ -103,11 +104,11 @@ export default function UserModal({
   };
 
   const availableRoles = [
-    { value: "user", label: "User" },
-    { value: "guide_editor", label: "Tourism Content Editor" },
-    { value: "business_owner", label: "Business Owner" },
-    { value: "admin", label: "Admin" },
-    ...(isSuperAdmin ? [{ value: "super_admin", label: "Super Admin" }] : [])
+    { value: "user", label: t('users.roleUser', 'User') },
+    { value: "guide_editor", label: t('users.roleGuideEditor', 'Tourism Content Editor') },
+    { value: "business_owner", label: t('users.roleBusinessOwner', 'Business Owner') },
+    { value: "admin", label: t('users.roleAdmin', 'Admin') },
+    ...(isSuperAdmin ? [{ value: "super_admin", label: t('users.roleSuperAdmin', 'Super Admin') }] : [])
   ];
 
   return (
@@ -130,10 +131,14 @@ export default function UserModal({
             </div>
             <div>
               <h3 className="text-base font-bold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">
-                {editingUser ? "Edit User Account" : "Create New User Account"}
+                {editingUser 
+                  ? t('users.modalEditTitle', 'Edit User Account') 
+                  : t('users.modalAddTitle', 'Create New User Account')}
               </h3>
               <p className="text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
-                {editingUser ? "Update system role, profile details and permissions." : "Add a new user with assigned system role."}
+                {editingUser 
+                  ? t('users.modalEditSubtitle', 'Update system role, profile details and permissions.') 
+                  : t('users.modalAddSubtitle', 'Add a new user with assigned system role.')}
               </p>
             </div>
           </div>
@@ -147,8 +152,8 @@ export default function UserModal({
             <div className="p-3 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 rounded-md flex items-start gap-2.5">
               <ShieldAlert className="w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
               <div className="text-xs text-amber-800 dark:text-amber-300">
-                <span className="font-bold block mb-0.5">Super Admin Protected</span>
-                Only Super Administrators can modify Super Admin accounts.
+                <span className="font-bold block mb-0.5">{t('users.superAdminProtected', 'Super Admin Protected')}</span>
+                {t('users.superAdminProtectedMsg', 'Only Super Administrators can modify Super Admin accounts.')}
               </div>
             </div>
           )}
@@ -179,7 +184,7 @@ export default function UserModal({
                   className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#003E83] hover:bg-[#002e62] text-white text-xs font-medium rounded-md transition-colors cursor-pointer disabled:opacity-50"
                 >
                   <Camera className="w-3.5 h-3.5" />
-                  {isUploading ? "Uploading..." : "Upload Photo"}
+                  {isUploading ? t('users.uploading', 'Uploading...') : t('users.uploadPhoto', 'Upload Photo')}
                 </button>
                 {data.avatar && (
                   <button
@@ -187,14 +192,14 @@ export default function UserModal({
                     onClick={handleRemoveAvatar}
                     disabled={isBlockedFromEditing}
                     className="p-1.5 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-md transition-colors cursor-pointer"
-                    title="Remove Photo"
+                    title={t('users.removePhoto', 'Remove Photo')}
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
                 )}
               </div>
               <p className="text-[11px] text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
-                PNG, JPG, WEBP up to 5MB
+                {t('users.avatarHelp', 'PNG, JPG, WEBP up to 5MB')}
               </p>
               {fileValidationError && (
                 <p className="text-[11px] text-rose-500 flex items-center gap-1">
@@ -208,13 +213,13 @@ export default function UserModal({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">
-                Full Name *
+                {t('users.labelFullNameReq', 'Full Name *')}
               </label>
               <div className="relative">
                 <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <input
                   type="text"
-                  placeholder="e.g., Sophea Traveler"
+                  placeholder={t('users.placeholderFullName', 'e.g., Sophea Traveler')}
                   value={data.name || ""}
                   onChange={(e) => handleChange("name", e.target.value)}
                   disabled={isBlockedFromEditing}
@@ -226,13 +231,13 @@ export default function UserModal({
 
             <div>
               <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">
-                Email Address *
+                {t('users.labelEmailReq', 'Email Address *')}
               </label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <input
                   type="email"
-                  placeholder="user@example.com"
+                  placeholder={t('users.placeholderEmail', 'user@example.com')}
                   value={data.email || ""}
                   onChange={(e) => handleChange("email", e.target.value)}
                   disabled={isBlockedFromEditing}
@@ -247,13 +252,13 @@ export default function UserModal({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">
-                Phone Number
+                {t('users.labelPhone', 'Phone Number')}
               </label>
               <div className="relative">
                 <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <input
                   type="text"
-                  placeholder="+855 12 345 678"
+                  placeholder={t('users.placeholderPhone', '+855 12 345 678')}
                   value={data.phone || ""}
                   onChange={(e) => handleChange("phone", e.target.value)}
                   disabled={isBlockedFromEditing}
@@ -264,13 +269,13 @@ export default function UserModal({
 
             <div>
               <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">
-                Location / Province
+                {t('users.labelLocationReq', 'Location / Province')}
               </label>
               <div className="relative">
                 <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <input
                   type="text"
-                  placeholder="e.g., Phnom Penh"
+                  placeholder={t('users.placeholderLocation', 'e.g., Phnom Penh')}
                   value={data.location || ""}
                   onChange={(e) => handleChange("location", e.target.value)}
                   disabled={isBlockedFromEditing}
@@ -283,13 +288,17 @@ export default function UserModal({
           {/* Password */}
           <div>
             <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">
-              {editingUser ? "New Password (Leave blank to keep current)" : "Password *"}
+              {editingUser 
+                ? t('users.labelPasswordEdit', 'New Password (Leave blank to keep current)') 
+                : t('users.labelPasswordReq', 'Password *')}
             </label>
             <div className="relative">
               <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
               <input
                 type="password"
-                placeholder={editingUser ? "Enter new password if changing" : "Enter password (min. 6 characters)"}
+                placeholder={editingUser 
+                  ? t('users.placeholderPasswordEdit', 'Enter new password if changing') 
+                  : t('users.placeholderPassword', 'Enter password (min. 6 characters)')}
                 value={data.password || ""}
                 onChange={(e) => handleChange("password", e.target.value)}
                 disabled={isBlockedFromEditing}
@@ -304,7 +313,7 @@ export default function UserModal({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">
-                System Role *
+                {t('users.labelRoleReq', 'System Role *')}
               </label>
               <div className="relative">
                 <Shield className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
@@ -324,7 +333,7 @@ export default function UserModal({
 
             <div>
               <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">
-                Account Status *
+                {t('users.labelStatusReq', 'Account Status *')}
               </label>
               <div className="relative">
                 <CheckCircle2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
@@ -334,9 +343,9 @@ export default function UserModal({
                   disabled={isBlockedFromEditing}
                   className="appearance-none w-full bg-[var(--color-bg-light)] dark:bg-[var(--color-input-dark-bg)] border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]/70 rounded-md pl-9 pr-9 py-2.5 text-sm text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] focus:outline-none focus:ring-2 focus:ring-[var(--color-input)] cursor-pointer disabled:opacity-50"
                 >
-                  <option value="Active">Active</option>
-                  <option value="Inactive">Inactive</option>
-                  <option value="Suspended">Suspended</option>
+                  <option value="Active">{t('users.statusActive', 'Active')}</option>
+                  <option value="Inactive">{t('users.statusInactive', 'Inactive')}</option>
+                  <option value="Suspended">{t('users.statusSuspended', 'Suspended')}</option>
                 </select>
                 <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
               </div>
@@ -350,7 +359,7 @@ export default function UserModal({
               onClick={onClose}
               className="flex-1 py-2.5 px-4 rounded-md border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] hover:bg-[var(--color-surface-hover-light)] dark:hover:bg-[var(--color-surface-hover-dark)] font-medium text-sm transition-colors text-center cursor-pointer"
             >
-              Cancel
+              {t('users.btnCancel', 'Cancel')}
             </button>
             <button
               type="submit"
@@ -358,16 +367,16 @@ export default function UserModal({
               className="flex-1 py-2.5 px-4 rounded-md bg-[#003E83] hover:bg-[#002e62] active:scale-[0.98] text-white font-medium text-sm transition-all text-center cursor-pointer disabled:opacity-50 shadow-xs flex items-center justify-center gap-1.5"
             >
               {isUploading ? (
-                "Uploading..."
+                t('users.uploading', 'Uploading...')
               ) : editingUser ? (
                 <>
                   <Check className="w-4 h-4" />
-                  <span>Save Changes</span>
+                  <span>{t('users.btnSaveChanges', 'Save Changes')}</span>
                 </>
               ) : (
                 <>
                   <Plus className="w-4 h-4" />
-                  <span>Create User</span>
+                  <span>{t('users.btnCreateUser', 'Create User')}</span>
                 </>
               )}
             </button>

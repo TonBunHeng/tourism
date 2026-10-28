@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { X, Save, Loader2, Plus, Edit2, ShieldAlert } from 'lucide-react';
+import { X, Save, Loader2, Plus, Edit2 } from 'lucide-react';
+import { useLanguage } from '../../i18n';
 
 export default function TrackingModal({
   isOpen,
@@ -8,6 +9,7 @@ export default function TrackingModal({
   editingLog = null,
   loading = false,
 }) {
+  const { t } = useLanguage();
   const isEditing = Boolean(editingLog);
 
   const [formData, setFormData] = useState({
@@ -84,10 +86,12 @@ export default function TrackingModal({
             </div>
             <div>
               <h3 className="text-lg font-bold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] tracking-wide">
-                {isEditing ? 'Edit Activity Note' : 'Log Super Admin Action'}
+                {isEditing ? t('tracking.modalEditTitle', 'Edit Activity Note') : t('tracking.modalCreateTitle', 'Log Super Admin Action')}
               </h3>
               <p className="text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
-                {isEditing ? 'Update the description or note for this record' : 'Manually record a privileged administrator action'}
+                {isEditing 
+                  ? t('tracking.modalEditSubtitle', 'Update the description or note for this record') 
+                  : t('tracking.modalCreateSubtitle', 'Manually record a privileged administrator action')}
               </p>
             </div>
           </div>
@@ -105,7 +109,7 @@ export default function TrackingModal({
           {/* Action Type */}
           <div>
             <label className="block text-xs font-semibold text-gray-700 dark:text-zinc-300 mb-1">
-              Action Name / Key <span className="text-red-500">*</span>
+              {t('tracking.labelActionName', 'Action Name / Key *')}
             </label>
             <select
               value={formData.action}
@@ -137,7 +141,7 @@ export default function TrackingModal({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-semibold text-gray-700 dark:text-zinc-300 mb-1">
-                Target Entity Type
+                {t('tracking.labelTargetEntityType', 'Target Entity Type')}
               </label>
               <select
                 value={formData.entity_type}
@@ -156,7 +160,7 @@ export default function TrackingModal({
 
             <div>
               <label className="block text-xs font-semibold text-gray-700 dark:text-zinc-300 mb-1">
-                Target Item ID (Optional)
+                {t('tracking.labelTargetItemId', 'Target Item ID (Optional)')}
               </label>
               <input
                 type="number"
@@ -171,14 +175,14 @@ export default function TrackingModal({
           {/* Description */}
           <div>
             <label className="block text-xs font-semibold text-gray-700 dark:text-zinc-300 mb-1">
-              Description / Action Note <span className="text-red-500">*</span>
+              {t('tracking.labelDescriptionNote', 'Description / Action Note *')}
             </label>
             <textarea
               required
               rows={3}
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              placeholder="Describe the action or item modification details..."
+              placeholder={t('tracking.placeholderDescription', 'Describe the action or item modification details...')}
               className="w-full px-3 py-2 text-xs md:text-sm bg-white dark:bg-zinc-900 border border-gray-300 dark:border-zinc-700 rounded-md text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#003E83] focus:border-transparent resize-none"
             />
           </div>
@@ -191,7 +195,7 @@ export default function TrackingModal({
               disabled={loading}
               className="px-4 py-2 text-xs md:text-sm font-medium rounded-md bg-gray-100 hover:bg-gray-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-gray-700 dark:text-zinc-200 transition-colors cursor-pointer"
             >
-              Cancel
+              {t('tracking.btnCancel', 'Cancel')}
             </button>
             <button
               type="submit"
@@ -200,7 +204,7 @@ export default function TrackingModal({
             >
               {loading && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
               <Save className="w-3.5 h-3.5" />
-              <span>{isEditing ? 'Save Changes' : 'Record Action'}</span>
+              <span>{isEditing ? t('tracking.btnSaveChanges', 'Save Changes') : t('tracking.btnRecordAction', 'Record Action')}</span>
             </button>
           </div>
         </form>

@@ -1,7 +1,9 @@
 import React from 'react';
 import { Activity, Clock } from 'lucide-react';
+import { useLanguage } from '../../i18n';
 
 export default function ProfileActivity({ recentActivity = [] }) {
+  const { t } = useLanguage();
   const safeActivities = (Array.isArray(recentActivity) ? recentActivity : []).slice(0, 5);
 
   return (
@@ -9,10 +11,10 @@ export default function ProfileActivity({ recentActivity = [] }) {
       <div className="flex items-center justify-between mb-4 pb-3 border-b border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]">
         <div>
           <h3 className="font-semibold text-sm md:text-base text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">
-            Recent Activity
+            {t('profile.recentActivityTitle', 'Recent Activity')}
           </h3>
           <p className="text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
-            Your recent administrative actions & logs
+            {t('profile.recentActivitySubtitle', 'Your recent administrative actions & logs')}
           </p>
         </div>
       </div>
@@ -48,7 +50,7 @@ export default function ProfileActivity({ recentActivity = [] }) {
           })
         ) : (
           <p className="text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] py-4 text-center">
-            No recent activities recorded.
+            {t('profile.noActivities', 'No recent activities recorded.')}
           </p>
         )}
       </div>

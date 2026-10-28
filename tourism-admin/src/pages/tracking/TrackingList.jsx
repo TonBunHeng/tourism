@@ -1,6 +1,7 @@
 import React from 'react';
 import { Eye, Trash2, Clock, Activity, PlusCircle, CheckCircle2, AlertCircle, RefreshCw, LogIn } from 'lucide-react';
 import { getRoleColor, formatRoleLabel } from '../../utils/StatusUtils';
+import { useLanguage } from '../../i18n';
 
 export default function TrackingList({
   logs = [],
@@ -10,6 +11,8 @@ export default function TrackingList({
   onViewDetails,
   onDeleteLog,
 }) {
+  const { t } = useLanguage();
+
   const getActionBadge = (action) => {
     const act = (action || '').toLowerCase();
     if (act.includes('create') || act.includes('store')) {
@@ -54,8 +57,18 @@ export default function TrackingList({
     };
   };
 
+  const formatRoleText = (role) => {
+    const r = String(role || '').toLowerCase();
+    if (r === 'super_admin' || r === 'super admin') return t('users.roleSuperAdmin', 'Super Admin');
+    if (r === 'admin') return t('tracking.roleAdmin', 'Admin Staff');
+    if (r === 'guide_editor' || r === 'tourism_content_editor') return t('tracking.roleGuideEditor', 'Content Editors');
+    if (r === 'business_owner') return t('tracking.roleBusinessOwner', 'Business Owners');
+    if (r === 'user' || r === 'tourist') return t('users.roleUser', 'User');
+    return formatRoleLabel(role);
+  };
+
   const formatTimestamp = (dateStr) => {
-    if (!dateStr) return { relative: 'Just now', full: '' };
+    if (!dateStr) return { relative: t('tracking.timeJustNow', 'Just now'), full: '' };
     const date = new Date(dateStr);
     const now = new Date();
     const diffMs = now - date;
@@ -65,11 +78,11 @@ export default function TrackingList({
     const diffDays = Math.floor(diffHr / 24);
 
     let relative = '';
-    if (diffSec < 60) relative = 'Just now';
-    else if (diffMin < 60) relative = `${diffMin}m ago`;
-    else if (diffHr < 24) relative = `${diffHr}h ago`;
-    else if (diffDays === 1) relative = 'Yesterday';
-    else if (diffDays < 7) relative = `${diffDays}d ago`;
+    if (diffSec < 60) relative = t('tracking.timeJustNow', 'Just now');
+    else if (diffMin < 60) relative = t('tracking.timeMinAgo', '{min}m ago', { min: diffMin });
+    else if (diffHr < 24) relative = t('tracking.timeHrAgo', '{hr}h ago', { hr: diffHr });
+    else if (diffDays === 1) relative = t('tracking.timeYesterday', 'Yesterday');
+    else if (diffDays < 7) relative = t('tracking.timeDaysAgo', '{days}d ago', { days: diffDays });
     else relative = date.toLocaleDateString();
 
     const full = date.toLocaleString();
@@ -88,7 +101,7 @@ export default function TrackingList({
             const actionInfo = getActionBadge(log.action);
             const ActionIcon = actionInfo.icon;
             const timeData = formatTimestamp(log.created_at);
-            const userName = log.user_name || log.user?.name || 'Staff User';
+            const userName = log.user_name || log.user?.name || t('tracking.staffUser', 'Staff User');
             const userEmail = log.user?.email || (log.ip_address ? `IP: ${log.ip_address}` : 'staff@angkorverses.com');
 
             return (
@@ -112,7 +125,7 @@ export default function TrackingList({
                         {userName}
                       </p>
                       <span className={`inline-flex items-center px-2 py-0.5 text-[10px] font-semibold rounded-md border shrink-0 ${getRoleColor(role)}`}>
-                        {formatRoleLabel(role)}
+                        {formatRoleText(role)}
                       </span>
                     </div>
 
@@ -156,7 +169,7 @@ export default function TrackingList({
                           type="button"
                           onClick={() => onViewDetails(log)}
                           className="p-1 text-[var(--color-purple-badge-text)] dark:text-[var(--color-purple-badge-dark-text)] hover:bg-[var(--color-purple-badge-bg)] dark:hover:bg-[var(--color-purple-badge-dark-bg)] rounded-md transition-colors cursor-pointer"
-                          title="View Details"
+                          title={t('tracking.tooltipViewDetails', 'View Details')}
                         >
                           <Eye className="w-3.5 h-3.5" />
                         </button>
@@ -165,7 +178,7 @@ export default function TrackingList({
                             type="button"
                             onClick={() => onDeleteLog(log)}
                             className="p-1 text-[var(--color-danger-text)] dark:text-[var(--color-danger-dark-text)] hover:bg-[var(--color-danger-bg)] dark:hover:bg-[var(--color-danger-dark-bg)] rounded-md transition-colors cursor-pointer"
-                            title="Delete Activity Record"
+                            title={t('tracking.tooltipDeleteRecord', 'Delete Activity Record')}
                           >
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>
@@ -181,10 +194,10 @@ export default function TrackingList({
           <div className="text-center py-10 px-4">
             <Activity className="w-10 h-10 text-[#003E83] dark:text-blue-500 mx-auto mb-2 opacity-80" />
             <h3 className="text-sm font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] mb-1">
-              No activities found
+              {t('tracking.noActivitiesFound', 'No activities found')}
             </h3>
             <p className="text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
-              Try adjusting your search or role filter criteria
+              {t('tracking.tryAdjustingFilter', 'Try adjusting your search or role filter criteria')}
             </p>
           </div>
         )}
@@ -196,28 +209,28 @@ export default function TrackingList({
           <thead className="bg-[var(--color-surface-hover-light)]/50 dark:bg-[var(--color-surface-hover-dark)]/50 border-b border-[var(--color-border-light)] dark:border-[var(--color-border-dark)]">
             <tr>
               <th className="hidden md:table-cell w-10 pl-3 pr-1 py-3.5 text-xs font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] uppercase tracking-wider text-center font-mono">
-                #
+                {t('tracking.thIndex', '#')}
               </th>
               <th className="w-[20%] lg:w-[19%] px-3 py-3.5 text-xs font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] uppercase tracking-wider">
-                USER
+                {t('tracking.thUser', 'USER')}
               </th>
               <th className="w-[12%] lg:w-[11%] px-2.5 py-3.5 text-xs font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] uppercase tracking-wider">
-                ROLE
+                {t('tracking.thRole', 'ROLE')}
               </th>
               <th className="w-[14%] lg:w-[13%] px-2.5 py-3.5 text-xs font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] uppercase tracking-wider">
-                ACTION
+                {t('tracking.thAction', 'ACTION')}
               </th>
               <th className="w-[13%] lg:w-[12%] px-2.5 py-3.5 text-xs font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] uppercase tracking-wider">
-                TARGET ITEM
+                {t('tracking.thTargetItem', 'TARGET ITEM')}
               </th>
               <th className="px-3 py-3.5 text-xs font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] uppercase tracking-wider">
-                DESCRIPTION
+                {t('tracking.thDescription', 'DESCRIPTION')}
               </th>
               <th className="w-[13%] lg:w-[12%] px-2.5 py-3.5 text-xs font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] uppercase tracking-wider">
-                DATE & TIME
+                {t('tracking.thDateTime', 'DATE & TIME')}
               </th>
               <th className="w-16 lg:w-20 pl-1 pr-4 py-3.5 text-right text-xs font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] uppercase tracking-wider">
-                ACTIONS
+                {t('tracking.thActions', 'ACTIONS')}
               </th>
             </tr>
           </thead>
@@ -228,7 +241,7 @@ export default function TrackingList({
                 const actionInfo = getActionBadge(log.action);
                 const ActionIcon = actionInfo.icon;
                 const timeData = formatTimestamp(log.created_at);
-                const userName = log.user_name || log.user?.name || 'Staff User';
+                const userName = log.user_name || log.user?.name || t('tracking.staffUser', 'Staff User');
                 const userEmail = log.user?.email || (log.ip_address ? `IP: ${log.ip_address}` : 'staff@angkorverses.com');
 
                 return (
@@ -272,9 +285,9 @@ export default function TrackingList({
                     <td className="px-2.5 py-3 min-w-0">
                       <span
                         className={`inline-flex items-center px-2 py-0.5 text-xs font-semibold rounded-md border truncate max-w-full ${getRoleColor(role)}`}
-                        title={formatRoleLabel(role)}
+                        title={formatRoleText(role)}
                       >
-                        <span className="truncate">{formatRoleLabel(role)}</span>
+                        <span className="truncate">{formatRoleText(role)}</span>
                       </span>
                     </td>
 
@@ -332,7 +345,7 @@ export default function TrackingList({
                           type="button"
                           onClick={() => onViewDetails(log)}
                           className="p-1.5 text-[var(--color-purple-badge-text)] dark:text-[var(--color-purple-badge-dark-text)] hover:bg-[var(--color-purple-badge-bg)] dark:hover:bg-[var(--color-purple-badge-dark-bg)] rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
-                          title="View Details"
+                          title={t('tracking.tooltipViewDetails', 'View Details')}
                         >
                           <Eye className="w-4 h-4" />
                         </button>
@@ -343,7 +356,7 @@ export default function TrackingList({
                             type="button"
                             onClick={() => onDeleteLog(log)}
                             className="p-1.5 text-[var(--color-danger-text)] dark:text-[var(--color-danger-dark-text)] hover:bg-[var(--color-danger-bg)] dark:hover:bg-[var(--color-danger-dark-bg)] rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
-                            title="Delete Activity Record"
+                            title={t('tracking.tooltipDeleteRecord', 'Delete Activity Record')}
                           >
                             <Trash2 className="w-4 h-4" />
                           </button>
@@ -358,10 +371,10 @@ export default function TrackingList({
                 <td colSpan="8" className="text-center py-12 px-4">
                   <Activity className="w-12 h-12 text-[#003E83] dark:text-blue-500 mx-auto mb-2 opacity-80" />
                   <h3 className="text-base font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] mb-1">
-                    No activities found
+                    {t('tracking.noActivitiesFound', 'No activities found')}
                   </h3>
                   <p className="text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
-                    Try adjusting your search or role filter criteria
+                    {t('tracking.tryAdjustingFilter', 'Try adjusting your search or role filter criteria')}
                   </p>
                 </td>
               </tr>

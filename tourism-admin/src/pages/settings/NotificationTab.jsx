@@ -1,6 +1,10 @@
+import { useMemo } from 'react';
 import { Bell, Mail, Smartphone, UserPlus, Star, Calendar, Trash2, ShieldAlert } from 'lucide-react';
+import { useLanguage } from '../../i18n';
 
 export default function NotificationTab({ settings, setSettings }) {
+  const { t } = useLanguage();
+
   const handleToggle = (field) => {
     setSettings((prev) => ({
       ...prev,
@@ -8,77 +12,77 @@ export default function NotificationTab({ settings, setSettings }) {
     }));
   };
 
-  const channelToggles = [
+  const channelToggles = useMemo(() => [
     {
       id: 'pushNotifications',
-      title: 'Web Push Notifications',
-      desc: 'Receive real-time browser desktop pop-up alerts for high-priority incidents.',
+      title: t('settings.pushNotifTitle', 'Web Push Notifications'),
+      desc: t('settings.pushNotifDesc', 'Receive real-time browser desktop pop-up alerts for high-priority incidents.'),
       icon: Bell,
       color: 'text-[var(--color-info-text)] dark:text-[var(--color-info-dark-text)] bg-[var(--color-info-bg)] dark:bg-[var(--color-info-dark-bg)]'
     },
     {
       id: 'emailNotifications',
-      title: 'Email Notification Digest',
-      desc: 'Deliver administrative digests and daily operational summaries to official contact email.',
+      title: t('settings.emailNotifTitle', 'Email Notification Digest'),
+      desc: t('settings.emailNotifDesc', 'Deliver administrative digests and daily operational summaries to official contact email.'),
       icon: Mail,
       color: 'text-[var(--color-purple-text)] dark:text-[var(--color-purple-dark-text)] bg-[var(--color-purple-bg)] dark:bg-[var(--color-purple-dark-bg)]'
     },
     {
       id: 'smsNotifications',
-      title: 'Urgent SMS Alert Channel',
-      desc: 'Transmit critical security breaches and server outages via SMS to designated admin numbers.',
+      title: t('settings.smsNotifTitle', 'Urgent SMS Alert Channel'),
+      desc: t('settings.smsNotifDesc', 'Transmit critical security breaches and server outages via SMS to designated admin numbers.'),
       icon: Smartphone,
       color: 'text-[var(--color-success-text)] dark:text-[var(--color-success-dark-text)] bg-[var(--color-success-bg)] dark:bg-[var(--color-success-dark-bg)]'
     }
-  ];
+  ], [t]);
 
-  const alertToggles = [
+  const alertToggles = useMemo(() => [
     {
       id: 'newUserAlert',
-      title: 'New Tourist / Partner Registration',
-      desc: 'Notify administrator when a new user registers on the portal or mobile app.',
+      title: t('settings.alertNewUserTitle', 'New Tourist / Partner Registration'),
+      desc: t('settings.alertNewUserDesc', 'Notify administrator when a new user registers on the portal or mobile app.'),
       icon: UserPlus,
       color: 'text-[var(--color-success-text)] dark:text-[var(--color-success-dark-text)] bg-[var(--color-success-bg)] dark:bg-[var(--color-success-dark-bg)]'
     },
     {
       id: 'newReviewAlert',
-      title: 'New Destination Review & Rating',
-      desc: 'Notify when a tourist submits a new review requiring moderation.',
+      title: t('settings.alertNewReviewTitle', 'New Destination Review & Rating'),
+      desc: t('settings.alertNewReviewDesc', 'Notify when a tourist submits a new review requiring moderation.'),
       icon: Star,
       color: 'text-[var(--color-purple-text)] dark:text-[var(--color-purple-dark-text)] bg-[var(--color-purple-bg)] dark:bg-[var(--color-purple-dark-bg)]'
     },
     {
       id: 'newEventAlert',
-      title: 'Tourism & Cultural Event Published',
-      desc: 'Broadcast internal notifications when cultural events are scheduled.',
+      title: t('settings.alertNewEventTitle', 'Tourism & Cultural Event Published'),
+      desc: t('settings.alertNewEventDesc', 'Broadcast internal notifications when cultural events are scheduled.'),
       icon: Calendar,
       color: 'text-[var(--color-info-text)] dark:text-[var(--color-info-dark-text)] bg-[var(--color-info-bg)] dark:bg-[var(--color-info-dark-bg)]'
     },
     {
       id: 'deletionRequestAlert',
-      title: 'Account & Data Deletion Requests',
-      desc: 'Immediate high-priority alert when a tourist submits a data deletion request.',
+      title: t('settings.alertDeletionRequestTitle', 'Account & Data Deletion Requests'),
+      desc: t('settings.alertDeletionRequestDesc', 'Immediate high-priority alert when a tourist submits a data deletion request.'),
       icon: Trash2,
       color: 'text-[var(--color-danger-text)] dark:text-[var(--color-danger-dark-text)] bg-[var(--color-danger-bg)] dark:bg-[var(--color-danger-dark-bg)]'
     },
     {
       id: 'securityAlert',
-      title: 'Security Incidents & IP Lockouts',
-      desc: 'Trigger immediate notification upon multiple failed logins or unauthorized access attempts.',
+      title: t('settings.alertSecurityTitle', 'Security Incidents & IP Lockouts'),
+      desc: t('settings.alertSecurityDesc', 'Trigger immediate notification upon multiple failed logins or unauthorized access attempts.'),
       icon: ShieldAlert,
       color: 'text-[var(--color-warning-text)] dark:text-[var(--color-warning-dark-text)] bg-[var(--color-warning-bg)] dark:bg-[var(--color-warning-dark-bg)]'
     }
-  ];
+  ], [t]);
 
   return (
     <div className="space-y-6 animate-in fade-in duration-200">
       {/* Section Header */}
       <div>
         <h2 className="text-lg font-bold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">
-          Notification & Alert Preferences
+          {t('settings.notificationsTitle', 'Notification & Alert Preferences')}
         </h2>
         <p className="text-sm text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mt-1">
-          Configure real-time delivery channels and customize administrative alerts for platform activities.
+          {t('settings.notificationsSubtitle', 'Configure real-time delivery channels and customize administrative alerts for platform activities.')}
         </p>
       </div>
 
@@ -86,7 +90,7 @@ export default function NotificationTab({ settings, setSettings }) {
       <div className="bg-[var(--color-white)] dark:bg-[var(--color-bg-dark)] rounded-md border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] p-5 shadow-xs space-y-4">
         <h3 className="text-sm font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] flex items-center gap-2 border-b border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] pb-3">
           <Bell className="w-4 h-4 text-[var(--color-primary)]" />
-          Notification Delivery Channels
+          {t('settings.cardDeliveryChannels', 'Notification Delivery Channels')}
         </h3>
 
         <div className="space-y-3">
@@ -132,7 +136,7 @@ export default function NotificationTab({ settings, setSettings }) {
       <div className="bg-[var(--color-white)] dark:bg-[var(--color-bg-dark)] rounded-md border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] p-5 shadow-xs space-y-4">
         <h3 className="text-sm font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] flex items-center gap-2 border-b border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] pb-3">
           <Star className="w-4 h-4 text-[var(--color-primary)]" />
-          Administrative Platform Event Alerts
+          {t('settings.cardEventAlerts', 'Administrative Platform Event Alerts')}
         </h3>
 
         <div className="space-y-3">

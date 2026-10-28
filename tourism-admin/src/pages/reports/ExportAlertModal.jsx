@@ -1,7 +1,10 @@
 import { useEffect } from 'react';
 import { FileText, FileSpreadsheet, X } from 'lucide-react';
+import { useLanguage } from '../../i18n';
 
 export default function ExportAlertModal({ isOpen, format, activeTab, recordCount, onClose, onConfirm }) {
+  const { t } = useLanguage();
+
   // Prevent background scrolling when modal is open
   useEffect(() => {
     if (isOpen) {
@@ -40,7 +43,7 @@ export default function ExportAlertModal({ isOpen, format, activeTab, recordCoun
         <button
           onClick={onClose}
           className="absolute right-3.5 top-3.5 p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-zinc-200 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-md transition-all active:scale-90 cursor-pointer"
-          aria-label="Close modal"
+          aria-label={t('common.close', 'Close')}
         >
           <X size={18} />
         </button>
@@ -60,12 +63,16 @@ export default function ExportAlertModal({ isOpen, format, activeTab, recordCoun
 
         {/* Title */}
         <h3 id="export-modal-title" className="text-base sm:text-lg font-bold text-gray-900 dark:text-zinc-100 text-center mb-2 tracking-tight">
-          {isPDF ? 'Export PDF Confirmation' : 'Export Excel Confirmation'}
+          {isPDF 
+            ? t('reports.exportPdfConfirmation', 'Export PDF Confirmation') 
+            : t('reports.exportExcelConfirmation', 'Export Excel Confirmation')}
         </h3>
 
         {/* Message */}
         <p className="text-gray-600 dark:text-zinc-300 text-center mb-6 text-xs sm:text-sm leading-relaxed whitespace-pre-line px-1">
-          Are you sure you want to export the <strong className="text-gray-800 dark:text-zinc-100">{tabName}</strong> dataset ({recordCount} items) as a {isPDF ? 'PDF' : 'Excel'} file?
+          {isPDF
+            ? t('reports.confirmPdfExportMessage', { tab: tabName, count: recordCount }, `Are you sure you want to export the "${tabName}" dataset (${recordCount} items) as a styled PDF document?`)
+            : t('reports.confirmExcelExportMessage', { tab: tabName, count: recordCount }, `Are you sure you want to export the "${tabName}" dataset (${recordCount} items) as an Excel spreadsheet?`)}
         </p>
 
         {/* Buttons */}
@@ -75,7 +82,7 @@ export default function ExportAlertModal({ isOpen, format, activeTab, recordCoun
             onClick={onClose}
             className="flex-1 px-4 py-2.5 border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-700 dark:text-zinc-200 font-semibold rounded-md hover:bg-gray-50 dark:hover:bg-zinc-750 active:scale-95 transition-all shadow-xs cursor-pointer text-xs sm:text-sm"
           >
-            Cancel
+            {t('common.cancel', 'Cancel')}
           </button>
           <button
             type="button"
@@ -86,7 +93,9 @@ export default function ExportAlertModal({ isOpen, format, activeTab, recordCoun
                 : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-600/25'
             }`}
           >
-            {isPDF ? 'Export PDF' : 'Export Excel'}
+            {isPDF 
+              ? t('reports.btnExportPdf', 'Export PDF') 
+              : t('reports.btnExportExcel', 'Export Excel')}
           </button>
         </div>
       </div>

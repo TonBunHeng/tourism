@@ -12,9 +12,11 @@ import {
   Zap
 } from 'lucide-react';
 import { useAlert } from '../../context/AlertContext';
+import { useLanguage } from '../../i18n';
 
 export default function BackupTab({ settings, setSettings }) {
-  const { showConfirm, showSuccess, showInfo } = useAlert();
+  const { t } = useLanguage();
+  const { showConfirm, showSuccess } = useAlert();
   const [backups, setBackups] = useState([
     {
       id: '1',
@@ -91,22 +93,29 @@ export default function BackupTab({ settings, setSettings }) {
 
       setBackups([newBackup, ...backups]);
       setCreatingBackup(false);
-      showSuccess(`Database snapshot "${newBackup.name}" (149.2 MB) generated and stored successfully.`, 'Backup Created');
+      showSuccess(
+        t('settings.backupCreatedMsg', { name: newBackup.name, size: '149.2 MB' }, `Database snapshot "${newBackup.name}" (149.2 MB) generated and stored successfully.`),
+        t('settings.backupCreatedTitle', 'Backup Created')
+      );
     }, 1800);
   };
 
   const handleDeleteBackup = async (id) => {
     const target = backups.find((b) => b.id === id);
     const confirmed = await showConfirm({
-      title: 'Delete Backup Snapshot',
-      message: `Are you sure you want to permanently remove "${target?.name || 'this backup file'}"?`,
-      confirmText: 'Delete Snapshot',
+      title: t('settings.deleteBackupConfirmTitle', 'Delete Backup Snapshot'),
+      message: t('settings.deleteBackupConfirmMsg', { name: target?.name || 'this backup file' }, `Are you sure you want to permanently remove "${target?.name || 'this backup file'}"?`),
+      confirmText: t('settings.btnDeleteConfirm', 'Delete Snapshot'),
+      cancelText: t('common.cancel', 'Cancel'),
       type: 'danger'
     });
 
     if (confirmed) {
       setBackups(backups.filter((b) => b.id !== id));
-      showSuccess('Backup file has been removed from server storage.', 'Deleted');
+      showSuccess(
+        t('settings.deleteSuccessMsg', 'Backup file has been removed from server storage.'),
+        t('settings.deleteSuccessTitle', 'Deleted')
+      );
     }
   };
 
@@ -130,7 +139,10 @@ SET FOREIGN_KEY_CHECKS=0;
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    showSuccess(`Backup snapshot "${backup.name}" downloaded to your device.`, 'Download Complete');
+    showSuccess(
+      t('settings.downloadSuccessMsg', { name: backup.name }, `Backup snapshot "${backup.name}" downloaded to your device.`),
+      t('settings.downloadSuccessTitle', 'Download Complete')
+    );
   };
 
   const handleRestoreSubmit = () => {
@@ -139,8 +151,12 @@ SET FOREIGN_KEY_CHECKS=0;
     setTimeout(() => {
       setRestoring(false);
       setRestoreModalOpen(false);
+      const fileName = selectedFile.name;
       setSelectedFile(null);
-      showSuccess(`Database state restored successfully from "${selectedFile.name}".`, 'Database Restored');
+      showSuccess(
+        t('settings.dbRestoredMsg', { name: fileName }, `Database state restored successfully from "${fileName}".`),
+        t('settings.dbRestoredTitle', 'Database Restored')
+      );
     }, 2200);
   };
 
@@ -148,7 +164,10 @@ SET FOREIGN_KEY_CHECKS=0;
     setClearingCache(true);
     setTimeout(() => {
       setClearingCache(false);
-      showSuccess('Application configuration, route cache, and compiled views have been purged.', 'Cache Cleared');
+      showSuccess(
+        t('settings.cacheClearedMsg', 'Application configuration, route cache, and compiled views have been purged.'),
+        t('settings.cacheClearedTitle', 'Cache Cleared')
+      );
     }, 1200);
   };
 
@@ -156,7 +175,10 @@ SET FOREIGN_KEY_CHECKS=0;
     setPurgingTemp(true);
     setTimeout(() => {
       setPurgingTemp(false);
-      showSuccess('Temporary upload artifacts and cached thumbnail fragments have been purged (2.4 GB reclaimed).', 'Storage Cleaned');
+      showSuccess(
+        t('settings.storageCleanedMsg', 'Temporary upload artifacts and cached thumbnail fragments have been purged (2.4 GB reclaimed).'),
+        t('settings.storageCleanedTitle', 'Storage Cleaned')
+      );
     }, 1400);
   };
 
@@ -164,7 +186,10 @@ SET FOREIGN_KEY_CHECKS=0;
     setOptimizingDb(true);
     setTimeout(() => {
       setOptimizingDb(false);
-      showSuccess('All database tables, spatial indexes, and foreign key relations optimized.', 'Database Optimized');
+      showSuccess(
+        t('settings.dbOptimizedMsg', 'All database tables, spatial indexes, and foreign key relations optimized.'),
+        t('settings.dbOptimizedTitle', 'Database Optimized')
+      );
     }, 1600);
   };
 
@@ -173,10 +198,10 @@ SET FOREIGN_KEY_CHECKS=0;
       {/* Section Header */}
       <div>
         <h2 className="text-lg font-bold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">
-          Backup, Restore & Maintenance
+          {t('settings.backupTitle', 'Backup, Restore & Maintenance')}
         </h2>
         <p className="text-sm text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mt-1">
-          Automate relational database snapshots, restore backups, configure retention, and run system cache cleanups.
+          {t('settings.backupSubtitle', 'Automate relational database snapshots, restore backups, configure retention, and run system cache cleanups.')}
         </p>
       </div>
 
@@ -186,10 +211,10 @@ SET FOREIGN_KEY_CHECKS=0;
           <div>
             <h3 className="text-sm font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] flex items-center gap-2">
               <Database className="w-4 h-4 text-[var(--color-primary)]" />
-              Database Snapshots & Disaster Recovery
+              {t('settings.cardSnapshots', 'Database Snapshots & Disaster Recovery')}
             </h3>
             <p className="text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mt-0.5">
-              Exports full SQL dumps of places, categories, reviews, events, users, and audit logs.
+              {t('settings.cardSnapshotsSubtitle', 'Exports full SQL dumps of places, categories, reviews, events, users, and audit logs.')}
             </p>
           </div>
 
@@ -200,7 +225,7 @@ SET FOREIGN_KEY_CHECKS=0;
               className="flex items-center gap-1.5 px-3 py-2 text-xs font-semibold rounded-md border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] bg-[var(--color-white)] dark:bg-[var(--color-bg-dark)] text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] hover:bg-[var(--color-surface-hover-light)] dark:hover:bg-[var(--color-surface-hover-dark)] transition-all cursor-pointer"
             >
               <Upload className="w-3.5 h-3.5" />
-              <span>Restore from SQL</span>
+              <span>{t('settings.btnRestoreSql', 'Restore from SQL')}</span>
             </button>
 
             <button
@@ -210,7 +235,7 @@ SET FOREIGN_KEY_CHECKS=0;
               className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold rounded-md bg-[#003E83] hover:bg-[#002e62] text-white shadow-xs transition-all cursor-pointer disabled:opacity-50"
             >
               {creatingBackup ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Play className="w-3.5 h-3.5 fill-current" />}
-              <span>{creatingBackup ? 'Creating Snapshot...' : 'Create Snapshot Now'}</span>
+              <span>{creatingBackup ? t('settings.creatingSnapshot', 'Creating Snapshot...') : t('settings.btnCreateSnapshot', 'Create Snapshot Now')}</span>
             </button>
           </div>
         </div>
@@ -218,33 +243,33 @@ SET FOREIGN_KEY_CHECKS=0;
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">
-              Automated Snapshot Frequency
+              {t('settings.labelSnapshotFrequency', 'Automated Snapshot Frequency')}
             </label>
             <select
               value={settings.backupSchedule || 'daily'}
               onChange={(e) => handleChange('backupSchedule', e.target.value)}
               className="w-full h-10 px-3 py-2 text-sm rounded-md border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] bg-[var(--color-white)] dark:bg-[var(--color-bg-dark)] text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] focus:outline-none focus:ring-2 focus:ring-[var(--color-input)]"
             >
-              <option value="daily">Daily at 02:00 AM (ICT)</option>
-              <option value="weekly">Weekly (Sunday Midnight)</option>
-              <option value="monthly">Monthly (1st of month)</option>
-              <option value="disabled">Disabled (Manual Only)</option>
+              <option value="daily">{t('settings.freqDaily', 'Daily at 02:00 AM (ICT)')}</option>
+              <option value="weekly">{t('settings.freqWeekly', 'Weekly (Sunday Midnight)')}</option>
+              <option value="monthly">{t('settings.freqMonthly', 'Monthly (1st of month)')}</option>
+              <option value="disabled">{t('settings.freqDisabled', 'Disabled (Manual Only)')}</option>
             </select>
           </div>
 
           <div>
             <label className="block text-sm font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">
-              Snapshot Retention Policy
+              {t('settings.labelRetentionPolicy', 'Snapshot Retention Policy')}
             </label>
             <select
               value={settings.backupRetention || '30'}
               onChange={(e) => handleChange('backupRetention', e.target.value)}
               className="w-full h-10 px-3 py-2 text-sm rounded-md border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] bg-[var(--color-white)] dark:bg-[var(--color-bg-dark)] text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] focus:outline-none focus:ring-2 focus:ring-[var(--color-input)]"
             >
-              <option value="7">Retain last 7 days</option>
-              <option value="14">Retain last 14 days</option>
-              <option value="30">Retain last 30 days (Recommended)</option>
-              <option value="90">Retain last 90 days</option>
+              <option value="7">{t('settings.retain7', 'Retain last 7 days')}</option>
+              <option value="14">{t('settings.retain14', 'Retain last 14 days')}</option>
+              <option value="30">{t('settings.retain30', 'Retain last 30 days (Recommended)')}</option>
+              <option value="90">{t('settings.retain90', 'Retain last 90 days')}</option>
             </select>
           </div>
         </div>
@@ -254,17 +279,17 @@ SET FOREIGN_KEY_CHECKS=0;
       <div className="bg-[var(--color-white)] dark:bg-[var(--color-bg-dark)] rounded-md border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] p-5 shadow-xs space-y-4">
         <h3 className="text-sm font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] flex items-center gap-2 border-b border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] pb-3">
           <Zap className="w-4 h-4 text-[var(--color-warning-text)] dark:text-[var(--color-warning-dark-text)]" />
-          System Maintenance & Cache Operations
+          {t('settings.cardMaintenanceTools', 'System Maintenance & Cache Operations')}
         </h3>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div className="p-4 rounded-md border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] bg-[var(--color-surface-hover-light)]/40 dark:bg-[var(--color-surface-hover-dark)]/20 flex flex-col justify-between space-y-3">
             <div>
               <h4 className="text-xs font-bold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">
-                Purge System Cache
+                {t('settings.toolPurgeCacheTitle', 'Purge System Cache')}
               </h4>
               <p className="text-[11px] text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mt-1">
-                Flushes Laravel config, routes, and compiled templates.
+                {t('settings.toolPurgeCacheDesc', 'Flushes Laravel config, routes, and compiled templates.')}
               </p>
             </div>
             <button
@@ -273,17 +298,17 @@ SET FOREIGN_KEY_CHECKS=0;
               disabled={clearingCache}
               className="w-full py-1.5 text-xs font-semibold rounded-md border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] bg-[var(--color-white)] dark:bg-[var(--color-bg-dark)] text-[var(--color-primary)] hover:bg-[var(--color-info-bg)] transition-all cursor-pointer disabled:opacity-50"
             >
-              {clearingCache ? 'Flushing...' : 'Clear Cache'}
+              {clearingCache ? t('settings.flushingCache', 'Flushing...') : t('settings.btnPurgeCache', 'Clear Cache')}
             </button>
           </div>
 
           <div className="p-4 rounded-md border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] bg-[var(--color-surface-hover-light)]/40 dark:bg-[var(--color-surface-hover-dark)]/20 flex flex-col justify-between space-y-3">
             <div>
               <h4 className="text-xs font-bold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">
-                Purge Temp Uploads
+                {t('settings.toolPurgeTempTitle', 'Purge Temp Uploads')}
               </h4>
               <p className="text-[11px] text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mt-1">
-                Reclaims disk space by purging unlinked temp images.
+                {t('settings.toolPurgeTempDesc', 'Reclaims disk space by purging unlinked temp images.')}
               </p>
             </div>
             <button
@@ -292,17 +317,17 @@ SET FOREIGN_KEY_CHECKS=0;
               disabled={purgingTemp}
               className="w-full py-1.5 text-xs font-semibold rounded-md border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] bg-[var(--color-white)] dark:bg-[var(--color-bg-dark)] text-[var(--color-primary)] hover:bg-[var(--color-info-bg)] transition-all cursor-pointer disabled:opacity-50"
             >
-              {purgingTemp ? 'Purging...' : 'Purge Temp Files'}
+              {purgingTemp ? t('settings.purgingTemp', 'Purging...') : t('settings.btnPurgeTemp', 'Purge Temp Files')}
             </button>
           </div>
 
           <div className="p-4 rounded-md border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] bg-[var(--color-surface-hover-light)]/40 dark:bg-[var(--color-surface-hover-dark)]/20 flex flex-col justify-between space-y-3">
             <div>
               <h4 className="text-xs font-bold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">
-                Optimize Database
+                {t('settings.toolOptimizeDbTitle', 'Optimize Database')}
               </h4>
               <p className="text-[11px] text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mt-1">
-                Defragments tables and updates query analyzer stats.
+                {t('settings.toolOptimizeDbDesc', 'Defragments tables and updates query analyzer stats.')}
               </p>
             </div>
             <button
@@ -311,7 +336,7 @@ SET FOREIGN_KEY_CHECKS=0;
               disabled={optimizingDb}
               className="w-full py-1.5 text-xs font-semibold rounded-md border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] bg-[var(--color-white)] dark:bg-[var(--color-bg-dark)] text-[var(--color-primary)] hover:bg-[var(--color-info-bg)] transition-all cursor-pointer disabled:opacity-50"
             >
-              {optimizingDb ? 'Optimizing...' : 'Optimize Tables'}
+              {optimizingDb ? t('settings.optimizingDb', 'Optimizing...') : t('settings.btnOptimizeDb', 'Optimize Tables')}
             </button>
           </div>
         </div>
@@ -323,10 +348,12 @@ SET FOREIGN_KEY_CHECKS=0;
           <div className="flex items-center gap-2.5">
             <h3 className="text-sm sm:text-base font-bold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] flex items-center gap-2">
               <Database className="w-4 h-4 text-[#003E83] dark:text-blue-400" />
-              Stored Backup Snapshots
+              {t('settings.cardStoredBackups', 'Stored Backup Snapshots')}
             </h3>
             <span className="text-xs font-semibold px-2 py-0.5 rounded-md bg-blue-50 text-[#003E83] dark:bg-blue-950/50 dark:text-blue-400 border border-blue-100 dark:border-blue-900/40">
-              {backups.length} {backups.length === 1 ? 'archive' : 'archives'}
+              {backups.length === 1
+                ? t('settings.archivesSingle', { count: backups.length }, '1 archive')
+                : t('settings.archivesPlural', { count: backups.length }, `${backups.length} archives`)}
             </span>
           </div>
         </div>
@@ -336,19 +363,19 @@ SET FOREIGN_KEY_CHECKS=0;
             <thead className="bg-[var(--color-surface-hover-light)]/50 dark:bg-[var(--color-surface-hover-dark)]/50 text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] uppercase tracking-wider text-xs font-medium">
               <tr>
                 <th className="pl-4 pr-2 py-3.5 text-xs font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] uppercase tracking-wider w-10 text-center">#</th>
-                <th className="px-4 py-3.5">Archive File Name</th>
-                <th className="px-3 py-3.5 whitespace-nowrap w-44">Type</th>
-                <th className="px-3 py-3.5 whitespace-nowrap w-44">Timestamp</th>
-                <th className="px-3 py-3.5 whitespace-nowrap w-28">Size</th>
-                <th className="px-3 py-3.5 whitespace-nowrap w-28">Status</th>
-                <th className="pl-3 pr-4 py-3.5 text-right w-24 whitespace-nowrap">Actions</th>
+                <th className="px-4 py-3.5">{t('settings.thArchiveName', 'Archive File Name')}</th>
+                <th className="px-3 py-3.5 whitespace-nowrap w-44">{t('settings.thType', 'Type')}</th>
+                <th className="px-3 py-3.5 whitespace-nowrap w-44">{t('settings.thTimestamp', 'Timestamp')}</th>
+                <th className="px-3 py-3.5 whitespace-nowrap w-28">{t('settings.thSize', 'Size')}</th>
+                <th className="px-3 py-3.5 whitespace-nowrap w-28">{t('settings.thStatus', 'Status')}</th>
+                <th className="pl-3 pr-4 py-3.5 text-right w-24 whitespace-nowrap">{t('settings.thActions', 'Actions')}</th>
               </tr>
             </thead>
             <tbody className="bg-[var(--color-white)] dark:bg-[var(--color-bg-dark)] divide-y divide-[var(--color-border-light)] dark:divide-[var(--color-border-dark)]">
               {backups.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="py-10 text-center text-xs text-[var(--color-text-muted-light)] dark:text-[var(--color-text-muted-dark)] font-medium">
-                    No backup archives found. Create a manual snapshot to protect data.
+                    {t('settings.noBackupsFound', 'No backup archives found. Create a manual snapshot to protect data.')}
                   </td>
                 </tr>
               ) : (
@@ -367,7 +394,7 @@ SET FOREIGN_KEY_CHECKS=0;
                             {b.name}
                           </p>
                           <span className="text-[10px] font-semibold text-[var(--color-text-muted-light)] dark:text-[var(--color-text-secondary-dark)]">
-                            SQL Database Snapshot Dump
+                            {t('settings.sqlDumpSubtext', 'SQL Database Snapshot Dump')}
                           </span>
                         </div>
                       </div>
@@ -394,7 +421,7 @@ SET FOREIGN_KEY_CHECKS=0;
                           type="button"
                           onClick={() => handleDownloadBackup(b)}
                           className="p-1.5 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
-                          title="Download Backup"
+                          title={t('settings.tooltipDownloadBackup', 'Download Backup')}
                         >
                           <Download className="w-4 h-4" />
                         </button>
@@ -402,7 +429,7 @@ SET FOREIGN_KEY_CHECKS=0;
                           type="button"
                           onClick={() => handleDeleteBackup(b.id)}
                           className="p-1.5 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
-                          title="Delete Backup"
+                          title={t('settings.tooltipDeleteBackup', 'Delete Backup')}
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
@@ -438,28 +465,28 @@ SET FOREIGN_KEY_CHECKS=0;
 
             {/* Modal Title */}
             <h3 id="restore-modal-title" className="text-lg font-bold text-gray-900 dark:text-white text-center mb-2 tracking-tight">
-              Restore Database File
+              {t('settings.modalRestoreTitle', 'Restore Database File')}
             </h3>
 
             {/* Description */}
             <p className="text-sm text-gray-500 dark:text-zinc-400 text-center mb-4 leading-relaxed px-1">
-              Select a valid SQL database dump file to restore the system state.
+              {t('settings.modalRestoreDesc', 'Select a valid SQL database dump file to restore the system state.')}
             </p>
 
             {/* Caution Callout Box */}
             <div className="p-3.5 bg-amber-50/80 dark:bg-amber-950/40 border border-amber-200/80 dark:border-amber-900/50 rounded-md text-left text-xs mb-5 space-y-1">
               <span className="font-bold text-amber-900 dark:text-amber-200 block text-xs">
-                ⚠️ Caution: Irreversible Database Overwrite
+                {t('settings.cautionOverwriteTitle', '⚠️ Caution: Irreversible Database Overwrite')}
               </span>
               <p className="text-xs leading-relaxed text-amber-800/90 dark:text-amber-300/90">
-                Restoring a snapshot will replace all active tourist records, review submissions, and media references with the chosen dump file data.
+                {t('settings.cautionOverwriteDesc', 'Restoring a snapshot will replace all active tourist records, review submissions, and media references with the chosen dump file data.')}
               </p>
             </div>
 
             {/* File Selector */}
             <div className="text-left mb-6">
               <label className="block text-xs font-semibold text-gray-700 dark:text-zinc-300 mb-1.5">
-                Database Dump File (.sql, .gz)
+                {t('settings.labelDumpFile', 'Database Dump File (.sql, .gz)')}
               </label>
               <input
                 type="file"
@@ -476,7 +503,7 @@ SET FOREIGN_KEY_CHECKS=0;
                 onClick={() => setRestoreModalOpen(false)}
                 className="flex-1 py-2.5 px-4 border border-gray-300 dark:border-zinc-800 bg-transparent hover:bg-gray-100 dark:hover:bg-zinc-800/80 text-gray-700 dark:text-zinc-300 font-medium rounded-md transition-colors cursor-pointer text-sm"
               >
-                Cancel
+                {t('settings.btnCancel', 'Cancel')}
               </button>
               <button
                 type="button"
@@ -485,7 +512,7 @@ SET FOREIGN_KEY_CHECKS=0;
                 className="flex-1 py-2.5 px-4 bg-amber-600 hover:bg-amber-700 disabled:opacity-50 text-white font-medium rounded-md flex items-center justify-center gap-1.5 transition-colors cursor-pointer text-sm shadow-xs active:scale-[0.98]"
               >
                 {restoring ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
-                <span>{restoring ? 'Restoring...' : 'Confirm Restore'}</span>
+                <span>{restoring ? t('settings.restoringDb', 'Restoring...') : t('settings.btnConfirmRestore', 'Confirm Restore')}</span>
               </button>
             </div>
           </div>

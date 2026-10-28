@@ -1,6 +1,8 @@
 import { FileText, Clock, UserX, Trash2 } from 'lucide-react';
+import { useLanguage } from '../../i18n';
 
 export default function DeletionStats({ requests = [] }) {
+  const { t } = useLanguage();
   const safeRequests = Array.isArray(requests) ? requests : [];
   const total = safeRequests.length;
   const pending = safeRequests.filter(r => r.status?.toLowerCase() === 'pending').length;
@@ -9,33 +11,35 @@ export default function DeletionStats({ requests = [] }) {
 
   const stats = [
     {
-      label: 'Total Requests',
+      label: t('deletion.statTotalRequests', 'Total Requests'),
       value: total.toLocaleString(),
-      subtext: 'Logged privacy & removal tickets',
+      subtext: t('deletion.subtextTotalRequests', 'Logged privacy & removal tickets'),
       icon: FileText,
       color: 'text-[var(--color-info-text)] dark:text-[var(--color-info-dark-text)]',
       bg: 'bg-[var(--color-info-bg)] dark:bg-[var(--color-info-dark-bg)]'
     },
     {
-      label: 'Pending Reviews',
+      label: t('deletion.statPendingReviews', 'Pending Reviews'),
       value: pending.toLocaleString(),
-      subtext: pending === 0 ? 'All tickets resolved' : `${pending} tickets awaiting admin action`,
+      subtext: pending === 0 
+        ? t('deletion.subtextAllResolved', 'All tickets resolved') 
+        : t('deletion.subtextAwaitingAdmin', '{count} tickets awaiting admin action', { count: pending }),
       icon: Clock,
       color: 'text-[var(--color-warning-text)] dark:text-[var(--color-warning-dark-text)]',
       bg: 'bg-[var(--color-warning-bg)] dark:bg-[var(--color-warning-dark-bg)]'
     },
     {
-      label: 'Account Deletions',
+      label: t('deletion.statAccountDeletions', 'Account Deletions'),
       value: accountDeletions.toLocaleString(),
-      subtext: 'GDPR / user erasure requests',
+      subtext: t('deletion.subtextAccountDeletions', 'GDPR / user erasure requests'),
       icon: UserX,
       color: 'text-[var(--color-danger-text)] dark:text-[var(--color-danger-dark-text)]',
       bg: 'bg-[var(--color-danger-bg)] dark:bg-[var(--color-danger-dark-bg)]'
     },
     {
-      label: 'Item Deletions',
+      label: t('deletion.statItemDeletions', 'Item Deletions'),
       value: itemDeletions.toLocaleString(),
-      subtext: 'Specific content removal requests',
+      subtext: t('deletion.subtextItemDeletions', 'Specific content removal requests'),
       icon: Trash2,
       color: 'text-[var(--color-purple-badge-text)] dark:text-[var(--color-purple-badge-dark-text)]',
       bg: 'bg-[var(--color-purple-badge-bg)] dark:bg-[var(--color-purple-badge-dark-bg)]'

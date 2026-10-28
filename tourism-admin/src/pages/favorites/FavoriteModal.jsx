@@ -35,7 +35,7 @@ export default function FavoriteModal({
 
   if (!isOpen) return null;
 
-  const updatePlace = onNewPlaceChange || setNewPlace || (() => {});
+  const updatePlace = onNewPlaceChange || setNewPlace || (() => { });
 
   const filteredCategories = categories.filter(c => c !== 'All');
   const availableFilteredPlaces = availablePlaces.filter(p =>
@@ -86,22 +86,20 @@ export default function FavoriteModal({
             <button
               type="button"
               onClick={() => setActiveTab('existing')}
-              className={`pb-2.5 px-3 text-xs md:text-sm font-semibold border-b-2 transition-all cursor-pointer ${
-                activeTab === 'existing'
-                  ? 'border-[var(--color-primary)] text-[var(--color-primary)] dark:text-[var(--color-info-dark-text)]'
-                  : 'border-transparent text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] hover:text-[var(--color-text-primary-light)]'
-              }`}
+              className={`pb-2.5 px-3 text-xs md:text-sm font-semibold border-b-2 transition-all cursor-pointer ${activeTab === 'existing'
+                ? 'border-[var(--color-primary)] text-[var(--color-primary)] dark:text-[var(--color-info-dark-text)]'
+                : 'border-transparent text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] hover:text-[var(--color-text-primary-light)]'
+                }`}
             >
               {t('favorites.tabExisting')} ({availablePlaces.length})
             </button>
             <button
               type="button"
               onClick={() => setActiveTab('custom')}
-              className={`pb-2.5 px-3 text-xs md:text-sm font-semibold border-b-2 transition-all cursor-pointer ${
-                activeTab === 'custom'
-                  ? 'border-[var(--color-primary)] text-[var(--color-primary)] dark:text-[var(--color-info-dark-text)]'
-                  : 'border-transparent text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] hover:text-[var(--color-text-primary-light)]'
-              }`}
+              className={`pb-2.5 px-3 text-xs md:text-sm font-semibold border-b-2 transition-all cursor-pointer ${activeTab === 'custom'
+                ? 'border-[var(--color-primary)] text-[var(--color-primary)] dark:text-[var(--color-info-dark-text)]'
+                : 'border-transparent text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] hover:text-[var(--color-text-primary-light)]'
+                }`}
             >
               {t('favorites.tabCustom')}
             </button>

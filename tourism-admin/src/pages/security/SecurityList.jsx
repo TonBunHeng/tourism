@@ -10,6 +10,7 @@ import {
   ShieldCheck,
   Ban
 } from 'lucide-react';
+import { useLanguage } from '../../i18n';
 
 const getStatusBadge = (isRead, isBlocked) => {
   if (isBlocked) {
@@ -35,23 +36,25 @@ export default function SecurityList({
   onDeleteAlert,
   startIndex = 0
 }) {
+  const { t } = useLanguage();
+
   if (loading) return null;
 
   const formatTimeAgo = (dateString) => {
-    if (!dateString) return 'Recent';
+    if (!dateString) return t('security.timeRecent', 'Recent');
     try {
       const now = new Date();
       const date = new Date(dateString);
       const diffSec = Math.floor((now - date) / 1000);
 
-      if (diffSec < 60) return 'Just now';
+      if (diffSec < 60) return t('security.timeJustNow', 'Just now');
       const diffMin = Math.floor(diffSec / 60);
-      if (diffMin < 60) return `${diffMin}m ago`;
+      if (diffMin < 60) return t('security.timeMinAgo', '{min}m ago', { min: diffMin });
       const diffHour = Math.floor(diffMin / 60);
-      if (diffHour < 24) return `${diffHour}h ago`;
+      if (diffHour < 24) return t('security.timeHourAgo', '{hour}h ago', { hour: diffHour });
       const diffDays = Math.floor(diffHour / 24);
-      if (diffDays === 1) return 'Yesterday';
-      if (diffDays < 7) return `${diffDays}d ago`;
+      if (diffDays === 1) return t('security.timeYesterday', 'Yesterday');
+      if (diffDays < 7) return t('security.timeDaysAgo', '{days}d ago', { days: diffDays });
       
       return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
     } catch {
@@ -59,12 +62,18 @@ export default function SecurityList({
     }
   };
 
+  const getStatusText = (isRead, isBlocked) => {
+    if (isBlocked) return t('security.badgeIpBlocked', 'IP Blocked');
+    if (isRead) return t('security.badgeAcknowledged', 'Acknowledged');
+    return t('security.badgeActiveAlert', 'Active Alert');
+  };
+
   return (
     <>
       {/* Mobile Card View */}
       <div className="sm:hidden divide-y divide-[var(--color-border-subtle-light)] dark:divide-[var(--color-border-dark)]">
         {alerts.length > 0 ? (
-          alerts.map((alert, index) => {
+          alerts.map((alert) => {
             return (
               <div
                 key={alert.id}
@@ -84,7 +93,7 @@ export default function SecurityList({
                         {alert.email}
                       </p>
                       <span className={`px-2 py-0.5 text-[10px] font-bold rounded-md border shrink-0 ${getStatusBadge(alert.is_read, alert.is_ip_blocked)}`}>
-                        {alert.is_ip_blocked ? 'IP Blocked' : alert.is_read ? 'Acknowledged' : 'Active Alert'}
+                        {getStatusText(alert.is_read, alert.is_ip_blocked)}
                       </span>
                     </div>
 
@@ -98,7 +107,7 @@ export default function SecurityList({
                         {alert.ip_address || '127.0.0.1'}
                       </span>
                       <span className={`px-2 py-0.5 text-[10px] font-bold rounded-md border ${getSeverityBadge(alert.attempts)}`}>
-                        {alert.attempts} Failed Attempts
+                        {t('security.failedAttemptsCount', '{count} Failed Attempts', { count: alert.attempts })}
                       </span>
                       <span className="flex items-center gap-1">
                         <Clock className="w-3.5 h-3.5" />
@@ -112,7 +121,7 @@ export default function SecurityList({
                         type="button"
                         onClick={() => onOpenDetails(alert)}
                         className="p-1.5 text-[var(--color-purple-badge-text)] dark:text-[var(--color-purple-badge-dark-text)] hover:bg-[var(--color-purple-badge-bg)] dark:hover:bg-[var(--color-purple-badge-dark-bg)] rounded-md transition-colors cursor-pointer"
-                        title="View Details"
+                        title={t('security.tooltipViewDetails', 'View Details')}
                       >
                         <Eye className="w-4 h-4" />
                       </button>
@@ -121,7 +130,7 @@ export default function SecurityList({
                           type="button"
                           onClick={() => onMarkRead(alert.id)}
                           className="p-1.5 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/30 rounded-md transition-colors cursor-pointer"
-                          title="Acknowledge"
+                          title={t('security.tooltipAcknowledge', 'Acknowledge')}
                         >
                           <Check className="w-4 h-4" />
                         </button>
@@ -130,7 +139,7 @@ export default function SecurityList({
                         type="button"
                         onClick={() => onDeleteAlert(alert.id)}
                         className="p-1.5 text-[var(--color-danger-text)] dark:text-[var(--color-danger-dark-text)] hover:bg-[var(--color-danger-bg)] dark:hover:bg-[var(--color-danger-dark-bg)] rounded-md transition-colors cursor-pointer"
-                        title="Delete"
+                        title={t('security.tooltipDelete', 'Delete')}
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -144,10 +153,10 @@ export default function SecurityList({
           <div className="text-center py-12 px-4">
             <ShieldCheck className="w-12 h-12 text-blue-500 mx-auto mb-2 opacity-80" />
             <h3 className="text-base font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] mb-1">
-              No security alerts found
+              {t('security.noAlertsFound', 'No security alerts found')}
             </h3>
             <p className="text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
-              Authentication attacks and threshold alarms will appear here.
+              {t('security.noAlertsSubtext', 'Authentication attacks and threshold alarms will appear here.')}
             </p>
           </div>
         )}
@@ -159,25 +168,25 @@ export default function SecurityList({
           <thead className="bg-[var(--color-surface-hover-light)]/50 dark:bg-[var(--color-surface-hover-dark)]/50">
             <tr>
               <th className="pl-4 pr-2 py-3.5 text-xs font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] uppercase tracking-wider w-10 text-center">
-                #
+                {t('security.thIndex', '#')}
               </th>
               <th className="px-4 py-3.5 text-xs font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] uppercase tracking-wider">
-                Target Account & Incident
+                {t('security.thTargetAccount', 'Target Account & Incident')}
               </th>
               <th className="px-3 py-3.5 text-xs font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] uppercase tracking-wider whitespace-nowrap w-36">
-                Source IP
+                {t('security.thSourceIP', 'Source IP')}
               </th>
               <th className="px-3 py-3.5 text-xs font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] uppercase tracking-wider whitespace-nowrap w-28">
-                Failures
+                {t('security.thFailures', 'Failures')}
               </th>
               <th className="px-3 py-3.5 text-xs font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] uppercase tracking-wider whitespace-nowrap w-32">
-                Status
+                {t('security.thStatus', 'Status')}
               </th>
               <th className="px-3 py-3.5 text-xs font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] uppercase tracking-wider whitespace-nowrap w-24">
-                Time
+                {t('security.thTime', 'Time')}
               </th>
               <th className="pl-3 pr-4 py-3.5 text-right text-xs font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] uppercase tracking-wider w-24 whitespace-nowrap">
-                Actions
+                {t('security.thActions', 'Actions')}
               </th>
             </tr>
           </thead>
@@ -207,7 +216,7 @@ export default function SecurityList({
                             </p>
                             {alert.is_ip_blocked && (
                               <span className="text-[9px] uppercase font-bold px-1.5 py-0.2 rounded-md bg-red-600 text-white shrink-0">
-                                Blocked
+                                {t('security.badgeBlocked', 'Blocked')}
                               </span>
                             )}
                           </div>
@@ -230,7 +239,7 @@ export default function SecurityList({
                     <td className="px-3 py-3.5 whitespace-nowrap">
                       <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 text-xs font-bold rounded-md border ${getSeverityBadge(alert.attempts)}`}>
                         <Lock className="w-3 h-3 shrink-0" />
-                        {alert.attempts} Attempts
+                        {t('security.attemptsCount', '{count} Attempts', { count: alert.attempts })}
                       </span>
                     </td>
 
@@ -239,17 +248,17 @@ export default function SecurityList({
                         {alert.is_ip_blocked ? (
                           <>
                             <Ban className="w-3 h-3 text-red-500 shrink-0" />
-                            <span>IP Blocked</span>
+                            <span>{t('security.badgeIpBlocked', 'IP Blocked')}</span>
                           </>
                         ) : !alert.is_read ? (
                           <>
                             <span className="w-1.5 h-1.5 rounded-md bg-red-500 animate-pulse shrink-0" />
-                            <span>Active Alert</span>
+                            <span>{t('security.badgeActiveAlert', 'Active Alert')}</span>
                           </>
                         ) : (
                           <>
                             <span className="w-1.5 h-1.5 rounded-md bg-slate-400 shrink-0" />
-                            <span>Acknowledged</span>
+                            <span>{t('security.badgeAcknowledged', 'Acknowledged')}</span>
                           </>
                         )}
                       </span>
@@ -257,7 +266,7 @@ export default function SecurityList({
 
                     <td className="px-3 py-3.5 whitespace-nowrap text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
                       <div className="flex items-center gap-1">
-                        <Clock className="w-3 h-3 text-[var(--color-text-muted-light)] shrink-0" />
+                        <Clock className="w-3.5 h-3.5 text-[var(--color-text-muted-light)] shrink-0" />
                         <span>{formatTimeAgo(alert.created_at)}</span>
                       </div>
                     </td>
@@ -268,7 +277,7 @@ export default function SecurityList({
                           type="button"
                           onClick={() => onOpenDetails(alert)}
                           className="p-1.5 text-[var(--color-purple-badge-text)] dark:text-[var(--color-purple-badge-dark-text)] hover:bg-[var(--color-purple-badge-bg)] dark:hover:bg-[var(--color-purple-badge-dark-bg)] rounded-md transition-colors cursor-pointer"
-                          title="View Details"
+                          title={t('security.tooltipViewDetails', 'View Details')}
                         >
                           <Eye className="w-4 h-4" />
                         </button>
@@ -277,7 +286,7 @@ export default function SecurityList({
                             type="button"
                             onClick={() => onMarkRead(alert.id)}
                             className="p-1.5 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/30 rounded-md transition-colors cursor-pointer"
-                            title="Acknowledge"
+                            title={t('security.tooltipAcknowledge', 'Acknowledge')}
                           >
                             <Check className="w-4 h-4" />
                           </button>
@@ -286,7 +295,7 @@ export default function SecurityList({
                           type="button"
                           onClick={() => onDeleteAlert(alert.id)}
                           className="p-1.5 text-[var(--color-danger-text)] dark:text-[var(--color-danger-dark-text)] hover:bg-[var(--color-danger-bg)] dark:hover:bg-[var(--color-danger-dark-bg)] rounded-md transition-colors cursor-pointer"
-                          title="Delete"
+                          title={t('security.tooltipDelete', 'Delete')}
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
@@ -300,10 +309,10 @@ export default function SecurityList({
                 <td colSpan="7" className="text-center py-12">
                   <ShieldCheck className="w-12 h-12 text-blue-500 mx-auto mb-2 opacity-80" />
                   <h3 className="text-lg font-medium text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] mb-1">
-                    No security alerts found
+                    {t('security.noAlertsFound', 'No security alerts found')}
                   </h3>
                   <p className="text-sm text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
-                    All authentication records are safe and within normal limits.
+                    {t('security.allSafeSubtext', 'All authentication records are safe and within normal limits.')}
                   </p>
                 </td>
               </tr>

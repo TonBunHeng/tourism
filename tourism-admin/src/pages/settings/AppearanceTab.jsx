@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import {
   Sun,
   Moon,
@@ -17,8 +18,11 @@ import {
   getInitialFontSize,
   getInitialFontFamily
 } from '../../utils/Theme';
+import { useLanguage } from '../../i18n';
 
 export default function AppearanceTab({ settings, setSettings }) {
+  const { t } = useLanguage();
+
   const handleChange = (field, value) => {
     setSettings((prev) => ({
       ...prev,
@@ -38,29 +42,83 @@ export default function AppearanceTab({ settings, setSettings }) {
     }
   };
 
-  const themeOptions = [
-    { id: 'light', name: 'Light Mode', icon: Sun, desc: 'Clean, crisp white interface tailored for daytime operations' },
-    { id: 'dark', name: 'Dark Mode', icon: Moon, desc: 'Sleek dark theme reducing eye fatigue in low-light environments' },
-    { id: 'system', name: 'System Default', icon: Monitor, desc: 'Automatically syncs with your operating system preference' }
-  ];
+  const themeOptions = useMemo(() => [
+    {
+      id: 'light',
+      name: t('settings.themeLightName', 'Light Mode'),
+      icon: Sun,
+      desc: t('settings.themeLightDesc', 'Clean, crisp white interface tailored for daytime operations')
+    },
+    {
+      id: 'dark',
+      name: t('settings.themeDarkName', 'Dark Mode'),
+      icon: Moon,
+      desc: t('settings.themeDarkDesc', 'Sleek dark theme reducing eye fatigue in low-light environments')
+    },
+    {
+      id: 'system',
+      name: t('settings.themeSystemName', 'System Default'),
+      icon: Monitor,
+      desc: t('settings.themeSystemDesc', 'Automatically syncs with your operating system preference')
+    }
+  ], [t]);
 
-  const sidebarOptions = [
-    { id: 'brand', name: 'Brand Navy', color: 'bg-[#003E83]', desc: 'Official Ministry of Tourism deep navy blue' },
-    { id: 'modern', name: 'Modern Charcoal', color: 'bg-slate-900 dark:bg-zinc-900', desc: 'Neutral modern dark charcoal navigation' },
-    { id: 'light', name: 'Clean White', color: 'bg-white border border-gray-300', desc: 'High-contrast light minimalist sidebar' }
-  ];
+  const sidebarOptions = useMemo(() => [
+    {
+      id: 'brand',
+      name: t('settings.sidebarBrandName', 'Brand Navy'),
+      color: 'bg-[#003E83]',
+      desc: t('settings.sidebarBrandDesc', 'Official Ministry of Tourism deep navy blue')
+    },
+    {
+      id: 'modern',
+      name: t('settings.sidebarModernName', 'Modern Charcoal'),
+      color: 'bg-slate-900 dark:bg-zinc-900',
+      desc: t('settings.sidebarModernDesc', 'Neutral modern dark charcoal navigation')
+    },
+    {
+      id: 'light',
+      name: t('settings.sidebarLightName', 'Clean White'),
+      color: 'bg-white border border-gray-300',
+      desc: t('settings.sidebarLightDesc', 'High-contrast light minimalist sidebar')
+    }
+  ], [t]);
 
-  const fontSizeOptions = [
-    { id: 'small', name: 'Compact (14px)', desc: 'High information density for large monitors' },
-    { id: 'medium', name: 'Standard (16px)', desc: 'Optimal balance of legibility and density' },
-    { id: 'large', name: 'Comfort (18px)', desc: 'Enlarged text for higher reading comfort' }
-  ];
+  const fontSizeOptions = useMemo(() => [
+    {
+      id: 'small',
+      name: t('settings.fontScaleSmallName', 'Compact (14px)'),
+      desc: t('settings.fontScaleSmallDesc', 'High information density for large monitors')
+    },
+    {
+      id: 'medium',
+      name: t('settings.fontScaleMediumName', 'Standard (16px)'),
+      desc: t('settings.fontScaleMediumDesc', 'Optimal balance of legibility and density')
+    },
+    {
+      id: 'large',
+      name: t('settings.fontScaleLargeName', 'Comfort (18px)'),
+      desc: t('settings.fontScaleLargeDesc', 'Enlarged text for higher reading comfort')
+    }
+  ], [t]);
 
-  const fontFamilyOptions = [
-    { id: 'inter', name: 'Inter Display', desc: 'Modern geometric sans-serif standard' },
-    { id: 'jakarta', name: 'Plus Jakarta Sans', desc: 'Contemporary high-contrast humanist font' },
-    { id: 'outfit', name: 'Outfit Modern', desc: 'Distinctive brand display typography' }
-  ];
+  const fontFamilyOptions = useMemo(() => [
+    {
+      id: 'inter',
+      name: t('settings.fontInterName', 'Inter Display'),
+      desc: t('settings.fontInterDesc', 'Modern geometric sans-serif standard')
+    },
+    {
+      id: 'jakarta',
+      name: t('settings.fontJakartaName', 'Plus Jakarta Sans'),
+      desc: t('settings.fontJakartaDesc', 'Contemporary high-contrast humanist font')
+    },
+    {
+      id: 'outfit',
+      name: t('settings.fontOutfitName', 'Outfit Modern'),
+      desc: t('settings.fontOutfitDesc', 'Distinctive brand display typography')
+    }
+  ], [t]);
 
   const activeTheme = settings.theme || 'system';
   const activeSidebarStyle = settings.sidebarStyle || 'brand';
@@ -73,10 +131,10 @@ export default function AppearanceTab({ settings, setSettings }) {
       {/* Section Header */}
       <div>
         <h2 className="text-lg font-bold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">
-          Appearance & Theme Settings
+          {t('settings.appearanceTitle', 'Appearance & Theme Settings')}
         </h2>
         <p className="text-sm text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mt-1">
-          Customize the administrative portal visual theme, contrast mode, typography, and navigation sidebar styling.
+          {t('settings.appearanceSubtitle', 'Customize the administrative portal visual theme, contrast mode, typography, and navigation sidebar styling.')}
         </p>
       </div>
 
@@ -84,7 +142,7 @@ export default function AppearanceTab({ settings, setSettings }) {
       <div className="bg-[var(--color-white)] dark:bg-[var(--color-bg-dark)] rounded-md border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] p-5 shadow-xs space-y-4">
         <h3 className="text-sm font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] flex items-center gap-2 border-b border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] pb-3">
           <Sun className="w-4 h-4 text-[var(--color-primary)]" />
-          Color Theme Mode
+          {t('settings.cardColorTheme', 'Color Theme Mode')}
         </h3>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -125,12 +183,12 @@ export default function AppearanceTab({ settings, setSettings }) {
         <div className="flex items-center justify-between border-b border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] pb-3">
           <h3 className="text-sm font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] flex items-center gap-2">
             <LayoutDashboard className="w-4 h-4 text-[var(--color-primary)]" />
-            Navigation Sidebar Style
+            {t('settings.cardSidebarStyle', 'Navigation Sidebar Style')}
           </h3>
 
           <label className="flex items-center gap-2 cursor-pointer text-xs font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
             <Maximize2 className="w-3.5 h-3.5" />
-            <span>Compact Mode:</span>
+            <span>{t('settings.compactModeLabel', 'Compact Mode:')}</span>
             <input
               type="checkbox"
               checked={activeCompact}
@@ -179,14 +237,14 @@ export default function AppearanceTab({ settings, setSettings }) {
       <div className="bg-[var(--color-white)] dark:bg-[var(--color-bg-dark)] rounded-md border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] p-5 shadow-xs space-y-4">
         <h3 className="text-sm font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] flex items-center gap-2 border-b border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] pb-3">
           <Type className="w-4 h-4 text-[var(--color-primary)]" />
-          Typography & Base Font Sizing
+          {t('settings.cardTypography', 'Typography & Base Font Sizing')}
         </h3>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Base Font Size */}
           <div className="space-y-2">
             <label className="block text-xs font-semibold text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
-              Interface Base Scale
+              {t('settings.labelInterfaceScale', 'Interface Base Scale')}
             </label>
             <div className="space-y-2">
               {fontSizeOptions.map((opt) => {
@@ -220,7 +278,7 @@ export default function AppearanceTab({ settings, setSettings }) {
           {/* Font Family */}
           <div className="space-y-2">
             <label className="block text-xs font-semibold text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
-              Primary Font Family
+              {t('settings.labelFontFamily', 'Primary Font Family')}
             </label>
             <div className="space-y-2">
               {fontFamilyOptions.map((opt) => {

@@ -93,14 +93,14 @@ export default function NotificationDetailsModal({
     : (notification.data || {});
 
   const isSecurity = (notification.category || '').toLowerCase() === 'security' ||
-                     (notification.type || '').toLowerCase() === 'security' ||
-                     (notification.title || '').toLowerCase().includes('security');
+    (notification.type || '').toLowerCase() === 'security' ||
+    (notification.title || '').toLowerCase().includes('security');
 
   const formattedDate = notification.created_at
     ? new Date(notification.created_at).toLocaleString(undefined, {
-        dateStyle: 'medium',
-        timeStyle: 'short'
-      })
+      dateStyle: 'medium',
+      timeStyle: 'short'
+    })
     : t('notifications.timeRecent');
 
   return (

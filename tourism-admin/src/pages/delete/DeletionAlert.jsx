@@ -1,7 +1,10 @@
 import { AlertTriangle } from 'lucide-react';
+import { useLanguage } from '../../i18n';
 
-export default function DeletionAlert({ requests }) {
-  const criticalCount = requests.filter(r => r.urgency === 'critical' && r.status === 'pending').length;
+export default function DeletionAlert({ requests = [] }) {
+  const { t } = useLanguage();
+  const safeRequests = Array.isArray(requests) ? requests : [];
+  const criticalCount = safeRequests.filter(r => r.urgency === 'critical' && r.status === 'pending').length;
 
   if (criticalCount === 0) return null;
 
@@ -10,10 +13,10 @@ export default function DeletionAlert({ requests }) {
       <AlertTriangle className="w-5 h-5 text-[var(--color-danger-text)] dark:text-[var(--color-danger-dark-text)] flex-shrink-0 mt-0.5" />
       <div>
         <p className="text-sm font-medium text-[var(--color-danger-text)] dark:text-[var(--color-danger-dark-text)]">
-          {criticalCount} Critical Request(s) Need Immediate Attention
+          {t('deletion.alertCriticalTitle', '{count} Critical Request(s) Need Immediate Attention', { count: criticalCount })}
         </p>
         <p className="text-xs text-[var(--color-danger-text)] dark:text-[var(--color-danger-dark-text)] mt-0.5">
-          These requests require urgent action due to security or privacy concerns
+          {t('deletion.alertCriticalSubtext', 'These requests require urgent action due to security or privacy concerns')}
         </p>
       </div>
     </div>

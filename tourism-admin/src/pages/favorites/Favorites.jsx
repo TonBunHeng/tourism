@@ -206,10 +206,10 @@ export default function Favorites() {
         prev.map((f) =>
           f.id === favId
             ? {
-                ...f,
-                visited: !f.visited,
-                status: !f.visited ? "Visited" : "To Visit"
-              }
+              ...f,
+              visited: !f.visited,
+              status: !f.visited ? "Visited" : "To Visit"
+            }
             : f
         )
       );

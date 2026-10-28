@@ -1,8 +1,11 @@
 // src/pages/reports/ExportToast.jsx
 import { useEffect } from 'react';
 import { CheckCircle2, FileSpreadsheet, FileText, X } from 'lucide-react';
+import { useLanguage } from '../../i18n';
 
 export default function ExportToast({ toast, onClose }) {
+  const { t } = useLanguage();
+
   useEffect(() => {
     if (!toast) return;
     const timer = setTimeout(() => {
@@ -29,7 +32,9 @@ export default function ExportToast({ toast, onClose }) {
         <div className="flex items-center gap-1.5">
           <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
           <h4 className="text-sm font-bold text-gray-900 dark:text-zinc-100 truncate">
-            {isPDF ? 'PDF Exported Successfully' : 'Excel Exported Successfully'}
+            {isPDF 
+              ? t('reports.pdfExportedSuccessTitle', 'PDF Exported Successfully') 
+              : t('reports.excelExportedSuccessTitle', 'Excel Exported Successfully')}
           </h4>
         </div>
         <p className="text-xs text-gray-500 dark:text-zinc-400 mt-0.5 truncate font-mono">
@@ -40,7 +45,7 @@ export default function ExportToast({ toast, onClose }) {
       <button
         onClick={onClose}
         className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-zinc-200 rounded-md hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors shrink-0 cursor-pointer"
-        aria-label="Close notification"
+        aria-label={t('common.close', 'Close')}
       >
         <X size={16} />
       </button>

@@ -16,8 +16,10 @@ import {
 } from 'lucide-react';
 import { validateImageFile } from '../../utils/fileValidation';
 import uploadService from '../../services/uploadService';
+import { useLanguage } from '../../i18n';
 
 export default function GeneralTab({ settings, setSettings }) {
+  const { t } = useLanguage();
   const [logoPreview, setLogoPreview] = useState(settings.logoUrl || null);
   const [faviconPreview, setFaviconPreview] = useState(settings.faviconUrl || null);
   const [uploadingLogo, setUploadingLogo] = useState(false);
@@ -134,10 +136,10 @@ export default function GeneralTab({ settings, setSettings }) {
       {/* Section Header */}
       <div>
         <h2 className="text-lg font-bold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">
-          General Platform Settings
+          {t('settings.generalTitle', 'General Platform Settings')}
         </h2>
         <p className="text-sm text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mt-1">
-          Configure official platform identity, organization details, emergency contacts, localization, and branding assets.
+          {t('settings.generalSubtitle', 'Configure official platform identity, organization details, emergency contacts, localization, and branding assets.')}
         </p>
       </div>
 
@@ -145,45 +147,45 @@ export default function GeneralTab({ settings, setSettings }) {
       <div className="bg-[var(--color-white)] dark:bg-[var(--color-bg-dark)] rounded-md border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] p-5 shadow-xs space-y-4">
         <h3 className="text-sm font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] flex items-center gap-2 border-b border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] pb-3">
           <Globe className="w-4 h-4 text-[var(--color-primary)]" />
-          Platform Identity & Department
+          {t('settings.cardPlatformIdentity', 'Platform Identity & Department')}
         </h3>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1">
-              System Name <span className="text-[var(--color-danger-text)]">*</span>
+              {t('settings.labelSystemName', 'System Name')} <span className="text-[var(--color-danger-text)]">*</span>
             </label>
             <input
               type="text"
               value={settings.siteName || ''}
               onChange={(e) => handleChange('siteName', e.target.value)}
-              placeholder="e.g. AngkorVerses Administrative Portal"
+              placeholder={t('settings.placeholderSystemName', 'e.g. AngkorVerses Administrative Portal')}
               className="w-full px-3 py-2 text-sm rounded-md border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] bg-[var(--color-white)] dark:bg-[var(--color-bg-dark)] text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] focus:outline-none focus:ring-2 focus:ring-[var(--color-input)] transition-all"
             />
           </div>
 
           <div>
             <label className="block text-sm font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1">
-              Organization / Ministry <span className="text-[var(--color-danger-text)]">*</span>
+              {t('settings.labelOrganization', 'Organization / Ministry')} <span className="text-[var(--color-danger-text)]">*</span>
             </label>
             <input
               type="text"
               value={settings.organizationName || ''}
               onChange={(e) => handleChange('organizationName', e.target.value)}
-              placeholder="e.g. Ministry of Tourism & Culture Cambodia"
+              placeholder={t('settings.placeholderOrganization', 'e.g. Ministry of Tourism & Culture Cambodia')}
               className="w-full px-3 py-2 text-sm rounded-md border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] bg-[var(--color-white)] dark:bg-[var(--color-bg-dark)] text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] focus:outline-none focus:ring-2 focus:ring-[var(--color-input)] transition-all"
             />
           </div>
 
           <div className="md:col-span-2">
             <label className="block text-sm font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1">
-              Platform Overview & Description
+              {t('settings.labelPlatformDescription', 'Platform Overview & Description')}
             </label>
             <textarea
               rows={2}
               value={settings.siteDescription || ''}
               onChange={(e) => handleChange('siteDescription', e.target.value)}
-              placeholder="Describe the tourism portal's primary purpose and target tourist audience..."
+              placeholder={t('settings.placeholderPlatformDescription', "Describe the tourism portal's primary purpose and target tourist audience...")}
               className="w-full px-3 py-2 text-sm rounded-md border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] bg-[var(--color-white)] dark:bg-[var(--color-bg-dark)] text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] focus:outline-none focus:ring-2 focus:ring-[var(--color-input)] transition-all resize-none"
             />
           </div>
@@ -194,13 +196,13 @@ export default function GeneralTab({ settings, setSettings }) {
       <div className="bg-[var(--color-white)] dark:bg-[var(--color-bg-dark)] rounded-md border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] p-5 shadow-xs space-y-4">
         <h3 className="text-sm font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] flex items-center gap-2 border-b border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] pb-3">
           <Phone className="w-4 h-4 text-[var(--color-primary)]" />
-          Official Support & Tourist Emergency Hotlines
+          {t('settings.cardEmergencyHotlines', 'Official Support & Tourist Emergency Hotlines')}
         </h3>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1">
-              Official Support Email
+              {t('settings.labelSupportEmail', 'Official Support Email')}
             </label>
             <div className="relative">
               <Mail className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[var(--color-text-muted-light)] dark:text-[var(--color-text-secondary-dark)]" />
@@ -208,7 +210,7 @@ export default function GeneralTab({ settings, setSettings }) {
                 type="email"
                 value={settings.contactEmail || ''}
                 onChange={(e) => handleChange('contactEmail', e.target.value)}
-                placeholder="support@tourism.gov.kh"
+                placeholder={t('settings.placeholderSupportEmail', 'support@tourism.gov.kh')}
                 className="w-full pl-9 pr-3 py-2 text-sm rounded-md border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] bg-[var(--color-white)] dark:bg-[var(--color-bg-dark)] text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] focus:outline-none focus:ring-2 focus:ring-[var(--color-input)] transition-all"
               />
             </div>
@@ -216,7 +218,7 @@ export default function GeneralTab({ settings, setSettings }) {
 
           <div>
             <label className="block text-sm font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1">
-              Support Phone Hotline
+              {t('settings.labelSupportPhone', 'Support Phone Hotline')}
             </label>
             <div className="relative">
               <Phone className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[var(--color-text-muted-light)] dark:text-[var(--color-text-secondary-dark)]" />
@@ -224,7 +226,7 @@ export default function GeneralTab({ settings, setSettings }) {
                 type="text"
                 value={settings.contactPhone || ''}
                 onChange={(e) => handleChange('contactPhone', e.target.value)}
-                placeholder="+855 23 888 999"
+                placeholder={t('settings.placeholderSupportPhone', '+855 23 888 999')}
                 className="w-full pl-9 pr-3 py-2 text-sm rounded-md border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] bg-[var(--color-white)] dark:bg-[var(--color-bg-dark)] text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] focus:outline-none focus:ring-2 focus:ring-[var(--color-input)] transition-all"
               />
             </div>
@@ -232,7 +234,7 @@ export default function GeneralTab({ settings, setSettings }) {
 
           <div>
             <label className="block text-sm font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1">
-              National Police Hotline
+              {t('settings.labelPoliceHotline', 'National Police Hotline')}
             </label>
             <input
               type="text"
@@ -245,7 +247,7 @@ export default function GeneralTab({ settings, setSettings }) {
 
           <div>
             <label className="block text-sm font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1">
-              National Ambulance / Medical Emergency
+              {t('settings.labelAmbulanceHotline', 'National Ambulance / Medical Emergency')}
             </label>
             <input
               type="text"
@@ -258,7 +260,7 @@ export default function GeneralTab({ settings, setSettings }) {
 
           <div>
             <label className="block text-sm font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1">
-              Fire & Rescue Emergency Hotline
+              {t('settings.labelFireHotline', 'Fire & Rescue Emergency Hotline')}
             </label>
             <input
               type="text"
@@ -271,7 +273,7 @@ export default function GeneralTab({ settings, setSettings }) {
 
           <div>
             <label className="block text-sm font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1">
-              Tourist Police Emergency Number
+              {t('settings.labelTouristPoliceHotline', 'Tourist Police Emergency Number')}
             </label>
             <input
               type="text"
@@ -288,13 +290,13 @@ export default function GeneralTab({ settings, setSettings }) {
       <div className="bg-[var(--color-white)] dark:bg-[var(--color-bg-dark)] rounded-md border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] p-5 shadow-xs space-y-4">
         <h3 className="text-sm font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] flex items-center gap-2 border-b border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] pb-3">
           <Clock className="w-4 h-4 text-[var(--color-primary)]" />
-          Regional Localization & Currency
+          {t('settings.cardRegionalLocale', 'Regional Localization & Currency')}
         </h3>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <label className="block text-sm font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1">
-              Default System Language
+              {t('settings.labelDefaultLanguage', 'Default System Language')}
             </label>
             <select
               value={settings.defaultLanguage || 'km'}
@@ -308,7 +310,7 @@ export default function GeneralTab({ settings, setSettings }) {
 
           <div>
             <label className="block text-sm font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1">
-              Default Currency
+              {t('settings.labelDefaultCurrency', 'Default Currency')}
             </label>
             <select
               value={settings.defaultCurrency || 'USD'}
@@ -322,7 +324,7 @@ export default function GeneralTab({ settings, setSettings }) {
 
           <div>
             <label className="block text-sm font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1">
-              Timezone
+              {t('settings.labelTimezone', 'Timezone')}
             </label>
             <select
               value={settings.timezone || 'Asia/Phnom_Penh'}
@@ -340,13 +342,13 @@ export default function GeneralTab({ settings, setSettings }) {
       <div className="bg-[var(--color-white)] dark:bg-[var(--color-bg-dark)] rounded-md border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] p-5 shadow-xs space-y-4">
         <h3 className="text-sm font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] flex items-center gap-2 border-b border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] pb-3">
           <FileText className="w-4 h-4 text-[var(--color-primary)]" />
-          Public Legal & Compliance Links
+          {t('settings.cardLegalLinks', 'Public Legal & Compliance Links')}
         </h3>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1">
-              Terms of Service URL
+              {t('settings.labelTermsUrl', 'Terms of Service URL')}
             </label>
             <input
               type="url"
@@ -359,7 +361,7 @@ export default function GeneralTab({ settings, setSettings }) {
 
           <div>
             <label className="block text-sm font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1">
-              Privacy Policy URL
+              {t('settings.labelPrivacyUrl', 'Privacy Policy URL')}
             </label>
             <input
               type="url"
@@ -377,7 +379,7 @@ export default function GeneralTab({ settings, setSettings }) {
         <div className="flex items-center justify-between border-b border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] pb-3">
           <h3 className="text-sm font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] flex items-center gap-2">
             <AlertTriangle className="w-4 h-4 text-[var(--color-warning-text)] dark:text-[var(--color-warning-dark-text)]" />
-            System Maintenance Mode
+            {t('settings.cardMaintenanceMode', 'System Maintenance Mode')}
           </h3>
           <label className="relative inline-flex items-center cursor-pointer">
             <input
@@ -393,20 +395,20 @@ export default function GeneralTab({ settings, setSettings }) {
         {settings.maintenanceMode && (
           <div className="p-3 bg-[var(--color-warning-bg)] dark:bg-[var(--color-warning-dark-bg)] border border-[var(--color-warning-border)] dark:border-[var(--color-warning-dark-border)] rounded-md text-xs text-[var(--color-warning-text)] dark:text-[var(--color-warning-dark-text)] space-y-2 animate-in fade-in duration-150">
             <span className="font-bold flex items-center gap-1.5">
-              <ShieldAlert className="w-4 h-4" /> Active: Maintenance Mode Enabled
+              <ShieldAlert className="w-4 h-4" /> {t('settings.maintenanceActiveBadge', 'Active: Maintenance Mode Enabled')}
             </span>
             <p className="text-[11px] leading-relaxed">
-              Public mobile app visitors and web visitors will see a maintenance notice banner. Only logged-in administrators can access management functions.
+              {t('settings.maintenanceNoticeDesc', 'Public mobile app visitors and web visitors will see a maintenance notice banner. Only logged-in administrators can access management functions.')}
             </p>
             <div className="pt-1">
               <label className="block text-[11px] font-semibold mb-1 text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">
-                Public Maintenance Message Banner
+                {t('settings.labelMaintenanceBannerMsg', 'Public Maintenance Message Banner')}
               </label>
               <input
                 type="text"
                 value={settings.maintenanceMessage || ''}
                 onChange={(e) => handleChange('maintenanceMessage', e.target.value)}
-                placeholder="The system is undergoing scheduled maintenance. Please check back shortly."
+                placeholder={t('settings.placeholderMaintenanceMsg', 'The system is undergoing scheduled maintenance. Please check back shortly.')}
                 className="w-full px-3 py-1.5 text-xs rounded-md border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] bg-[var(--color-white)] dark:bg-[var(--color-bg-dark)] text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] focus:outline-none focus:ring-1 focus:ring-[var(--color-input)]"
               />
             </div>
@@ -418,7 +420,7 @@ export default function GeneralTab({ settings, setSettings }) {
       <div className="bg-[var(--color-white)] dark:bg-[var(--color-bg-dark)] rounded-md border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] p-5 shadow-xs space-y-4">
         <h3 className="text-sm font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] flex items-center gap-2 border-b border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] pb-3">
           <ImageIcon className="w-4 h-4 text-[var(--color-primary)]" />
-          Brand Assets (Logo & Favicon)
+          {t('settings.cardBrandingAssets', 'Brand Assets (Logo & Favicon)')}
         </h3>
 
         {uploadError && (
@@ -432,14 +434,14 @@ export default function GeneralTab({ settings, setSettings }) {
           {/* Logo Uploader */}
           <div className="space-y-2">
             <label className="block text-sm font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
-              Upload System Logo
+              {t('settings.labelUploadLogo', 'Upload System Logo')}
             </label>
 
             {uploadingLogo ? (
               <div className="border-2 border-dashed border-[#003E83] dark:border-blue-500 rounded-md p-6 flex flex-col items-center justify-center bg-blue-50/50 dark:bg-blue-950/30 text-[#003E83] dark:text-blue-400">
                 <RefreshCw className="w-6 h-6 animate-spin mb-1.5" />
-                <span className="text-xs font-semibold">Uploading system logo to server...</span>
-                <span className="text-[10px] text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mt-0.5">Please wait a moment</span>
+                <span className="text-xs font-semibold">{t('settings.uploadingLogoMsg', 'Uploading system logo to server...')}</span>
+                <span className="text-[10px] text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mt-0.5">{t('settings.pleaseWait', 'Please wait a moment')}</span>
               </div>
             ) : logoPreview ? (
               <div className="relative border-2 border-dashed border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] rounded-md p-4 bg-[var(--color-surface-hover-light)] dark:bg-[var(--color-surface-hover-dark)]/50 flex items-center justify-between">
@@ -452,7 +454,7 @@ export default function GeneralTab({ settings, setSettings }) {
                       {settings.logoFileName || 'logo.png'}
                     </span>
                     <span className="text-[10px] text-[var(--color-success-text)] dark:text-[var(--color-success-dark-text)] flex items-center gap-1 mt-0.5">
-                      <CheckCircle2 className="w-3 h-3" /> Ready to save
+                      <CheckCircle2 className="w-3 h-3" /> {t('settings.readyToSave', 'Ready to save')}
                     </span>
                   </div>
                 </div>
@@ -460,7 +462,7 @@ export default function GeneralTab({ settings, setSettings }) {
                   type="button"
                   onClick={removeLogo}
                   className="p-1.5 text-[var(--color-text-muted-light)] hover:text-[var(--color-danger-text)] dark:hover:text-[var(--color-danger-dark-text)] rounded-md transition-colors cursor-pointer"
-                  title="Remove Logo"
+                  title={t('settings.tooltipRemoveLogo', 'Remove Logo')}
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -468,8 +470,8 @@ export default function GeneralTab({ settings, setSettings }) {
             ) : (
               <label className="border-2 border-dashed border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] hover:border-[var(--color-primary)] rounded-md p-4 flex flex-col items-center justify-center cursor-pointer transition-all bg-[var(--color-surface-hover-light)] dark:bg-[var(--color-surface-hover-dark)]/30">
                 <Upload className="w-6 h-6 text-[var(--color-text-muted-light)] mb-1" />
-                <span className="text-xs font-medium text-[var(--color-primary)]">Click to upload logo</span>
-                <span className="text-[10px] text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mt-0.5">PNG, SVG, or JPG (max 2MB)</span>
+                <span className="text-xs font-medium text-[var(--color-primary)]">{t('settings.clickUploadLogo', 'Click to upload logo')}</span>
+                <span className="text-[10px] text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mt-0.5">{t('settings.logoFormatsHint', 'PNG, SVG, or JPG (max 2MB)')}</span>
                 <input type="file" accept="image/*" onChange={handleLogoUpload} className="hidden" />
               </label>
             )}
@@ -478,14 +480,14 @@ export default function GeneralTab({ settings, setSettings }) {
           {/* Favicon Uploader */}
           <div className="space-y-2">
             <label className="block text-sm font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
-              Upload Favicon
+              {t('settings.labelUploadFavicon', 'Upload Favicon')}
             </label>
 
             {uploadingFavicon ? (
               <div className="border-2 border-dashed border-[#003E83] dark:border-blue-500 rounded-md p-6 flex flex-col items-center justify-center bg-blue-50/50 dark:bg-blue-950/30 text-[#003E83] dark:text-blue-400">
                 <RefreshCw className="w-6 h-6 animate-spin mb-1.5" />
-                <span className="text-xs font-semibold">Uploading favicon to server...</span>
-                <span className="text-[10px] text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mt-0.5">Please wait a moment</span>
+                <span className="text-xs font-semibold">{t('settings.uploadingFaviconMsg', 'Uploading favicon to server...')}</span>
+                <span className="text-[10px] text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mt-0.5">{t('settings.pleaseWait', 'Please wait a moment')}</span>
               </div>
             ) : faviconPreview ? (
               <div className="relative border-2 border-dashed border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] rounded-md p-4 bg-[var(--color-surface-hover-light)] dark:bg-[var(--color-surface-hover-dark)]/50 flex items-center justify-between">
@@ -498,7 +500,7 @@ export default function GeneralTab({ settings, setSettings }) {
                       {settings.faviconFileName || 'favicon.ico'}
                     </span>
                     <span className="text-[10px] text-[var(--color-success-text)] dark:text-[var(--color-success-dark-text)] flex items-center gap-1 mt-0.5">
-                      <CheckCircle2 className="w-3 h-3" /> Ready to save
+                      <CheckCircle2 className="w-3 h-3" /> {t('settings.readyToSave', 'Ready to save')}
                     </span>
                   </div>
                 </div>
@@ -506,7 +508,7 @@ export default function GeneralTab({ settings, setSettings }) {
                   type="button"
                   onClick={removeFavicon}
                   className="p-1.5 text-[var(--color-text-muted-light)] hover:text-[var(--color-danger-text)] dark:hover:text-[var(--color-danger-dark-text)] rounded-md transition-colors cursor-pointer"
-                  title="Remove Favicon"
+                  title={t('settings.tooltipRemoveFavicon', 'Remove Favicon')}
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -514,8 +516,8 @@ export default function GeneralTab({ settings, setSettings }) {
             ) : (
               <label className="border-2 border-dashed border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] hover:border-[var(--color-primary)] rounded-md p-4 flex flex-col items-center justify-center cursor-pointer transition-all bg-[var(--color-surface-hover-light)] dark:bg-[var(--color-surface-hover-dark)]/30">
                 <Upload className="w-6 h-6 text-[var(--color-text-muted-light)] mb-1" />
-                <span className="text-xs font-medium text-[var(--color-primary)]">Click to upload favicon</span>
-                <span className="text-[10px] text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mt-0.5">ICO, PNG, or SVG (32x32px)</span>
+                <span className="text-xs font-medium text-[var(--color-primary)]">{t('settings.clickUploadFavicon', 'Click to upload favicon')}</span>
+                <span className="text-[10px] text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mt-0.5">{t('settings.faviconFormatsHint', 'ICO, PNG, or SVG (32x32px)')}</span>
                 <input type="file" accept="image/*,.ico" onChange={handleFaviconUpload} className="hidden" />
               </label>
             )}

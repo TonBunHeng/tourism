@@ -14,6 +14,7 @@ import {
   Ban,
   ShieldOff
 } from 'lucide-react';
+import { useLanguage } from '../../i18n';
 
 export default function SecurityDetailsModal({
   isOpen,
@@ -24,6 +25,8 @@ export default function SecurityDetailsModal({
   onBlockIp,
   onUnblockIp
 }) {
+  const { t } = useLanguage();
+
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === 'Escape' && isOpen) {
@@ -41,7 +44,7 @@ export default function SecurityDetailsModal({
     : (alert.data || {});
 
   const formattedDate = (() => {
-    if (!alert.created_at) return 'Recent';
+    if (!alert.created_at) return t('security.timeRecent', 'Recent');
     try {
       const d = new Date(alert.created_at);
       if (isNaN(d.getTime())) return String(alert.created_at);
@@ -77,21 +80,21 @@ export default function SecurityDetailsModal({
             <div className="min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
                 <span className="text-[11px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md border bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20">
-                  {alert.type || 'Failed Login Alert'}
+                  {alert.type || t('security.badgeFailedLoginAlert', 'Failed Login Alert')}
                 </span>
                 {isHighRisk && (
                   <span className="text-[11px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md border bg-rose-500/15 text-rose-700 dark:text-rose-300 border-rose-500/30">
-                    High Risk Threshold
+                    {t('security.badgeHighRiskThreshold', 'High Risk Threshold')}
                   </span>
                 )}
                 {isBlocked && (
                   <span className="text-[11px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md border bg-red-600 text-white border-red-700">
-                    IP Blocked
+                    {t('security.badgeIpBlocked', 'IP Blocked')}
                   </span>
                 )}
               </div>
               <h2 className="text-base font-bold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] truncate mt-1">
-                Security Incident #{alert.id}
+                {t('security.modalHeaderTitle', 'Security Incident #{id}', { id: alert.id })}
               </h2>
             </div>
           </div>
@@ -100,7 +103,7 @@ export default function SecurityDetailsModal({
             type="button"
             onClick={onClose}
             className="p-1.5 rounded-md text-slate-400 hover:text-slate-600 dark:hover:text-zinc-200 hover:bg-slate-200/60 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
-            title="Close modal"
+            title={t('security.btnClose', 'Close')}
           >
             <X className="w-5 h-5" />
           </button>
@@ -120,7 +123,7 @@ export default function SecurityDetailsModal({
               </span>
               <span className="w-1 h-1 rounded-md bg-slate-300 dark:bg-zinc-700" />
               <span className={`font-semibold ${alert.is_read ? 'text-slate-500 dark:text-zinc-400' : 'text-blue-600 dark:text-blue-400'}`}>
-                {alert.is_read ? 'Acknowledged (Read)' : 'Unread Incident'}
+                {alert.is_read ? t('security.statusAcknowledgedRead', 'Acknowledged (Read)') : t('security.statusUnreadIncident', 'Unread Incident')}
               </span>
             </div>
           </div>
@@ -130,15 +133,15 @@ export default function SecurityDetailsModal({
             <div className="flex items-center justify-between gap-2 text-red-600 dark:text-red-400 font-semibold text-xs uppercase tracking-wider">
               <span className="flex items-center gap-2">
                 <AlertOctagon className="w-4 h-4" />
-                Authentication Attack Parameters
+                {t('security.sectionAttackParams', 'Authentication Attack Parameters')}
               </span>
               {isBlocked ? (
                 <span className="text-[10px] text-red-600 dark:text-red-400 bg-red-100 dark:bg-red-950/80 px-2 py-0.5 rounded-md font-bold">
-                  IP BLOCKED BY ADMIN
+                  {t('security.labelIpBlockedByAdmin', 'IP BLOCKED BY ADMIN')}
                 </span>
               ) : (
                 <span className="text-[10px] text-slate-500 dark:text-zinc-400 font-medium">
-                  IP Not Blocked
+                  {t('security.labelIpNotBlocked', 'IP Not Blocked')}
                 </span>
               )}
             </div>
@@ -147,7 +150,9 @@ export default function SecurityDetailsModal({
               <div className="p-3 rounded-md bg-white/90 dark:bg-zinc-900/90 border border-slate-200/70 dark:border-zinc-800 flex items-center gap-3">
                 <Mail className="w-5 h-5 text-slate-400 shrink-0" />
                 <div className="min-w-0">
-                  <p className="text-[10px] text-slate-400 uppercase font-semibold">Target Account</p>
+                  <p className="text-[10px] text-slate-400 uppercase font-semibold">
+                    {t('security.labelTargetAccount', 'Target Account')}
+                  </p>
                   <p className="font-bold text-slate-900 dark:text-zinc-100 truncate mt-0.5">{alert.email}</p>
                 </div>
               </div>
@@ -155,7 +160,9 @@ export default function SecurityDetailsModal({
               <div className="p-3 rounded-md bg-white/90 dark:bg-zinc-900/90 border border-slate-200/70 dark:border-zinc-800 flex items-center gap-3">
                 <Globe className="w-5 h-5 text-slate-400 shrink-0" />
                 <div className="min-w-0">
-                  <p className="text-[10px] text-slate-400 uppercase font-semibold">Source IP Address</p>
+                  <p className="text-[10px] text-slate-400 uppercase font-semibold">
+                    {t('security.labelSourceIp', 'Source IP Address')}
+                  </p>
                   <p className="font-bold text-slate-900 dark:text-zinc-100 mt-0.5 font-mono">{alert.ip_address || '127.0.0.1'}</p>
                 </div>
               </div>
@@ -163,17 +170,23 @@ export default function SecurityDetailsModal({
               <div className="p-3 rounded-md bg-white/90 dark:bg-zinc-900/90 border border-slate-200/70 dark:border-zinc-800 flex items-center gap-3">
                 <ShieldAlert className="w-5 h-5 text-red-500 shrink-0" />
                 <div className="min-w-0">
-                  <p className="text-[10px] text-slate-400 uppercase font-semibold">Consecutive Failures</p>
-                  <p className="font-extrabold text-red-600 dark:text-red-400 mt-0.5 text-sm">{alert.attempts} Failed Attempts</p>
+                  <p className="text-[10px] text-slate-400 uppercase font-semibold">
+                    {t('security.labelConsecutiveFailures', 'Consecutive Failures')}
+                  </p>
+                  <p className="font-extrabold text-red-600 dark:text-red-400 mt-0.5 text-sm">
+                    {t('security.failedAttemptsCount', '{count} Failed Attempts', { count: alert.attempts })}
+                  </p>
                 </div>
               </div>
 
               <div className="p-3 rounded-md bg-white/90 dark:bg-zinc-900/90 border border-slate-200/70 dark:border-zinc-800 flex items-center gap-3">
                 <Lock className="w-5 h-5 text-indigo-500 shrink-0" />
                 <div className="min-w-0">
-                  <p className="text-[10px] text-slate-400 uppercase font-semibold">Defense Status</p>
+                  <p className="text-[10px] text-slate-400 uppercase font-semibold">
+                    {t('security.labelDefenseStatus', 'Defense Status')}
+                  </p>
                   <p className="font-bold text-slate-900 dark:text-zinc-100 mt-0.5">
-                    {isBlocked ? 'IP Blacklisted (Access Rejected)' : 'Throttled (Rate Limited)'}
+                    {isBlocked ? t('security.defenseBlacklisted', 'IP Blacklisted (Access Rejected)') : t('security.defenseThrottled', 'Throttled (Rate Limited)')}
                   </p>
                 </div>
               </div>
@@ -182,7 +195,9 @@ export default function SecurityDetailsModal({
                 <div className="p-3 rounded-md bg-white/90 dark:bg-zinc-900/90 border border-slate-200/70 dark:border-zinc-800 flex items-start gap-3 sm:col-span-2">
                   <Laptop className="w-5 h-5 text-slate-400 shrink-0 mt-0.5" />
                   <div className="min-w-0">
-                    <p className="text-[10px] text-slate-400 uppercase font-semibold">Attacker User Agent</p>
+                    <p className="text-[10px] text-slate-400 uppercase font-semibold">
+                      {t('security.labelAttackerUserAgent', 'Attacker User Agent')}
+                    </p>
                     <p className="font-medium text-slate-700 dark:text-zinc-300 text-xs mt-0.5 break-all">
                       {data.user_agent || alert.user_agent}
                     </p>
@@ -196,10 +211,10 @@ export default function SecurityDetailsModal({
           <div className="p-4 rounded-md bg-slate-50 dark:bg-zinc-800/40 border border-slate-200 dark:border-zinc-800 space-y-2 text-xs">
             <h4 className="font-semibold text-slate-700 dark:text-zinc-300 uppercase tracking-wider flex items-center gap-1.5">
               <ShieldCheck className="w-4 h-4 text-blue-500" />
-              IP Access Protection
+              {t('security.labelIpAccessProtection', 'IP Access Protection')}
             </h4>
             <p className="text-slate-600 dark:text-zinc-400 leading-relaxed">
-              When an IP is blocked, any client attempting to access or log in from this IP address will be instantly denied with a 403 Forbidden notice.
+              {t('security.defenseExplanation', 'When an IP is blocked, any client attempting to access or log in from this IP address will be instantly denied with a 403 Forbidden notice.')}
             </p>
           </div>
         </div>
@@ -213,7 +228,7 @@ export default function SecurityDetailsModal({
               className="py-2 px-3 rounded-md border border-red-200 dark:border-red-900/40 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 text-xs font-medium flex items-center gap-1.5 transition-colors cursor-pointer"
             >
               <Trash2 className="w-4 h-4" />
-              Delete
+              {t('security.tooltipDelete', 'Delete')}
             </button>
 
             {/* Block / Unblock IP Button */}
@@ -222,20 +237,20 @@ export default function SecurityDetailsModal({
                 type="button"
                 onClick={() => onUnblockIp(alert.ip_address)}
                 className="py-2 px-3.5 rounded-md border border-emerald-300 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 text-xs font-medium flex items-center gap-1.5 transition-colors cursor-pointer"
-                title="Unblock this IP address"
+                title={t('security.titleUnblockIp', 'Unblock this IP address')}
               >
                 <ShieldOff className="w-4 h-4" />
-                Unblock IP
+                {t('security.btnUnblockIp', 'Unblock IP')}
               </button>
             ) : (
               <button
                 type="button"
                 onClick={() => onBlockIp(alert.ip_address)}
                 className="py-2 px-3.5 rounded-md bg-red-600 hover:bg-red-700 text-white text-xs font-medium flex items-center gap-1.5 transition-colors cursor-pointer"
-                title="Block this IP address immediately"
+                title={t('security.titleBlockIp', 'Block this IP address immediately')}
               >
                 <Ban className="w-4 h-4" />
-                Block IP
+                {t('security.btnBlockIp', 'Block IP')}
               </button>
             )}
           </div>
@@ -248,7 +263,7 @@ export default function SecurityDetailsModal({
                 className="py-2 px-3.5 rounded-md border border-slate-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-slate-700 dark:text-zinc-200 hover:bg-slate-50 dark:hover:bg-zinc-700 text-xs font-medium flex items-center gap-1.5 transition-colors cursor-pointer"
               >
                 <Check className="w-4 h-4 text-blue-500" />
-                Acknowledge
+                {t('security.btnAcknowledge', 'Acknowledge')}
               </button>
             )}
 
@@ -257,7 +272,7 @@ export default function SecurityDetailsModal({
               onClick={onClose}
               className="py-2 px-4 rounded-md bg-slate-200 dark:bg-zinc-800 hover:bg-slate-300 dark:hover:bg-zinc-700 text-slate-800 dark:text-zinc-200 text-xs font-medium transition-colors cursor-pointer"
             >
-              Close
+              {t('security.btnClose', 'Close')}
             </button>
           </div>
         </div>

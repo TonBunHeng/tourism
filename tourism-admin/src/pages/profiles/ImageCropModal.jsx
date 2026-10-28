@@ -1,7 +1,9 @@
 import { useState, useRef, useEffect } from 'react';
 import { X, ZoomIn, ZoomOut, RotateCw, Check } from 'lucide-react';
+import { useLanguage } from '../../i18n';
 
 export default function ImageCropModal({ isOpen, imageSrc, onClose, onCropComplete }) {
+  const { t } = useLanguage();
   const [zoom, setZoom] = useState(1);
   const [rotation, setRotation] = useState(0);
   const [position, setPosition] = useState({ x: 0, y: 0 });
@@ -90,8 +92,14 @@ export default function ImageCropModal({ isOpen, imageSrc, onClose, onCropComple
       <div className="bg-[var(--color-white)] dark:bg-[var(--color-bg-dark-modal)] text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] rounded-md max-w-md w-full shadow-lg border border-gray-200 dark:border-zinc-800 overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-zinc-800">
-          <h3 className="text-base font-bold text-gray-900 dark:text-zinc-100">Crop & Position Profile Picture</h3>
-          <button onClick={onClose} className="p-1 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-md transition-colors cursor-pointer">
+          <h3 className="text-base font-bold text-gray-900 dark:text-zinc-100">
+            {t('profile.cropModalTitle', 'Crop & Position Profile Picture')}
+          </h3>
+          <button 
+            onClick={onClose} 
+            className="p-1 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-md transition-colors cursor-pointer"
+            aria-label={t('common.close', 'Close')}
+          >
             <X className="w-5 h-5 text-gray-400" />
           </button>
         </div>
@@ -99,7 +107,7 @@ export default function ImageCropModal({ isOpen, imageSrc, onClose, onCropComple
         {/* Crop Viewport Box */}
         <div className="p-6 flex flex-col items-center">
           <p className="text-xs text-gray-500 dark:text-zinc-400 mb-4 text-center">
-            Drag image to reposition • Scroll or use slider to zoom
+            {t('profile.cropInstruction', 'Drag image to reposition • Scroll or use slider to zoom')}
           </p>
 
           <div
@@ -155,14 +163,14 @@ export default function ImageCropModal({ isOpen, imageSrc, onClose, onCropComple
                 className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
               >
                 <RotateCw className="w-3.5 h-3.5" />
-                Rotate 90°
+                {t('profile.rotate90', 'Rotate 90°')}
               </button>
               <button
                 type="button"
                 onClick={() => { setZoom(1); setPosition({ x: 0, y: 0 }); setRotation(0); }}
                 className="text-xs text-[var(--color-primary)] hover:underline font-medium cursor-pointer"
               >
-                Reset Position
+                {t('profile.resetPosition', 'Reset Position')}
               </button>
             </div>
           </div>
@@ -175,7 +183,7 @@ export default function ImageCropModal({ isOpen, imageSrc, onClose, onCropComple
             onClick={onClose}
             className="flex-1 py-2.5 px-4 rounded-md border border-gray-300 dark:border-zinc-700 text-xs font-medium text-gray-700 dark:text-zinc-300 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors text-center cursor-pointer"
           >
-            Cancel
+            {t('common.cancel', 'Cancel')}
           </button>
           <button
             type="button"
@@ -183,7 +191,7 @@ export default function ImageCropModal({ isOpen, imageSrc, onClose, onCropComple
             className="flex-1 py-2.5 px-4 rounded-md bg-[#003E83] hover:bg-[#002e62] text-white text-xs font-medium transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
           >
             <Check className="w-4 h-4" />
-            Save Picture
+            {t('profile.btnSavePicture', 'Save Picture')}
           </button>
         </div>
       </div>

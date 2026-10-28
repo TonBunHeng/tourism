@@ -1,7 +1,10 @@
 import React from 'react';
 import { ShieldCheck, Edit3, Building2, Activity } from 'lucide-react';
+import { useLanguage } from '../../i18n';
 
 export default function TrackingStats({ meta = {}, stats = {} }) {
+  const { t } = useLanguage();
+
   const total = meta?.total_logs ?? stats?.total_actions ?? 0;
   const adminCount = meta?.admin_actions ?? stats?.roles_breakdown?.admin ?? 0;
   const editorCount = meta?.guide_editor_actions ?? stats?.roles_breakdown?.guide_editor ?? 0;
@@ -9,33 +12,33 @@ export default function TrackingStats({ meta = {}, stats = {} }) {
 
   const statCards = [
     {
-      label: 'Total Operations',
+      label: t('tracking.statTotalOperations', 'Total Operations'),
       value: Number(total).toLocaleString(),
-      subtext: 'Tracked staff & business actions',
+      subtext: t('tracking.subtextTotalOperations', 'Tracked staff & business actions'),
       icon: Activity,
       color: 'text-[var(--color-info-text)] dark:text-[var(--color-info-dark-text)]',
       bg: 'bg-[var(--color-info-bg)] dark:bg-[var(--color-info-dark-bg)]',
     },
     {
-      label: 'Admin Staff',
+      label: t('tracking.statAdminStaff', 'Admin Staff'),
       value: Number(adminCount).toLocaleString(),
-      subtext: 'Approvals, item edits & removals',
+      subtext: t('tracking.subtextAdminStaff', 'Approvals, item edits & removals'),
       icon: ShieldCheck,
       color: 'text-[var(--color-purple-text)] dark:text-[var(--color-purple-dark-text)]',
       bg: 'bg-[var(--color-purple-bg)] dark:bg-[var(--color-purple-dark-bg)]',
     },
     {
-      label: 'Content Editors',
+      label: t('tracking.statContentEditors', 'Content Editors'),
       value: Number(editorCount).toLocaleString(),
-      subtext: 'Places, events & media modified',
+      subtext: t('tracking.subtextContentEditors', 'Places, events & media modified'),
       icon: Edit3,
       color: 'text-[var(--color-success-text)] dark:text-[var(--color-success-dark-text)]',
       bg: 'bg-[var(--color-success-bg)] dark:bg-[var(--color-success-dark-bg)]',
     },
     {
-      label: 'Business Owners',
+      label: t('tracking.statBusinessOwners', 'Business Owners'),
       value: Number(ownerCount).toLocaleString(),
-      subtext: 'Profile edits & booking status',
+      subtext: t('tracking.subtextBusinessOwners', 'Profile edits & booking status'),
       icon: Building2,
       color: 'text-[var(--color-warning-text)] dark:text-[var(--color-warning-dark-text)]',
       bg: 'bg-[var(--color-warning-bg)] dark:bg-[var(--color-warning-dark-bg)]',

@@ -12,28 +12,28 @@ import TrackingToolbar from './TrackingToolbar';
 import TrackingList from './TrackingList';
 import TrackingDetailsModal from './TrackingDetailsModal';
 import SimplePagination from '../../components/common/SimplePagination';
+import { useLanguage } from '../../i18n';
 
 export default function UsersTracking() {
+  const { t } = useLanguage();
   const { showConfirm, showSuccess, showError } = useAlert();
   const { searchTerm } = useSearch();
   const currentUser = authService.getCurrentUser();
   const isSuperAdmin = isSuperAdminRole(currentUser?.role);
 
-  const cachedData = getPageCache('user_tracking_data');
-
   // Data states
-  const [logs, setLogs] = useState(() => cachedData?.logs || []);
-  const [meta, setMeta] = useState(() => cachedData?.meta || {});
-  const [stats, setStats] = useState(() => cachedData?.stats || {});
-  const [loading, setLoading] = useState(() => !cachedData);
+  const [logs, setLogs] = useState(() => getPageCache('user_tracking_data')?.logs || []);
+  const [meta, setMeta] = useState(() => getPageCache('user_tracking_data')?.meta || {});
+  const [stats, setStats] = useState(() => getPageCache('user_tracking_data')?.stats || {});
+  const [loading, setLoading] = useState(() => !getPageCache('user_tracking_data'));
 
   // Filters & Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const [roleFilter, setRoleFilter] = useState('all');
   const [actionFilter, setActionFilter] = useState('all');
   const [periodFilter, setPeriodFilter] = useState('all');
-  const [totalRecords, setTotalRecords] = useState(() => cachedData?.totalRecords || 0);
-  const [totalPages, setTotalPages] = useState(() => cachedData?.totalPages || 1);
+  const [totalRecords, setTotalRecords] = useState(() => getPageCache('user_tracking_data')?.totalRecords || 0);
+  const [totalPages, setTotalPages] = useState(() => getPageCache('user_tracking_data')?.totalPages || 1);
   const itemsPerPage = 10;
 
   // Modals
@@ -65,21 +65,22 @@ export default function UsersTracking() {
         setTotalRecords(total);
         setTotalPages(pages);
 
+        const currentCache = getPageCache('user_tracking_data') || {};
         setPageCache('user_tracking_data', {
+          ...currentCache,
           logs: list,
           meta: resMeta,
-          stats,
           totalRecords: total,
           totalPages: pages,
         });
       }
     } catch (err) {
       console.error('Failed to load tracking logs:', err);
-      showError(err.message || 'Failed to fetch user tracking records', 'Data Error');
+      showError(err.message || t('tracking.loadingRecords', 'Failed to fetch user tracking records'), 'Data Error');
     } finally {
       setLoading(false);
     }
-  }, [currentPage, roleFilter, actionFilter, periodFilter, searchTerm, showError, stats, itemsPerPage]);
+  }, [currentPage, roleFilter, actionFilter, periodFilter, searchTerm]);
 
   // Fetch stats for cards
   const fetchStats = useCallback(async () => {
@@ -87,6 +88,11 @@ export default function UsersTracking() {
       const res = await userTrackingService.getStatistics();
       if (res && res.data) {
         setStats(res.data);
+        const currentCache = getPageCache('user_tracking_data') || {};
+        setPageCache('user_tracking_data', {
+          ...currentCache,
+          stats: res.data,
+        });
       }
     } catch (err) {
       console.warn('Could not load tracking statistics:', err);
@@ -130,9 +136,13 @@ export default function UsersTracking() {
   // Super Admin: Delete single log
   const handleDeleteLog = async (log) => {
     const confirmed = await showConfirm({
-      title: 'Delete Activity Record',
-      message: `Are you sure you want to permanently delete activity record #${log.id} (${log.action})?\n\nThis action cannot be undone.`,
-      confirmText: 'Delete Record',
+      title: t('tracking.deleteConfirmTitle', 'Delete Activity Record'),
+      message: t(
+        'tracking.deleteConfirmMsg',
+        'Are you sure you want to permanently delete activity record #{id} ({action})?\n\nThis action cannot be undone.',
+        { id: log.id, action: log.action }
+      ),
+      confirmText: t('tracking.deleteConfirmBtn', 'Delete Record'),
       type: 'danger',
     });
 
@@ -140,11 +150,11 @@ export default function UsersTracking() {
 
     try {
       await userTrackingService.deleteLog(log.id);
-      showSuccess('Activity record permanently deleted.', 'Record Deleted');
+      showSuccess(t('tracking.deleteSuccess', 'Activity record permanently deleted.'), t('tracking.deleteSuccessTitle', 'Record Deleted'));
       fetchLogs(false);
       fetchStats();
     } catch (err) {
-      showError(err.message || 'Failed to delete record.', 'Delete Error');
+      showError(err.message || t('tracking.deleteFailed', 'Failed to delete record.'), t('tracking.deleteFailed', 'Failed to delete record.'));
     }
   };
 
@@ -152,15 +162,19 @@ export default function UsersTracking() {
   const handleExportPDF = async () => {
     const recordCount = totalRecords || logs.length;
     if (recordCount === 0) {
-      showError('No records found to export.', 'Export Failed');
+      showError(t('tracking.noRecordsToExport', 'No records found to export.'), t('tracking.exportFailedTitle', 'Export Failed'));
       return;
     }
 
     const confirmed = await showConfirm({
-      title: 'Export PDF Report Confirmation',
-      message: `Are you sure you want to export the "Users Tracking" dataset (${recordCount} items) as a styled PDF document?`,
-      confirmText: 'Export PDF',
-      cancelText: 'Cancel',
+      title: t('tracking.exportPdfConfirmTitle', 'Export PDF Report Confirmation'),
+      message: t(
+        'tracking.exportPdfConfirmMsg',
+        'Are you sure you want to export the "Users Tracking" dataset ({count} items) as a styled PDF document?',
+        { count: recordCount }
+      ),
+      confirmText: t('tracking.exportPdfConfirmBtn', 'Export PDF'),
+      cancelText: t('tracking.btnCancel', 'Cancel'),
       type: 'danger',
       customIcon: (
         <div className="w-16 h-16 rounded-md bg-red-50 dark:bg-red-950/50 text-red-600 dark:text-red-400 ring-8 ring-red-50/70 dark:ring-red-950/30 flex items-center justify-center shadow-xs">
@@ -182,7 +196,7 @@ export default function UsersTracking() {
       const items = res?.data || [];
 
       if (items.length === 0) {
-        showError('No records found to export.', 'Export Failed');
+        showError(t('tracking.noRecordsToExport', 'No records found to export.'), t('tracking.exportFailedTitle', 'Export Failed'));
         return;
       }
 
@@ -200,8 +214,12 @@ export default function UsersTracking() {
 
       const todayStr = new Date().toISOString().slice(0, 10);
       const result = exportToPDF({
-        title: 'Users Tracking & Activity History Report',
-        subtitle: `User CRUD operations and action history across all platform roles (${items.length} records).`,
+        title: t('tracking.exportPdfDocTitle', 'Users Tracking & Activity History Report'),
+        subtitle: t(
+          'tracking.exportPdfDocSubtitle',
+          'User CRUD operations and action history across all platform roles ({count} records).',
+          { count: items.length }
+        ),
         headers,
         rows,
         filename: `Users_Tracking_Report_${todayStr}.pdf`,
@@ -218,13 +236,16 @@ export default function UsersTracking() {
       });
 
       if (result.success) {
-        showSuccess(`The "Users Tracking" dataset (${items.length} items) has been exported to PDF successfully.`, 'PDF Exported Successfully');
+        showSuccess(
+          t('tracking.exportPdfSuccess', 'The "Users Tracking" dataset ({count} items) has been exported to PDF successfully.', { count: items.length }),
+          t('tracking.exportPdfSuccessTitle', 'PDF Exported Successfully')
+        );
       } else {
-        showError(result.error || 'Failed to generate PDF report document.', 'Export Failed');
+        showError(result.error || t('tracking.exportPdfFailed', 'Failed to generate PDF report document.'), t('tracking.exportFailedTitle', 'Export Failed'));
       }
     } catch (err) {
       console.error('PDF Export Error:', err);
-      showError(err.message || 'An unexpected error occurred during PDF export.', 'Export Failed');
+      showError(err.message || t('tracking.exportPdfFailed', 'An unexpected error occurred during PDF export.'), t('tracking.exportFailedTitle', 'Export Failed'));
     }
   };
 
@@ -232,15 +253,19 @@ export default function UsersTracking() {
   const handleExportExcel = async () => {
     const recordCount = totalRecords || logs.length;
     if (recordCount === 0) {
-      showError('No records found to export.', 'Export Failed');
+      showError(t('tracking.noRecordsToExport', 'No records found to export.'), t('tracking.exportFailedTitle', 'Export Failed'));
       return;
     }
 
     const confirmed = await showConfirm({
-      title: 'Export Excel Spreadsheet Confirmation',
-      message: `Are you sure you want to export the "Users Tracking" dataset (${recordCount} items) as an Excel spreadsheet?`,
-      confirmText: 'Export Excel',
-      cancelText: 'Cancel',
+      title: t('tracking.exportExcelConfirmTitle', 'Export Excel Spreadsheet Confirmation'),
+      message: t(
+        'tracking.exportExcelConfirmMsg',
+        'Are you sure you want to export the "Users Tracking" dataset ({count} items) as an Excel spreadsheet?',
+        { count: recordCount }
+      ),
+      confirmText: t('tracking.exportExcelConfirmBtn', 'Export Excel'),
+      cancelText: t('tracking.btnCancel', 'Cancel'),
       type: 'success',
       customIcon: (
         <div className="w-16 h-16 rounded-md bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 ring-8 ring-emerald-50/70 dark:ring-emerald-950/30 flex items-center justify-center shadow-xs">
@@ -262,25 +287,28 @@ export default function UsersTracking() {
       const items = res?.data || [];
 
       if (items.length === 0) {
-        showError('No records found to export.', 'Export Failed');
+        showError(t('tracking.noRecordsToExport', 'No records found to export.'), t('tracking.exportFailedTitle', 'Export Failed'));
         return;
       }
 
       const todayStr = new Date().toISOString().slice(0, 10);
       const result = exportToExcel({
         data: items,
-        sheetName: 'Users Tracking',
+        sheetName: t('tracking.exportExcelSheetName', 'Users Tracking'),
         filename: `Users_Tracking_Report_${todayStr}.xlsx`
       });
 
       if (result.success) {
-        showSuccess(`The "Users Tracking" dataset (${items.length} items) has been exported to Excel successfully.`, 'Excel Exported Successfully');
+        showSuccess(
+          t('tracking.exportExcelSuccess', 'The "Users Tracking" dataset ({count} items) has been exported to Excel successfully.', { count: items.length }),
+          t('tracking.exportExcelSuccessTitle', 'Excel Exported Successfully')
+        );
       } else {
-        showError(result.error || 'Failed to generate Excel spreadsheet.', 'Export Failed');
+        showError(result.error || t('tracking.exportExcelFailed', 'Failed to generate Excel spreadsheet.'), t('tracking.exportFailedTitle', 'Export Failed'));
       }
     } catch (err) {
       console.error('Excel Export Error:', err);
-      showError(err.message || 'An unexpected error occurred during Excel export.', 'Export Failed');
+      showError(err.message || t('tracking.exportExcelFailed', 'An unexpected error occurred during Excel export.'), t('tracking.exportFailedTitle', 'Export Failed'));
     }
   };
 
@@ -316,7 +344,9 @@ export default function UsersTracking() {
           <div className="flex items-center justify-center py-20">
             <div className="flex flex-col items-center gap-3">
               <Loader2 className="w-8 h-8 text-[#003E83] dark:text-blue-500 animate-spin" />
-              <p className="text-xs font-medium text-gray-500 dark:text-zinc-400">Loading user activity records...</p>
+              <p className="text-xs font-medium text-gray-500 dark:text-zinc-400">
+                {t('tracking.loadingRecords', 'Loading user activity records...')}
+              </p>
             </div>
           </div>
         ) : (
@@ -338,7 +368,7 @@ export default function UsersTracking() {
           startIndex={startIndex}
           endIndex={endIndex}
           totalRecords={totalRecords}
-          label="activities"
+          label={t('tracking.paginationLabel', 'activities')}
         />
       </div>
 

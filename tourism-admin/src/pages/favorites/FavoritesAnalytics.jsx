@@ -507,22 +507,22 @@ export default function FavoritesAnalytics({ favorites: initialFavorites = [] })
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={monthlyData} margin={{ top: 10, right: 10, left: -15, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" opacity={0.15} />
-                  <XAxis 
-                    dataKey="month" 
-                    stroke="#9CA3AF" 
-                    fontSize={11} 
+                  <XAxis
+                    dataKey="month"
+                    stroke="#9CA3AF"
+                    fontSize={11}
                     tick={{ fontSize: 11, fill: '#9CA3AF' }}
                     tickLine={false}
                     axisLine={{ stroke: '#E5E7EB' }}
                   />
-                  <YAxis 
-                    stroke="#9CA3AF" 
-                    fontSize={11} 
+                  <YAxis
+                    stroke="#9CA3AF"
+                    fontSize={11}
                     tick={{ fontSize: 11, fill: '#9CA3AF' }}
                     tickLine={false}
                     axisLine={{ stroke: '#E5E7EB' }}
                     domain={[0, (dataMax) => (Number.isFinite(dataMax) && dataMax > 5 ? Math.ceil(dataMax * 1.1) : 5)]}
-                    allowDecimals={false} 
+                    allowDecimals={false}
                     width={32}
                   />
                   <Tooltip
@@ -601,22 +601,20 @@ export default function FavoritesAnalytics({ favorites: initialFavorites = [] })
                 <button
                   type="button"
                   onClick={() => setFavoritesChartTab('category')}
-                  className={`px-2.5 py-1 text-xs font-semibold rounded-sm transition-all cursor-pointer ${
-                    favoritesChartTab === 'category'
-                      ? 'bg-[var(--color-white)] dark:bg-zinc-900 text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] shadow-xs'
-                      : 'text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] hover:text-gray-900 dark:hover:text-white'
-                  }`}
+                  className={`px-2.5 py-1 text-xs font-semibold rounded-sm transition-all cursor-pointer ${favoritesChartTab === 'category'
+                    ? 'bg-[var(--color-white)] dark:bg-zinc-900 text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] shadow-xs'
+                    : 'text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] hover:text-gray-900 dark:hover:text-white'
+                    }`}
                 >
                   {t('favorites.tabByCategory')}
                 </button>
                 <button
                   type="button"
                   onClick={() => setFavoritesChartTab('journey')}
-                  className={`px-2.5 py-1 text-xs font-semibold rounded-sm transition-all cursor-pointer ${
-                    favoritesChartTab === 'journey'
-                      ? 'bg-[var(--color-white)] dark:bg-zinc-900 text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] shadow-xs'
-                      : 'text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] hover:text-gray-900 dark:hover:text-white'
-                  }`}
+                  className={`px-2.5 py-1 text-xs font-semibold rounded-sm transition-all cursor-pointer ${favoritesChartTab === 'journey'
+                    ? 'bg-[var(--color-white)] dark:bg-zinc-900 text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] shadow-xs'
+                    : 'text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] hover:text-gray-900 dark:hover:text-white'
+                    }`}
                 >
                   {t('favorites.tabByStatus')}
                 </button>
@@ -649,19 +647,19 @@ export default function FavoritesAnalytics({ favorites: initialFavorites = [] })
                           data={
                             favoritesChartTab === 'category'
                               ? (categoryData.length > 0 ? categoryData : [{ name: 'No Category', count: 1, percentage: 0, fillColor: '#9CA3AF' }]).map(c => ({
-                                  name: c.name,
-                                  fullName: c.name,
-                                  count: Number(c.count) || 0,
-                                  percentage: c.percentage || 0,
-                                  fill: c.fillColor || '#003E83'
-                                }))
+                                name: c.name,
+                                fullName: c.name,
+                                count: Number(c.count) || 0,
+                                percentage: c.percentage || 0,
+                                fill: c.fillColor || '#003E83'
+                              }))
                               : journeyData.map(j => ({
-                                  name: j.name,
-                                  fullName: j.name,
-                                  count: Number(j.value) || 0,
-                                  percentage: j.percentage || 0,
-                                  fill: j.color || '#10B981'
-                                }))
+                                name: j.name,
+                                fullName: j.name,
+                                count: Number(j.value) || 0,
+                                percentage: j.percentage || 0,
+                                fill: j.color || '#10B981'
+                              }))
                           }
                           dataKey="count"
                           nameKey="fullName"

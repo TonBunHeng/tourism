@@ -6,9 +6,9 @@ import {
   Trash2,
   Lock,
   ChevronRight,
-  AlertTriangle,
   ShieldCheck
 } from 'lucide-react';
+import { useLanguage } from '../../i18n';
 
 export default function SecurityGrid({
   alerts = [],
@@ -17,6 +17,8 @@ export default function SecurityGrid({
   onMarkRead,
   onDeleteAlert
 }) {
+  const { t } = useLanguage();
+
   if (loading) return null;
 
   if (alerts.length === 0) {
@@ -24,26 +26,26 @@ export default function SecurityGrid({
       <div className="text-center py-12 px-4">
         <ShieldCheck className="w-12 h-12 text-blue-500 mx-auto mb-2 opacity-80" />
         <h3 className="text-base font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] mb-1">
-          No security alerts found
+          {t('security.noAlertsFound', 'No security alerts found')}
         </h3>
         <p className="text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
-          All authentication records are safe and within normal limits.
+          {t('security.allSafeSubtext', 'All authentication records are safe and within normal limits.')}
         </p>
       </div>
     );
   }
 
   const formatTimeAgo = (dateString) => {
-    if (!dateString) return 'Recent';
+    if (!dateString) return t('security.timeRecent', 'Recent');
     try {
       const now = new Date();
       const date = new Date(dateString);
       const diffSec = Math.floor((now - date) / 1000);
-      if (diffSec < 60) return 'Just now';
+      if (diffSec < 60) return t('security.timeJustNow', 'Just now');
       const diffMin = Math.floor(diffSec / 60);
-      if (diffMin < 60) return `${diffMin}m ago`;
+      if (diffMin < 60) return t('security.timeMinAgo', '{min}m ago', { min: diffMin });
       const diffHour = Math.floor(diffMin / 60);
-      if (diffHour < 24) return `${diffHour}h ago`;
+      if (diffHour < 24) return t('security.timeHourAgo', '{hour}h ago', { hour: diffHour });
       return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
     } catch {
       return dateString;
@@ -54,7 +56,6 @@ export default function SecurityGrid({
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       {alerts.map((alert) => {
         const timeAgo = formatTimeAgo(alert.created_at);
-        const isHighRisk = (alert.attempts || 0) >= 6;
 
         return (
           <div
@@ -92,7 +93,7 @@ export default function SecurityGrid({
                 <div className="flex items-center justify-between gap-2">
                   <span className="text-slate-400 flex items-center gap-1.5 font-medium">
                     <Mail className="w-3.5 h-3.5" />
-                    Target:
+                    {t('security.labelTargetAccount', 'Target Account')}:
                   </span>
                   <span className="font-semibold text-slate-800 dark:text-zinc-200 truncate max-w-[150px]">
                     {alert.email}
@@ -102,7 +103,7 @@ export default function SecurityGrid({
                 <div className="flex items-center justify-between gap-2">
                   <span className="text-slate-400 flex items-center gap-1.5 font-medium">
                     <Globe className="w-3.5 h-3.5" />
-                    IP Address:
+                    {t('security.labelSourceIp', 'Source IP Address')}:
                   </span>
                   <span className="font-semibold text-slate-800 dark:text-zinc-200">
                     {alert.ip_address || '127.0.0.1'}
@@ -112,10 +113,10 @@ export default function SecurityGrid({
                 <div className="flex items-center justify-between gap-2">
                   <span className="text-slate-400 flex items-center gap-1.5 font-medium">
                     <Lock className="w-3.5 h-3.5" />
-                    Failed Attempts:
+                    {t('security.labelConsecutiveFailures', 'Consecutive Failures')}:
                   </span>
                   <span className="font-bold text-red-600 dark:text-red-400">
-                    {alert.attempts} tries
+                    {t('security.triesCount', '{count} tries', { count: alert.attempts })}
                   </span>
                 </div>
               </div>
@@ -125,7 +126,7 @@ export default function SecurityGrid({
             <div className="mt-4 pt-3 border-t border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] flex items-center justify-between text-xs">
               <span className={`font-semibold ${alert.is_read ? 'text-slate-400' : 'text-red-500 flex items-center gap-1.5'}`}>
                 {!alert.is_read && <span className="w-1.5 h-1.5 rounded-md bg-red-500 animate-pulse" />}
-                {alert.is_read ? 'Read' : 'Action Required'}
+                {alert.is_read ? t('security.badgeRead', 'Read') : t('security.badgeActionRequired', 'Action Required')}
               </span>
 
               <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
@@ -133,7 +134,7 @@ export default function SecurityGrid({
                   type="button"
                   onClick={() => onDeleteAlert(alert.id)}
                   className="p-1.5 rounded-md text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
-                  title="Delete"
+                  title={t('security.tooltipDelete', 'Delete')}
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>
@@ -142,7 +143,7 @@ export default function SecurityGrid({
                   type="button"
                   onClick={() => onOpenDetails(alert)}
                   className="p-1.5 rounded-md text-[#003E83] dark:text-blue-400 hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors"
-                  title="Details"
+                  title={t('security.tooltipDetails', 'Details')}
                 >
                   <ChevronRight className="w-5 h-5 group-hover:translate-x-0.5 transition-transform" />
                 </button>

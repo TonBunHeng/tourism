@@ -124,7 +124,11 @@ export default function Header({ toggleSidebar, isSidebarOpen, isExpanded, toggl
     };
 
     window.addEventListener('profile-updated', handleProfileUpdate);
-    return () => window.removeEventListener('profile-updated', handleProfileUpdate);
+    window.addEventListener('user-profile-updated', handleProfileUpdate);
+    return () => {
+      window.removeEventListener('profile-updated', handleProfileUpdate);
+      window.removeEventListener('user-profile-updated', handleProfileUpdate);
+    };
   }, []);
 
   // Theme Sync

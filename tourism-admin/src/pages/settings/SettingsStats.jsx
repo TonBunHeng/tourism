@@ -1,11 +1,18 @@
 import { ShieldCheck, Globe, Database, Layers } from 'lucide-react';
+import { useLanguage } from '../../i18n';
 
 export default function SettingsStats({ settings }) {
+  const { t } = useLanguage();
+
   const stats = [
     {
-      label: 'Platform Status',
-      value: settings.maintenanceMode ? 'Maintenance Mode' : 'Online & Active',
-      subtext: settings.maintenanceMode ? 'Public traffic paused' : 'Public portal operating normally',
+      label: t('settings.platformStatus', 'Platform Status'),
+      value: settings.maintenanceMode
+        ? t('settings.maintenanceMode', 'Maintenance Mode')
+        : t('settings.onlineActive', 'Online & Active'),
+      subtext: settings.maintenanceMode
+        ? t('settings.publicTrafficPaused', 'Public traffic paused')
+        : t('settings.publicPortalOperating', 'Public portal operating normally'),
       icon: Layers,
       color: settings.maintenanceMode
         ? 'text-[var(--color-warning-text)] dark:text-[var(--color-warning-dark-text)]'
@@ -15,25 +22,38 @@ export default function SettingsStats({ settings }) {
         : 'bg-[var(--color-success-bg)] dark:bg-[var(--color-success-dark-bg)]'
     },
     {
-      label: 'Security Posture',
-      value: settings.twoFactorAuth ? '2FA Enforced' : 'Standard 2FA',
-      subtext: `${settings.sessionTimeout || '30'}m timeout • ${settings.passwordPolicy || 'strong'} policy`,
+      label: t('settings.securityPosture', 'Security Posture'),
+      value: settings.twoFactorAuth
+        ? t('settings.twoFactorEnforced', '2FA Enforced')
+        : t('settings.standardTwoFactor', 'Standard 2FA'),
+      subtext: t('settings.securitySubtext', {
+        timeout: settings.sessionTimeout || '30',
+        policy: settings.passwordPolicy || 'strong'
+      }, `${settings.sessionTimeout || '30'}m timeout • ${settings.passwordPolicy || 'strong'} policy`),
       icon: ShieldCheck,
       color: 'text-[var(--color-info-text)] dark:text-[var(--color-info-dark-text)]',
       bg: 'bg-[var(--color-info-bg)] dark:bg-[var(--color-info-dark-bg)]'
     },
     {
-      label: 'Regional Locale',
-      value: settings.defaultLanguage === 'km' ? 'Khmer (KM)' : 'English (EN)',
-      subtext: `${settings.defaultCurrency || 'USD'} currency • Asia/Phnom_Penh`,
+      label: t('settings.regionalLocale', 'Regional Locale'),
+      value: settings.defaultLanguage === 'km'
+        ? t('settings.khmerLocale', 'Khmer (KM)')
+        : t('settings.englishLocale', 'English (EN)'),
+      subtext: t('settings.localeSubtext', {
+        currency: settings.defaultCurrency || 'USD'
+      }, `${settings.defaultCurrency || 'USD'} currency • Asia/Phnom_Penh`),
       icon: Globe,
       color: 'text-[var(--color-purple-badge-text)] dark:text-[var(--color-purple-badge-dark-text)]',
       bg: 'bg-[var(--color-purple-badge-bg)] dark:bg-[var(--color-purple-badge-dark-bg)]'
     },
     {
-      label: 'Backup Automation',
-      value: settings.backupSchedule === 'disabled' ? 'Manual Only' : 'Automated Daily',
-      subtext: `${settings.backupRetention || '30'} days snapshot retention`,
+      label: t('settings.backupAutomation', 'Backup Automation'),
+      value: settings.backupSchedule === 'disabled'
+        ? t('settings.manualOnly', 'Manual Only')
+        : t('settings.automatedDaily', 'Automated Daily'),
+      subtext: t('settings.backupSubtext', {
+        days: settings.backupRetention || '30'
+      }, `${settings.backupRetention || '30'} days snapshot retention`),
       icon: Database,
       color: 'text-[var(--color-primary)] dark:text-blue-400',
       bg: 'bg-[var(--color-info-bg)] dark:bg-[var(--color-info-dark-bg)]'

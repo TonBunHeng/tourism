@@ -1,4 +1,5 @@
-import { User, Mail, Phone, MapPin, Calendar, Edit, Camera, CheckCircle, Clock, Trash2 } from 'lucide-react';
+import { User, Mail, Phone, MapPin, Calendar, Edit, Camera, CheckCircle, Trash2 } from 'lucide-react';
+import { useLanguage } from '../../i18n';
 
 export default function ProfileHeader({
   userData,
@@ -8,8 +9,16 @@ export default function ProfileHeader({
   onDeleteImage,
   setIsEditing
 }) {
+  const { t } = useLanguage();
+
   const formatRole = (role) => {
-    if (!role) return 'User';
+    if (!role) return t('profile.roleUser', 'User');
+    const norm = String(role).toLowerCase().replace(/[\s-]+/g, '_');
+    if (norm === 'super_admin') return t('profile.roleSuperAdmin', 'Super Admin');
+    if (norm === 'admin') return t('profile.roleAdmin', 'Admin');
+    if (norm === 'moderator') return t('profile.roleModerator', 'Moderator');
+    if (norm === 'editor') return t('profile.roleEditor', 'Editor');
+    if (norm === 'user') return t('profile.roleUser', 'User');
     return role.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
   };
 
@@ -31,7 +40,7 @@ export default function ProfileHeader({
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
                   className="p-1.5 bg-white/20 hover:bg-white/40 text-white rounded-md transition-colors cursor-pointer"
-                  title="Change photo"
+                  title={t('profile.tooltipChangePhoto', 'Change photo')}
                 >
                   <Camera className="w-3.5 h-3.5" />
                 </button>
@@ -41,7 +50,7 @@ export default function ProfileHeader({
                   type="button"
                   onClick={onDeleteImage}
                   className="p-1.5 bg-red-600/80 hover:bg-red-600 text-white rounded-md transition-colors cursor-pointer"
-                  title="Remove photo"
+                  title={t('profile.tooltipRemovePhoto', 'Remove photo')}
                 >
                   <Trash2 className="w-3.5 h-3.5" />
                 </button>
@@ -56,7 +65,7 @@ export default function ProfileHeader({
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
                 className="absolute -bottom-1 -right-1 p-2 bg-[#003E83] hover:bg-[#002e62] text-white rounded-md shadow-md ring-2 ring-[var(--color-white)] dark:ring-zinc-900 transition-transform active:scale-95 cursor-pointer z-10"
-                title="Change & crop profile picture"
+                title={t('profile.titleChangeCrop', 'Change & crop profile picture')}
               >
                 <Camera className="w-3.5 h-3.5" />
               </button>
@@ -73,13 +82,15 @@ export default function ProfileHeader({
         {/* Name/badges shown next to avatar on mobile so the header reads naturally at narrow widths */}
         <div className="flex-1 min-w-0 sm:hidden">
           <div className="flex flex-wrap items-center gap-2">
-            <h2 className="text-xl font-bold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] truncate">{userData.name || 'User'}</h2>
+            <h2 className="text-xl font-bold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] truncate">
+              {userData.name || t('profile.userDefault', 'User')}
+            </h2>
           </div>
           <div className="flex flex-wrap items-center gap-2 mt-1">
             {userData.verified && (
               <span className="flex items-center gap-1 text-xs px-2 py-0.5 bg-[var(--color-info-bg)] dark:bg-[var(--color-info-dark-bg)] text-[var(--color-info-text)] dark:text-[var(--color-info-dark-text)] rounded-md border border-[var(--color-info-border)] dark:border-[var(--color-info-dark-border)]">
                 <CheckCircle className="w-3 h-3" />
-                Verified
+                {t('profile.verified', 'Verified')}
               </span>
             )}
             <span className="text-xs px-2 py-0.5 bg-[var(--color-purple-badge-bg)] dark:bg-[var(--color-purple-badge-dark-bg)] text-[var(--color-purple-badge-text)] dark:text-[var(--color-purple-badge-dark-text)] rounded-md border border-[var(--color-purple-badge-border)] dark:border-[var(--color-purple-badge-dark-border)] font-medium">
@@ -90,11 +101,13 @@ export default function ProfileHeader({
       </div>
       <div className="flex-1 min-w-0 w-full">
         <div className="hidden sm:flex flex-wrap items-center gap-3">
-          <h2 className="text-2xl font-bold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">{userData.name || 'User'}</h2>
+          <h2 className="text-2xl font-bold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">
+            {userData.name || t('profile.userDefault', 'User')}
+          </h2>
           {userData.verified && (
             <span className="flex items-center gap-1 text-xs px-2.5 py-0.5 bg-[var(--color-info-bg)] dark:bg-[var(--color-info-dark-bg)] text-[var(--color-info-text)] dark:text-[var(--color-info-dark-text)] rounded-md border border-[var(--color-info-border)] dark:border-[var(--color-info-dark-border)] font-medium">
               <CheckCircle className="w-3 h-3" />
-              Verified
+              {t('profile.verified', 'Verified')}
             </span>
           )}
           <span className="text-xs px-2.5 py-0.5 bg-[var(--color-purple-badge-bg)] dark:bg-[var(--color-purple-badge-dark-bg)] text-[var(--color-purple-badge-text)] dark:text-[var(--color-purple-badge-dark-text)] rounded-md border border-[var(--color-purple-badge-border)] dark:border-[var(--color-purple-badge-dark-border)] font-medium">
@@ -122,7 +135,7 @@ export default function ProfileHeader({
           {userData.joinDate && (
             <span className="flex items-center gap-1">
               <Calendar className="w-3.5 h-3.5" />
-              Joined {userData.joinDate}
+              {t('profile.joinedDate', { date: userData.joinDate }, `Joined ${userData.joinDate}`)}
             </span>
           )}
         </div>
@@ -133,7 +146,7 @@ export default function ProfileHeader({
         className="flex items-center justify-center gap-1.5 md:gap-2 px-4 py-2 text-xs md:text-sm font-medium rounded-md bg-[#003E83] hover:bg-[#002e62] text-white transition-colors shrink-0 w-full sm:w-auto cursor-pointer"
       >
         <Edit className="w-4 h-4 shrink-0" />
-        <span>Edit Profile</span>
+        <span>{t('profile.btnEditProfile', 'Edit Profile')}</span>
       </button>
     </div>
   );

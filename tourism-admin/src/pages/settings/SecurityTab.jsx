@@ -10,8 +10,10 @@ import {
   Trash2
 } from 'lucide-react';
 import { useAlert } from '../../context/AlertContext';
+import { useLanguage } from '../../i18n';
 
 export default function SecurityTab({ settings, setSettings }) {
+  const { t } = useLanguage();
   const { showSuccess, showConfirm } = useAlert();
   const [show2FAModal, setShow2FAModal] = useState(false);
 
@@ -60,15 +62,19 @@ export default function SecurityTab({ settings, setSettings }) {
 
   const handleRevokeSession = async (sessionId) => {
     const confirmed = await showConfirm({
-      title: 'Revoke Administrator Session',
-      message: 'Are you sure you want to terminate this remote session? The user will be immediately logged out.',
-      confirmText: 'Revoke Session',
+      title: t('settings.revokeSessionConfirmTitle', 'Revoke Administrator Session'),
+      message: t('settings.revokeSessionConfirmMsg', 'Are you sure you want to terminate this remote session? The user will be immediately logged out.'),
+      confirmText: t('settings.btnRevokeConfirm', 'Revoke Session'),
+      cancelText: t('common.cancel', 'Cancel'),
       type: 'danger'
     });
 
     if (confirmed) {
       setSessions((prev) => prev.filter((s) => s.id !== sessionId));
-      showSuccess('Remote session revoked successfully.', 'Session Terminated');
+      showSuccess(
+        t('settings.revokeSuccessMsg', 'Remote session revoked successfully.'),
+        t('settings.revokeSuccessTitle', 'Session Terminated')
+      );
     }
   };
 
@@ -77,10 +83,10 @@ export default function SecurityTab({ settings, setSettings }) {
       {/* Section Header */}
       <div>
         <h2 className="text-lg font-bold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">
-          Security & Access Policies
+          {t('settings.securityTitle', 'Security & Access Policies')}
         </h2>
         <p className="text-sm text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mt-1">
-          Enforce authentication standards, session expiration timers, brute force protection, and monitor active sessions.
+          {t('settings.securitySubtitle', 'Enforce authentication standards, session expiration timers, brute force protection, and monitor active sessions.')}
         </p>
       </div>
 
@@ -93,10 +99,10 @@ export default function SecurityTab({ settings, setSettings }) {
             </div>
             <div>
               <h3 className="text-sm font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">
-                Two-Factor Authentication (2FA) Enforcement
+                {t('settings.cardTwoFactor', 'Two-Factor Authentication (2FA) Enforcement')}
               </h3>
               <p className="text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mt-0.5">
-                Mandate one-time TOTP security codes for all administrative accounts upon login.
+                {t('settings.twoFactorSubtitle', 'Mandate one-time TOTP security codes for all administrative accounts upon login.')}
               </p>
             </div>
           </div>
@@ -114,14 +120,19 @@ export default function SecurityTab({ settings, setSettings }) {
 
         <div className="flex items-center justify-between pt-1 text-xs">
           <span className="text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
-            Policy status: <strong className="text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">{settings.twoFactorAuth ? 'Required for all Admins' : 'Optional'}</strong>
+            {t('settings.twoFactorPolicyStatus', 'Policy status:')}{' '}
+            <strong className="text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">
+              {settings.twoFactorAuth
+                ? t('settings.twoFactorRequired', 'Required for all Admins')
+                : t('settings.twoFactorOptional', 'Optional')}
+            </strong>
           </span>
           <button
             type="button"
             onClick={() => setShow2FAModal(true)}
             className="text-xs font-semibold text-[var(--color-primary)] hover:underline cursor-pointer"
           >
-            View 2FA Setup Guidelines
+            {t('settings.btnViewTwoFactorGuide', 'View 2FA Setup Guidelines')}
           </button>
         </div>
       </div>
@@ -130,53 +141,53 @@ export default function SecurityTab({ settings, setSettings }) {
       <div className="bg-[var(--color-white)] dark:bg-[var(--color-bg-dark)] rounded-md border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] p-5 shadow-xs space-y-4">
         <h3 className="text-sm font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] flex items-center gap-2 border-b border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] pb-3">
           <Clock className="w-4 h-4 text-[var(--color-primary)]" />
-          Session & Password Policies
+          {t('settings.cardSessionPolicies', 'Session & Password Policies')}
         </h3>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <label className="block text-sm font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">
-              Admin Session Timeout
+              {t('settings.labelSessionTimeout', 'Admin Session Timeout')}
             </label>
             <select
               value={settings.sessionTimeout || '30'}
               onChange={(e) => handleChange('sessionTimeout', e.target.value)}
               className="w-full h-10 px-3 py-2 text-sm rounded-md border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] bg-[var(--color-white)] dark:bg-[var(--color-bg-dark)] text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] focus:outline-none focus:ring-2 focus:ring-[var(--color-input)] transition-all"
             >
-              <option value="15">15 Minutes (High Security)</option>
-              <option value="30">30 Minutes (Recommended)</option>
-              <option value="60">1 Hour</option>
-              <option value="240">4 Hours</option>
+              <option value="15">{t('settings.timeout15', '15 Minutes (High Security)')}</option>
+              <option value="30">{t('settings.timeout30', '30 Minutes (Recommended)')}</option>
+              <option value="60">{t('settings.timeout60', '1 Hour')}</option>
+              <option value="240">{t('settings.timeout240', '4 Hours')}</option>
             </select>
           </div>
 
           <div>
             <label className="block text-sm font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">
-              Password Complexity Level
+              {t('settings.labelPasswordPolicy', 'Password Complexity Level')}
             </label>
             <select
               value={settings.passwordPolicy || 'strong'}
               onChange={(e) => handleChange('passwordPolicy', e.target.value)}
               className="w-full h-10 px-3 py-2 text-sm rounded-md border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] bg-[var(--color-white)] dark:bg-[var(--color-bg-dark)] text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] focus:outline-none focus:ring-2 focus:ring-[var(--color-input)] transition-all"
             >
-              <option value="standard">Standard (8+ chars)</option>
-              <option value="strong">Strong (8+ chars, numbers & symbols)</option>
-              <option value="strict">Strict (12+ chars, mixed case, symbols)</option>
+              <option value="standard">{t('settings.policyStandard', 'Standard (8+ chars)')}</option>
+              <option value="strong">{t('settings.policyStrong', 'Strong (8+ chars, numbers & symbols)')}</option>
+              <option value="strict">{t('settings.policyStrict', 'Strict (12+ chars, mixed case, symbols)')}</option>
             </select>
           </div>
 
           <div>
             <label className="block text-sm font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">
-              Max Failed Logins (Lockout)
+              {t('settings.labelLoginAttempts', 'Max Failed Logins (Lockout)')}
             </label>
             <select
               value={settings.loginAttempts || '5'}
               onChange={(e) => handleChange('loginAttempts', e.target.value)}
               className="w-full h-10 px-3 py-2 text-sm rounded-md border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] bg-[var(--color-white)] dark:bg-[var(--color-bg-dark)] text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] focus:outline-none focus:ring-2 focus:ring-[var(--color-input)] transition-all"
             >
-              <option value="3">3 Attempts (Strict)</option>
-              <option value="5">5 Attempts (Standard)</option>
-              <option value="10">10 Attempts (Relaxed)</option>
+              <option value="3">{t('settings.attempts3', '3 Attempts (Strict)')}</option>
+              <option value="5">{t('settings.attempts5', '5 Attempts (Standard)')}</option>
+              <option value="10">{t('settings.attempts10', '10 Attempts (Relaxed)')}</option>
             </select>
           </div>
         </div>
@@ -188,10 +199,10 @@ export default function SecurityTab({ settings, setSettings }) {
           <div className="flex items-center gap-2.5">
             <h3 className="text-sm sm:text-base font-bold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] flex items-center gap-2">
               <Monitor className="w-4 h-4 text-[#003E83] dark:text-blue-400" />
-              Active Administrator Sessions
+              {t('settings.cardActiveSessions', 'Active Administrator Sessions')}
             </h3>
             <span className="text-xs font-semibold px-2 py-0.5 rounded-md bg-blue-50 text-[#003E83] dark:bg-blue-950/50 dark:text-blue-400 border border-blue-100 dark:border-blue-900/40">
-              {sessions.length} Authorized Devices
+              {t('settings.authorizedDevicesCount', { count: sessions.length }, `${sessions.length} Authorized Devices`)}
             </span>
           </div>
         </div>
@@ -212,12 +223,12 @@ export default function SecurityTab({ settings, setSettings }) {
                     <span>{sess.device}</span>
                     {sess.isCurrent && (
                       <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-[var(--color-success-bg)] dark:bg-[var(--color-success-dark-bg)] text-[var(--color-success-text)] dark:text-[var(--color-success-dark-text)] border border-[var(--color-success-border)] dark:border-[var(--color-success-dark-border)]">
-                        Current Session
+                        {t('settings.currentSessionBadge', 'Current Session')}
                       </span>
                     )}
                   </p>
                   <p className="text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mt-0.5">
-                    {sess.location} • <span className="font-mono text-[var(--color-text-muted-light)] dark:text-zinc-400">{sess.ip}</span> • Last active: {sess.lastActive}
+                    {sess.location} • <span className="font-mono text-[var(--color-text-muted-light)] dark:text-zinc-400">{sess.ip}</span> • {t('settings.lastActiveText', { time: sess.lastActive }, `Last active: ${sess.lastActive}`)}
                   </p>
                 </div>
               </div>
@@ -227,7 +238,7 @@ export default function SecurityTab({ settings, setSettings }) {
                   type="button"
                   onClick={() => handleRevokeSession(sess.id)}
                   className="p-1.5 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
-                  title="Revoke Session"
+                  title={t('settings.tooltipRevokeSession', 'Revoke Session')}
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>
@@ -259,22 +270,22 @@ export default function SecurityTab({ settings, setSettings }) {
 
             {/* Modal Title */}
             <h3 id="twofa-modal-title" className="text-lg font-bold text-gray-900 dark:text-white text-center mb-2 tracking-tight">
-              Two-Factor Authentication Setup
+              {t('settings.modalTwoFactorTitle', 'Two-Factor Authentication Setup')}
             </h3>
 
             {/* Description */}
             <p className="text-sm text-gray-500 dark:text-zinc-400 text-center mb-5 leading-relaxed px-1">
-              When 2FA Enforcement is turned on, administrators must scan a QR code using standard authenticator apps (Google Authenticator, Microsoft Authenticator, or 1Password) upon logging in.
+              {t('settings.modalTwoFactorDesc', 'When 2FA Enforcement is turned on, administrators must scan a QR code using standard authenticator apps (Google Authenticator, Microsoft Authenticator, or 1Password) upon logging in.')}
             </p>
 
             {/* Security Tip Callout Card */}
             <div className="p-3.5 bg-blue-50/80 dark:bg-blue-950/30 rounded-md border border-blue-200 dark:border-blue-900 text-xs text-blue-800 dark:text-blue-300 space-y-1 mb-5 text-left">
               <p className="font-semibold flex items-center gap-1.5 text-blue-900 dark:text-blue-200 text-xs">
                 <Info className="w-3.5 h-3.5 text-[#003E83] dark:text-blue-400 shrink-0" />
-                Security Tip
+                {t('settings.twoFactorTipTitle', 'Security Tip')}
               </p>
               <p className="text-xs leading-relaxed text-blue-700 dark:text-blue-300/90 pl-5">
-                Ensure emergency backup recovery codes are stored securely offline in case an administrator device is lost or replaced.
+                {t('settings.twoFactorTipDesc', 'Ensure emergency backup recovery codes are stored securely offline in case an administrator device is lost or replaced.')}
               </p>
             </div>
 
@@ -285,7 +296,7 @@ export default function SecurityTab({ settings, setSettings }) {
                 onClick={() => setShow2FAModal(false)}
                 className="w-full py-2.5 px-4 font-medium rounded-md bg-[#003E83] hover:bg-[#002e62] text-white transition-colors cursor-pointer text-sm shadow-xs"
               >
-                Understood
+                {t('settings.btnUnderstood', 'Understood')}
               </button>
             </div>
           </div>

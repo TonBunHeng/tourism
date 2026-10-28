@@ -1,6 +1,7 @@
 import { useRef } from 'react';
 import { Download, FileSpreadsheet, BarChart2, Calendar, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useLanguage } from '../../i18n';
 
 export default function ReportsHeader({
   selectedDay,
@@ -12,6 +13,7 @@ export default function ReportsHeader({
   isSubmitting,
   isResetting
 }) {
+  const { t } = useLanguage();
   const dateInputRef = useRef(null);
 
   const handleOpenPicker = () => {
@@ -37,10 +39,10 @@ export default function ReportsHeader({
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
           <h1 className="text-xl sm:text-2xl font-bold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] tracking-tight">
-            Reports Management
+            {t('reports.title', 'Reports')}
           </h1>
           <p className="text-xs sm:text-sm text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mt-1">
-            Export comprehensive tourism data, user engagement metrics
+            {t('reports.subtitle', 'Export comprehensive tourism data, user engagement metrics')}
           </p>
         </div>
 
@@ -51,7 +53,7 @@ export default function ReportsHeader({
             className="flex items-center justify-center gap-1.5 md:gap-2 px-4 py-2 text-xs md:text-sm font-medium rounded-md bg-[#003E83] hover:bg-[#002e62] text-white transition-colors shrink-0 cursor-pointer shadow-xs"
           >
             <BarChart2 className="w-4 h-4 shrink-0" />
-            <span>Analytics</span>
+            <span>{t('reports.btnAnalytics', 'Analytics')}</span>
           </Link>
 
           {/* Date Filter Controls */}
@@ -70,11 +72,13 @@ export default function ReportsHeader({
                   if (onSubmitFilter) onSubmitFilter(e.target.value);
                 }}
                 className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                title={selectedDay ? `Selected Date: ${selectedDay}` : 'Select Date Filter'}
+                title={selectedDay 
+                  ? t('reports.selectedDateTitle', { date: selectedDay }, `Selected Date: ${selectedDay}`) 
+                  : t('reports.selectDateFilterTitle', 'Select Date Filter')}
               />
               <Calendar className="w-4 h-4 text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] shrink-0" />
               <span className="font-semibold text-xs md:text-sm tracking-tight text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">
-                {selectedDay || 'Date Filter'}
+                {selectedDay || t('reports.dateFilter', 'Date Filter')}
               </span>
               {selectedDay && (
                 <button
@@ -85,7 +89,7 @@ export default function ReportsHeader({
                     if (onResetFilter) onResetFilter();
                   }}
                   className="relative z-20 p-0.5 hover:bg-gray-200 dark:hover:bg-gray-700 rounded text-gray-400 hover:text-red-500 cursor-pointer ml-1"
-                  title="Clear Date"
+                  title={t('reports.clearDate', 'Clear Date')}
                 >
                   <X className="w-3.5 h-3.5" />
                 </button>
@@ -101,7 +105,7 @@ export default function ReportsHeader({
               className={`${actionBtnClass} border border-transparent bg-red-600 hover:bg-red-700 text-white shadow-sm flex-1 sm:flex-initial`}
             >
               <Download className="w-4 h-4 shrink-0" />
-              <span>PDF</span>
+              <span>{t('reports.btnPDF', 'PDF')}</span>
             </button>
 
             {/* Export Excel */}
@@ -110,7 +114,7 @@ export default function ReportsHeader({
               className={`${actionBtnClass} border border-transparent bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm flex-1 sm:flex-initial`}
             >
               <FileSpreadsheet className="w-4 h-4 shrink-0" />
-              <span>Excel</span>
+              <span>{t('reports.btnExcel', 'Excel')}</span>
             </button>
           </div>
         </div>

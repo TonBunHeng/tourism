@@ -1,5 +1,6 @@
 import React from 'react';
 import { User, AlertCircle, Clock, Check, X, Eye, UserX, Trash2, ShieldAlert } from 'lucide-react';
+import { useLanguage } from '../../i18n';
 
 const getStatusBadge = (status) => {
   const colors = {
@@ -21,10 +22,6 @@ const getUrgencyBadge = (urgency) => {
   return colors[urgency] || colors.low;
 };
 
-const getTypeLabel = (type) => {
-  return type === 'account' ? 'Account Deletion' : 'Item Deletion';
-};
-
 const getTypeIcon = (type) => {
   return type === 'account' ? UserX : Trash2;
 };
@@ -44,7 +41,30 @@ export default function DeletionList({
   hasActiveFilters,
   startIndex = 0
 }) {
+  const { t } = useLanguage();
   const safeRequests = requests || [];
+
+  const getTypeLabel = (type) => {
+    return type === 'account' ? t('deletion.labelAccountDeletion', 'Account Deletion') : t('deletion.labelItemDeletion', 'Item Deletion');
+  };
+
+  const getUrgencyText = (urgency) => {
+    const u = String(urgency || '').toLowerCase();
+    if (u === 'critical') return t('deletion.urgencyCritical', 'Critical').toUpperCase();
+    if (u === 'high') return t('deletion.urgencyHigh', 'High').toUpperCase();
+    if (u === 'medium') return t('deletion.urgencyMedium', 'Medium').toUpperCase();
+    if (u === 'low') return t('deletion.urgencyLow', 'Low').toUpperCase();
+    return String(urgency).toUpperCase();
+  };
+
+  const getStatusText = (status) => {
+    const s = String(status || '').toLowerCase();
+    if (s === 'pending') return t('deletion.statusPending', 'Pending');
+    if (s === 'approved') return t('deletion.statusApproved', 'Approved');
+    if (s === 'rejected') return t('deletion.statusRejected', 'Rejected');
+    if (s === 'archived') return t('deletion.statusArchived', 'Archived');
+    return status?.charAt(0).toUpperCase() + status?.slice(1);
+  };
 
   return (
     <>
@@ -67,10 +87,10 @@ export default function DeletionList({
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between gap-2">
                       <p className="text-sm font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] truncate">
-                        {request.user?.name || 'User'}
+                        {request.user?.name || t('deletion.userDefault', 'User')}
                       </p>
                       <span className={`px-2 py-0.5 text-[10px] font-bold rounded-md border shrink-0 ${getStatusBadge(request.status)}`}>
-                        {request.status?.charAt(0).toUpperCase() + request.status?.slice(1)}
+                        {getStatusText(request.status)}
                       </span>
                     </div>
 
@@ -85,7 +105,7 @@ export default function DeletionList({
                       </span>
                       <span className={`inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-semibold rounded-md border ${getUrgencyBadge(request.urgency)}`}>
                         <AlertCircle className="w-3 h-3" />
-                        {request.urgency?.toUpperCase()}
+                        {getUrgencyText(request.urgency)}
                       </span>
                     </div>
 
@@ -101,7 +121,7 @@ export default function DeletionList({
                         type="button"
                         onClick={() => onViewDetails(request)}
                         className="p-1.5 text-[var(--color-purple-badge-text)] dark:text-[var(--color-purple-badge-dark-text)] hover:bg-[var(--color-purple-badge-bg)] dark:hover:bg-[var(--color-purple-badge-dark-bg)] rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
-                        title="View Details"
+                        title={t('deletion.tooltipViewDetails', 'View Details')}
                       >
                         <Eye className="w-4 h-4" />
                       </button>
@@ -111,7 +131,7 @@ export default function DeletionList({
                             type="button"
                             onClick={() => onApprove(request)}
                             className="p-1.5 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
-                            title="Approve"
+                            title={t('deletion.tooltipApprove', 'Approve')}
                           >
                             <Check className="w-4 h-4" />
                           </button>
@@ -119,7 +139,7 @@ export default function DeletionList({
                             type="button"
                             onClick={() => onReject(request)}
                             className="p-1.5 text-[var(--color-danger-text)] dark:text-[var(--color-danger-dark-text)] hover:bg-[var(--color-danger-bg)] dark:hover:bg-[var(--color-danger-dark-bg)] rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
-                            title="Reject"
+                            title={t('deletion.tooltipReject', 'Reject')}
                           >
                             <X className="w-4 h-4" />
                           </button>
@@ -135,10 +155,10 @@ export default function DeletionList({
           <div className="text-center py-12 px-4">
             <ShieldAlert className="w-12 h-12 text-blue-500 mx-auto mb-2 opacity-80" />
             <h3 className="text-base font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] mb-1">
-              No requests found
+              {t('deletion.noRequestsFound', 'No requests found')}
             </h3>
             <p className="text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
-              Try adjusting your search or filter criteria
+              {t('deletion.tryAdjustingFilter', 'Try adjusting your search or filter criteria')}
             </p>
           </div>
         )}
@@ -150,25 +170,25 @@ export default function DeletionList({
           <thead className="bg-[var(--color-surface-hover-light)]/50 dark:bg-[var(--color-surface-hover-dark)]/50">
             <tr>
               <th className="pl-4 pr-2 py-3.5 text-xs font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] uppercase tracking-wider w-10 text-center">
-                #
+                {t('deletion.thIndex', '#')}
               </th>
               <th className="px-4 py-3.5 text-xs font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] uppercase tracking-wider">
-                User & Account
+                {t('deletion.thUserAccount', 'User & Account')}
               </th>
               <th className="px-3 py-3.5 text-xs font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] uppercase tracking-wider whitespace-nowrap w-36">
-                Type
+                {t('deletion.thType', 'Type')}
               </th>
               <th className="px-3 py-3.5 text-xs font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] uppercase tracking-wider whitespace-nowrap w-28">
-                Urgency
+                {t('deletion.thUrgency', 'Urgency')}
               </th>
               <th className="px-3 py-3.5 text-xs font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] uppercase tracking-wider">
-                Reason
+                {t('deletion.thReason', 'Reason')}
               </th>
               <th className="px-3 py-3.5 text-xs font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] uppercase tracking-wider whitespace-nowrap w-32">
-                Status
+                {t('deletion.thStatus', 'Status')}
               </th>
               <th className="pl-3 pr-4 py-3.5 text-right text-xs font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] uppercase tracking-wider w-24 whitespace-nowrap">
-                Actions
+                {t('deletion.thActions', 'Actions')}
               </th>
             </tr>
           </thead>
@@ -192,7 +212,7 @@ export default function DeletionList({
                         </div>
                         <div className="min-w-0 flex-1">
                           <p className="text-xs md:text-sm font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] truncate">
-                            {request.user?.name || 'User'}
+                            {request.user?.name || t('deletion.userDefault', 'User')}
                           </p>
                           <p className="text-[11px] text-[var(--color-text-muted-light)] dark:text-[var(--color-text-secondary-dark)] truncate">
                             {request.user?.email}
@@ -211,7 +231,7 @@ export default function DeletionList({
                     <td className="px-3 py-3.5 whitespace-nowrap">
                       <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 text-xs font-semibold rounded-md border ${getUrgencyBadge(request.urgency)}`}>
                         <AlertCircle className="w-3 h-3" />
-                        {request.urgency?.toUpperCase()}
+                        {getUrgencyText(request.urgency)}
                       </span>
                     </td>
 
@@ -227,7 +247,7 @@ export default function DeletionList({
                         {request.status === 'pending' && <Clock className="w-3 h-3" />}
                         {request.status === 'approved' && <Check className="w-3 h-3" />}
                         {request.status === 'rejected' && <X className="w-3 h-3" />}
-                        {request.status?.charAt(0).toUpperCase() + request.status?.slice(1)}
+                        {getStatusText(request.status)}
                       </span>
                     </td>
 
@@ -237,7 +257,7 @@ export default function DeletionList({
                           type="button"
                           onClick={() => onViewDetails(request)}
                           className="p-1.5 text-[var(--color-purple-badge-text)] dark:text-[var(--color-purple-badge-dark-text)] hover:bg-[var(--color-purple-badge-bg)] dark:hover:bg-[var(--color-purple-badge-dark-bg)] rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
-                          title="View Details"
+                          title={t('deletion.tooltipViewDetails', 'View Details')}
                         >
                           <Eye className="w-4 h-4" />
                         </button>
@@ -247,7 +267,7 @@ export default function DeletionList({
                               type="button"
                               onClick={() => onApprove(request)}
                               className="p-1.5 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
-                              title="Approve"
+                              title={t('deletion.tooltipApprove', 'Approve')}
                             >
                               <Check className="w-4 h-4" />
                             </button>
@@ -255,7 +275,7 @@ export default function DeletionList({
                               type="button"
                               onClick={() => onReject(request)}
                               className="p-1.5 text-[var(--color-danger-text)] dark:text-[var(--color-danger-dark-text)] hover:bg-[var(--color-danger-bg)] dark:hover:bg-[var(--color-danger-dark-bg)] rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
-                              title="Reject"
+                              title={t('deletion.tooltipReject', 'Reject')}
                             >
                               <X className="w-4 h-4" />
                             </button>
@@ -271,10 +291,10 @@ export default function DeletionList({
                 <td colSpan="7" className="text-center py-12 px-4">
                   <ShieldAlert className="w-12 h-12 text-blue-500 mx-auto mb-2 opacity-80" />
                   <h3 className="text-base font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] mb-1">
-                    No requests found
+                    {t('deletion.noRequestsFound', 'No requests found')}
                   </h3>
                   <p className="text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
-                    Try adjusting your search or filter criteria
+                    {t('deletion.tryAdjustingFilter', 'Try adjusting your search or filter criteria')}
                   </p>
                   {hasActiveFilters && (
                     <button
@@ -282,7 +302,7 @@ export default function DeletionList({
                       onClick={onClearFilters}
                       className="mt-3 px-4 py-2 text-xs font-semibold text-[var(--color-danger-text)] dark:text-[var(--color-danger-dark-text)] hover:bg-[var(--color-danger-bg)] dark:hover:bg-[var(--color-danger-dark-bg)] rounded-md transition-colors cursor-pointer"
                     >
-                      Clear all filters
+                      {t('deletion.clearFiltersBtn', 'Clear all filters')}
                     </button>
                   )}
                 </td>

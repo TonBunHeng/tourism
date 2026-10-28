@@ -1,35 +1,40 @@
 import { ShieldAlert, AlertTriangle, KeyRound, Activity } from 'lucide-react';
+import { useLanguage } from '../../i18n';
 
 export default function SecurityStats({ meta = {} }) {
+  const { t } = useLanguage();
+
   const stats = [
     {
-      label: 'Total Incidents',
+      label: t('security.statTotalIncidents', 'Total Incidents'),
       value: (meta.total_alerts || 0).toLocaleString(),
-      subtext: 'Security alerts generated',
+      subtext: t('security.subtextTotalIncidents', 'Security alerts generated'),
       icon: ShieldAlert,
       color: 'text-[var(--color-info-text)] dark:text-[var(--color-info-dark-text)]',
       bg: 'bg-[var(--color-info-bg)] dark:bg-[var(--color-info-dark-bg)]'
     },
     {
-      label: 'Unread Alerts',
+      label: t('security.statUnreadAlerts', 'Unread Alerts'),
       value: (meta.unread_count || 0).toLocaleString(),
-      subtext: (meta.unread_count || 0) === 0 ? 'All alerts resolved' : `${meta.unread_count} awaiting attention`,
+      subtext: (meta.unread_count || 0) === 0 
+        ? t('security.subtextAllResolved', 'All alerts resolved') 
+        : t('security.subtextAwaitingAttention', '{count} awaiting attention', { count: meta.unread_count }),
       icon: AlertTriangle,
       color: 'text-[var(--color-warning-text)] dark:text-[var(--color-warning-dark-text)]',
       bg: 'bg-[var(--color-warning-bg)] dark:bg-[var(--color-warning-dark-bg)]'
     },
     {
-      label: 'High Risk (≥6 Tries)',
+      label: t('security.statHighRisk', 'High Risk (≥6 Tries)'),
       value: (meta.high_risk_count || 0).toLocaleString(),
-      subtext: 'Brute-force thresholds reached',
+      subtext: t('security.subtextHighRisk', 'Brute-force thresholds reached'),
       icon: KeyRound,
       color: 'text-[var(--color-danger-text)] dark:text-[var(--color-danger-dark-text)]',
       bg: 'bg-[var(--color-danger-bg)] dark:bg-[var(--color-danger-dark-bg)]'
     },
     {
-      label: 'Failed Logins Tracked',
+      label: t('security.statFailedLogins', 'Failed Logins Tracked'),
       value: (meta.failed_attempts || 0).toLocaleString(),
-      subtext: 'Total recorded bad attempts',
+      subtext: t('security.subtextFailedLogins', 'Total recorded bad attempts'),
       icon: Activity,
       color: 'text-[var(--color-purple-badge-text)] dark:text-[var(--color-purple-badge-dark-text)]',
       bg: 'bg-[var(--color-purple-badge-bg)] dark:bg-[var(--color-purple-badge-dark-bg)]'

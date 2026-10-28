@@ -1,5 +1,6 @@
 import { User as UserIcon, Check, Eye, Edit, Trash2, Activity, Calendar } from "lucide-react";
 import authService, { normalizeRole } from '../../services/authService';
+import { useLanguage } from '../../i18n';
 
 export default function UsersGrid({
   users = [],
@@ -10,6 +11,7 @@ export default function UsersGrid({
   onEditUser,
   onDeleteUser
 }) {
+  const { t } = useLanguage();
   const currentUser = authService.getCurrentUser();
   const isSuperAdmin = normalizeRole(currentUser?.role) === 'super_admin';
 
@@ -46,13 +48,28 @@ export default function UsersGrid({
   const formatRoleLabel = (role) => {
     const norm = normalizeRole(role);
     switch (norm) {
-      case 'super_admin': return 'Super Admin';
-      case 'admin': return 'Admin';
+      case 'super_admin': return t('users.roleSuperAdmin', 'Super Admin');
+      case 'admin': return t('users.roleAdmin', 'Admin');
       case 'guide_editor':
-      case 'tourism_content_editor': return 'Tourism Content Editor';
-      case 'business_owner': return 'Business Owner';
-      default: return 'User';
+      case 'tourism_content_editor': return t('users.roleGuideEditor', 'Tourism Content Editor');
+      case 'business_owner': return t('users.roleBusinessOwner', 'Business Owner');
+      default: return t('users.roleUser', 'User');
     }
+  };
+
+  const formatStatusLabel = (status) => {
+    const s = String(status || '').toLowerCase();
+    if (s === 'suspended') return t('users.statusSuspended', 'Suspended');
+    if (s === 'inactive') return t('users.statusInactive', 'Inactive');
+    if (s === 'active') return t('users.statusActive', 'Active');
+    return status || t('users.statusActive', 'Active');
+  };
+
+  const formatSubscriptionLabel = (sub) => {
+    const s = String(sub || '').toLowerCase();
+    if (s === 'premium') return t('users.subPremium', 'Premium');
+    if (s === 'basic') return t('users.subBasic', 'Basic');
+    return t('users.subFree', 'Free');
   };
 
   const safeUsers = users || [];
@@ -94,7 +111,7 @@ export default function UsersGrid({
                     </span>
                     <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 text-xs font-semibold rounded-md border ${getStatusColor(user.status, isOnline)}`}>
                       <span className={`w-1.5 h-1.5 rounded-md ${isOnline ? 'bg-emerald-500 animate-pulse' : (String(user.status || '').toLowerCase() === 'suspended' ? 'bg-rose-500' : 'bg-slate-400 dark:bg-zinc-500')}`} />
-                      {user.status || 'Active'}
+                      {formatStatusLabel(user.status)}
                     </span>
                   </div>
                 </div>
@@ -103,7 +120,7 @@ export default function UsersGrid({
                     type="button"
                     onClick={(e) => { e.stopPropagation(); handleView(user); }}
                     className="p-1.5 text-[var(--color-purple-badge-text)] dark:text-[var(--color-purple-badge-dark-text)] hover:bg-[var(--color-purple-badge-bg)] dark:hover:bg-[var(--color-purple-badge-dark-bg)] rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
-                    title="View Details"
+                    title={t('users.tooltipViewDetails', 'View Details')}
                   >
                     <Eye className="w-3.5 h-3.5" />
                   </button>
@@ -116,7 +133,7 @@ export default function UsersGrid({
                         ? 'hover:bg-[var(--color-surface-hover-light)] dark:hover:bg-[var(--color-surface-hover-dark)] text-blue-600 dark:text-blue-400 active:scale-90 hover:scale-105' 
                         : 'text-gray-300 dark:text-zinc-600 cursor-not-allowed opacity-50'
                     }`}
-                    title={canModifyRow ? "Edit User" : "Only Super Admin can modify Super Admin accounts"}
+                    title={canModifyRow ? t('users.tooltipEditUser', 'Edit User') : t('users.tooltipSuperAdminProtected', 'Only Super Admin can modify Super Admin accounts')}
                   >
                     <Edit className="w-3.5 h-3.5" />
                   </button>
@@ -129,7 +146,7 @@ export default function UsersGrid({
                         ? 'hover:bg-[var(--color-danger-bg)] dark:hover:bg-[var(--color-danger-dark-bg)] text-[var(--color-danger-text)] dark:text-[var(--color-danger-dark-text)] active:scale-90 hover:scale-105' 
                         : 'text-gray-300 dark:text-zinc-600 cursor-not-allowed opacity-50'
                     }`}
-                    title={canModifyRow ? "Delete User" : "Only Super Admin can delete Super Admin accounts"}
+                    title={canModifyRow ? t('users.tooltipDeleteUser', 'Delete User') : t('users.tooltipSuperAdminProtectedDelete', 'Only Super Admin can delete Super Admin accounts')}
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>
@@ -138,15 +155,15 @@ export default function UsersGrid({
 
               <div className="grid grid-cols-3 gap-2 mb-3">
                 <div className="text-center p-2 bg-[var(--color-surface-hover-light)] dark:bg-[var(--color-surface-hover-dark)]/50 rounded-md">
-                  <p className="text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">Reviews</p>
+                  <p className="text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">{t('users.reviewsCount', 'Reviews')}</p>
                   <p className="text-sm font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">{user.reviews}</p>
                 </div>
                 <div className="text-center p-2 bg-[var(--color-surface-hover-light)] dark:bg-[var(--color-surface-hover-dark)]/50 rounded-md">
-                  <p className="text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">Favorites</p>
+                  <p className="text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">{t('users.favoritesCount', 'Favorites')}</p>
                   <p className="text-sm font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">{user.favorites}</p>
                 </div>
                 <div className="text-center p-2 bg-[var(--color-surface-hover-light)] dark:bg-[var(--color-surface-hover-dark)]/50 rounded-md">
-                  <p className="text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">Places</p>
+                  <p className="text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">{t('users.placesCount', 'Places')}</p>
                   <p className="text-sm font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">{user.places}</p>
                 </div>
               </div>
@@ -154,7 +171,7 @@ export default function UsersGrid({
               <div className="flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-[var(--color-border-light)] dark:border-[var(--color-border-dark)]">
                 <div className="flex items-center gap-2 flex-wrap">
                   <span className={`text-xs px-2 py-0.5 rounded-md border ${getSubscriptionColor(user.subscription)}`}>
-                    {user.subscription || 'Free'}
+                    {formatSubscriptionLabel(user.subscription)}
                   </span>
                   <span className="text-xs text-[var(--color-text-muted-light)] dark:text-[var(--color-text-secondary-dark)] flex items-center gap-1">
                     <Activity className="w-3 h-3" />
@@ -171,8 +188,12 @@ export default function UsersGrid({
         })
       ) : (
         <div className="col-span-full text-center py-12">
-          <h3 className="text-lg font-medium text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] mb-1">No users found</h3>
-          <p className="text-sm text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">Try adjusting your search or filter criteria</p>
+          <h3 className="text-lg font-medium text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] mb-1">
+            {t('users.noUsersFound', 'No users found')}
+          </h3>
+          <p className="text-sm text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
+            {t('users.tryAdjustingFilter', 'Try adjusting your search or filter criteria')}
+          </p>
         </div>
       )}
     </div>

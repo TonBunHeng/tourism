@@ -25,8 +25,10 @@ import favoriteService from '../../services/favoriteService';
 import galleryService from '../../services/galleryService';
 import { useAlert } from '../../context/AlertContext';
 import { validateImageFile } from '../../utils/fileValidation';
+import { useLanguage } from '../../i18n';
 
 export default function Profile() {
+  const { t } = useLanguage();
   const { showAlert, showConfirm } = useAlert();
   const [userData, setUserData] = useState({
     name: 'Admin User',
@@ -201,10 +203,10 @@ export default function Profile() {
   }, [loadUserData, populateUserData]);
 
   const userStats = [
-    { label: 'Total Places', value: String(statsData.totalPlaces), subtext: 'Destinations created', icon: MapPinned, color: 'text-[var(--color-info-text)] dark:text-[var(--color-info-dark-text)]', bg: 'bg-[var(--color-info-bg)] dark:bg-[var(--color-info-dark-bg)]' },
-    { label: 'Total Reviews', value: String(statsData.totalReviews), subtext: 'Traveler feedback ratings', icon: MessageSquare, color: 'text-[var(--color-success-text)] dark:text-[var(--color-success-dark-text)]', bg: 'bg-[var(--color-success-bg)] dark:bg-[var(--color-success-dark-bg)]' },
-    { label: 'Total Favorites', value: String(statsData.totalFavorites), subtext: 'Saved wishlist destinations', icon: Heart, color: 'text-[var(--color-danger-text)] dark:text-[var(--color-danger-dark-text)]', bg: 'bg-[var(--color-danger-bg)] dark:bg-[var(--color-danger-dark-bg)]' },
-    { label: 'Total Photos', value: String(statsData.totalPhotos), subtext: 'Gallery uploads & media', icon: Image, color: 'text-[var(--color-purple-badge-text)] dark:text-[var(--color-purple-badge-dark-text)]', bg: 'bg-[var(--color-purple-badge-bg)] dark:bg-[var(--color-purple-badge-dark-bg)]' }
+    { label: t('profile.statTotalPlaces', 'Total Places'), value: String(statsData.totalPlaces), subtext: t('profile.subtextTotalPlaces', 'Destinations created'), icon: MapPinned, color: 'text-[var(--color-info-text)] dark:text-[var(--color-info-dark-text)]', bg: 'bg-[var(--color-info-bg)] dark:bg-[var(--color-info-dark-bg)]' },
+    { label: t('profile.statTotalReviews', 'Total Reviews'), value: String(statsData.totalReviews), subtext: t('profile.subtextTotalReviews', 'Traveler feedback ratings'), icon: MessageSquare, color: 'text-[var(--color-success-text)] dark:text-[var(--color-success-dark-text)]', bg: 'bg-[var(--color-success-bg)] dark:bg-[var(--color-success-dark-bg)]' },
+    { label: t('profile.statTotalFavorites', 'Total Favorites'), value: String(statsData.totalFavorites), subtext: t('profile.subtextTotalFavorites', 'Saved wishlist destinations'), icon: Heart, color: 'text-[var(--color-danger-text)] dark:text-[var(--color-danger-dark-text)]', bg: 'bg-[var(--color-danger-bg)] dark:bg-[var(--color-danger-dark-bg)]' },
+    { label: t('profile.statTotalPhotos', 'Total Photos'), value: String(statsData.totalPhotos), subtext: t('profile.subtextTotalPhotos', 'Gallery uploads & media'), icon: Image, color: 'text-[var(--color-purple-badge-text)] dark:text-[var(--color-purple-badge-dark-text)]', bg: 'bg-[var(--color-purple-badge-bg)] dark:bg-[var(--color-purple-badge-dark-bg)]' }
   ];
 
   const currentRole = authService.getCurrentUser()?.role || userData.role || 'Admin';
@@ -212,38 +214,38 @@ export default function Profile() {
 
   const achievements = [
     {
-      name: 'Explorer',
-      description: 'Created 5+ places',
+      name: t('profile.achieveExplorerName', 'Explorer'),
+      description: t('profile.achieveExplorerDesc', 'Created 5+ places'),
       icon: Globe,
       unlocked: isSuperAdmin || Number(statsData.totalPlaces || 0) >= 5
     },
     {
-      name: 'Reviewer',
-      description: 'Written 5+ reviews',
+      name: t('profile.achieveReviewerName', 'Reviewer'),
+      description: t('profile.achieveReviewerDesc', 'Written 5+ reviews'),
       icon: FileText,
       unlocked: isSuperAdmin || Number(statsData.totalReviews || 0) >= 5
     },
     {
-      name: 'Photographer',
-      description: 'Uploaded 3+ photos',
+      name: t('profile.achievePhotographerName', 'Photographer'),
+      description: t('profile.achievePhotographerDesc', 'Uploaded 3+ photos'),
       icon: Image,
       unlocked: isSuperAdmin || Number(statsData.totalPhotos || 0) >= 3
     },
     {
-      name: 'Curator',
-      description: 'Saved 2+ favorites',
+      name: t('profile.achieveCuratorName', 'Curator'),
+      description: t('profile.achieveCuratorDesc', 'Saved 2+ favorites'),
       icon: Heart,
       unlocked: isSuperAdmin || Number(statsData.totalFavorites || 0) >= 2
     },
     {
-      name: 'Event Host',
-      description: 'Host 5+ events',
+      name: t('profile.achieveEventHostName', 'Event Host'),
+      description: t('profile.achieveEventHostDesc', 'Host 5+ events'),
       icon: CalendarDays,
       unlocked: isSuperAdmin || false
     },
     {
-      name: 'Ambassador',
-      description: 'Verified Admin',
+      name: t('profile.achieveAmbassadorName', 'Ambassador'),
+      description: t('profile.achieveAmbassadorDesc', 'Verified Admin'),
       icon: Sparkles,
       unlocked: isSuperAdmin || Boolean(userData.verified)
     }
@@ -263,7 +265,7 @@ export default function Profile() {
     if (!validation.valid) {
       showAlert({
         type: 'error',
-        title: 'Invalid File',
+        title: t('profile.invalidFileTitle', 'Invalid File'),
         message: validation.error
       });
       return;
@@ -289,8 +291,8 @@ export default function Profile() {
       }
       showAlert({
         type: 'success',
-        title: 'Avatar Updated',
-        message: 'Your profile picture has been updated successfully.'
+        title: t('profile.avatarUpdatedTitle', 'Avatar Updated'),
+        message: t('profile.avatarUpdatedMsg', 'Your profile picture has been updated successfully.')
       });
     } catch (err) {
       console.error('Avatar DB update error:', err);
@@ -305,13 +307,15 @@ export default function Profile() {
     const updated = { ...currentUser, ...fields };
     localStorage.setItem('user', JSON.stringify(updated));
     window.dispatchEvent(new Event('user-profile-updated'));
+    window.dispatchEvent(new Event('profile-updated'));
   };
 
   const handleDeleteImage = async () => {
     const confirmed = await showConfirm({
-      title: 'Remove Profile Photo',
-      message: 'Are you sure you want to remove your profile picture?',
-      confirmText: 'Remove'
+      title: t('profile.removePhotoConfirmTitle', 'Remove Profile Photo'),
+      message: t('profile.removePhotoConfirmMsg', 'Are you sure you want to remove your profile picture?'),
+      confirmText: t('profile.btnConfirmRemove', 'Remove'),
+      cancelText: t('common.cancel', 'Cancel')
     });
     if (!confirmed) return;
 
@@ -326,8 +330,8 @@ export default function Profile() {
       }
       showAlert({
         type: 'success',
-        title: 'Photo Removed',
-        message: 'Your profile photo has been removed.'
+        title: t('profile.photoRemovedTitle', 'Photo Removed'),
+        message: t('profile.photoRemovedMsg', 'Your profile photo has been removed.')
       });
     } catch (e) {
       console.error('Error clearing avatar:', e);
@@ -376,8 +380,8 @@ export default function Profile() {
           populateUserData(res.data);
           showAlert({
             type: 'success',
-            title: 'Profile Saved',
-            message: 'Your profile details have been saved successfully.'
+            title: t('profile.profileSavedTitle', 'Profile Saved'),
+            message: t('profile.profileSavedMsg', 'Your profile details have been saved successfully.')
           });
         }
       }
@@ -385,8 +389,8 @@ export default function Profile() {
       console.error('DB profile save error:', e);
       showAlert({
         type: 'error',
-        title: 'Update Failed',
-        message: e?.message || 'Failed to update profile.'
+        title: t('profile.updateFailedTitle', 'Update Failed'),
+        message: e?.message || t('profile.updateFailedMsg', 'Failed to update profile.')
       });
     }
   };
@@ -397,10 +401,10 @@ export default function Profile() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 sm:mb-8">
         <div>
           <h1 className="text-xl sm:text-2xl font-bold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] tracking-tight">
-            Profile Settings
+            {t('profile.title', 'Profile')}
           </h1>
           <p className="text-xs sm:text-sm text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mt-1">
-            Manage your personal profile, view achievements, and track activity
+            {t('profile.subtitle', 'Manage your personal profile, view achievements, and track activity')}
           </p>
         </div>
       </div>

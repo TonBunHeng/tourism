@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { User } from "lucide-react";
 import SimplePagination from "../../components/common/SimplePagination";
 import DeletionHeader from "./DeletionHeader";
 import DeletionStats from "./DeletionStats";
@@ -12,22 +11,23 @@ import deletionRequestService from "../../services/deletionRequestService";
 import { useAlert } from "../../context/AlertContext";
 import { useSearch } from "../../context/SearchContext";
 import { getPageCache, setPageCache } from "../../utils/pageCache";
+import { useLanguage } from "../../i18n";
 
 export default function DeleteAccount() {
+  const { t } = useLanguage();
   const { showSuccess, showError } = useAlert();
   const { searchTerm, setSearchTerm } = useSearch();
 
-  const cachedDeletion = getPageCache('deletion_requests_data');
-  const [requests, setRequests] = useState(() => cachedDeletion?.requests || []);
-  const [isLoading, setIsLoading] = useState(() => !cachedDeletion);
+  const [requests, setRequests] = useState(() => getPageCache('deletion_requests_data')?.requests || []);
+  const [isLoading, setIsLoading] = useState(() => !getPageCache('deletion_requests_data'));
   const [selectedType, setSelectedType] = useState("All");
   const [selectedStatus, setSelectedStatus] = useState("All");
   const [selectedUrgency, setSelectedUrgency] = useState("All");
   const [sortBy, setSortBy] = useState("newest");
 
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalRecords, setTotalRecords] = useState(() => cachedDeletion?.totalRecords || 0);
-  const [totalPages, setTotalPages] = useState(() => cachedDeletion?.totalPages || 1);
+  const [totalRecords, setTotalRecords] = useState(() => getPageCache('deletion_requests_data')?.totalRecords || 0);
+  const [totalPages, setTotalPages] = useState(() => getPageCache('deletion_requests_data')?.totalPages || 1);
   const itemsPerPage = 10;
 
   // Modal states
@@ -43,7 +43,7 @@ export default function DeleteAccount() {
   const urgencies = ["All", "critical", "high", "medium", "low"];
 
   const loadRequests = async () => {
-    if (!cachedDeletion && requests.length === 0) {
+    if (requests.length === 0) {
       setIsLoading(true);
     }
     try {
@@ -147,15 +147,10 @@ export default function DeleteAccount() {
   const endIndex = Math.min(startIndex + itemsPerPage, totalRecords);
   const paginatedRequests = sortedRequests.slice(startIndex, endIndex);
 
-  const handleSearchChange = (val) => { setSearchTerm(val); setCurrentPage(1); };
   const handleTypeChange = (val) => { setSelectedType(val); setCurrentPage(1); };
   const handleStatusChange = (val) => { setSelectedStatus(val); setCurrentPage(1); };
   const handleUrgencyChange = (val) => { setSelectedUrgency(val); setCurrentPage(1); };
   const handleSortChange = (val) => { setSortBy(val); setCurrentPage(1); };
-
-  const handleReset = () => {
-    loadRequests();
-  };
 
   const handleViewDetails = (request) => {
     setSelectedRequest(request);
@@ -191,11 +186,21 @@ export default function DeleteAccount() {
       setConfirmAction(null);
       setAdminNotes("");
       setSelectedRequest(null);
-      const msg = res.message || (newStatus === "approved" ? "Deletion request approved and item/account deleted." : "Deletion request rejected.");
-      showSuccess(msg, newStatus === "approved" ? "Request Approved" : "Request Rejected");
+      const msg = res.message || (newStatus === "approved" 
+        ? t('deletion.approveSuccess', 'Deletion request approved and item/account deleted.') 
+        : t('deletion.rejectSuccess', 'Deletion request rejected.'));
+      showSuccess(
+        msg, 
+        newStatus === "approved" 
+          ? t('deletion.approveTitle', 'Request Approved') 
+          : t('deletion.rejectTitle', 'Request Rejected')
+      );
       loadRequests();
     } catch (e) {
-      showError(e.message || "Failed to update request status.", "Action Failed");
+      showError(
+        e.message || t('deletion.updateFailed', 'Failed to update request status.'), 
+        t('deletion.actionFailedTitle', 'Action Failed')
+      );
     }
   };
 
@@ -243,7 +248,7 @@ export default function DeleteAccount() {
         {/* Requests List */}
         {isLoading ? (
           <div className="p-12 text-center text-slate-500 dark:text-zinc-400 font-medium">
-            Loading deletion requests from API...
+            {t('deletion.loadingRequests', 'Loading deletion requests from API...')}
           </div>
         ) : (
           <DeletionList
@@ -265,7 +270,7 @@ export default function DeleteAccount() {
           startIndex={startIndex}
           endIndex={endIndex}
           totalRecords={totalRecords}
-          label="requests"
+          label={t('deletion.paginationLabel', 'requests')}
         />
       </div>
 

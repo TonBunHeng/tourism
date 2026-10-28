@@ -15,8 +15,10 @@ import bookingService from '../../services/bookingService';
 import tourService from '../../services/tourService';
 import { useSearch } from '../../context/SearchContext';
 import { getPageCache, setPageCache } from '../../utils/pageCache';
+import { useLanguage } from '../../i18n';
 
 export default function Reports() {
+  const { t } = useLanguage();
   const [searchParams, setSearchParams] = useSearchParams();
   const { searchTerm, setSearchTerm, setPlaceholder } = useSearch();
 
@@ -30,19 +32,19 @@ export default function Reports() {
 
   useEffect(() => {
     const tabPlaceholders = {
-      all: 'Search all records across platform...',
-      places: 'Search places report...',
-      events: 'Search events report...',
-      tours: 'Search tours report...',
-      bookings: 'Search bookings report...',
-      users: 'Search users report...',
-      reviews: 'Search reviews report...',
-      categories: 'Search categories report...'
+      all: t('reports.searchAllPlaceholder', 'Search all records across platform...'),
+      places: t('reports.searchPlacesPlaceholder', 'Search places report...'),
+      events: t('reports.searchEventsPlaceholder', 'Search events report...'),
+      tours: t('reports.searchToursPlaceholder', 'Search tours report...'),
+      bookings: t('reports.searchBookingsPlaceholder', 'Search bookings report...'),
+      users: t('reports.searchUsersPlaceholder', 'Search users report...'),
+      reviews: t('reports.searchReviewsPlaceholder', 'Search reviews report...'),
+      categories: t('reports.searchCategoriesPlaceholder', 'Search categories report...')
     };
     if (setPlaceholder) {
-      setPlaceholder(tabPlaceholders[activeTab] || 'Search reports...');
+      setPlaceholder(tabPlaceholders[activeTab] || t('reports.searchPlaceholder', 'Search reports...'));
     }
-  }, [activeTab, setPlaceholder]);
+  }, [activeTab, setPlaceholder, t]);
 
   const [selectedDay, setSelectedDay] = useState('');
   const [appliedDay, setAppliedDay] = useState('');
@@ -52,10 +54,9 @@ export default function Reports() {
   const { showConfirm, showSuccess, showError } = useAlert();
   const [totalExports, setTotalExports] = useState(16);
 
-  const cachedDatasets = getPageCache('reports_datasets');
-  const [isLoading, setIsLoading] = useState(() => !cachedDatasets);
+  const [isLoading, setIsLoading] = useState(() => !getPageCache('reports_datasets'));
 
-  const [datasets, setDatasets] = useState(() => cachedDatasets || {
+  const [datasets, setDatasets] = useState(() => getPageCache('reports_datasets') || {
     all: [],
     places: [],
     events: [],
@@ -67,7 +68,7 @@ export default function Reports() {
   });
 
   const loadAllReportsData = async () => {
-    if (!cachedDatasets && datasets.all.length === 0) {
+    if (datasets.all.length === 0) {
       setIsLoading(true);
     }
     try {
@@ -324,15 +325,15 @@ export default function Reports() {
 
   const handleOpenExportPDF = async () => {
     const tabName = activeTab === 'all'
-      ? 'All Records (Master)'
+      ? t('reports.tabAllRecords', 'All Records')
       : (activeTab ? (activeTab.charAt(0).toUpperCase() + activeTab.slice(1)) : 'Data');
     const recordCount = filteredData.length;
 
     const confirmed = await showConfirm({
-      title: 'Export PDF Report Confirmation',
-      message: `Are you sure you want to export the "${tabName}" dataset (${recordCount} items) as a styled PDF document?`,
-      confirmText: 'Export PDF',
-      cancelText: 'Cancel',
+      title: t('reports.exportPdfConfirmation', 'Export PDF Report Confirmation'),
+      message: t('reports.confirmPdfExportMessage', { tab: tabName, count: recordCount }, `Are you sure you want to export the "${tabName}" dataset (${recordCount} items) as a styled PDF document?`),
+      confirmText: t('reports.btnExportPdf', 'Export PDF'),
+      cancelText: t('common.cancel', 'Cancel'),
       type: 'danger',
       customIcon: (
         <div className="w-16 h-16 rounded-md bg-red-50 dark:bg-red-950/50 text-red-600 dark:text-red-400 ring-8 ring-red-50/70 dark:ring-red-950/30 flex items-center justify-center shadow-xs">
@@ -392,28 +393,35 @@ export default function Reports() {
 
       if (result.success) {
         setTotalExports(prev => prev + 1);
-        showSuccess(`The "${tabName}" dataset (${recordCount} items) has been exported to PDF successfully.`, 'PDF Exported Successfully');
+        showSuccess(
+          t('reports.pdfExportSuccess', { tab: tabName, count: recordCount }, `The "${tabName}" dataset (${recordCount} items) has been exported to PDF successfully.`),
+          t('reports.pdfExportedSuccessTitle', 'PDF Exported Successfully')
+        );
       } else {
-        showError(result.error || 'Failed to generate PDF report document.', 'Export Failed');
+        showError(
+          result.error || t('reports.pdfExportFailed', 'Failed to generate PDF report document.'), 
+          t('reports.exportFailedTitle', 'Export Failed')
+        );
       }
     } catch (e) {
-      showError(e.message || 'An unexpected error occurred during PDF export.', 'Export Failed');
+      showError(
+        e.message || t('reports.pdfExportFailed', 'Failed to generate PDF report document.'), 
+        t('reports.exportFailedTitle', 'Export Failed')
+      );
     }
   };
 
   const handleOpenExportExcel = async () => {
     const tabName = activeTab === 'all'
-      ? 'All Records (Master)'
+      ? t('reports.tabAllRecords', 'All Records')
       : (activeTab ? (activeTab.charAt(0).toUpperCase() + activeTab.slice(1)) : 'Data');
     const recordCount = filteredData.length;
 
     const confirmed = await showConfirm({
-      title: 'Export Excel Spreadsheet Confirmation',
-      message: `Are you sure you want to export the "${tabName}" dataset (${recordCount} items) as an Excel spreadsheet?${
-        activeTab === 'all' ? ' This will generate a comprehensive workbook with all datasets in separate sheets.' : ''
-      }`,
-      confirmText: 'Export Excel',
-      cancelText: 'Cancel',
+      title: t('reports.exportExcelConfirmation', 'Export Excel Spreadsheet Confirmation'),
+      message: t('reports.confirmExcelExportMessage', { tab: tabName, count: recordCount }, `Are you sure you want to export the "${tabName}" dataset (${recordCount} items) as an Excel spreadsheet?`) + (activeTab === 'all' ? t('reports.excelMasterNote', ' This will generate a comprehensive workbook with all datasets in separate sheets.') : ''),
+      confirmText: t('reports.btnExportExcel', 'Export Excel'),
+      cancelText: t('common.cancel', 'Cancel'),
       type: 'success',
       customIcon: (
         <div className="w-16 h-16 rounded-md bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 ring-8 ring-emerald-50/70 dark:ring-emerald-950/30 flex items-center justify-center shadow-xs">
@@ -555,12 +563,21 @@ export default function Reports() {
 
       if (result.success) {
         setTotalExports(prev => prev + 1);
-        showSuccess(`The "${tabName}" dataset (${recordCount} items) has been exported to Excel successfully.`, 'Excel Exported Successfully');
+        showSuccess(
+          t('reports.excelExportSuccess', { tab: tabName, count: recordCount }, `The "${tabName}" dataset (${recordCount} items) has been exported to Excel successfully.`),
+          t('reports.excelExportedSuccessTitle', 'Excel Exported Successfully')
+        );
       } else {
-        showError(result.error || 'Failed to generate Excel spreadsheet.', 'Export Failed');
+        showError(
+          result.error || t('reports.excelExportFailed', 'Failed to generate Excel spreadsheet.'), 
+          t('reports.exportFailedTitle', 'Export Failed')
+        );
       }
     } catch (e) {
-      showError(e.message || 'An unexpected error occurred during Excel export.', 'Export Failed');
+      showError(
+        e.message || t('reports.excelExportFailed', 'Failed to generate Excel spreadsheet.'), 
+        t('reports.exportFailedTitle', 'Export Failed')
+      );
     }
   };
 

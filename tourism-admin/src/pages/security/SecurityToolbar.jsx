@@ -1,15 +1,18 @@
 import { ChevronDown } from 'lucide-react';
+import { useLanguage } from '../../i18n';
 
 export default function SecurityToolbar({
   statusFilter = 'all',
   onStatusFilterChange = () => {},
   totalResults
 }) {
+  const { t } = useLanguage();
+
   const statusOptions = [
-    { value: 'all', label: 'All Status' },
-    { value: 'unread', label: 'Unread Only' },
-    { value: 'read', label: 'Read / Acknowledged' },
-    { value: 'blocked', label: 'Blocked IPs Only' },
+    { value: 'all', label: t('security.filterAllStatus', 'All Status') },
+    { value: 'unread', label: t('security.filterUnreadOnly', 'Unread Only') },
+    { value: 'read', label: t('security.filterReadAcknowledged', 'Read / Acknowledged') },
+    { value: 'blocked', label: t('security.filterBlockedIpsOnly', 'Blocked IPs Only') },
   ];
 
   return (
@@ -17,11 +20,13 @@ export default function SecurityToolbar({
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex items-center gap-2.5">
           <h2 className="text-lg md:text-xl font-bold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">
-            All Incidents
+            {t('security.allIncidents', 'All Incidents')}
           </h2>
           {totalResults !== undefined && (
             <span className="text-xs font-semibold px-2 py-0.5 rounded-md bg-blue-50 text-[#003E83] dark:bg-blue-950/50 dark:text-blue-400 border border-blue-100 dark:border-blue-900/40">
-              {totalResults} {totalResults === 1 ? 'alert' : 'alerts'}
+              {totalResults === 1 
+                ? t('security.pillCountSingle', '1 alert') 
+                : t('security.pillCount', '{count} alerts', { count: totalResults })}
             </span>
           )}
         </div>

@@ -22,9 +22,9 @@ export default function FavoritesToolbar({
   onDeselectAll
 }) {
   const { t } = useLanguage();
-  const handleCategory = onCategoryChange || setSelectedCategory || (() => {});
-  const handleStatus = onStatusChange || setSelectedStatus || (() => {});
-  const handleSort = onSortChange || setSortBy || (() => {});
+  const handleCategory = onCategoryChange || setSelectedCategory || (() => { });
+  const handleStatus = onStatusChange || setSelectedStatus || (() => { });
+  const handleSort = onSortChange || setSortBy || (() => { });
 
   const hasActiveFilters = Boolean(
     (selectedCategory && selectedCategory !== 'All') ||

@@ -1,14 +1,18 @@
 import { Check, Lock } from 'lucide-react';
+import { useLanguage } from '../../i18n';
 
 export default function ProfileAchievements({ achievements = [] }) {
+  const { t } = useLanguage();
   const unlockedCount = achievements.filter((a) => a.unlocked).length;
 
   return (
     <div className="bg-[var(--color-white)] dark:bg-[var(--color-bg-dark)] rounded-md p-4 md:p-5 shadow-sm border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]">
       <div className="flex items-center justify-between mb-3">
-        <h3 className="font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">Achievements</h3>
+        <h3 className="font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">
+          {t('profile.achievementsTitle', 'Achievements')}
+        </h3>
         <span className="text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] font-medium">
-          {unlockedCount} of {achievements.length} Unlocked
+          {t('profile.unlockedCount', { count: unlockedCount, total: achievements.length }, `${unlockedCount} of ${achievements.length} Unlocked`)}
         </span>
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
@@ -49,11 +53,11 @@ export default function ProfileAchievements({ achievements = [] }) {
               <div className="mt-1.5 flex items-center justify-center">
                 {achievement.unlocked ? (
                   <span className="inline-flex items-center gap-0.5 text-[10px] font-semibold text-[var(--color-warning-text)] dark:text-[var(--color-warning-dark-text)]">
-                    <Check className="w-3 h-3" /> Unlocked
+                    <Check className="w-3 h-3" /> {t('profile.statusUnlocked', 'Unlocked')}
                   </span>
                 ) : (
                   <span className="inline-flex items-center gap-0.5 text-[10px] text-gray-400 dark:text-zinc-500">
-                    <Lock className="w-2.5 h-2.5" /> Locked
+                    <Lock className="w-2.5 h-2.5" /> {t('profile.statusLocked', 'Locked')}
                   </span>
                 )}
               </div>

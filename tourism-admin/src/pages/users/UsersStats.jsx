@@ -1,41 +1,45 @@
 import { Users as UsersIcon, UserCheck, ShieldCheck, Clock } from "lucide-react";
+import { useLanguage } from "../../i18n";
 
 export default function UsersStats({ users = [] }) {
+  const { t } = useLanguage();
   const safeUsers = Array.isArray(users) ? users : [];
   const total = safeUsers.length;
   const activeCount = safeUsers.filter(u => u.status === "Active" || u.onlineStatus === "Online").length;
   const offlineCount = safeUsers.filter(u => u.status !== "Active" && u.onlineStatus !== "Online").length;
   const adminCount = safeUsers.filter(u => u.role === "Super Admin" || u.role === "Admin").length;
 
+  const pct = total > 0 ? Math.round((activeCount / total) * 100) : 0;
+
   const stats = [
     {
-      label: "Total Registered Users",
+      label: t('users.statTotalUsers'),
       value: total.toLocaleString(),
-      subtext: "Tourist & staff accounts",
+      subtext: t('users.subtextTotalUsers'),
       icon: UsersIcon,
       color: "text-[var(--color-info-text)] dark:text-[var(--color-info-dark-text)]",
       bg: "bg-[var(--color-info-bg)] dark:bg-[var(--color-info-dark-bg)]"
     },
     {
-      label: "Active Accounts",
+      label: t('users.statActiveAccounts'),
       value: activeCount.toLocaleString(),
-      subtext: `${total > 0 ? Math.round((activeCount / total) * 100) : 0}% active engagement`,
+      subtext: t('users.subtextActiveAccounts', { pct }),
       icon: UserCheck,
       color: "text-[var(--color-success-text)] dark:text-[var(--color-success-dark-text)]",
       bg: "bg-[var(--color-success-bg)] dark:bg-[var(--color-success-dark-bg)]"
     },
     {
-      label: "Inactive / Suspended",
+      label: t('users.statInactiveAccounts'),
       value: offlineCount.toLocaleString(),
-      subtext: "Inactive member accounts",
+      subtext: t('users.subtextInactiveAccounts'),
       icon: Clock,
       color: "text-[var(--color-warning-text)] dark:text-[var(--color-warning-dark-text)]",
       bg: "bg-[var(--color-warning-bg)] dark:bg-[var(--color-warning-dark-bg)]"
     },
     {
-      label: "Administrators",
+      label: t('users.statAdmins'),
       value: adminCount.toLocaleString(),
-      subtext: "Full system access permissions",
+      subtext: t('users.subtextAdmins'),
       icon: ShieldCheck,
       color: "text-[var(--color-purple-text)] dark:text-[var(--color-purple-dark-text)]",
       bg: "bg-[var(--color-purple-bg)] dark:bg-[var(--color-purple-dark-bg)]"

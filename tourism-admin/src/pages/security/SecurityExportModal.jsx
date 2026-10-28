@@ -1,17 +1,17 @@
 import { useEffect, useState } from 'react';
 import {
-  X,
   FileText,
   Download,
   FileSpreadsheet,
   Code,
-  ShieldCheck,
   Loader2
 } from 'lucide-react';
 import { exportToPDF, exportToExcel } from '../../utils/exportReports';
 import { useAlert } from '../../context/AlertContext';
+import { useLanguage } from '../../i18n';
 
 export default function SecurityExportModal({ isOpen, onClose, alerts = [], meta = {} }) {
+  const { t } = useLanguage();
   const { showSuccess, showError } = useAlert();
   const [downloading, setDownloading] = useState(false);
   const [downloadType, setDownloadType] = useState(null);
@@ -61,15 +61,15 @@ export default function SecurityExportModal({ isOpen, onClose, alerts = [], meta
       if (result.success) {
         onClose?.();
         showSuccess(
-          `The security audit report (${alerts.length} incident records) has been exported to PDF successfully.`,
-          'PDF Exported Successfully'
+          t('security.exportPdfSuccess', 'The security audit report ({count} incident records) has been exported to PDF successfully.', { count: alerts.length }),
+          t('security.exportPdfSuccessTitle', 'PDF Exported Successfully')
         );
       } else {
-        showError(result.error || 'Failed to generate PDF document.', 'Export Failed');
+        showError(result.error || t('security.exportPdfError', 'Failed to generate PDF document.'), t('security.exportFailedTitle', 'Export Failed'));
       }
     } catch (err) {
       console.error('PDF Generation Error:', err);
-      showError(err.message || 'An error occurred during PDF generation.', 'Export Failed');
+      showError(err.message || t('security.exportPdfError', 'An error occurred during PDF generation.'), t('security.exportFailedTitle', 'Export Failed'));
     } finally {
       setDownloading(false);
       setDownloadType(null);
@@ -103,15 +103,15 @@ export default function SecurityExportModal({ isOpen, onClose, alerts = [], meta
       if (result.success) {
         onClose?.();
         showSuccess(
-          `The security audit report (${alerts.length} incident records) has been exported to Excel successfully.`,
-          'Excel Exported Successfully'
+          t('security.exportExcelSuccess', 'The security audit report ({count} incident records) has been exported to Excel successfully.', { count: alerts.length }),
+          t('security.exportExcelSuccessTitle', 'Excel Exported Successfully')
         );
       } else {
-        showError(result.error || 'Failed to generate Excel file.', 'Export Failed');
+        showError(result.error || t('security.exportExcelError', 'Failed to generate Excel file.'), t('security.exportFailedTitle', 'Export Failed'));
       }
     } catch (err) {
       console.error('Excel Export Error:', err);
-      showError(err.message || 'An error occurred during Excel export.', 'Export Failed');
+      showError(err.message || t('security.exportExcelError', 'An error occurred during Excel export.'), t('security.exportFailedTitle', 'Export Failed'));
     } finally {
       setDownloading(false);
       setDownloadType(null);
@@ -145,12 +145,12 @@ export default function SecurityExportModal({ isOpen, onClose, alerts = [], meta
 
       onClose?.();
       showSuccess(
-        `Security audit logs (${alerts.length} records) have been exported to JSON successfully.`,
-        'JSON Exported Successfully'
+        t('security.exportJsonSuccess', 'Security audit logs ({count} records) have been exported to JSON successfully.', { count: alerts.length }),
+        t('security.exportJsonSuccessTitle', 'JSON Exported Successfully')
       );
     } catch (err) {
       console.error('JSON Export Error:', err);
-      showError(err.message || 'An error occurred during JSON export.', 'Export Failed');
+      showError(err.message || t('security.exportJsonError', 'An error occurred during JSON export.'), t('security.exportFailedTitle', 'Export Failed'));
     } finally {
       setDownloading(false);
       setDownloadType(null);
@@ -177,10 +177,10 @@ export default function SecurityExportModal({ isOpen, onClose, alerts = [], meta
             </div>
             <div>
               <h2 id="security-export-modal-title" className="text-base font-bold text-gray-900 dark:text-white">
-                Download Security Report
+                {t('security.exportModalTitle', 'Download Security Report')}
               </h2>
               <p className="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">
-                Choose your preferred export document format
+                {t('security.exportModalSubtitle', 'Choose your preferred export document format')}
               </p>
             </div>
           </div>
@@ -205,14 +205,14 @@ export default function SecurityExportModal({ isOpen, onClose, alerts = [], meta
             <div className="min-w-0 flex-1">
               <div className="flex items-center justify-between">
                 <h4 className="text-xs font-bold text-gray-900 dark:text-zinc-100 group-hover:text-red-500 dark:group-hover:text-red-400 transition-colors">
-                  PDF Security Audit Report
+                  {t('security.exportPdfTitle', 'PDF Security Audit Report')}
                 </h4>
                 <span className="text-[10px] uppercase font-semibold text-red-500 dark:text-red-400 bg-red-500/10 px-2 py-0.5 rounded-md border border-red-500/20">
-                  PDF
+                  {t('security.exportPdfTag', 'PDF')}
                 </span>
               </div>
               <p className="text-xs text-gray-500 dark:text-zinc-400 mt-1 leading-relaxed">
-                Formatted executive document with KPIs, incident tables, and system defense summary.
+                {t('security.exportPdfDesc', 'Formatted executive document with KPIs, incident tables, and system defense summary.')}
               </p>
             </div>
           </button>
@@ -234,14 +234,14 @@ export default function SecurityExportModal({ isOpen, onClose, alerts = [], meta
             <div className="min-w-0 flex-1">
               <div className="flex items-center justify-between">
                 <h4 className="text-xs font-bold text-gray-900 dark:text-zinc-100 group-hover:text-emerald-500 dark:group-hover:text-emerald-400 transition-colors">
-                  CSV / Excel Spreadsheet
+                  {t('security.exportExcelTitle', 'CSV / Excel Spreadsheet')}
                 </h4>
                 <span className="text-[10px] uppercase font-semibold text-emerald-500 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/20">
-                  Excel
+                  {t('security.exportExcelTag', 'Excel')}
                 </span>
               </div>
               <p className="text-xs text-gray-500 dark:text-zinc-400 mt-1 leading-relaxed">
-                Spreadsheet data with raw timestamps, source IPs, target emails, and failure counters.
+                {t('security.exportExcelDesc', 'Spreadsheet data with raw timestamps, source IPs, target emails, and failure counters.')}
               </p>
             </div>
           </button>
@@ -263,14 +263,14 @@ export default function SecurityExportModal({ isOpen, onClose, alerts = [], meta
             <div className="min-w-0 flex-1">
               <div className="flex items-center justify-between">
                 <h4 className="text-xs font-bold text-gray-900 dark:text-zinc-100 group-hover:text-indigo-500 dark:group-hover:text-indigo-400 transition-colors">
-                  JSON Security Audit Log
+                  {t('security.exportJsonTitle', 'JSON Security Audit Log')}
                 </h4>
                 <span className="text-[10px] uppercase font-semibold text-indigo-500 dark:text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded-md border border-indigo-500/20">
-                  JSON
+                  {t('security.exportJsonTag', 'JSON')}
                 </span>
               </div>
               <p className="text-xs text-gray-500 dark:text-zinc-400 mt-1 leading-relaxed">
-                Structured machine-readable logs for SIEM and security analysis tools.
+                {t('security.exportJsonDesc', 'Structured machine-readable logs for SIEM and security analysis tools.')}
               </p>
             </div>
           </button>
@@ -279,14 +279,14 @@ export default function SecurityExportModal({ isOpen, onClose, alerts = [], meta
         {/* Modal Footer */}
         <div className="p-4 border-t border-gray-200 dark:border-zinc-800 bg-gray-50/50 dark:bg-zinc-900/40 flex items-center justify-between">
           <span className="text-xs text-gray-500 dark:text-zinc-400">
-            {alerts.length} incident records ready to export
+            {t('security.readyToExport', '{count} incident records ready to export', { count: alerts.length })}
           </span>
           <button
             type="button"
             onClick={onClose}
             className="py-2 px-4 rounded-md border border-gray-300 dark:border-zinc-800 bg-transparent hover:bg-gray-100 dark:hover:bg-zinc-800 text-gray-700 dark:text-zinc-300 text-xs font-medium transition-colors cursor-pointer"
           >
-            Cancel
+            {t('security.btnCancel', 'Cancel')}
           </button>
         </div>
       </div>

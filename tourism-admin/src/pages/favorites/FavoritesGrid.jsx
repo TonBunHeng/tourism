@@ -76,9 +76,8 @@ export default function FavoritesGrid({
         return (
           <div
             key={favorite.id}
-            className={`bg-[var(--color-white)] dark:bg-[var(--color-bg-dark)] border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] rounded-md overflow-hidden shadow-xs flex flex-col justify-between group ${
-              isSelected ? 'ring-2 ring-[var(--color-primary)]' : ''
-            }`}
+            className={`bg-[var(--color-white)] dark:bg-[var(--color-bg-dark)] border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] rounded-md overflow-hidden shadow-xs flex flex-col justify-between group ${isSelected ? 'ring-2 ring-[var(--color-primary)]' : ''
+              }`}
           >
             {/* Image & Badges */}
             <div className="relative h-44 w-full overflow-hidden bg-slate-100 dark:bg-zinc-800">
@@ -121,11 +120,10 @@ export default function FavoritesGrid({
                 </span>
 
                 <span
-                  className={`inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-md border ${
-                    isVisited
-                      ? 'bg-emerald-600 text-white border-emerald-500'
-                      : 'bg-[#003E83] text-white border-blue-800'
-                  }`}
+                  className={`inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-md border ${isVisited
+                    ? 'bg-emerald-600 text-white border-emerald-500'
+                    : 'bg-[#003E83] text-white border-blue-800'
+                    }`}
                 >
                   {isVisited ? (
                     <>
@@ -208,11 +206,10 @@ export default function FavoritesGrid({
                 <button
                   type="button"
                   onClick={() => handleToggleVisit(favorite.id)}
-                  className={`flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded-md border transition-colors cursor-pointer ${
-                    isVisited
-                      ? 'bg-[var(--color-success-bg)] dark:bg-[var(--color-success-dark-bg)] text-[var(--color-success-text)] dark:text-[var(--color-success-dark-text)] border-[var(--color-success-border)] dark:border-[var(--color-success-dark-border)] hover:opacity-85'
-                      : 'bg-[var(--color-neutral-badge-bg)] dark:bg-[var(--color-neutral-badge-dark-bg)] text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] hover:text-[var(--color-primary)]'
-                  }`}
+                  className={`flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded-md border transition-colors cursor-pointer ${isVisited
+                    ? 'bg-[var(--color-success-bg)] dark:bg-[var(--color-success-dark-bg)] text-[var(--color-success-text)] dark:text-[var(--color-success-dark-text)] border-[var(--color-success-border)] dark:border-[var(--color-success-dark-border)] hover:opacity-85'
+                    : 'bg-[var(--color-neutral-badge-bg)] dark:bg-[var(--color-neutral-badge-dark-bg)] text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] hover:text-[var(--color-primary)]'
+                    }`}
                   title={isVisited ? t('favorites.tooltipMarkToVisit') : t('favorites.tooltipMarkVisited')}
                 >
                   <Check className="w-3.5 h-3.5" />

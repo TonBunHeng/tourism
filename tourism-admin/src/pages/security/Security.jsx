@@ -11,15 +11,16 @@ import SecurityExportModal from './SecurityExportModal';
 import SecurityToolbar from './SecurityToolbar';
 import SimplePagination from '../../components/common/SimplePagination';
 import { getPageCache, setPageCache } from '../../utils/pageCache';
+import { useLanguage } from '../../i18n';
 
 export default function Security() {
+  const { t } = useLanguage();
   const { showConfirm, showSuccess, showError } = useAlert();
   const { searchTerm } = useSearch();
 
-  const cachedSecurity = getPageCache('security_data');
-  const [alerts, setAlerts] = useState(() => cachedSecurity?.alerts || []);
-  const [meta, setMeta] = useState(() => cachedSecurity?.meta || {});
-  const [loading, setLoading] = useState(() => !cachedSecurity);
+  const [alerts, setAlerts] = useState(() => getPageCache('security_data')?.alerts || []);
+  const [meta, setMeta] = useState(() => getPageCache('security_data')?.meta || {});
+  const [loading, setLoading] = useState(() => !getPageCache('security_data'));
 
   // Modal States
   const [selectedAlert, setSelectedAlert] = useState(null);
@@ -32,9 +33,6 @@ export default function Security() {
   const itemsPerPage = 10;
 
   const fetchSecurityAlerts = useCallback(async () => {
-    if (!cachedSecurity && alerts.length === 0) {
-      setLoading(true);
-    }
     try {
       const res = await securityService.getAlerts({ per_page: 100 });
       const data = res?.data || [];
@@ -50,7 +48,7 @@ export default function Security() {
     } finally {
       setLoading(false);
     }
-  }, [cachedSecurity, alerts.length]);
+  }, []);
 
   useEffect(() => {
     fetchSecurityAlerts();
@@ -107,23 +105,12 @@ export default function Security() {
     }
   };
 
-  const handleMarkAllRead = async () => {
-    try {
-      await securityService.markAllRead();
-      setAlerts(prev => prev.map(a => ({ ...a, is_read: true })));
-      setMeta(prev => ({ ...prev, unread_count: 0 }));
-      showSuccess('All security incidents marked as acknowledged.', 'Success');
-    } catch (err) {
-      showError(err.message || 'Failed to mark alerts as read.', 'Error');
-    }
-  };
-
   const handleBlockIp = async (ipAddress) => {
     if (!ipAddress) return;
     const confirmed = await showConfirm({
-      title: 'Block IP Address',
-      message: `Are you sure you want to block IP address "${ipAddress}"? All login requests and access from this IP will be immediately rejected.`,
-      confirmText: 'Block IP',
+      title: t('security.blockIpConfirmTitle', 'Block IP Address'),
+      message: t('security.blockIpConfirmMsg', 'Are you sure you want to block IP address "{ip}"? All login requests and access from this IP will be immediately rejected.', { ip: ipAddress }),
+      confirmText: t('security.blockIpConfirmBtn', 'Block IP'),
       type: 'danger'
     });
 
@@ -137,7 +124,10 @@ export default function Security() {
           setSelectedAlert(prev => ({ ...prev, is_ip_blocked: true }));
         }
         setMeta(prev => ({ ...prev, blocked_ips_count: (prev.blocked_ips_count || 0) + 1 }));
-        showSuccess(`IP address ${ipAddress} has been blocked.`, 'IP Blocked');
+        showSuccess(
+          t('security.blockIpSuccess', 'IP address {ip} has been blocked.', { ip: ipAddress }),
+          t('security.blockIpSuccessTitle', 'IP Blocked')
+        );
       } catch (err) {
         showError(err.message || 'Failed to block IP address.', 'Error');
       }
@@ -147,9 +137,9 @@ export default function Security() {
   const handleUnblockIp = async (ipAddress) => {
     if (!ipAddress) return;
     const confirmed = await showConfirm({
-      title: 'Unblock IP Address',
-      message: `Are you sure you want to unblock IP address "${ipAddress}"?`,
-      confirmText: 'Unblock IP',
+      title: t('security.unblockIpConfirmTitle', 'Unblock IP Address'),
+      message: t('security.unblockIpConfirmMsg', 'Are you sure you want to unblock IP address "{ip}"?', { ip: ipAddress }),
+      confirmText: t('security.unblockIpConfirmBtn', 'Unblock IP'),
       type: 'info'
     });
 
@@ -163,7 +153,10 @@ export default function Security() {
           setSelectedAlert(prev => ({ ...prev, is_ip_blocked: false }));
         }
         setMeta(prev => ({ ...prev, blocked_ips_count: Math.max(0, (prev.blocked_ips_count || 1) - 1) }));
-        showSuccess(`IP address ${ipAddress} is now unblocked.`, 'IP Unblocked');
+        showSuccess(
+          t('security.unblockIpSuccess', 'IP address {ip} is now unblocked.', { ip: ipAddress }),
+          t('security.unblockIpSuccessTitle', 'IP Unblocked')
+        );
       } catch (err) {
         showError(err.message || 'Failed to unblock IP address.', 'Error');
       }
@@ -172,9 +165,9 @@ export default function Security() {
 
   const handleDeleteAlert = async (id) => {
     const confirmed = await showConfirm({
-      title: 'Delete Security Alert',
-      message: 'Are you sure you want to permanently remove this incident record?',
-      confirmText: 'Delete',
+      title: t('security.deleteAlertConfirmTitle', 'Delete Security Alert'),
+      message: t('security.deleteAlertConfirmMsg', 'Are you sure you want to permanently remove this incident record?'),
+      confirmText: t('security.deleteAlertConfirmBtn', 'Delete'),
       type: 'danger'
     });
 
@@ -187,7 +180,7 @@ export default function Security() {
           setSelectedAlert(null);
         }
         setMeta(prev => ({ ...prev, total_alerts: Math.max(0, (prev.total_alerts || 1) - 1) }));
-        showSuccess('Security alert deleted.', 'Success');
+        showSuccess(t('security.deleteAlertSuccess', 'Security alert deleted.'), 'Success');
       } catch (err) {
         showError(err.message || 'Failed to delete security alert.', 'Error');
       }
@@ -228,7 +221,7 @@ export default function Security() {
         <div className="p-12 text-center flex flex-col items-center justify-center space-y-3 bg-[var(--color-white)] dark:bg-[var(--color-bg-dark)] rounded-md border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]">
           <Loader2 className="w-8 h-8 text-[#003E83] dark:text-blue-500 animate-spin" />
           <p className="text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
-            Loading real security logs from database...
+            {t('security.loadingLogs', 'Loading real security logs from database...')}
           </p>
         </div>
       ) : (
@@ -255,7 +248,7 @@ export default function Security() {
             startIndex={startIndex}
             endIndex={endIndex}
             totalRecords={totalRecords}
-            label="alerts"
+            label={t('security.paginationLabel', 'alerts')}
           />
         </div>
       )}

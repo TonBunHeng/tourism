@@ -42,8 +42,10 @@ import reviewService from '../../services/reviewService';
 import categoryService from '../../services/categoryService';
 import reportService from '../../services/reportService';
 import { getPageCache } from '../../utils/pageCache';
+import { useLanguage } from '../../i18n';
 
 export default function ReportsAnalytics({ datasets: initialDatasets = null }) {
+  const { t } = useLanguage();
   const [timeframe, setTimeframe] = useState('Year');
   const [selectedDataset, setSelectedDataset] = useState('ALL');
   const [statusFilter, setStatusFilter] = useState('ALL');
@@ -55,13 +57,13 @@ export default function ReportsAnalytics({ datasets: initialDatasets = null }) {
 
   const timeframeLabel = useMemo(() => {
     switch (timeframe) {
-      case 'Day': return 'Today';
-      case 'Week': return 'This Week';
-      case 'Month': return 'This Month';
+      case 'Day': return t('reports.tfToday', 'Today');
+      case 'Week': return t('reports.tfThisWeek', 'This Week');
+      case 'Month': return t('reports.tfThisMonth', 'This Month');
       case 'Year':
-      default: return '2026';
+      default: return t('reports.tfYear2026', '2026');
     }
-  }, [timeframe]);
+  }, [timeframe, t]);
 
   // Raw dataset holders
   const [datasets, setDatasets] = useState(() => {
@@ -319,10 +321,10 @@ export default function ReportsAnalytics({ datasets: initialDatasets = null }) {
   }, [currentDatasetItems]);
 
   const healthStatus = useMemo(() => {
-    if (activePct >= 80) return { label: 'Optimal Health', color: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800' };
-    if (activePct >= 60) return { label: 'Good Standing', color: 'bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300 border-blue-200 dark:border-blue-800' };
-    return { label: 'Attention Needed', color: 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300 border-amber-200 dark:border-amber-800' };
-  }, [activePct]);
+    if (activePct >= 80) return { label: t('reports.healthOptimal', 'Optimal Health'), color: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800' };
+    if (activePct >= 60) return { label: t('reports.healthGood', 'Good Standing'), color: 'bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300 border-blue-200 dark:border-blue-800' };
+    return { label: t('reports.healthAttention', 'Attention Needed'), color: 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300 border-amber-200 dark:border-amber-800' };
+  }, [activePct, t]);
 
   // Quality & Rating score
   const avgScore = useMemo(() => {
@@ -430,11 +432,11 @@ export default function ReportsAnalytics({ datasets: initialDatasets = null }) {
     if (selectedDataset === 'ALL') {
       const total = globalTotalRecords || 1;
       return [
-        { name: 'Places & Attractions', count: places.length, percentage: Math.round((places.length / total) * 100), color: palette[0], fillColor: fillColors[0] },
-        { name: 'Events & Festivals', count: events.length, percentage: Math.round((events.length / total) * 100), color: palette[1], fillColor: fillColors[1] },
-        { name: 'Users & Accounts', count: users.length, percentage: Math.round((users.length / total) * 100), color: palette[2], fillColor: fillColors[2] },
-        { name: 'Ratings & Reviews', count: reviews.length, percentage: Math.round((reviews.length / total) * 100), color: palette[3], fillColor: fillColors[3] },
-        { name: 'Categories', count: categories.length, percentage: Math.round((categories.length / total) * 100), color: palette[4], fillColor: fillColors[4] }
+        { name: t('reports.datasetPlaces', 'Places & Attractions'), count: places.length, percentage: Math.round((places.length / total) * 100), color: palette[0], fillColor: fillColors[0] },
+        { name: t('reports.datasetEvents', 'Events & Festivals'), count: events.length, percentage: Math.round((events.length / total) * 100), color: palette[1], fillColor: fillColors[1] },
+        { name: t('reports.datasetUsers', 'Users & Accounts'), count: users.length, percentage: Math.round((users.length / total) * 100), color: palette[2], fillColor: fillColors[2] },
+        { name: t('reports.datasetReviews', 'Ratings & Reviews'), count: reviews.length, percentage: Math.round((reviews.length / total) * 100), color: palette[3], fillColor: fillColors[3] },
+        { name: t('reports.datasetCategories', 'Categories'), count: categories.length, percentage: Math.round((categories.length / total) * 100), color: palette[4], fillColor: fillColors[4] }
       ].filter(item => item.count > 0);
     }
 
@@ -474,17 +476,17 @@ export default function ReportsAnalytics({ datasets: initialDatasets = null }) {
       color: palette[idx % palette.length],
       fillColor: fillColors[idx % fillColors.length]
     }));
-  }, [selectedDataset, globalTotalRecords, places, events, users, reviews, categories, currentDatasetItems]);
+  }, [selectedDataset, globalTotalRecords, places, events, users, reviews, categories, currentDatasetItems, t]);
 
   // Operational Status Breakdown Data (for Donut Hub)
   const statusBreakdownData = useMemo(() => {
     const total = currentDatasetItems.length || 1;
     return [
-      { name: 'Active / Published', count: activeCount, percentage: Math.round((activeCount / total) * 100), color: '#10b981', bgClass: 'bg-emerald-500' },
-      { name: 'Pending / Review', count: pendingCount, percentage: Math.round((pendingCount / total) * 100), color: '#f59e0b', bgClass: 'bg-amber-500' },
-      { name: 'Archived / Inactive', count: archivedCount, percentage: Math.round((archivedCount / total) * 100), color: '#94a3b8', bgClass: 'bg-gray-400' }
+      { name: t('reports.statusActivePublished', 'Active / Published'), count: activeCount, percentage: Math.round((activeCount / total) * 100), color: '#10b981', bgClass: 'bg-emerald-500' },
+      { name: t('reports.statusPendingReview', 'Pending / Review'), count: pendingCount, percentage: Math.round((pendingCount / total) * 100), color: '#f59e0b', bgClass: 'bg-amber-500' },
+      { name: t('reports.statusArchivedInactive', 'Archived / Inactive'), count: archivedCount, percentage: Math.round((archivedCount / total) * 100), color: '#94a3b8', bgClass: 'bg-gray-400' }
     ].filter(item => item.count > 0 || currentDatasetItems.length === 0);
-  }, [currentDatasetItems, activeCount, pendingCount, archivedCount]);
+  }, [currentDatasetItems, activeCount, pendingCount, archivedCount, t]);
 
   const isFilterActive = timeframe !== 'Year' || selectedDataset !== 'ALL' || statusFilter !== 'ALL';
 
@@ -496,33 +498,33 @@ export default function ReportsAnalytics({ datasets: initialDatasets = null }) {
 
   const stats = [
     {
-      label: 'Total Ingested Records',
+      label: t('reports.kpiTotalIngested', 'Total Ingested Records'),
       value: totalRecords.toLocaleString(),
-      subtext: `${globalTotalRecords.toLocaleString()} global records in DB`,
+      subtext: t('reports.subtextTotalIngested', { count: globalTotalRecords.toLocaleString() }, `${globalTotalRecords.toLocaleString()} global records in DB`),
       icon: FileText,
       color: 'text-[var(--color-info-text)] dark:text-[var(--color-info-dark-text)]',
       bg: 'bg-[var(--color-info-bg)] dark:bg-[var(--color-info-dark-bg)]'
     },
     {
-      label: 'Active System Records',
+      label: t('reports.kpiActiveRecords', 'Active System Records'),
       value: `${activePct}%`,
-      subtext: `${activeCount.toLocaleString()} active/published entities`,
+      subtext: t('reports.subtextActiveRecords', { count: activeCount.toLocaleString() }, `${activeCount.toLocaleString()} active/published entities`),
       icon: CheckCircle2,
       color: 'text-[var(--color-success-text)] dark:text-[var(--color-success-dark-text)]',
       bg: 'bg-[var(--color-success-bg)] dark:bg-[var(--color-success-dark-bg)]'
     },
     {
-      label: 'Dataset Quality Index',
+      label: t('reports.kpiQualityIndex', 'Dataset Quality Index'),
       value: `${avgScore} ★`,
-      subtext: 'Average destination & feedback rating',
+      subtext: t('reports.subtextQualityIndex', 'Average destination & feedback rating'),
       icon: Star,
       color: 'text-[var(--color-warning-text)] dark:text-[var(--color-warning-dark-text)]',
       bg: 'bg-[var(--color-warning-bg)] dark:bg-[var(--color-warning-dark-bg)]'
     },
     {
-      label: 'Database Schema Scope',
-      value: `${Object.keys(datasets).length} Tables`,
-      subtext: 'Places, Events, Users, Reviews, Categories',
+      label: t('reports.kpiSchemaScope', 'Database Schema Scope'),
+      value: t('reports.valueSchemaScope', { count: Object.keys(datasets).length }, `${Object.keys(datasets).length} Tables`),
+      subtext: t('reports.subtextSchemaScope', 'Places, Events, Users, Reviews, Categories'),
       icon: Layers,
       color: 'text-[var(--color-purple-badge-text)] dark:text-[var(--color-purple-badge-dark-text)]',
       bg: 'bg-[var(--color-purple-badge-bg)] dark:bg-[var(--color-purple-badge-dark-bg)]'
@@ -536,10 +538,10 @@ export default function ReportsAnalytics({ datasets: initialDatasets = null }) {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <h1 className="text-xl sm:text-2xl font-bold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] tracking-tight">
-              Reports & System Analytics
+              {t('reports.analyticsTitle', 'Reports Analytics')}
             </h1>
             <p className="text-xs sm:text-sm text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mt-1">
-              Cross-dataset intelligence, volume trends, and database metrics
+              {t('reports.analyticsSubtitle', 'Cross-dataset intelligence, volume trends, and database metrics')}
             </p>
           </div>
 
@@ -549,7 +551,7 @@ export default function ReportsAnalytics({ datasets: initialDatasets = null }) {
               className="flex items-center justify-center gap-1.5 md:gap-2 px-4 py-2 text-xs md:text-sm font-medium rounded-md border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] bg-[var(--color-white)] dark:bg-[var(--color-bg-dark)] hover:bg-gray-100 dark:hover:bg-gray-800 text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] shadow-xs transition-colors cursor-pointer shrink-0 w-full sm:w-auto"
             >
               <ArrowLeft className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
-              <span>Back to Reports</span>
+              <span>{t('reports.btnBackToReports', 'Back to Reports')}</span>
             </Link>
           </div>
         </div>
@@ -591,10 +593,10 @@ export default function ReportsAnalytics({ datasets: initialDatasets = null }) {
           <div className="flex items-center gap-2">
             <Filter className="w-4 h-4 text-[#003E83] dark:text-blue-400 shrink-0" />
             <span className="text-sm font-bold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">
-              Filter Analytics
+              {t('reports.filterAnalytics', 'Filter Analytics')}
             </span>
             <span className="text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
-              ({totalRecords.toLocaleString()} records)
+              {t('reports.recordsCount', { count: totalRecords.toLocaleString() }, `(${totalRecords.toLocaleString()} records)`)}
             </span>
           </div>
 
@@ -606,12 +608,12 @@ export default function ReportsAnalytics({ datasets: initialDatasets = null }) {
                 onChange={(e) => setSelectedDataset(e.target.value)}
                 className="appearance-none w-full sm:w-auto pl-3.5 pr-8 py-2 border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] rounded-md bg-[var(--color-white)] dark:bg-[var(--color-bg-dark)] text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] text-xs md:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[var(--color-input)] focus:border-transparent cursor-pointer shadow-xs"
               >
-                <option value="ALL">All Datasets (Global)</option>
-                <option value="places">Places & Attractions</option>
-                <option value="events">Events & Festivals</option>
-                <option value="users">Users & Accounts</option>
-                <option value="reviews">Ratings & Reviews</option>
-                <option value="categories">Categories</option>
+                <option value="ALL">{t('reports.datasetAll', 'All Datasets (Global)')}</option>
+                <option value="places">{t('reports.datasetPlaces', 'Places & Attractions')}</option>
+                <option value="events">{t('reports.datasetEvents', 'Events & Festivals')}</option>
+                <option value="users">{t('reports.datasetUsers', 'Users & Accounts')}</option>
+                <option value="reviews">{t('reports.datasetReviews', 'Ratings & Reviews')}</option>
+                <option value="categories">{t('reports.datasetCategories', 'Categories')}</option>
               </select>
               <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--color-text-muted-light)] dark:text-[var(--color-text-secondary-dark)] pointer-events-none" />
             </div>
@@ -623,10 +625,10 @@ export default function ReportsAnalytics({ datasets: initialDatasets = null }) {
                 onChange={(e) => setStatusFilter(e.target.value)}
                 className="appearance-none w-full sm:w-auto pl-3.5 pr-8 py-2 border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] rounded-md bg-[var(--color-white)] dark:bg-[var(--color-bg-dark)] text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] text-xs md:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[var(--color-input)] focus:border-transparent cursor-pointer shadow-xs"
               >
-                <option value="ALL">All Statuses</option>
-                <option value="Active">Active / Published</option>
-                <option value="Pending">Pending / Upcoming</option>
-                <option value="Archived">Archived / Inactive</option>
+                <option value="ALL">{t('reports.statusAllOptions', 'All Statuses')}</option>
+                <option value="Active">{t('reports.statusActivePublished', 'Active / Published')}</option>
+                <option value="Pending">{t('reports.statusPendingUpcoming', 'Pending / Upcoming')}</option>
+                <option value="Archived">{t('reports.statusArchivedInactive', 'Archived / Inactive')}</option>
               </select>
               <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--color-text-muted-light)] dark:text-[var(--color-text-secondary-dark)] pointer-events-none" />
             </div>
@@ -638,10 +640,10 @@ export default function ReportsAnalytics({ datasets: initialDatasets = null }) {
                 onChange={(e) => setTimeframe(e.target.value)}
                 className="appearance-none w-full sm:w-auto pl-3.5 pr-8 py-2 border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] rounded-md bg-[var(--color-white)] dark:bg-[var(--color-bg-dark)] text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] text-xs md:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[var(--color-input)] focus:border-transparent cursor-pointer shadow-xs"
               >
-                <option value="Year">Year</option>
-                <option value="Month">Month</option>
-                <option value="Week">Week</option>
-                <option value="Day">Day</option>
+                <option value="Year">{t('reports.tfYear', 'Year')}</option>
+                <option value="Month">{t('reports.tfMonth', 'Month')}</option>
+                <option value="Week">{t('reports.tfWeek', 'Week')}</option>
+                <option value="Day">{t('reports.tfDay', 'Day')}</option>
               </select>
               <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--color-text-muted-light)] dark:text-[var(--color-text-secondary-dark)] pointer-events-none" />
             </div>
@@ -653,7 +655,7 @@ export default function ReportsAnalytics({ datasets: initialDatasets = null }) {
                 className="flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-rose-600 hover:text-rose-700 dark:text-rose-400 dark:hover:text-rose-300 hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded-md cursor-pointer transition-colors"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
-                <span>Reset</span>
+                <span>{t('reports.btnReset', 'Reset')}</span>
               </button>
             )}
           </div>
@@ -671,14 +673,20 @@ export default function ReportsAnalytics({ datasets: initialDatasets = null }) {
               <div>
                 <h3 className="font-semibold text-sm md:text-base text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] flex items-center gap-2">
                   <Calendar className="w-4 h-4 text-[#003E83] dark:text-blue-400" />
-                  <span>Record Ingestion Velocity ({timeframeLabel})</span>
+                  <span>{t('reports.chartVelocityTitle', { timeframe: timeframeLabel }, `Record Ingestion Velocity (${timeframeLabel})`)}</span>
                 </h3>
                 <p className="text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mt-0.5">
-                  {timeframe === 'Day' ? 'Hourly' : timeframe === 'Week' ? 'Daily' : timeframe === 'Month' ? 'Weekly' : 'Monthly'} distribution of active/published vs pending records
+                  {timeframe === 'Day' 
+                    ? t('reports.chartVelocityHourly', 'Hourly distribution of active/published vs pending records') 
+                    : timeframe === 'Week' 
+                      ? t('reports.chartVelocityDaily', 'Daily distribution of active/published vs pending records') 
+                      : timeframe === 'Month' 
+                        ? t('reports.chartVelocityWeekly', 'Weekly distribution of active/published vs pending records') 
+                        : t('reports.chartVelocityMonthly', 'Monthly distribution of active/published vs pending records')}
                 </p>
               </div>
               <span className="text-[11px] font-semibold px-2.5 py-1 rounded-md border border-blue-100 dark:border-blue-900/50 bg-blue-50 dark:bg-blue-950/40 text-[#003E83] dark:text-blue-400 shrink-0 self-start sm:self-center">
-                Total: {totalRecords.toLocaleString()} Records
+                {t('reports.totalVelocityRecords', { count: totalRecords.toLocaleString() }, `Total: ${totalRecords.toLocaleString()} Records`)}
               </span>
             </div>
 
@@ -686,11 +694,11 @@ export default function ReportsAnalytics({ datasets: initialDatasets = null }) {
             <div className="flex items-center gap-3 sm:gap-4 flex-wrap mb-3 text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
               <span className="inline-flex items-center gap-1.5 font-medium">
                 <span className="w-2.5 h-2.5 rounded-xs bg-[#10b981]" />
-                <span>Active / Published</span>
+                <span>{t('reports.legendActivePublished', 'Active / Published')}</span>
               </span>
               <span className="inline-flex items-center gap-1.5 font-medium">
                 <span className="w-2.5 h-2.5 rounded-xs bg-[#003E83]" />
-                <span>Pending / Review</span>
+                <span>{t('reports.legendPendingReview', 'Pending / Review')}</span>
               </span>
             </div>
 
@@ -727,20 +735,22 @@ export default function ReportsAnalytics({ datasets: initialDatasets = null }) {
                           <div className="bg-[var(--color-white)] dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 p-2.5 rounded-md shadow-md text-xs space-y-1.5 min-w-[170px]">
                             <div className="flex items-center justify-between border-b border-gray-100 dark:border-zinc-800 pb-1">
                               <p className="font-bold text-gray-900 dark:text-zinc-100">{label}</p>
-                              <span className="text-[11px] font-semibold text-gray-500 dark:text-zinc-400">{totM} {totM === 1 ? 'record' : 'records'}</span>
+                              <span className="text-[11px] font-semibold text-gray-500 dark:text-zinc-400">
+                                {totM} {totM === 1 ? t('reports.tooltipSingleRecord', 'record') : t('reports.tooltipPluralRecords', 'records')}
+                              </span>
                             </div>
                             <div className="space-y-1 text-gray-600 dark:text-zinc-300">
                               <div className="flex items-center justify-between gap-3">
                                 <span className="flex items-center gap-1.5">
                                   <span className="w-2 h-2 rounded-xs bg-[#10b981]" />
-                                  Active:
+                                  {t('reports.tooltipActive', 'Active:')}
                                 </span>
                                 <span className="font-bold text-[#10b981]">{actCount}</span>
                               </div>
                               <div className="flex items-center justify-between gap-3">
                                 <span className="flex items-center gap-1.5">
                                   <span className="w-2 h-2 rounded-xs bg-[#003E83]" />
-                                  Pending / Other:
+                                  {t('reports.tooltipPendingOther', 'Pending / Other:')}
                                 </span>
                                 <span className="font-bold text-[#003E83] dark:text-blue-400">{othCount}</span>
                               </div>
@@ -751,8 +761,8 @@ export default function ReportsAnalytics({ datasets: initialDatasets = null }) {
                       return null;
                     }}
                   />
-                  <Bar dataKey="active" stackId="recs" fill="#10b981" radius={[0, 0, 0, 0]} name="Active / Published" barSize={16} isAnimationActive={true} animationDuration={800} />
-                  <Bar dataKey="other" stackId="recs" fill="#003E83" radius={[3, 3, 0, 0]} name="Pending / Review" barSize={16} isAnimationActive={true} animationDuration={800} />
+                  <Bar dataKey="active" stackId="recs" fill="#10b981" radius={[0, 0, 0, 0]} name={t('reports.legendActivePublished', 'Active / Published')} barSize={16} isAnimationActive={true} animationDuration={800} />
+                  <Bar dataKey="other" stackId="recs" fill="#003E83" radius={[3, 3, 0, 0]} name={t('reports.legendPendingReview', 'Pending / Review')} barSize={16} isAnimationActive={true} animationDuration={800} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -762,15 +772,21 @@ export default function ReportsAnalytics({ datasets: initialDatasets = null }) {
           <div className="mt-3 pt-2.5 border-t border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] grid grid-cols-3 gap-2 text-center">
             <div className="p-1.5 sm:p-2 rounded-md bg-[var(--color-surface-hover-light)] dark:bg-[var(--color-surface-hover-dark)]/50 border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]">
               <p className="text-xs sm:text-sm font-bold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">{timeframeLabel}</p>
-              <p className="text-[10px] sm:text-[11px] text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] truncate">Timeframe</p>
+              <p className="text-[10px] sm:text-[11px] text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] truncate">
+                {t('reports.footerTimeframe', 'Timeframe')}
+              </p>
             </div>
             <div className="p-1.5 sm:p-2 rounded-md bg-[var(--color-surface-hover-light)] dark:bg-[var(--color-surface-hover-dark)]/50 border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]">
               <p className="text-xs sm:text-sm font-bold text-[#003E83] dark:text-blue-400">{totalRecords.toLocaleString()}</p>
-              <p className="text-[10px] sm:text-[11px] text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] truncate">Total Ingested</p>
+              <p className="text-[10px] sm:text-[11px] text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] truncate">
+                {t('reports.footerTotalIngested', 'Total Ingested')}
+              </p>
             </div>
             <div className="p-1.5 sm:p-2 rounded-md bg-[var(--color-success-bg)] dark:bg-[var(--color-success-dark-bg)] border border-[var(--color-success-border)] dark:border-[var(--color-success-dark-border)]">
               <p className="text-xs sm:text-sm font-bold text-[var(--color-success-text)] dark:text-[var(--color-success-dark-text)]">{peakMonth.name} ({peakMonth.count})</p>
-              <p className="text-[10px] sm:text-[11px] text-[var(--color-success-text)] dark:text-[var(--color-success-dark-text)] truncate">Peak Ingestion</p>
+              <p className="text-[10px] sm:text-[11px] text-[var(--color-success-text)] dark:text-[var(--color-success-dark-text)] truncate">
+                {t('reports.footerPeakIngestion', 'Peak Ingestion')}
+              </p>
             </div>
           </div>
         </div>
@@ -782,10 +798,10 @@ export default function ReportsAnalytics({ datasets: initialDatasets = null }) {
               <div>
                 <h3 className="font-semibold text-sm md:text-base text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] flex items-center gap-2">
                   <Activity className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                  <span>System Health & Dataset Hub</span>
+                  <span>{t('reports.chartHealthHubTitle', 'System Health & Dataset Hub')}</span>
                 </h3>
                 <p className="text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
-                  Entity operational status and cross-dataset distribution
+                  {t('reports.chartHealthHubSubtitle', 'Entity operational status and cross-dataset distribution')}
                 </p>
               </div>
               <div className="flex items-center gap-1 bg-gray-100 dark:bg-zinc-800/80 p-0.5 rounded-md border border-gray-200/50 dark:border-zinc-700/50 self-start sm:self-auto">
@@ -798,7 +814,7 @@ export default function ReportsAnalytics({ datasets: initialDatasets = null }) {
                       : 'text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] hover:text-gray-900 dark:hover:text-white'
                   }`}
                 >
-                  Dataset Mix
+                  {t('reports.tabDatasetMix', 'Dataset Mix')}
                 </button>
                 <button
                   type="button"
@@ -809,7 +825,7 @@ export default function ReportsAnalytics({ datasets: initialDatasets = null }) {
                       : 'text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] hover:text-gray-900 dark:hover:text-white'
                   }`}
                 >
-                  Health Status
+                  {t('reports.tabHealthStatus', 'Health Status')}
                 </button>
               </div>
             </div>
@@ -819,7 +835,7 @@ export default function ReportsAnalytics({ datasets: initialDatasets = null }) {
               {totalRecords === 0 ? (
                 <div className="h-full flex flex-col items-center justify-center text-gray-400 text-xs">
                   <Activity className="w-8 h-8 mb-2 stroke-1 text-gray-300 dark:text-zinc-600" />
-                  <p>No entity records found</p>
+                  <p>{t('reports.noEntityRecordsFound', 'No entity records found')}</p>
                 </div>
               ) : (
                 <>
@@ -829,7 +845,7 @@ export default function ReportsAnalytics({ datasets: initialDatasets = null }) {
                       {reportsChartTab === 'dataset' ? totalRecords.toLocaleString() : `${activePct}%`}
                     </span>
                     <span className="text-[11px] text-gray-500 dark:text-zinc-400 font-medium">
-                      {reportsChartTab === 'dataset' ? 'Total Records' : 'Operational'}
+                      {reportsChartTab === 'dataset' ? t('reports.donutTotalRecords', 'Total Records') : t('reports.donutOperational', 'Operational')}
                     </span>
                   </div>
 
@@ -886,7 +902,7 @@ export default function ReportsAnalytics({ datasets: initialDatasets = null }) {
                                   </p>
                                   <div className="flex items-center gap-3 pt-1 border-t border-gray-100 dark:border-zinc-800">
                                     <span className="text-gray-900 dark:text-zinc-100 font-bold">
-                                      {data.count.toLocaleString()} {data.count === 1 ? 'record' : 'records'}
+                                      {data.count.toLocaleString()} {data.count === 1 ? t('reports.tooltipSingleRecord', 'record') : t('reports.tooltipPluralRecords', 'records')}
                                     </span>
                                     <span className="text-blue-600 dark:text-blue-400 font-semibold">
                                       ({data.percentage}%)
@@ -923,7 +939,9 @@ export default function ReportsAnalytics({ datasets: initialDatasets = null }) {
                     </div>
                   ))}
                   {compositionData.length === 0 && (
-                    <p className="text-xs text-gray-400 col-span-2 text-center py-2">No composition records found</p>
+                    <p className="text-xs text-gray-400 col-span-2 text-center py-2">
+                      {t('reports.noCompositionRecordsFound', 'No composition records found')}
+                    </p>
                   )}
                 </>
               ) : (
@@ -945,7 +963,7 @@ export default function ReportsAnalytics({ datasets: initialDatasets = null }) {
                     <div className="flex items-center gap-1.5 min-w-0 pr-1">
                       <span className="w-2.5 h-2.5 rounded-full shrink-0 bg-purple-500" />
                       <span className="text-gray-700 dark:text-zinc-300 font-medium truncate text-[11px]">
-                        Total Entities
+                        {t('reports.totalEntitiesLabel', 'Total Entities')}
                       </span>
                     </div>
                     <span className="text-purple-600 dark:text-purple-400 text-[10px] font-semibold shrink-0">
@@ -965,16 +983,22 @@ export default function ReportsAnalytics({ datasets: initialDatasets = null }) {
           <div>
             <h3 className="font-semibold text-sm md:text-base text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] flex items-center gap-2">
               <TrendingUp className="w-4 h-4 text-[#003E83] dark:text-blue-400" />
-              <span>Cumulative Database Growth & Ingestion Trajectory ({timeframeLabel})</span>
+              <span>{t('reports.chartTrajectoryTitle', { timeframe: timeframeLabel }, `Cumulative Database Growth & Ingestion Trajectory (${timeframeLabel})`)}</span>
             </h3>
             <p className="text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mt-0.5">
-              Total cumulative database footprint vs {timeframe === 'Day' ? 'hourly' : timeframe === 'Week' ? 'daily' : timeframe === 'Month' ? 'weekly' : 'monthly'} new record intake
+              {timeframe === 'Day' 
+                ? t('reports.chartTrajectoryHourly', 'Total cumulative database footprint vs hourly new record intake')
+                : timeframe === 'Week'
+                  ? t('reports.chartTrajectoryDaily', 'Total cumulative database footprint vs daily new record intake')
+                  : timeframe === 'Month'
+                    ? t('reports.chartTrajectoryWeekly', 'Total cumulative database footprint vs weekly new record intake')
+                    : t('reports.chartTrajectoryMonthly', 'Total cumulative database footprint vs monthly new record intake')}
             </p>
           </div>
           <div className="flex items-center gap-2">
             <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2.5 py-1 rounded-md border border-emerald-200 dark:border-emerald-900/50">
               <TrendingUp className="w-3.5 h-3.5" />
-              {totalRecords.toLocaleString()} Total System Records ({timeframeLabel})
+              {t('reports.badgeTotalSystemRecords', { count: totalRecords.toLocaleString(), timeframe: timeframeLabel }, `${totalRecords.toLocaleString()} Total System Records (${timeframeLabel})`)}
             </span>
           </div>
         </div>
@@ -983,11 +1007,17 @@ export default function ReportsAnalytics({ datasets: initialDatasets = null }) {
         <div className="flex items-center gap-4 mb-4 text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
           <span className="flex items-center gap-1.5 font-medium">
             <span className="w-3 h-3 rounded-full bg-[#003E83]" />
-            {timeframe === 'Day' ? 'Hourly' : timeframe === 'Week' ? 'Daily' : timeframe === 'Month' ? 'Weekly' : 'Monthly'} New Records
+            {timeframe === 'Day' 
+              ? t('reports.legendHourlyNew', 'Hourly New Records')
+              : timeframe === 'Week' 
+                ? t('reports.legendDailyNew', 'Daily New Records') 
+                : timeframe === 'Month' 
+                  ? t('reports.legendWeeklyNew', 'Weekly New Records') 
+                  : t('reports.legendMonthlyNew', 'Monthly New Records')}
           </span>
           <span className="flex items-center gap-1.5 font-medium">
             <span className="w-3 h-3 rounded-full bg-[#10b981]" />
-            Cumulative Database Volume
+            {t('reports.legendCumulativeVolume', 'Cumulative Database Volume')}
           </span>
         </div>
 
@@ -1020,16 +1050,26 @@ export default function ReportsAnalytics({ datasets: initialDatasets = null }) {
                         <div className="flex items-center justify-between gap-3 text-gray-600 dark:text-zinc-300">
                           <span className="flex items-center gap-1.5">
                             <span className="w-2.5 h-2.5 rounded-full bg-[#003E83]" />
-                            {timeframe === 'Day' ? 'Hourly' : timeframe === 'Week' ? 'Daily' : timeframe === 'Month' ? 'Weekly' : 'Monthly'} Ingested:
+                            {timeframe === 'Day' 
+                              ? t('reports.tooltipHourlyIngested', 'Hourly Ingested:') 
+                              : timeframe === 'Week' 
+                                ? t('reports.tooltipDailyIngested', 'Daily Ingested:') 
+                                : timeframe === 'Month' 
+                                  ? t('reports.tooltipWeeklyIngested', 'Weekly Ingested:') 
+                                  : t('reports.tooltipMonthlyIngested', 'Monthly Ingested:')}
                           </span>
-                          <span className="font-bold text-[#003E83] dark:text-blue-400">{rec} records</span>
+                          <span className="font-bold text-[#003E83] dark:text-blue-400">
+                            {rec} {rec === 1 ? t('reports.tooltipSingleRecord', 'record') : t('reports.tooltipPluralRecords', 'records')}
+                          </span>
                         </div>
                         <div className="flex items-center justify-between gap-3 text-gray-600 dark:text-zinc-300">
                           <span className="flex items-center gap-1.5">
                             <span className="w-2.5 h-2.5 rounded-full bg-[#10b981]" />
-                            Cumulative Volume:
+                            {t('reports.tooltipCumulativeVolume', 'Cumulative Volume:')}
                           </span>
-                          <span className="font-bold text-[#10b981]">{cum} total</span>
+                          <span className="font-bold text-[#10b981]">
+                            {cum} {t('reports.tooltipTotal', 'total')}
+                          </span>
                         </div>
                       </div>
                     );
@@ -1044,7 +1084,7 @@ export default function ReportsAnalytics({ datasets: initialDatasets = null }) {
                 strokeWidth={2.5}
                 dot={{ r: 3.5, fill: '#003E83' }}
                 activeDot={{ r: 6 }}
-                name="New Records Ingested"
+                name={t('reports.lineNewRecordsIngested', 'New Records Ingested')}
                 isAnimationActive={true}
                 animationDuration={800}
                 animationEasing="ease-out"
@@ -1056,7 +1096,7 @@ export default function ReportsAnalytics({ datasets: initialDatasets = null }) {
                 strokeWidth={2.5}
                 dot={{ r: 3.5, fill: '#10b981' }}
                 activeDot={{ r: 6 }}
-                name="Cumulative Total"
+                name={t('reports.lineCumulativeTotal', 'Cumulative Total')}
                 isAnimationActive={true}
                 animationDuration={800}
                 animationEasing="ease-out"

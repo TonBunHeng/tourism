@@ -1,35 +1,40 @@
 import { Database, CheckCircle, Star, Download } from 'lucide-react';
+import { useLanguage } from '../../i18n';
 
 export default function ReportsStats({ totalCount = 0, activeCount = 0, avgRating = '0.0', totalExports = 0 }) {
+  const { t } = useLanguage();
+
+  const verifiedRate = totalCount > 0 ? Math.round((Number(activeCount) / Number(totalCount)) * 100) : 0;
+
   const stats = [
     {
-      label: 'Total Report Items',
+      label: t('reports.statTotalReportItems', 'Total Report Items'),
       value: (Number(totalCount) || 0).toLocaleString(),
-      subtext: 'Aggregated dataset records',
+      subtext: t('reports.subtextTotalReportItems', 'Aggregated dataset records'),
       icon: Database,
       color: 'text-[var(--color-info-text)] dark:text-[var(--color-info-dark-text)]',
       bg: 'bg-[var(--color-info-bg)] dark:bg-[var(--color-info-dark-bg)]'
     },
     {
-      label: 'Active / Verified',
+      label: t('reports.statActiveVerified', 'Active / Verified'),
       value: (Number(activeCount) || 0).toLocaleString(),
-      subtext: `${totalCount > 0 ? Math.round((Number(activeCount) / Number(totalCount)) * 100) : 0}% verified data rate`,
+      subtext: t('reports.subtextActiveVerified', { rate: verifiedRate }, `${verifiedRate}% verified data rate`),
       icon: CheckCircle,
       color: 'text-[var(--color-success-text)] dark:text-[var(--color-success-dark-text)]',
       bg: 'bg-[var(--color-success-bg)] dark:bg-[var(--color-success-dark-bg)]'
     },
     {
-      label: 'Average Score',
+      label: t('reports.statAverageScore', 'Average Score'),
       value: avgRating ? `${avgRating} ★` : '4.9 ★',
-      subtext: 'Composite data quality score',
+      subtext: t('reports.subtextAverageScore', 'Composite data quality score'),
       icon: Star,
       color: 'text-[var(--color-warning-text)] dark:text-[var(--color-warning-dark-text)]',
       bg: 'bg-[var(--color-warning-bg)] dark:bg-[var(--color-warning-dark-bg)]'
     },
     {
-      label: 'Total Downloads',
+      label: t('reports.statTotalDownloads', 'Total Downloads'),
       value: (Number(totalExports) || 0).toLocaleString(),
-      subtext: 'CSV / PDF exports generated',
+      subtext: t('reports.subtextTotalDownloads', 'CSV / PDF exports generated'),
       icon: Download,
       color: 'text-[var(--color-purple-badge-text)] dark:text-[var(--color-purple-badge-dark-text)]',
       bg: 'bg-[var(--color-purple-badge-bg)] dark:bg-[var(--color-purple-badge-dark-bg)]'

@@ -69,9 +69,8 @@ export default function FavoritesList({
               <div
                 key={favorite.id}
                 onClick={() => handleView(favorite)}
-                className={`p-4 hover:bg-[var(--color-surface-hover-light)] dark:hover:bg-[var(--color-surface-hover-dark)]/50 transition-colors cursor-pointer ${
-                  isSelected ? 'bg-blue-50/40 dark:bg-blue-950/20' : ''
-                }`}
+                className={`p-4 hover:bg-[var(--color-surface-hover-light)] dark:hover:bg-[var(--color-surface-hover-dark)]/50 transition-colors cursor-pointer ${isSelected ? 'bg-blue-50/40 dark:bg-blue-950/20' : ''
+                  }`}
               >
                 <div className="flex items-start gap-3">
                   <div className="w-10 h-10 rounded-md overflow-hidden bg-slate-100 dark:bg-zinc-800 shrink-0 border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] flex items-center justify-center">
@@ -92,11 +91,10 @@ export default function FavoritesList({
                         {favorite.name}
                       </p>
                       <span
-                        className={`px-2 py-0.5 text-[10px] font-bold rounded-md border shrink-0 ${
-                          isVisited
-                            ? 'bg-[var(--color-success-bg)] dark:bg-[var(--color-success-dark-bg)] text-[var(--color-success-text)] dark:text-[var(--color-success-dark-text)] border-[var(--color-success-border)] dark:border-[var(--color-success-dark-border)]'
-                            : 'bg-[var(--color-info-bg)] dark:bg-[var(--color-info-dark-bg)] text-[var(--color-info-text)] dark:text-[var(--color-info-dark-text)] border-[var(--color-info-border)] dark:border-[var(--color-info-dark-border)]'
-                        }`}
+                        className={`px-2 py-0.5 text-[10px] font-bold rounded-md border shrink-0 ${isVisited
+                          ? 'bg-[var(--color-success-bg)] dark:bg-[var(--color-success-dark-bg)] text-[var(--color-success-text)] dark:text-[var(--color-success-dark-text)] border-[var(--color-success-border)] dark:border-[var(--color-success-dark-border)]'
+                          : 'bg-[var(--color-info-bg)] dark:bg-[var(--color-info-dark-bg)] text-[var(--color-info-text)] dark:text-[var(--color-info-dark-text)] border-[var(--color-info-border)] dark:border-[var(--color-info-dark-border)]'
+                          }`}
                       >
                         {isVisited ? t('favorites.statusVisited') : t('favorites.statusToVisit')}
                       </span>
@@ -206,9 +204,8 @@ export default function FavoritesList({
                 return (
                   <tr
                     key={favorite.id}
-                    className={`hover:bg-[var(--color-surface-hover-light)] dark:hover:bg-[var(--color-surface-hover-dark)]/50 transition-colors group ${
-                      isSelected ? 'bg-blue-50/40 dark:bg-blue-950/20' : ''
-                    }`}
+                    className={`hover:bg-[var(--color-surface-hover-light)] dark:hover:bg-[var(--color-surface-hover-dark)]/50 transition-colors group ${isSelected ? 'bg-blue-50/40 dark:bg-blue-950/20' : ''
+                      }`}
                   >
                     <td className="pl-4 pr-2 py-3.5 whitespace-nowrap text-xs font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] font-mono text-center">
                       {startIndex + index + 1}
@@ -288,11 +285,10 @@ export default function FavoritesList({
 
                     <td className="px-3 py-3.5 whitespace-nowrap">
                       <span
-                        className={`inline-flex items-center gap-1 px-2.5 py-0.5 text-xs font-semibold rounded-md border ${
-                          isVisited
-                            ? 'bg-[var(--color-success-bg)] dark:bg-[var(--color-success-dark-bg)] text-[var(--color-success-text)] dark:text-[var(--color-success-dark-text)] border-[var(--color-success-border)] dark:border-[var(--color-success-dark-border)]'
-                            : 'bg-[var(--color-info-bg)] dark:bg-[var(--color-info-dark-bg)] text-[var(--color-info-text)] dark:text-[var(--color-info-dark-text)] border-[var(--color-info-border)] dark:border-[var(--color-info-dark-border)]'
-                        }`}
+                        className={`inline-flex items-center gap-1 px-2.5 py-0.5 text-xs font-semibold rounded-md border ${isVisited
+                          ? 'bg-[var(--color-success-bg)] dark:bg-[var(--color-success-dark-bg)] text-[var(--color-success-text)] dark:text-[var(--color-success-dark-text)] border-[var(--color-success-border)] dark:border-[var(--color-success-dark-border)]'
+                          : 'bg-[var(--color-info-bg)] dark:bg-[var(--color-info-dark-bg)] text-[var(--color-info-text)] dark:text-[var(--color-info-dark-text)] border-[var(--color-info-border)] dark:border-[var(--color-info-dark-border)]'
+                          }`}
                       >
                         {isVisited ? (
                           <>
