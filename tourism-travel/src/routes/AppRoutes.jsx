@@ -22,6 +22,13 @@ import NotFound from '../pages/error/NotFound';
 import TouristHome from '../pages/tourist/TouristHome';
 import Destinations from '../pages/tourist/Destinations';
 import DestinationDetails from '../pages/tourist/DestinationDetails';
+import Businesses from '../pages/tourist/Businesses';
+import TourPackages from '../pages/tourist/TourPackages';
+import TourGuides from '../pages/tourist/TourGuides';
+import Categories from '../pages/tourist/Categories';
+import Provinces from '../pages/tourist/Provinces';
+import Galleries from '../pages/tourist/Galleries';
+import Events from '../pages/tourist/Events';
 import AIChat from '../pages/tourist/AIChat';
 import Bookings from '../pages/tourist/Bookings';
 import Favorites from '../pages/tourist/Favorites';
@@ -66,8 +73,24 @@ export default function AppRoutes() {
             {/* 1. Tourist Portal (Public & Authenticated Routes under TouristLayout) */}
             <Route element={<TouristLayout />}>
               <Route path="/" element={<TouristHome />} />
+              
+              {/* Destinations Section */}
               <Route path="/destinations" element={<Destinations />} />
+              <Route path="/places" element={<Navigate to="/destinations" replace />} />
               <Route path="/destinations/:id" element={<DestinationDetails />} />
+              <Route path="/categories" element={<Categories />} />
+              <Route path="/provinces" element={<Provinces />} />
+              <Route path="/galleries" element={<Galleries />} />
+              <Route path="/events" element={<Events />} />
+
+              {/* Tours & Bookings Section */}
+              <Route path="/businesses" element={<Businesses />} />
+              <Route path="/tours" element={<TourPackages />} />
+              <Route path="/tour-packages" element={<Navigate to="/tours" replace />} />
+              <Route path="/guides" element={<TourGuides />} />
+              <Route path="/tour-guides" element={<Navigate to="/guides" replace />} />
+
+              {/* General Tourist Pages */}
               <Route path="/support" element={<Support />} />
 
               {/* Protected Tourist Actions */}

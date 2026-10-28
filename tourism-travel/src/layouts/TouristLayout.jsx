@@ -1,20 +1,27 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
-import { 
+import {
   Compass,
-  Heart, 
-  Calendar, 
-  User, 
-  Bell, 
-  Sun, 
-  Moon, 
-  Menu, 
-  X, 
-  LogOut, 
-  Briefcase, 
-  PhoneCall, 
-  MapPin, 
-  ChevronDown 
+  Heart,
+  Calendar,
+  User,
+  Bell,
+  Sun,
+  Moon,
+  Menu,
+  X,
+  LogOut,
+  MapPin,
+  ChevronDown,
+  Building2,
+  CalendarCheck,
+  Sparkles,
+  UserCheck,
+  Tags,
+  Globe,
+  Images,
+  CalendarDays,
+  ArrowRight
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { toggleTheme, isDarkTheme, getInitialTheme } from '../utils/Theme';
@@ -32,6 +39,10 @@ export default function TouristLayout() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
 
+  // Mega Menu State
+  const [isMegaMenuOpen, setIsMegaMenuOpen] = useState(false);
+  const megaMenuTimeoutRef = useRef(null);
+
   useEffect(() => {
     if (isAuthenticated) {
       notificationService.getUnreadCount()
@@ -40,125 +51,162 @@ export default function TouristLayout() {
             setUnreadCount(res.data.unread_count);
           }
         })
-        .catch(() => {});
+        .catch(() => { });
     }
   }, [isAuthenticated, location.pathname]);
+
+  // Close mega menu on route navigation
+  useEffect(() => {
+    setIsMegaMenuOpen(false);
+    setIsMobileMenuOpen(false);
+  }, [location.pathname]);
 
   const handleToggleTheme = () => {
     const next = toggleTheme(theme);
     setTheme(next);
   };
 
-  const navLinks = [
-    { label: 'Explore', path: '/' },
-    { label: 'Destinations', path: '/destinations' },
-    { label: 'Bookings', path: '/bookings', authRequired: true },
-    { label: 'Favorites', path: '/favorites', authRequired: true },
-    { label: 'Support & FAQs', path: '/support' },
-  ];
+  const handleOpenMegaMenu = () => {
+    if (megaMenuTimeoutRef.current) {
+      clearTimeout(megaMenuTimeoutRef.current);
+    }
+    setIsMegaMenuOpen(true);
+  };
 
-  const filteredNavLinks = navLinks.filter(item => !item.authRequired || isAuthenticated);
+  const handleCloseMegaMenu = () => {
+    megaMenuTimeoutRef.current = setTimeout(() => {
+      setIsMegaMenuOpen(false);
+    }, 250);
+  };
+
+  // Active route helpers
+  const isExploreActive = location.pathname === '/';
+
+  const isDestinationsActive = ['/destinations', '/places', '/categories', '/provinces', '/galleries', '/events'].some(
+    (p) => location.pathname === p || (p !== '/' && location.pathname.startsWith(p))
+  );
+
+  const isToursActive = ['/tours', '/tour-packages', '/guides', '/tour-guides', '/bookings'].some(
+    (p) => location.pathname === p || location.pathname.startsWith(p)
+  );
+
+  const isBusinessesActive = location.pathname.startsWith('/businesses');
+  const isSupportActive = location.pathname.startsWith('/support');
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-[#09090b] text-slate-800 dark:text-zinc-100 flex flex-col font-sans transition-colors duration-200">
-      {/* Top Announcement Bar */}
-      <div className="bg-[#003E83] text-white text-xs py-1.5 px-4">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="font-semibold tracking-wide flex items-center gap-1.5">
-              <Compass size={13} className="text-amber-300 shrink-0" />
-              <span>Kingdom of Wonder</span>
-            </span>
-            <span className="hidden sm:inline text-blue-200">— Official Cambodia Tourism Portal</span>
-          </div>
-          <div className="flex items-center gap-4 text-[11px] text-blue-100">
-            <span className="flex items-center gap-1">
-              <PhoneCall size={12} className="text-amber-300" />
-              <span>Tourist Police: <strong>117</strong></span>
-            </span>
-            {isBusinessOwner && (
-              <Link to="/business/dashboard" className="hidden sm:flex items-center gap-1 font-semibold text-amber-300 hover:underline">
-                <Briefcase size={12} />
-                <span>Go to Business Hub</span>
-              </Link>
-            )}
-          </div>
-        </div>
-      </div>
+      <header
+        className="sticky top-0 z-40 bg-white dark:bg-zinc-900 border-b border-slate-200/80 dark:border-zinc-800 shadow-sm transition-colors"
+        onMouseLeave={handleCloseMegaMenu}
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-22 flex items-center justify-between relative">
 
-      {/* Main Navbar */}
-      <header className="sticky top-0 z-40 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-md border-b border-slate-200/80 dark:border-zinc-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-18 flex items-center justify-between">
-          {/* Brand Logo */}
-          <Link to="/" className="flex items-center gap-3 group">
-            <img 
-              src={logoImg} 
-              alt="AngkorVerses Logo" 
-              className="w-10 h-10 object-contain drop-shadow-sm group-hover:scale-105 transition-transform"
+          {/* Left: Round Emblem Logo + Dual-Line Khmer & English Branding (Matches Picture 2) */}
+          <Link to="/" className="flex items-center gap-3.5 group shrink-0">
+            <img
+              src={logoImg}
+              alt="AngkorVerses Logo"
+              className="w-13 h-13 object-contain drop-shadow-sm group-hover:scale-105 transition-transform"
               onError={(e) => {
                 e.target.style.display = 'none';
               }}
             />
-            <div>
-              <div className="font-extrabold text-xl tracking-tight bg-gradient-to-r from-[#003E83] to-blue-600 dark:from-blue-400 dark:to-indigo-300 bg-clip-text text-transparent">
-                AngkorVerses
-              </div>
-              <div className="text-[10px] uppercase font-bold tracking-widest text-slate-500 dark:text-zinc-400">
-                Kingdom of Cambodia
+            <div className="flex flex-col justify-center">
+              <div className="font-extrabold text-xs sm:text-sm tracking-wider text-[#002D62] dark:text-zinc-100 uppercase leading-snug">
+                ANGKORVERSES
               </div>
             </div>
           </Link>
 
-          {/* Desktop Nav Links */}
-          <nav className="hidden md:flex items-center gap-1">
-            {filteredNavLinks.map((item) => {
-              const isActive = location.pathname === item.path || 
-                (item.path !== '/' && location.pathname.startsWith(item.path));
-              const Icon = item.icon;
+          {/* Center-Right: Navigation Links Styled EXACTLY like Picture 2 (4 Items: ABOUT, TOURS & BOOKINGS, PARTNERSHIP, RESEARCH) */}
+          <nav className="hidden lg:flex items-center h-full gap-8 xl:gap-10">
+            {/* 1. ABOUT */}
+            <Link
+              to="/"
+              className="h-full flex flex-col justify-center items-center group relative cursor-pointer"
+            >
+              <span className={`text-xs xl:text-sm font-bold tracking-wider uppercase transition-colors ${isExploreActive
+                ? 'text-red-600 dark:text-red-500'
+                : 'text-[#002D62] dark:text-zinc-200 group-hover:text-red-600 dark:group-hover:text-red-400'
+                }`}>
+                ABOUT
+              </span>
+              <span className={`w-full h-1 mt-1.5 rounded-full transition-all duration-200 ${isExploreActive ? 'bg-red-600 dark:bg-red-500' : 'bg-transparent group-hover:bg-red-600/40'
+                }`} />
+            </Link>
 
-              return (
-                <Link
-                  key={item.path}
-                  to={item.path}
-                  className={`px-3.5 py-2 rounded-xl text-sm font-medium transition flex items-center gap-1.5 ${
-                    isActive
-                      ? 'bg-[#003E83]/10 dark:bg-blue-500/15 text-[#003E83] dark:text-blue-400 font-semibold'
-                      : 'text-slate-600 dark:text-zinc-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-zinc-800/60'
+            {/* 2. TOURS & BOOKINGS (Triggers Mega-Menu with Red Underline like ACADEMICS in Picture 2) */}
+            <div
+              className="h-full flex flex-col justify-center items-center group relative cursor-pointer"
+              onMouseEnter={handleOpenMegaMenu}
+              onClick={() => setIsMegaMenuOpen(!isMegaMenuOpen)}
+            >
+              <Link
+                to="/tours"
+                className={`text-xs xl:text-sm font-bold tracking-wider uppercase transition-colors flex items-center gap-1 ${isToursActive || isDestinationsActive || isMegaMenuOpen
+                  ? 'text-red-600 dark:text-red-500'
+                  : 'text-[#002D62] dark:text-zinc-200 group-hover:text-red-600 dark:group-hover:text-red-400'
                   }`}
-                >
-                  {Icon && <Icon size={15} className="text-amber-500 dark:text-amber-400" />}
-                  <span>{item.label}</span>
-                  {item.badge && (
-                    <span className="text-[10px] font-bold px-1.5 py-0.2 rounded-md bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-xs">
-                      {item.badge}
-                    </span>
-                  )}
-                </Link>
-              );
-            })}
+              >
+                <span>TOURS & BOOKINGS</span>
+              </Link>
+              <span className={`w-full h-1 mt-1.5 rounded-full transition-all duration-200 ${isToursActive || isDestinationsActive || isMegaMenuOpen
+                ? 'bg-red-600 dark:bg-red-500'
+                : 'bg-transparent group-hover:bg-red-600/40'
+                }`} />
+            </div>
+
+            {/* 3. PARTNERSHIP */}
+            <Link
+              to="/businesses"
+              className="h-full flex flex-col justify-center items-center group relative cursor-pointer"
+            >
+              <span className={`text-xs xl:text-sm font-bold tracking-wider uppercase transition-colors ${isBusinessesActive
+                ? 'text-red-600 dark:text-red-500'
+                : 'text-[#002D62] dark:text-zinc-200 group-hover:text-red-600 dark:group-hover:text-red-400'
+                }`}>
+                PARTNERSHIP
+              </span>
+              <span className={`w-full h-1 mt-1.5 rounded-full transition-all duration-200 ${isBusinessesActive ? 'bg-red-600 dark:bg-red-500' : 'bg-transparent group-hover:bg-red-600/40'
+                }`} />
+            </Link>
+
+            {/* 4. RESEARCH */}
+            <Link
+              to="/support"
+              className="h-full flex flex-col justify-center items-center group relative cursor-pointer"
+            >
+              <span className={`text-xs xl:text-sm font-bold tracking-wider uppercase transition-colors ${isSupportActive
+                ? 'text-red-600 dark:text-red-500'
+                : 'text-[#002D62] dark:text-zinc-200 group-hover:text-red-600 dark:group-hover:text-red-400'
+                }`}>
+                RESEARCH
+              </span>
+              <span className={`w-full h-1 mt-1.5 rounded-full transition-all duration-200 ${isSupportActive ? 'bg-red-600 dark:bg-red-500' : 'bg-transparent group-hover:bg-red-600/40'
+                }`} />
+            </Link>
           </nav>
 
-          {/* Actions & Profile */}
+          {/* Far Right Utility Actions (Theme, Notifications, Profile) */}
           <div className="flex items-center gap-2 sm:gap-3">
-            {/* Dark Mode Toggle */}
+            {/* Theme Toggle */}
             <button
               type="button"
               onClick={handleToggleTheme}
               className="p-2 rounded-xl text-slate-500 hover:text-slate-800 dark:text-zinc-400 dark:hover:text-zinc-100 hover:bg-slate-100 dark:hover:bg-zinc-800 transition cursor-pointer"
               aria-label="Toggle theme"
             >
-              {isDarkTheme(theme) ? <Sun size={19} className="text-amber-400" /> : <Moon size={19} />}
+              {isDarkTheme(theme) ? <Sun size={17} className="text-amber-400" /> : <Moon size={17} />}
             </button>
 
             {isAuthenticated ? (
               <>
-                {/* Notifications Link */}
                 <Link
                   to="/notifications"
                   className="relative p-2 rounded-xl text-slate-500 hover:text-slate-800 dark:text-zinc-400 dark:hover:text-zinc-100 hover:bg-slate-100 dark:hover:bg-zinc-800 transition"
                   title="Notifications"
                 >
-                  <Bell size={19} />
+                  <Bell size={17} />
                   {unreadCount > 0 && (
                     <span className="absolute top-1.5 right-1.5 w-4 h-4 bg-red-500 text-white rounded-full text-[10px] font-bold flex items-center justify-center animate-pulse">
                       {unreadCount > 9 ? '9+' : unreadCount}
@@ -171,24 +219,20 @@ export default function TouristLayout() {
                   <button
                     type="button"
                     onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
-                    className="flex items-center gap-2.5 p-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-zinc-800 transition cursor-pointer"
+                    className="flex items-center gap-2 p-1 rounded-xl hover:bg-slate-100 dark:hover:bg-zinc-800 transition cursor-pointer"
                   >
-                    <div className="w-8 h-8 rounded-full bg-[#003E83] text-white flex items-center justify-center text-xs font-bold ring-2 ring-blue-500/20 overflow-hidden">
+                    <div className="w-8 h-8 rounded-full bg-[#002D62] text-white flex items-center justify-center text-xs font-bold ring-2 ring-blue-500/20 overflow-hidden">
                       {user?.avatar ? (
                         <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
                       ) : (
                         user?.name ? user.name.charAt(0).toUpperCase() : 'U'
                       )}
                     </div>
-                    <span className="hidden sm:inline text-xs font-semibold text-slate-700 dark:text-zinc-200 max-w-[120px] truncate">
-                      {user?.name || 'Tourist'}
-                    </span>
-                    <ChevronDown size={14} className="text-slate-400" />
+                    <ChevronDown size={13} className="text-slate-400" />
                   </button>
 
-                  {/* Profile Dropdown Menu */}
                   {isProfileMenuOpen && (
-                    <div 
+                    <div
                       className="absolute right-0 mt-2 w-56 rounded-2xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 shadow-xl py-2 z-50 animate-dropdown"
                       onMouseLeave={() => setIsProfileMenuOpen(false)}
                     >
@@ -199,47 +243,33 @@ export default function TouristLayout() {
                         <div className="text-xs text-slate-500 dark:text-zinc-400 truncate">
                           {user?.email}
                         </div>
-                        <span className="inline-block mt-1 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-950/60 text-[#003E83] dark:text-blue-300">
-                          {user?.role || 'Tourist'}
-                        </span>
                       </div>
 
                       <div className="py-1">
                         <Link
                           to="/profile"
                           onClick={() => setIsProfileMenuOpen(false)}
-                          className="flex items-center gap-2.5 px-4 py-2 text-xs font-medium text-slate-700 dark:text-zinc-300 hover:bg-slate-50 dark:hover:bg-zinc-800 transition"
+                          className="flex items-center gap-2 px-4 py-2 text-xs font-medium text-slate-700 dark:text-zinc-300 hover:bg-slate-50 dark:hover:bg-zinc-800"
                         >
-                          <User size={15} className="text-slate-400" />
-                          <span>My Profile & Preferences</span>
+                          <User size={14} className="text-slate-400" />
+                          <span>My Profile</span>
                         </Link>
                         <Link
                           to="/bookings"
                           onClick={() => setIsProfileMenuOpen(false)}
-                          className="flex items-center gap-2.5 px-4 py-2 text-xs font-medium text-slate-700 dark:text-zinc-300 hover:bg-slate-50 dark:hover:bg-zinc-800 transition"
+                          className="flex items-center gap-2 px-4 py-2 text-xs font-medium text-slate-700 dark:text-zinc-300 hover:bg-slate-50 dark:hover:bg-zinc-800"
                         >
-                          <Calendar size={15} className="text-slate-400" />
+                          <Calendar size={14} className="text-slate-400" />
                           <span>My Bookings</span>
                         </Link>
                         <Link
                           to="/favorites"
                           onClick={() => setIsProfileMenuOpen(false)}
-                          className="flex items-center gap-2.5 px-4 py-2 text-xs font-medium text-slate-700 dark:text-zinc-300 hover:bg-slate-50 dark:hover:bg-zinc-800 transition"
+                          className="flex items-center gap-2 px-4 py-2 text-xs font-medium text-slate-700 dark:text-zinc-300 hover:bg-slate-50 dark:hover:bg-zinc-800"
                         >
-                          <Heart size={15} className="text-rose-500" />
+                          <Heart size={14} className="text-rose-500" />
                           <span>Saved Wishlist</span>
                         </Link>
-
-                        {isBusinessOwner && (
-                          <Link
-                            to="/business/dashboard"
-                            onClick={() => setIsProfileMenuOpen(false)}
-                            className="flex items-center gap-2.5 px-4 py-2 text-xs font-medium text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/30 transition border-t border-slate-100 dark:border-zinc-800"
-                          >
-                            <Briefcase size={15} />
-                            <span>Business Owner Hub</span>
-                          </Link>
-                        )}
                       </div>
 
                       <div className="pt-1 border-t border-slate-100 dark:border-zinc-800">
@@ -250,9 +280,9 @@ export default function TouristLayout() {
                             logout();
                             navigate('/');
                           }}
-                          className="flex items-center gap-2.5 w-full text-left px-4 py-2 text-xs font-medium text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition cursor-pointer"
+                          className="flex items-center gap-2 w-full text-left px-4 py-2 text-xs font-medium text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 cursor-pointer"
                         >
-                          <LogOut size={15} />
+                          <LogOut size={14} />
                           <span>Sign Out</span>
                         </button>
                       </div>
@@ -264,71 +294,249 @@ export default function TouristLayout() {
               <div className="flex items-center gap-2">
                 <Link
                   to="/login"
-                  className="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold text-[#003E83] dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-zinc-800 transition"
+                  className="px-3 py-1.5 rounded-lg text-xs font-bold text-[#002D62] dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-zinc-800 transition"
                 >
                   Sign In
                 </Link>
                 <Link
                   to="/register"
-                  className="px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-[#003E83] hover:bg-[#002e62] text-white shadow-sm transition"
+                  className="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-[#002D62] hover:bg-[#001f44] text-white shadow-xs transition"
                 >
                   Register
                 </Link>
               </div>
             )}
 
-            {/* Mobile Menu Hamburger */}
+            {/* Mobile Hamburger Button */}
             <button
               type="button"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="md:hidden p-2 rounded-xl text-slate-600 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-zinc-800 transition"
+              className="lg:hidden p-2 rounded-xl text-slate-600 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-zinc-800 transition cursor-pointer"
               aria-label="Open mobile menu"
             >
-              {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+              {isMobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
             </button>
           </div>
         </div>
 
-        {/* Mobile Nav Menu Drawer */}
-        {isMobileMenuOpen && (
-          <div className="md:hidden border-t border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-4 pt-3 pb-5 space-y-1">
-            {filteredNavLinks.map((item) => {
-              const isActive = location.pathname === item.path;
-              const Icon = item.icon;
-              return (
-                <Link
-                  key={item.path}
-                  to={item.path}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className={`flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium ${
-                    isActive
-                      ? 'bg-[#003E83]/10 text-[#003E83] dark:text-blue-400 font-bold'
-                      : 'text-slate-600 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-zinc-800'
-                  }`}
-                >
-                  <div className="flex items-center gap-2.5">
-                    {Icon && <Icon size={16} className="text-amber-500" />}
-                    <span>{item.label}</span>
-                  </div>
-                  {item.badge && (
-                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-indigo-500 text-white">
-                      {item.badge}
-                    </span>
-                  )}
-                </Link>
-              );
-            })}
+        {/* 3. MEGA-MENU DROPDOWN CARD (Floating White Card Exactly Matching Picture 2) */}
+        {isMegaMenuOpen && (
+          <div
+            className="hidden lg:block absolute left-0 right-0 top-full pt-1 z-50 pointer-events-auto"
+            onMouseEnter={handleOpenMegaMenu}
+            onMouseLeave={handleCloseMegaMenu}
+          >
+            <div className="max-w-5xl mx-auto px-2">
+              <div className="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl border border-slate-200/80 dark:border-zinc-800 p-8 grid grid-cols-12 gap-8 items-start animate-dropdown">
+                {/* Middle Section: Tours & Bookings (Clean typography like Faculty in Picture 2) */}
+                <div className="col-span-5 space-y-5">
+                  <h3 className="text-base font-extrabold text-[#002D62] dark:text-blue-400 tracking-wide">
+                    Tours & Bookings
+                  </h3>
 
-            {isBusinessOwner && (
+                  <div className="space-y-3 text-sm">
+                    <Link
+                      to="/businesses"
+                      onClick={() => setIsMegaMenuOpen(false)}
+                      className="block font-semibold text-slate-700 dark:text-zinc-200 hover:text-red-600 dark:hover:text-red-400 transition-colors"
+                    >
+                      Businesses
+                    </Link>
+
+                    <Link
+                      to="/bookings"
+                      onClick={() => setIsMegaMenuOpen(false)}
+                      className="block font-semibold text-slate-700 dark:text-zinc-200 hover:text-red-600 dark:hover:text-red-400 transition-colors"
+                    >
+                      Bookings
+                    </Link>
+
+                    <Link
+                      to="/tours"
+                      onClick={() => setIsMegaMenuOpen(false)}
+                      className="block font-semibold text-slate-700 dark:text-zinc-200 hover:text-red-600 dark:hover:text-red-400 transition-colors"
+                    >
+                      Tour Packages
+                    </Link>
+
+                    <Link
+                      to="/guides"
+                      onClick={() => setIsMegaMenuOpen(false)}
+                      className="block font-semibold text-slate-700 dark:text-zinc-200 hover:text-red-600 dark:hover:text-red-400 transition-colors"
+                    >
+                      Tour Guides
+                    </Link>
+                  </div>
+                </div>
+
+                {/* Right Section: Destinations (Clean typography with Divider line like Programs & Courses in Picture 2) */}
+                <div className="col-span-4 border-l border-slate-200 dark:border-zinc-800 pl-8 space-y-4">
+                  <h3 className="text-base font-extrabold text-[#002D62] dark:text-blue-400 tracking-wide">
+                    Destinations
+                  </h3>
+
+                  <div className="space-y-3 text-sm">
+                    <Link
+                      to="/categories"
+                      onClick={() => setIsMegaMenuOpen(false)}
+                      className="block font-semibold text-slate-700 dark:text-zinc-200 hover:text-red-600 dark:hover:text-red-400 transition-colors"
+                    >
+                      Categories
+                    </Link>
+
+                    <Link
+                      to="/destinations"
+                      onClick={() => setIsMegaMenuOpen(false)}
+                      className="block font-semibold text-slate-700 dark:text-zinc-200 hover:text-red-600 dark:hover:text-red-400 transition-colors"
+                    >
+                      Places
+                    </Link>
+
+                    <Link
+                      to="/provinces"
+                      onClick={() => setIsMegaMenuOpen(false)}
+                      className="block font-semibold text-slate-700 dark:text-zinc-200 hover:text-red-600 dark:hover:text-red-400 transition-colors"
+                    >
+                      Provinces
+                    </Link>
+
+                    <Link
+                      to="/galleries"
+                      onClick={() => setIsMegaMenuOpen(false)}
+                      className="block font-semibold text-slate-700 dark:text-zinc-200 hover:text-red-600 dark:hover:text-red-400 transition-colors"
+                    >
+                      Galleries
+                    </Link>
+
+                    <Link
+                      to="/events"
+                      onClick={() => setIsMegaMenuOpen(false)}
+                      className="block font-semibold text-slate-700 dark:text-zinc-200 hover:text-red-600 dark:hover:text-red-400 transition-colors"
+                    >
+                      Events
+                    </Link>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* 4. Mobile Drawer Navigation */}
+        {isMobileMenuOpen && (
+          <div className="lg:hidden border-t border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-4 pt-3 pb-6 space-y-4 max-h-[80vh] overflow-y-auto">
+            <Link
+              to="/"
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="flex items-center justify-between px-3 py-2 rounded-xl text-sm font-bold text-slate-800 dark:text-white hover:bg-slate-100 dark:hover:bg-zinc-800"
+            >
+              <span>About / Explore</span>
+              <ArrowRight size={14} className="text-slate-400" />
+            </Link>
+
+            {/* Tours & Bookings */}
+            <div className="space-y-1">
+              <div className="text-[10px] uppercase font-bold text-[#002D62] dark:text-blue-400 tracking-wider px-3 mb-1">
+                Tours & Bookings
+              </div>
               <Link
-                to="/business/dashboard"
+                to="/businesses"
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-semibold text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-zinc-800"
+                className="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-zinc-200 hover:bg-slate-100 dark:hover:bg-zinc-800"
               >
-                <Briefcase size={16} />
-                <span>Switch to Business Owner Hub</span>
+                <Building2 size={15} className="text-[#002D62]" />
+                <span>Businesses</span>
               </Link>
-            )}
+              <Link
+                to="/bookings"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-zinc-200 hover:bg-slate-100 dark:hover:bg-zinc-800"
+              >
+                <CalendarCheck size={15} className="text-emerald-500" />
+                <span>Bookings</span>
+              </Link>
+              <Link
+                to="/tours"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-zinc-200 hover:bg-slate-100 dark:hover:bg-zinc-800"
+              >
+                <Sparkles size={15} className="text-amber-500" />
+                <span>Tour Packages</span>
+              </Link>
+              <Link
+                to="/guides"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-zinc-200 hover:bg-slate-100 dark:hover:bg-zinc-800"
+              >
+                <UserCheck size={15} className="text-emerald-600" />
+                <span>Tour Guides</span>
+              </Link>
+            </div>
+
+            {/* Destinations */}
+            <div className="space-y-1 pt-2 border-t border-slate-100 dark:border-zinc-800">
+              <div className="text-[10px] uppercase font-bold text-[#002D62] dark:text-blue-400 tracking-wider px-3 mb-1">
+                Destinations
+              </div>
+              <Link
+                to="/categories"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-zinc-200 hover:bg-slate-100 dark:hover:bg-zinc-800"
+              >
+                <Tags size={15} className="text-purple-500" />
+                <span>Categories</span>
+              </Link>
+              <Link
+                to="/destinations"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-zinc-200 hover:bg-slate-100 dark:hover:bg-zinc-800"
+              >
+                <MapPin size={15} className="text-rose-500" />
+                <span>Places</span>
+              </Link>
+              <Link
+                to="/provinces"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-zinc-200 hover:bg-slate-100 dark:hover:bg-zinc-800"
+              >
+                <Globe size={15} className="text-blue-500" />
+                <span>Provinces</span>
+              </Link>
+              <Link
+                to="/galleries"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-zinc-200 hover:bg-slate-100 dark:hover:bg-zinc-800"
+              >
+                <Images size={15} className="text-indigo-500" />
+                <span>Galleries</span>
+              </Link>
+              <Link
+                to="/events"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-zinc-200 hover:bg-slate-100 dark:hover:bg-zinc-800"
+              >
+                <CalendarDays size={15} className="text-amber-500" />
+                <span>Events</span>
+              </Link>
+            </div>
+
+            <div className="pt-2 border-t border-slate-100 dark:border-zinc-800 space-y-1">
+              <Link
+                to="/businesses"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="block px-3 py-2 rounded-xl text-xs font-semibold text-slate-600 dark:text-zinc-400 hover:bg-slate-100 dark:hover:bg-zinc-800"
+              >
+                Partnership
+              </Link>
+              <Link
+                to="/support"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="block px-3 py-2 rounded-xl text-xs font-semibold text-slate-600 dark:text-zinc-400 hover:bg-slate-100 dark:hover:bg-zinc-800"
+              >
+                Research & Support
+              </Link>
+            </div>
           </div>
         )}
       </header>
@@ -353,7 +561,7 @@ export default function TouristLayout() {
               <p className="text-xs text-slate-500 dark:text-zinc-400 leading-relaxed mb-4">
                 The premier digital gateway to explore ancient Khmer heritage, vibrant provincial culture, pristine islands, and authentic Cambodian culinary experiences.
               </p>
-              <div className="flex items-center gap-2 text-xs font-medium text-[#003E83] dark:text-blue-400">
+              <div className="flex items-center gap-2 text-xs font-medium text-[#002D62] dark:text-blue-400">
                 <MapPin size={14} />
                 <span>Phnom Penh & Siem Reap, Cambodia</span>
               </div>
@@ -362,26 +570,28 @@ export default function TouristLayout() {
             {/* Quick Links */}
             <div>
               <h4 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white mb-3">
-                Discover
+                Destinations & Tours
               </h4>
               <ul className="space-y-2 text-xs text-slate-600 dark:text-zinc-400">
-                <li><Link to="/destinations?category=1" className="hover:text-[#003E83] dark:hover:text-blue-400">Angkor & Temples</Link></li>
-                <li><Link to="/destinations?province=Siem+Reap" className="hover:text-[#003E83] dark:hover:text-blue-400">Siem Reap Provincial Guide</Link></li>
-                <li><Link to="/destinations?province=Phnom+Penh" className="hover:text-[#003E83] dark:hover:text-blue-400">Phnom Penh City Life</Link></li>
-                <li><Link to="/ai-chat" className="hover:text-[#003E83] dark:hover:text-blue-400">Cambodia AI Travel Assistant</Link></li>
+                <li><Link to="/destinations" className="hover:text-[#002D62] dark:hover:text-blue-400">Top Cambodian Places</Link></li>
+                <li><Link to="/tours" className="hover:text-[#002D62] dark:hover:text-blue-400">Tour Packages & Sunrise Circuits</Link></li>
+                <li><Link to="/guides" className="hover:text-[#002D62] dark:hover:text-blue-400">Certified Local Guides</Link></li>
+                <li><Link to="/provinces" className="hover:text-[#002D62] dark:hover:text-blue-400">Explore 25 Provinces</Link></li>
+                <li><Link to="/businesses" className="hover:text-[#002D62] dark:hover:text-blue-400">Verified Tourism Businesses</Link></li>
               </ul>
             </div>
 
-            {/* For Business & Guides */}
+            {/* Festivals & Media */}
             <div>
               <h4 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white mb-3">
-                Partners & Directory
+                Culture & Media
               </h4>
               <ul className="space-y-2 text-xs text-slate-600 dark:text-zinc-400">
-                <li><Link to="/register" className="hover:text-[#003E83] dark:hover:text-blue-400">Register as Business Owner</Link></li>
-                <li><Link to="/business/dashboard" className="hover:text-[#003E83] dark:hover:text-blue-400">Business Management Hub</Link></li>
-                <li><a href="http://localhost:5174" target="_blank" rel="noreferrer" className="hover:text-[#003E83] dark:hover:text-blue-400">Ministry Staff Admin Portal ↗</a></li>
-                <li><Link to="/support" className="hover:text-[#003E83] dark:hover:text-blue-400">Help Center & Contact</Link></li>
+                <li><Link to="/events" className="hover:text-[#002D62] dark:hover:text-blue-400">Festivals & Celebrations</Link></li>
+                <li><Link to="/galleries" className="hover:text-[#002D62] dark:hover:text-blue-400">Scenic Photo Galleries</Link></li>
+                <li><Link to="/categories" className="hover:text-[#002D62] dark:hover:text-blue-400">Experience Categories</Link></li>
+                <li><Link to="/ai-chat" className="hover:text-[#002D62] dark:hover:text-blue-400">AngkorGenie AI Travel Assistant</Link></li>
+                <li><Link to="/support" className="hover:text-[#002D62] dark:hover:text-blue-400">Traveler Support & Inquiries</Link></li>
               </ul>
             </div>
 
@@ -394,7 +604,7 @@ export default function TouristLayout() {
                 <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-zinc-900 border border-slate-200/60 dark:border-zinc-800">
                   <div className="font-semibold text-slate-800 dark:text-zinc-200 flex items-center justify-between">
                     <span>Tourist Police Helpline</span>
-                    <span className="font-mono text-[#003E83] dark:text-blue-400 font-bold">117</span>
+                    <span className="font-mono text-[#002D62] dark:text-blue-400 font-bold">117</span>
                   </div>
                 </div>
                 <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-zinc-900 border border-slate-200/60 dark:border-zinc-800">
@@ -414,7 +624,6 @@ export default function TouristLayout() {
             <div className="flex items-center gap-4">
               <Link to="/support" className="hover:underline">Privacy Policy</Link>
               <Link to="/support" className="hover:underline">Terms of Service</Link>
-              <Link to="/support" className="hover:underline">GDPR / Deletion</Link>
             </div>
           </div>
         </div>
