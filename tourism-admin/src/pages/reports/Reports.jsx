@@ -17,17 +17,37 @@ import { useSearch } from '../../context/SearchContext';
 import { getPageCache, setPageCache } from '../../utils/pageCache';
 import { useLanguage } from '../../i18n';
 
+const VALID_TABS = ['all', 'places', 'events', 'tours', 'bookings', 'users', 'reviews', 'categories'];
+
+const safeStr = (val, fallback = '') => {
+  if (val === null || val === undefined) return fallback;
+  if (typeof val === 'string') return val;
+  if (typeof val === 'number') return String(val);
+  if (typeof val === 'object') return val.name || val.title || val.label || fallback;
+  return String(val);
+};
+
+const safeDateStr = (dateVal, fallback = '2026-08-18') => {
+  if (!dateVal) return fallback;
+  try {
+    return String(dateVal).split('T')[0];
+  } catch {
+    return fallback;
+  }
+};
+
 export default function Reports() {
   const { t } = useLanguage();
   const [searchParams, setSearchParams] = useSearchParams();
-  const { searchTerm, setSearchTerm, setPlaceholder } = useSearch();
+  const { searchTerm, setSearchTerm, placeholder, setPlaceholder } = useSearch();
 
   // Tab persistence via search param + sessionStorage (defaults to 'all' master dataset)
   const [activeTab, setActiveTab] = useState(() => {
     const tabFromUrl = searchParams.get('tab');
-    if (tabFromUrl) return tabFromUrl;
+    if (tabFromUrl && VALID_TABS.includes(tabFromUrl)) return tabFromUrl;
     const tabFromStorage = sessionStorage.getItem('reports_active_tab');
-    return tabFromStorage || 'all';
+    if (tabFromStorage && VALID_TABS.includes(tabFromStorage)) return tabFromStorage;
+    return 'all';
   });
 
   useEffect(() => {
@@ -41,10 +61,11 @@ export default function Reports() {
       reviews: t('reports.searchReviewsPlaceholder', 'Search reviews report...'),
       categories: t('reports.searchCategoriesPlaceholder', 'Search categories report...')
     };
-    if (setPlaceholder) {
-      setPlaceholder(tabPlaceholders[activeTab] || t('reports.searchPlaceholder', 'Search reports...'));
+    const desired = tabPlaceholders[activeTab] || t('reports.searchPlaceholder', 'Search reports...');
+    if (setPlaceholder && placeholder !== desired) {
+      setPlaceholder(desired);
     }
-  }, [activeTab, setPlaceholder, t]);
+  }, [activeTab, setPlaceholder, t, placeholder]);
 
   const [selectedDay, setSelectedDay] = useState('');
   const [appliedDay, setAppliedDay] = useState('');
@@ -101,115 +122,164 @@ export default function Reports() {
       const rawTours = toursRes.status === 'fulfilled' ? extractArray(toursRes.value) : [];
 
       // 1. Formatted Places
-      const formattedPlaces = rawPlaces.map(p => ({
-        id: p.id,
-        entityType: 'Place',
-        name: p.name || 'Unnamed Place',
-        category: p.category_name || (typeof p.category === 'object' ? p.category?.name : p.category) || 'General',
-        province: p.province_name || (typeof p.province === 'object' ? p.province?.name : p.province) || 'Siem Reap',
-        rating: Number(p.rating || 4.5),
-        reviews: Number(p.reviews_count || 0),
-        status: p.status || 'Active',
-        createdAt: p.created_at ? String(p.created_at).split('T')[0] : (p.createdAt ? String(p.createdAt).split('T')[0] : '2026-08-18'),
-        location: p.address || 'Cambodia',
-        primaryName: p.name || 'Unnamed Place',
-        secondaryDetail: `${p.category_name || (typeof p.category === 'object' ? p.category?.name : p.category) || 'Attraction'} • ${p.province_name || (typeof p.province === 'object' ? p.province?.name : p.province) || 'Siem Reap'}`,
-        date: p.created_at ? String(p.created_at).split('T')[0] : (p.createdAt ? String(p.createdAt).split('T')[0] : '2026-08-18')
-      }));
+      const formattedPlaces = rawPlaces.filter(Boolean).map(p => {
+        const catName = safeStr(p.category_name || (typeof p.category === 'object' ? p.category?.name : p.category), 'General');
+        const provName = safeStr(p.province_name || (typeof p.province === 'object' ? p.province?.name : p.province), 'Siem Reap');
+        const placeDate = safeDateStr(p.created_at || p.createdAt);
+        const pName = safeStr(p.name, 'Unnamed Place');
+        return {
+          id: p.id,
+          entityType: 'Place',
+          name: pName,
+          category: catName,
+          province: provName,
+          rating: Number(p.rating || 4.5),
+          reviews: Number(p.reviews_count || 0),
+          status: safeStr(p.status, 'Active'),
+          createdAt: placeDate,
+          location: safeStr(p.address, 'Cambodia'),
+          primaryName: pName,
+          secondaryDetail: `${catName} • ${provName}`,
+          date: placeDate
+        };
+      });
 
       // 2. Formatted Events
-      const formattedEvents = rawEvents.map(e => ({
-        id: e.id,
-        entityType: 'Event',
-        title: e.title || 'Upcoming Event',
-        location: e.location || 'Phnom Penh',
-        startDate: e.start_date ? String(e.start_date).split('T')[0] : (e.startDate ? String(e.startDate).split('T')[0] : '2026-08-18'),
-        endDate: e.end_date ? String(e.end_date).split('T')[0] : (e.endDate ? String(e.endDate).split('T')[0] : '2026-08-20'),
-        attendees: Number(e.attendees_count || 500),
-        status: e.status || 'Upcoming',
-        primaryName: e.title || 'Upcoming Event',
-        secondaryDetail: e.location || 'Phnom Penh',
-        date: e.start_date ? String(e.start_date).split('T')[0] : (e.startDate ? String(e.startDate).split('T')[0] : '2026-08-18')
-      }));
+      const formattedEvents = rawEvents.filter(Boolean).map(e => {
+        const startDate = safeDateStr(e.start_date || e.startDate);
+        const endDate = safeDateStr(e.end_date || e.endDate);
+        const loc = safeStr(e.location, 'Phnom Penh');
+        const eTitle = safeStr(e.title, 'Upcoming Event');
+        return {
+          id: e.id,
+          entityType: 'Event',
+          title: eTitle,
+          location: loc,
+          startDate,
+          endDate,
+          attendees: Number(e.attendees_count || 500),
+          status: safeStr(e.status, 'Upcoming'),
+          primaryName: eTitle,
+          secondaryDetail: loc,
+          date: startDate
+        };
+      });
 
       // 3. Formatted Tours
-      const formattedTours = rawTours.map(t => ({
-        id: t.id,
-        entityType: 'Tour',
-        title: t.title || 'Tour Package',
-        destination: t.destination || t.province || 'Siem Reap',
-        duration: t.duration || (t.duration_days ? `${t.duration_days} Days` : '1 Full Day'),
-        price_per_person: parseFloat(t.price || t.price_per_person || 0),
-        rating: parseFloat(t.rating || 5.0),
-        reviews_count: Number(t.reviews_count || 0),
-        status: t.status === 'active' ? 'Active' : (t.status || 'Active'),
-        category: t.category || 'Tour Package',
-        description: t.description || 'Curated travel experience in Cambodia.',
-        primaryName: t.title || 'Tour Package',
-        secondaryDetail: `${t.destination || 'Siem Reap'} • $${parseFloat(t.price || t.price_per_person || 0)} / person`,
-        date: t.created_at ? String(t.created_at).split('T')[0] : '2026-08-18'
-      }));
+      const formattedTours = rawTours.filter(Boolean).map(t => {
+        const dest = safeStr(t.destination || (typeof t.province === 'object' ? t.province?.name : t.province), 'Siem Reap');
+        const tourPrice = parseFloat(t.price || t.price_per_person || 0);
+        const tourCat = safeStr(typeof t.category === 'object' ? t.category?.name : t.category, 'Tour Package');
+        const tourDate = safeDateStr(t.created_at);
+        const tourTitle = safeStr(t.title, 'Tour Package');
+        return {
+          id: t.id,
+          entityType: 'Tour',
+          title: tourTitle,
+          destination: dest,
+          duration: safeStr(t.duration || (t.duration_days ? `${t.duration_days} Days` : '1 Full Day')),
+          price_per_person: tourPrice,
+          rating: parseFloat(t.rating || 5.0),
+          reviews_count: Number(t.reviews_count || 0),
+          status: String(t.status || '').toLowerCase() === 'active' ? 'Active' : safeStr(t.status, 'Active'),
+          category: tourCat,
+          description: safeStr(t.description, 'Curated travel experience in Cambodia.'),
+          primaryName: tourTitle,
+          secondaryDetail: `${dest} • $${tourPrice} / person`,
+          date: tourDate
+        };
+      });
 
       // 4. Formatted Bookings
-      const formattedBookings = rawBookings.map(b => ({
-        id: b.id,
-        entityType: 'Booking',
-        booking_code: b.booking_code || `BK-${b.id || Math.floor(1000 + Math.random() * 9000)}`,
-        service_name: b.service?.name || b.service_name || 'Travel Experience',
-        business_name: b.business?.name || b.business_name || 'Hospitality Partner',
-        total_price: Number(b.total_price) || 0,
-        booking_date: b.booking_date ? String(b.booking_date).split('T')[0] : (b.created_at ? String(b.created_at).split('T')[0] : '2026-08-18'),
-        status: b.status === 'confirmed' ? 'Active' : (b.status === 'pending' ? 'Pending' : (b.status || 'Active')),
-        customer_name: b.user?.name || b.customer_name || 'Traveler',
-        customer_email: b.user?.email || b.customer_email || 'guest@example.com',
-        primaryName: `Booking #${b.booking_code || b.id}`,
-        secondaryDetail: `${b.service?.name || b.service_name || 'Experience'} • $${Number(b.total_price) || 0}`,
-        date: b.booking_date ? String(b.booking_date).split('T')[0] : (b.created_at ? String(b.created_at).split('T')[0] : '2026-08-18')
-      }));
+      const formattedBookings = rawBookings.filter(Boolean).map(b => {
+        const code = safeStr(b.booking_code || b.booking_reference || `BK-${b.id || Math.floor(1000 + Math.random() * 9000)}`);
+        const sName = safeStr(b.service?.name || b.service_name, 'Travel Experience');
+        const bName = safeStr(b.business?.name || b.business_name, 'Hospitality Partner');
+        const cName = safeStr(b.user?.name || b.customer_name, 'Traveler');
+        const cEmail = safeStr(b.user?.email || b.customer_email, 'guest@example.com');
+        const price = Number(b.total_price) || 0;
+        const bDate = safeDateStr(b.booking_date || b.created_at);
+        const bStatus = String(b.status || '').toLowerCase();
+        const normStatus = bStatus === 'confirmed' ? 'Active' : (bStatus === 'pending' ? 'Pending' : safeStr(b.status, 'Active'));
+        return {
+          id: b.id,
+          entityType: 'Booking',
+          booking_code: code,
+          service_name: sName,
+          business_name: bName,
+          total_price: price,
+          booking_date: bDate,
+          status: normStatus,
+          customer_name: cName,
+          customer_email: cEmail,
+          primaryName: `Booking #${code}`,
+          secondaryDetail: `${sName} • $${price}`,
+          date: bDate
+        };
+      });
 
       // 5. Formatted Users
-      const formattedUsers = rawUsers.map(u => ({
-        id: u.id,
-        entityType: 'User',
-        name: u.name || 'User',
-        email: u.email || 'N/A',
-        role: u.role || 'User',
-        joinedDate: u.created_at ? String(u.created_at).split('T')[0] : (u.joinedDate ? String(u.joinedDate).split('T')[0] : '2026-08-18'),
-        reviewsCount: Number(u.reviews_count || 0),
-        status: u.status || 'Active',
-        primaryName: u.name || 'User',
-        secondaryDetail: `${u.role || 'User'} • ${u.email || ''}`,
-        date: u.created_at ? String(u.created_at).split('T')[0] : (u.joinedDate ? String(u.joinedDate).split('T')[0] : '2026-08-18')
-      }));
+      const formattedUsers = rawUsers.filter(Boolean).map(u => {
+        const uName = safeStr(u.name, 'User');
+        const uEmail = safeStr(u.email, 'N/A');
+        const uRole = safeStr(u.role, 'User');
+        const uDate = safeDateStr(u.created_at || u.joinedDate);
+        return {
+          id: u.id,
+          entityType: 'User',
+          name: uName,
+          email: uEmail,
+          role: uRole,
+          joinedDate: uDate,
+          reviewsCount: Number(u.reviews_count || 0),
+          status: safeStr(u.status, 'Active'),
+          primaryName: uName,
+          secondaryDetail: `${uRole} • ${uEmail}`,
+          date: uDate
+        };
+      });
 
       // 6. Formatted Reviews
-      const formattedReviews = rawReviews.map(r => ({
-        id: r.id,
-        entityType: 'Review',
-        userName: r.user_name || (typeof r.user === 'object' ? r.user?.name : r.user) || 'Traveler',
-        avatar: r.avatar || r.user_avatar || (typeof r.user === 'object' ? r.user?.avatar : null),
-        placeName: r.place_name || (typeof r.place === 'object' ? r.place?.name : r.place) || 'Attraction',
-        rating: Number(r.rating || 5),
-        comment: r.comment || r.title || '',
-        createdAt: r.created_at ? String(r.created_at).split('T')[0] : (r.date || '2026-08-18'),
-        date: r.date || (r.created_at ? String(r.created_at).split('T')[0] : '2026-08-18'),
-        status: r.status || 'Approved',
-        primaryName: `${r.user_name || (typeof r.user === 'object' ? r.user?.name : r.user) || 'Traveler'} on ${r.place_name || (typeof r.place === 'object' ? r.place?.name : r.place) || 'Attraction'}`,
-        secondaryDetail: `${Number(r.rating || 5).toFixed(1)}★ • ${r.comment ? `"${r.comment.slice(0, 40)}..."` : 'Feedback'}`,
-      }));
+      const formattedReviews = rawReviews.filter(Boolean).map(r => {
+        const uName = safeStr(r.user_name || (typeof r.user === 'object' ? r.user?.name : r.user), 'Traveler');
+        const pName = safeStr(r.place_name || (typeof r.place === 'object' ? r.place?.name : r.place), 'Attraction');
+        const commentStr = safeStr(r.comment || r.title, '');
+        const rDate = safeDateStr(r.created_at || r.date);
+        const rRating = Number(r.rating || 5);
+        return {
+          id: r.id,
+          entityType: 'Review',
+          userName: uName,
+          avatar: r.avatar || r.user_avatar || (typeof r.user === 'object' ? r.user?.avatar : null),
+          placeName: pName,
+          rating: rRating,
+          comment: commentStr,
+          createdAt: rDate,
+          date: rDate,
+          status: safeStr(r.status, 'Approved'),
+          primaryName: `${uName} on ${pName}`,
+          secondaryDetail: `${rRating.toFixed(1)}★ • ${commentStr ? `"${commentStr.slice(0, 40)}..."` : 'Feedback'}`
+        };
+      });
 
       // 7. Formatted Categories
-      const formattedCategories = rawCategories.map(c => ({
-        id: c.id,
-        entityType: 'Category',
-        name: c.name || 'Category',
-        description: c.description || 'Category description',
-        totalPlaces: Number(c.places_count || 0),
-        status: c.status || 'Active',
-        primaryName: c.name || 'Category',
-        secondaryDetail: `${Number(c.places_count || 0)} Places Listed`,
-        date: c.created_at ? String(c.created_at).split('T')[0] : '2026-08-18'
-      }));
+      const formattedCategories = rawCategories.filter(Boolean).map(c => {
+        const cName = safeStr(c.name, 'Category');
+        const cDesc = safeStr(c.description, 'Category description');
+        const cPlaces = Number(c.places_count || 0);
+        const cDate = safeDateStr(c.created_at);
+        return {
+          id: c.id,
+          entityType: 'Category',
+          name: cName,
+          description: cDesc,
+          totalPlaces: cPlaces,
+          status: safeStr(c.status, 'Active'),
+          primaryName: cName,
+          secondaryDetail: `${cPlaces} Places Listed`,
+          date: cDate
+        };
+      });
 
       // Master Consolidated Dataset (All records united across platform)
       const combinedAll = [
@@ -276,7 +346,7 @@ export default function Reports() {
 
     let matchesStatus = true;
     if (statusFilter !== 'All') {
-      const s = (item.status || '').toLowerCase();
+      const s = String(item.status || '').toLowerCase();
       const f = statusFilter.toLowerCase();
       if (f === 'active') {
         matchesStatus = ['active', 'approved', 'completed', 'confirmed', 'published'].includes(s);
@@ -293,13 +363,14 @@ export default function Reports() {
   });
 
   const handleTabChange = (tabId) => {
-    setActiveTab(tabId);
-    sessionStorage.setItem('reports_active_tab', tabId);
-    if (tabId === 'all') {
+    const validTab = VALID_TABS.includes(tabId) ? tabId : 'all';
+    setActiveTab(validTab);
+    sessionStorage.setItem('reports_active_tab', validTab);
+    if (validTab === 'all') {
       searchParams.delete('tab');
       setSearchParams(searchParams, { replace: true });
     } else {
-      setSearchParams({ tab: tabId }, { replace: true });
+      setSearchParams({ tab: validTab }, { replace: true });
     }
   };
 
@@ -583,7 +654,7 @@ export default function Reports() {
 
   const totalCount = filteredData.length;
   const activeCount = filteredData.filter(i =>
-    ['active', 'approved', 'completed', 'confirmed', 'published'].includes(i.status?.toLowerCase())
+    ['active', 'approved', 'completed', 'confirmed', 'published'].includes(String(i.status || '').toLowerCase())
   ).length;
 
   const ratedItems = filteredData.filter(i => Number(i.rating) > 0);

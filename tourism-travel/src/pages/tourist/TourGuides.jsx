@@ -88,14 +88,20 @@ export default function TourGuides() {
 
     setIsSubmittingInquiry(true);
     try {
+      const guestNum = Number(groupSize) || 1;
+      const rate = Number(selectedGuideForHire.daily_rate) || 0;
+
       // Create reservation or inquiry
       await travelService.createBooking({
+        business_id: selectedGuideForHire.business_id || 1,
         guide_id: selectedGuideForHire.id,
         booking_date: hireDate,
-        guests_count: Number(groupSize) || 1,
-        special_requests: inquiryNotes.trim() || undefined,
-        total_amount: Number(selectedGuideForHire.daily_rate) || 0
-      }).catch(() => {});
+        number_of_guests: guestNum,
+        guests_count: guestNum,
+        special_requests: `[Private Tour Guide: ${selectedGuideForHire.name}] ${inquiryNotes.trim()}`.trim() || undefined,
+        total_price: rate,
+        total_amount: rate,
+      });
 
       showSuccess(`Your guiding request for ${selectedGuideForHire.name} has been placed in the database.`, 'Guide Request Sent');
       setSelectedGuideForHire(null);

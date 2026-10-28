@@ -41,7 +41,7 @@ const NAV_SECTIONS = [
         icon: MapPinned,
         children: [
           { name: 'Categories', key: 'sidebar.categories', icon: Tags, path: '/categories' },
-          { name: 'Places', key: 'sidebar.places', icon: MapPinned, path: '/place', match: ['/place', '/places'] },
+          { name: 'Places', key: 'sidebar.places', icon: MapPinned, path: '/places', match: ['/places', '/place'] },
           { name: 'Provinces', key: 'sidebar.provinces', icon: Globe, path: '/provinces' },
           { name: 'Galleries', key: 'sidebar.galleries', icon: Images, path: '/galleries' },
           { name: 'Events', key: 'sidebar.events', icon: CalendarDays, path: '/events' },

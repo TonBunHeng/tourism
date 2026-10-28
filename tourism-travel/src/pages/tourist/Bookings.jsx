@@ -87,12 +87,16 @@ export default function Bookings() {
 
     setIsSubmittingReview(true);
     try {
-      const targetId = selectedBookingForReview?.place_id || selectedBookingForReview?.business_id;
-      if (targetId) {
+      if (selectedBookingForReview?.business_id) {
+        await travelService.postBusinessReview(selectedBookingForReview.business_id, {
+          rating: reviewRating,
+          comment: reviewComment.trim(),
+        });
+      } else if (selectedBookingForReview?.place_id) {
         await travelService.createReview({
           place_id: selectedBookingForReview.place_id,
           rating: reviewRating,
-          comment: reviewComment.trim()
+          comment: reviewComment.trim(),
         });
       }
       showSuccess('Your review has been submitted to the database.', 'Review Saved');
@@ -225,7 +229,7 @@ export default function Bookings() {
                   )}
                   <div className="flex items-center gap-2">
                     <Users size={14} className="text-[#002D62] dark:text-blue-400 shrink-0" />
-                    <span><strong>Guests:</strong> {b.guests_count || 1} participant(s)</span>
+                    <span><strong>Guests:</strong> {b.guests_count || b.number_of_guests || 1} participant(s)</span>
                   </div>
                 </div>
 
@@ -241,7 +245,7 @@ export default function Bookings() {
                 <div>
                   <div className="text-[10px] text-slate-400 uppercase font-semibold">Total Price</div>
                   <div className="font-extrabold text-slate-900 dark:text-white text-sm">
-                    {b.total_amount ? `$${Number(b.total_amount).toFixed(2)}` : 'Inquiry / Free'}
+                    {b.total_amount || b.total_price ? `$${Number(b.total_amount || b.total_price).toFixed(2)}` : 'Inquiry / Free'}
                   </div>
                 </div>
 
@@ -382,7 +386,7 @@ export default function Bookings() {
                 <div><strong>Visit Date:</strong> {activeBookingDetails.booking_date}</div>
                 <div><strong>Time:</strong> {activeBookingDetails.booking_time || 'Flexible'}</div>
               </div>
-              <div><strong>Party Size:</strong> {activeBookingDetails.guests_count || 1} Person(s)</div>
+              <div><strong>Party Size:</strong> {activeBookingDetails.guests_count || activeBookingDetails.number_of_guests || 1} Person(s)</div>
               <div><strong>Payment Status:</strong> {activeBookingDetails.payment_status || 'Unpaid / At Venue'}</div>
               {activeBookingDetails.special_requests && (
                 <div className="p-3 rounded-xl bg-slate-50 dark:bg-zinc-800">

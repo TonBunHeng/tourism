@@ -120,9 +120,14 @@ class NotificationController extends Controller
             });
         }
 
+        $count = $query->count();
+
         return response()->json([
             'success' => true,
-            'unread_count' => $query->count(),
+            'unread_count' => $count,
+            'data' => [
+                'unread_count' => $count,
+            ],
         ]);
     }
 

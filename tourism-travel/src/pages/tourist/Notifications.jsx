@@ -63,8 +63,13 @@ export default function Notifications() {
     // Refresh unread count
     try {
       const countRes = await notificationService.getUnreadCount();
-      if (countRes?.success && typeof countRes.data?.unread_count === 'number') {
-        setUnreadCount(countRes.data.unread_count);
+      const count = typeof countRes?.data?.unread_count === 'number'
+        ? countRes.data.unread_count
+        : typeof countRes?.unread_count === 'number'
+          ? countRes.unread_count
+          : null;
+      if (count !== null) {
+        setUnreadCount(count);
       }
     } catch {
       // ignore

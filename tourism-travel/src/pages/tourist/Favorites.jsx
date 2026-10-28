@@ -197,7 +197,7 @@ export default function Favorites() {
                   <div>
                     <div className="flex items-center gap-1 text-[11px] text-[#003E83] dark:text-blue-400 font-semibold mb-1">
                       <MapPin size={12} />
-                      <span>{place.province?.name || place.location || 'Cambodia'}</span>
+                      <span>{place.province?.name || (typeof place.province === 'string' ? place.province : place.province_name) || place.location || 'Cambodia'}</span>
                     </div>
                     <h3 className="font-extrabold text-sm text-slate-900 dark:text-white line-clamp-1">
                       {place.name}

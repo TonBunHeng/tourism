@@ -115,12 +115,15 @@ export default function DestinationDetails() {
 
     setIsSubmittingBooking(true);
     try {
+      const count = parseInt(guestsCount, 10) || 1;
       const payload = {
+        business_id: 1,
         place_id: place.id,
         booking_date: bookingDate,
         booking_time: bookingTime,
-        guests_count: parseInt(guestsCount, 10) || 1,
-        special_requests: specialRequests,
+        number_of_guests: count,
+        guests_count: count,
+        special_requests: `[Destination Visit: ${place.name}] ${specialRequests}`.trim() || undefined,
         customer_name: user?.name || 'Visitor',
         customer_email: user?.email || '',
         customer_phone: user?.phone || '',
@@ -242,10 +245,10 @@ export default function DestinationDetails() {
             />
             <div className="absolute top-4 left-4 flex items-center gap-2">
               <span className="px-3 py-1 rounded-full text-xs font-bold bg-[#003E83] text-white shadow-md">
-                {place.category?.name || 'Heritage & Cultural'}
+                {place.category?.name || (typeof place.category === 'string' ? place.category : place.category_name) || 'Heritage & Cultural'}
               </span>
               <span className="px-3 py-1 rounded-full text-xs font-bold bg-black/60 backdrop-blur-md text-white shadow-md">
-                {place.province?.name || 'Cambodia'}
+                {place.province?.name || (typeof place.province === 'string' ? place.province : place.province_name) || 'Cambodia'}
               </span>
             </div>
 
@@ -262,7 +265,7 @@ export default function DestinationDetails() {
           <div>
             <div className="flex items-center gap-2 text-xs font-semibold text-[#003E83] dark:text-blue-400 mb-1">
               <MapPin size={15} />
-              <span>{place.location || place.address || `${place.province?.name || 'Cambodia'}`}</span>
+              <span>{place.location || place.address || `${place.province?.name || (typeof place.province === 'string' ? place.province : place.province_name) || 'Cambodia'}`}</span>
             </div>
             <h1 className="text-2xl sm:text-4xl font-black text-slate-900 dark:text-white tracking-tight">
               {place.name}
@@ -359,7 +362,7 @@ export default function DestinationDetails() {
               </button>
 
               <Link
-                to={`/ai-chat?province=${encodeURIComponent(place.province?.name || 'Siem Reap')}&prompt=${encodeURIComponent(`Tell me practical travel advice, best sunrise photo spot, and dress code for ${place.name}.`)}`}
+                to={`/ai-chat?province=${encodeURIComponent(place.province?.name || (typeof place.province === 'string' ? place.province : place.province_name) || 'Siem Reap')}&prompt=${encodeURIComponent(`Tell me practical travel advice, best sunrise photo spot, and dress code for ${place.name}.`)}`}
                 className="w-full py-3 px-4 rounded-xl border border-indigo-200 dark:border-indigo-900/60 bg-indigo-50/50 dark:bg-indigo-950/30 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100/50 text-xs font-semibold transition flex items-center justify-center gap-2"
               >
                 <Sparkles size={15} />

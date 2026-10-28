@@ -170,21 +170,23 @@ export const aiChatService = {
       });
 
       if (res.data) {
-        const payload = res.data.data || res.data;
-        const replyText = payload.response || payload.reply || payload.answer || payload.message || '';
-        const nestedData = payload.data || {};
+        const payload = res.data;
+        const nestedData = (typeof payload.data === 'object' && payload.data !== null) ? payload.data : {};
+        const replyText = payload.response || payload.reply || payload.answer || payload.message || nestedData.response || nestedData.reply || nestedData.message || (typeof payload.data === 'string' ? payload.data : '');
 
-        return {
-          success: true,
-          reply: replyText,
-          message: replyText,
-          response: replyText,
-          sessionId: payload.session_id || sessionId,
-          suggestions: nestedData.suggestions || [],
-          sources: nestedData.sources || [],
-          relatedPlaces: nestedData.related_places || [],
-          data: payload,
-        };
+        if (replyText) {
+          return {
+            success: true,
+            reply: replyText,
+            message: replyText,
+            response: replyText,
+            sessionId: payload.session_id || nestedData.session_id || sessionId,
+            suggestions: nestedData.suggestions || payload.suggestions || [],
+            sources: nestedData.sources || payload.sources || [],
+            relatedPlaces: nestedData.related_places || payload.related_places || [],
+            data: payload,
+          };
+        }
       }
     } catch {
       // Laravel proxy also unreachable, proceed to local intelligence engine

@@ -160,11 +160,13 @@ class TravelBookingController extends Controller
             }
         }
 
-        $guests = max(1, (int) $request->input('number_of_guests', 1));
+        $guests = max(1, (int) ($request->input('number_of_guests') ?? $request->input('guests_count') ?? 1));
 
         $totalPrice = 0.00;
         if ($request->has('total_price') && $request->input('total_price') !== null) {
             $totalPrice = (float) $request->input('total_price');
+        } elseif ($request->has('total_amount') && $request->input('total_amount') !== null) {
+            $totalPrice = (float) $request->input('total_amount');
         } elseif ($service && $service->price !== null) {
             $totalPrice = (float) ($service->price * $guests);
         }

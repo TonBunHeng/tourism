@@ -22,9 +22,14 @@ class StoreBookingRequest extends FormRequest
             'booking_date' => 'required|date|after_or_equal:today',
             'booking_time' => 'nullable|string|max:20',
             'number_of_guests' => 'nullable|integer|min:1|max:100',
+            'guests_count' => 'nullable|integer|min:1|max:100',
             'total_price' => 'nullable|numeric|min:0',
+            'total_amount' => 'nullable|numeric|min:0',
             'currency' => 'nullable|string|max:10',
             'special_requests' => 'nullable|string|max:1000',
+            'tour_id' => 'nullable|integer',
+            'guide_id' => 'nullable|integer',
+            'place_id' => 'nullable|integer',
         ];
     }
 }

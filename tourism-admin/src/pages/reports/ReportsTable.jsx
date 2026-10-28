@@ -23,6 +23,17 @@ export default function ReportsTable({
   const itemsPerPage = 10;
 
   useEffect(() => {
+    setCurrentPage(1);
+  }, [activeTab, searchTerm, statusFilter]);
+
+  const safeText = (val, fallback = '') => {
+    if (val === null || val === undefined) return fallback;
+    if (typeof val === 'string' || typeof val === 'number') return String(val);
+    if (typeof val === 'object') return val.name || val.title || val.label || fallback;
+    return String(val);
+  };
+
+  useEffect(() => {
     if (selectedItem) {
       document.body.style.overflow = 'hidden';
       const handleKeyDown = (e) => {
@@ -56,19 +67,19 @@ export default function ReportsTable({
   const paginatedData = data.slice(startIndex, startIndex + itemsPerPage);
 
   const getStatusBadge = (status) => {
-    switch (status?.toLowerCase()) {
+    const rawStr = typeof status === 'string' ? status : (status !== null && status !== undefined ? String(status) : '');
+    const s = rawStr.toLowerCase();
+    switch (s) {
       case 'active':
       case 'approved':
       case 'completed':
       case 'confirmed':
       case 'published': {
-        const text = status ? (
-          status.toLowerCase() === 'active' ? t('reports.badgeActive', 'Active') :
-          status.toLowerCase() === 'approved' ? t('reports.badgeApproved', 'Approved') :
-          status.toLowerCase() === 'completed' ? t('reports.badgeCompleted', 'Completed') :
-          status.toLowerCase() === 'confirmed' ? t('reports.badgeConfirmed', 'Confirmed') :
-          t('reports.badgePublished', 'Published')
-        ) : t('reports.badgeActive', 'Active');
+        const text = s === 'active' ? t('reports.badgeActive', 'Active') :
+          s === 'approved' ? t('reports.badgeApproved', 'Approved') :
+          s === 'completed' ? t('reports.badgeCompleted', 'Completed') :
+          s === 'confirmed' ? t('reports.badgeConfirmed', 'Confirmed') :
+          t('reports.badgePublished', 'Published');
         return (
           <span className="inline-flex items-center gap-1 px-2.5 py-0.5 text-xs font-semibold rounded-md bg-[var(--color-success-bg)] dark:bg-[var(--color-success-dark-bg)] text-[var(--color-success-text)] dark:text-[var(--color-success-dark-text)] border border-[var(--color-success-border)] dark:border-[var(--color-success-dark-border)]">
             {text}
@@ -80,13 +91,11 @@ export default function ReportsTable({
       case 'scheduled':
       case 'draft':
       case 'under_review': {
-        const text = status ? (
-          status.toLowerCase() === 'pending' ? t('reports.badgePending', 'Pending') :
-          status.toLowerCase() === 'upcoming' ? t('reports.badgeUpcoming', 'Upcoming') :
-          status.toLowerCase() === 'scheduled' ? t('reports.badgeScheduled', 'Scheduled') :
-          status.toLowerCase() === 'draft' ? t('reports.badgeDraft', 'Draft') :
-          t('reports.badgeUnderReview', 'Under Review')
-        ) : t('reports.badgePending', 'Pending');
+        const text = s === 'pending' ? t('reports.badgePending', 'Pending') :
+          s === 'upcoming' ? t('reports.badgeUpcoming', 'Upcoming') :
+          s === 'scheduled' ? t('reports.badgeScheduled', 'Scheduled') :
+          s === 'draft' ? t('reports.badgeDraft', 'Draft') :
+          t('reports.badgeUnderReview', 'Under Review');
         return (
           <span className="inline-flex items-center gap-1 px-2.5 py-0.5 text-xs font-semibold rounded-md bg-[var(--color-warning-bg)] dark:bg-[var(--color-warning-dark-bg)] text-[var(--color-warning-text)] dark:text-[var(--color-warning-dark-text)] border border-[var(--color-warning-border)] dark:border-[var(--color-warning-dark-border)]">
             {text}
@@ -98,13 +107,11 @@ export default function ReportsTable({
       case 'inactive':
       case 'rejected':
       case 'cancelled': {
-        const text = status ? (
-          status.toLowerCase() === 'suspended' ? t('reports.badgeSuspended', 'Suspended') :
-          status.toLowerCase() === 'flagged' ? t('reports.badgeFlagged', 'Flagged') :
-          status.toLowerCase() === 'inactive' ? t('reports.badgeInactive', 'Inactive') :
-          status.toLowerCase() === 'rejected' ? t('reports.badgeRejected', 'Rejected') :
-          t('reports.badgeCancelled', 'Cancelled')
-        ) : t('reports.badgeInactive', 'Inactive');
+        const text = s === 'suspended' ? t('reports.badgeSuspended', 'Suspended') :
+          s === 'flagged' ? t('reports.badgeFlagged', 'Flagged') :
+          s === 'inactive' ? t('reports.badgeInactive', 'Inactive') :
+          s === 'rejected' ? t('reports.badgeRejected', 'Rejected') :
+          t('reports.badgeCancelled', 'Cancelled');
         return (
           <span className="inline-flex items-center gap-1 px-2.5 py-0.5 text-xs font-semibold rounded-md bg-[var(--color-danger-bg)] dark:bg-[var(--color-danger-dark-bg)] text-[var(--color-danger-text)] dark:text-[var(--color-danger-dark-text)] border border-[var(--color-danger-border)] dark:border-[var(--color-danger-dark-border)]">
             {text}
@@ -114,7 +121,7 @@ export default function ReportsTable({
       default:
         return (
           <span className="inline-flex items-center gap-1 px-2.5 py-0.5 text-xs font-semibold rounded-md bg-[var(--color-neutral-badge-bg)] dark:bg-[var(--color-neutral-badge-dark-bg)] text-[var(--color-neutral-badge-text)] dark:text-[var(--color-neutral-badge-dark-text)] border border-[var(--color-neutral-badge-border)] dark:border-[var(--color-neutral-badge-dark-border)]">
-            {status || t('reports.badgeStandard', 'Standard')}
+            {rawStr || t('reports.badgeStandard', 'Standard')}
           </span>
         );
     }
@@ -260,14 +267,14 @@ export default function ReportsTable({
               </div>
 
               {/* Master All Data View Mobile */}
-              {activeTab === 'all' && (
+              {(!['places', 'events', 'tours', 'bookings', 'users', 'reviews', 'categories'].includes(activeTab)) && (
                 <>
                   <h4 className="font-bold text-sm text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">
-                    {row.primaryName || row.name || row.title || row.booking_code || row.userName || 'Unnamed Record'}
+                    {safeText(row.primaryName || row.name || row.title || row.booking_code || row.userName, 'Unnamed Record')}
                   </h4>
                   <div className="grid grid-cols-2 gap-x-2 gap-y-1 text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
-                    <div><span className="font-semibold text-[var(--color-text-muted-light)]">{t('reports.labelDetail', 'Detail:')}</span> {row.secondaryDetail || row.category || row.destination || row.province || row.role || 'N/A'}</div>
-                    <div><span className="font-semibold text-[var(--color-text-muted-light)]">{t('reports.labelDate', 'Date:')}</span> {row.date || row.createdAt || row.startDate || 'N/A'}</div>
+                    <div><span className="font-semibold text-[var(--color-text-muted-light)]">{t('reports.labelDetail', 'Detail:')}</span> {safeText(row.secondaryDetail || row.category || row.destination || row.province || row.role, 'N/A')}</div>
+                    <div><span className="font-semibold text-[var(--color-text-muted-light)]">{t('reports.labelDate', 'Date:')}</span> {safeText(row.date || row.createdAt || row.startDate, 'N/A')}</div>
                   </div>
                 </>
               )}
@@ -275,15 +282,15 @@ export default function ReportsTable({
               {activeTab === 'places' && (
                 <>
                   <h4 className="font-bold text-sm text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">
-                    {row.name}
+                    {safeText(row.name)}
                   </h4>
                   <div className="grid grid-cols-2 gap-x-2 gap-y-1 text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
-                    <div><span className="font-semibold text-[var(--color-text-muted-light)]">{t('reports.labelCategoryShort', 'Cat:')}</span> {row.category}</div>
-                    <div><span className="font-semibold text-[var(--color-text-muted-light)]">{t('reports.labelProvince', 'Province:')}</span> {row.province}</div>
+                    <div><span className="font-semibold text-[var(--color-text-muted-light)]">{t('reports.labelCategoryShort', 'Cat:')}</span> {safeText(row.category)}</div>
+                    <div><span className="font-semibold text-[var(--color-text-muted-light)]">{t('reports.labelProvince', 'Province:')}</span> {safeText(row.province)}</div>
                     <div className="inline-flex items-center gap-1 font-semibold text-amber-500">
                       <Star className="w-3 h-3 fill-amber-400" /> {row.rating} ({row.reviews} {t('reports.thReviews', 'revs')})
                     </div>
-                    <div><span className="font-semibold text-[var(--color-text-muted-light)]">{t('reports.labelDate', 'Date:')}</span> {row.createdAt}</div>
+                    <div><span className="font-semibold text-[var(--color-text-muted-light)]">{t('reports.labelDate', 'Date:')}</span> {safeText(row.createdAt)}</div>
                   </div>
                 </>
               )}
@@ -409,7 +416,7 @@ export default function ReportsTable({
       <div className="hidden sm:block overflow-x-auto">
         <table className="w-full text-left text-xs md:text-sm text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">
           <thead className="bg-[var(--color-surface-hover-light)]/50 dark:bg-[var(--color-surface-hover-dark)]/50 text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] uppercase tracking-wider text-xs font-medium">
-            {activeTab === 'all' && (
+            {(!['places', 'events', 'tours', 'bookings', 'users', 'reviews', 'categories'].includes(activeTab)) && (
               <tr>
                 <th className="pl-4 pr-2 py-3.5 text-xs font-medium uppercase tracking-wider w-12 text-center">{t('reports.thIndex', '#')}</th>
                 <th className="px-3 py-3.5 whitespace-nowrap w-32">{t('reports.thType', 'Type')}</th>
@@ -524,7 +531,7 @@ export default function ReportsTable({
                 <tr key={i} className="hover:bg-[var(--color-surface-hover-light)] dark:hover:bg-[var(--color-surface-hover-dark)]/40 transition-colors">
                   
                   {/* Master All Data View */}
-                  {activeTab === 'all' && (
+                  {(!['places', 'events', 'tours', 'bookings', 'users', 'reviews', 'categories'].includes(activeTab)) && (
                     <>
                       <td className="pl-4 pr-2 py-3.5 whitespace-nowrap text-xs font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] font-mono text-center">
                         {startIndex + i + 1}
@@ -535,7 +542,7 @@ export default function ReportsTable({
                       <td className="px-4 py-3.5">
                         <div className="min-w-0">
                           <p className="text-xs md:text-sm font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] truncate">
-                            {row.primaryName || row.name || row.title || row.booking_code || row.userName || 'Unnamed Item'}
+                            {safeText(row.primaryName || row.name || row.title || row.booking_code || row.userName, 'Unnamed Item')}
                           </p>
                           <span className="text-[11px] text-[var(--color-text-muted-light)] dark:text-[var(--color-text-secondary-dark)] truncate block font-mono">
                             ID #{row.id}
@@ -543,13 +550,13 @@ export default function ReportsTable({
                         </div>
                       </td>
                       <td className="px-3 py-3.5 whitespace-nowrap text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
-                        {row.secondaryDetail || row.category || row.destination || row.province || row.role || row.placeName || row.description || 'General'}
+                        {safeText(row.secondaryDetail || row.category || row.destination || row.province || row.role || row.placeName || row.description, 'General')}
                       </td>
                       <td className="px-3 py-3.5 whitespace-nowrap">
                         {getStatusBadge(row.status)}
                       </td>
                       <td className="px-3 py-3.5 whitespace-nowrap text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] font-mono">
-                        {row.date || row.createdAt || row.startDate || row.joinedDate || row.booking_date || 'N/A'}
+                        {safeText(row.date || row.createdAt || row.startDate || row.joinedDate || row.booking_date, 'N/A')}
                       </td>
                       <td className="pl-3 pr-4 py-3.5 whitespace-nowrap text-right text-xs">
                         <button
@@ -577,10 +584,10 @@ export default function ReportsTable({
                           </div>
                           <div className="min-w-0 flex-1">
                             <p className="text-xs md:text-sm font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] truncate">
-                              {row.name}
+                              {safeText(row.name)}
                             </p>
                             <span className="text-[10px] font-semibold px-2 py-0.2 rounded-md bg-[var(--color-info-bg)] dark:bg-[var(--color-info-dark-bg)] text-[var(--color-info-text)] dark:text-[var(--color-info-dark-text)] border border-[var(--color-info-border)] dark:border-[var(--color-info-dark-border)]">
-                              {row.category}
+                              {safeText(row.category)}
                             </span>
                           </div>
                         </div>
@@ -588,7 +595,7 @@ export default function ReportsTable({
                       <td className="px-3 py-3.5 whitespace-nowrap text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
                         <div className="flex items-center gap-1">
                           <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                          <span>{row.province}</span>
+                          <span>{safeText(row.province)}</span>
                         </div>
                       </td>
                       <td className="px-3 py-3.5 whitespace-nowrap">
@@ -681,10 +688,10 @@ export default function ReportsTable({
                           </div>
                           <div className="min-w-0 flex-1">
                             <p className="text-xs md:text-sm font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] truncate">
-                              {row.title}
+                              {safeText(row.title)}
                             </p>
                             <span className="text-[10px] font-semibold px-2 py-0.2 rounded-md bg-purple-50 text-purple-700 dark:bg-purple-950/50 dark:text-purple-300 border border-purple-200 dark:border-purple-900/40">
-                              {row.category || 'Tour Package'}
+                              {safeText(row.category, 'Tour Package')}
                             </span>
                           </div>
                         </div>
@@ -692,11 +699,11 @@ export default function ReportsTable({
                       <td className="px-3 py-3.5 whitespace-nowrap text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
                         <div className="flex items-center gap-1">
                           <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                          <span>{row.destination}</span>
+                          <span>{safeText(row.destination)}</span>
                         </div>
                       </td>
                       <td className="px-3 py-3.5 whitespace-nowrap text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] font-mono">
-                        {row.duration}
+                        {safeText(row.duration)}
                       </td>
                       <td className="px-3 py-3.5 whitespace-nowrap text-xs font-bold text-emerald-600 dark:text-emerald-400">
                         ${row.price_per_person}
@@ -738,20 +745,20 @@ export default function ReportsTable({
                           </div>
                           <div className="min-w-0 flex-1">
                             <p className="text-xs md:text-sm font-semibold font-mono text-[#003E83] dark:text-blue-400 truncate">
-                              #{row.booking_code}
+                              #{safeText(row.booking_code)}
                             </p>
                             <p className="text-[11px] text-[var(--color-text-muted-light)] dark:text-[var(--color-text-secondary-dark)] truncate">
-                              {row.user?.name || row.customer_name || 'Traveler'}
+                              {safeText(row.user?.name || row.customer_name, 'Traveler')}
                             </p>
                           </div>
                         </div>
                       </td>
                       <td className="px-3 py-3.5 text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
-                        <p className="font-medium text-[var(--color-text-primary-light)] dark:text-white truncate">{row.service_name}</p>
-                        <p className="text-[11px] text-[var(--color-text-muted-light)] dark:text-zinc-400 truncate">{row.business_name}</p>
+                        <p className="font-medium text-[var(--color-text-primary-light)] dark:text-white truncate">{safeText(row.service_name)}</p>
+                        <p className="text-[11px] text-[var(--color-text-muted-light)] dark:text-zinc-400 truncate">{safeText(row.business_name)}</p>
                       </td>
                       <td className="px-3 py-3.5 whitespace-nowrap text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] font-mono">
-                        {row.booking_date || row.date}
+                        {safeText(row.booking_date || row.date)}
                       </td>
                       <td className="px-3 py-3.5 whitespace-nowrap text-xs font-bold text-emerald-600 dark:text-emerald-400">
                         ${row.total_price}
@@ -785,21 +792,21 @@ export default function ReportsTable({
                           </div>
                           <div className="min-w-0 flex-1">
                             <p className="text-xs md:text-sm font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] truncate">
-                              {row.name}
+                              {safeText(row.name)}
                             </p>
                             <p className="text-[11px] text-[var(--color-text-muted-light)] dark:text-[var(--color-text-secondary-dark)] truncate">
-                              {row.email}
+                              {safeText(row.email)}
                             </p>
                           </div>
                         </div>
                       </td>
                       <td className="px-3 py-3.5 whitespace-nowrap text-xs">
                         <span className="px-2 py-0.5 rounded-md text-xs font-semibold bg-gray-100 dark:bg-zinc-800 text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] border border-gray-200 dark:border-zinc-700">
-                          {row.role}
+                          {safeText(row.role)}
                         </span>
                       </td>
                       <td className="px-3 py-3.5 whitespace-nowrap text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] font-mono">
-                        {row.joinedDate}
+                        {safeText(row.joinedDate)}
                       </td>
                       <td className="px-3 py-3.5 whitespace-nowrap text-xs font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">
                         {row.reviewsCount}
@@ -837,18 +844,18 @@ export default function ReportsTable({
                           </div>
                           <div className="min-w-0 flex-1">
                             <p className="text-xs md:text-sm font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] truncate">
-                              {row.userName}
+                              {safeText(row.userName)}
                             </p>
-                            <p className="text-[11px] text-[var(--color-text-muted-light)] dark:text-[var(--color-text-secondary-dark)] truncate max-w-xs italic" title={row.comment}>
-                              {row.comment ? `"${row.comment}"` : 'Tourist review'}
+                            <p className="text-[11px] text-[var(--color-text-muted-light)] dark:text-[var(--color-text-secondary-dark)] truncate max-w-xs italic" title={safeText(row.comment)}>
+                              {safeText(row.comment) ? `"${safeText(row.comment)}"` : 'Tourist review'}
                             </p>
                           </div>
                         </div>
                       </td>
                       <td className="px-3 py-3.5 whitespace-nowrap text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
-                        <div className="flex items-center gap-1.5 max-w-[180px] truncate" title={row.placeName}>
+                        <div className="flex items-center gap-1.5 max-w-[180px] truncate" title={safeText(row.placeName)}>
                           <MapPin className="w-3.5 h-3.5 text-rose-500 shrink-0" />
-                          <span className="truncate font-medium text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">{row.placeName}</span>
+                          <span className="truncate font-medium text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">{safeText(row.placeName)}</span>
                         </div>
                       </td>
                       <td className="px-3 py-3.5 whitespace-nowrap">
@@ -860,7 +867,7 @@ export default function ReportsTable({
                         </div>
                       </td>
                       <td className="px-3 py-3.5 whitespace-nowrap text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] font-mono">
-                        {row.date}
+                        {safeText(row.date)}
                       </td>
                       <td className="px-3 py-3.5 whitespace-nowrap">
                         {getStatusBadge(row.status)}
@@ -890,12 +897,12 @@ export default function ReportsTable({
                             <FolderTree className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                           </div>
                           <p className="text-xs md:text-sm font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] truncate">
-                            {row.name}
+                            {safeText(row.name)}
                           </p>
                         </div>
                       </td>
                       <td className="px-3 py-3.5 text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] max-w-xs truncate">
-                        {row.description}
+                        {safeText(row.description)}
                       </td>
                       <td className="px-3 py-3.5 whitespace-nowrap text-xs font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">
                         {row.totalPlaces}

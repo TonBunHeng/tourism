@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import {
-  Compass,
   Heart,
   Calendar,
   User,
@@ -30,7 +29,7 @@ import logoImg from '../assets/images/tourism_logo.png';
 import AngkorGenieFloatingWidget from '../components/common/AngkorGenieFloatingWidget';
 
 export default function TouristLayout() {
-  const { user, isAuthenticated, logout, isBusinessOwner } = useAuth();
+  const { user, isAuthenticated, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -43,23 +42,61 @@ export default function TouristLayout() {
   const [isMegaMenuOpen, setIsMegaMenuOpen] = useState(false);
   const megaMenuTimeoutRef = useRef(null);
 
+  // Refresh the notification badge when authentication or route changes.
+  // Ignore late responses after navigation/unmount and reset on sign-out.
   useEffect(() => {
-    if (isAuthenticated) {
-      notificationService.getUnreadCount()
-        .then((res) => {
-          if (res?.success && typeof res.data?.unread_count === 'number') {
-            setUnreadCount(res.data.unread_count);
-          }
-        })
-        .catch(() => { });
+    let cancelled = false;
+
+    if (!isAuthenticated) {
+      setUnreadCount(0);
+      return undefined;
     }
+
+    notificationService
+      .getUnreadCount()
+      .then((res) => {
+        if (cancelled) return;
+
+        const count = typeof res?.data?.unread_count === 'number'
+          ? res.data.unread_count
+          : typeof res?.unread_count === 'number'
+            ? res.unread_count
+            : null;
+
+        if (count !== null) {
+          setUnreadCount(count);
+        }
+      })
+      .catch(() => {
+        // Preserve the current badge count if the request temporarily fails.
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, [isAuthenticated, location.pathname]);
 
-  // Close mega menu on route navigation
+  // Close navigation menus whenever the route changes.
   useEffect(() => {
     setIsMegaMenuOpen(false);
     setIsMobileMenuOpen(false);
+    setIsProfileMenuOpen(false);
+
+    if (megaMenuTimeoutRef.current) {
+      clearTimeout(megaMenuTimeoutRef.current);
+      megaMenuTimeoutRef.current = null;
+    }
   }, [location.pathname]);
+
+  // Do not leave a pending timeout behind when this layout unmounts.
+  useEffect(() => {
+    return () => {
+      if (megaMenuTimeoutRef.current) {
+        clearTimeout(megaMenuTimeoutRef.current);
+        megaMenuTimeoutRef.current = null;
+      }
+    };
+  }, []);
 
   const handleToggleTheme = () => {
     const next = toggleTheme(theme);
@@ -69,14 +106,21 @@ export default function TouristLayout() {
   const handleOpenMegaMenu = () => {
     if (megaMenuTimeoutRef.current) {
       clearTimeout(megaMenuTimeoutRef.current);
+      megaMenuTimeoutRef.current = null;
     }
+
     setIsMegaMenuOpen(true);
   };
 
   const handleCloseMegaMenu = () => {
+    if (megaMenuTimeoutRef.current) {
+      clearTimeout(megaMenuTimeoutRef.current);
+    }
+
     megaMenuTimeoutRef.current = setTimeout(() => {
       setIsMegaMenuOpen(false);
-    }, 250);
+      megaMenuTimeoutRef.current = null;
+    }, 200);
   };
 
   // Active route helpers
@@ -99,21 +143,21 @@ export default function TouristLayout() {
         className="sticky top-0 z-40 bg-white dark:bg-zinc-900 border-b border-slate-200/80 dark:border-zinc-800 shadow-sm transition-colors"
         onMouseLeave={handleCloseMegaMenu}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-22 flex items-center justify-between relative">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-[88px] flex items-center justify-between relative">
 
           {/* Left: Round Emblem Logo + Dual-Line Khmer & English Branding (Matches Picture 2) */}
           <Link to="/" className="flex items-center gap-3.5 group shrink-0">
             <img
               src={logoImg}
-              alt="AngkorVerses Logo"
-              className="w-13 h-13 object-contain drop-shadow-sm group-hover:scale-105 transition-transform"
-              onError={(e) => {
-                e.target.style.display = 'none';
+              alt="Angkor Verse AI logo"
+              className="size-[52px] object-contain drop-shadow-sm group-hover:scale-105 transition-transform"
+              onError={(event) => {
+                event.currentTarget.style.display = 'none';
               }}
             />
             <div className="flex flex-col justify-center">
               <div className="font-extrabold text-xs sm:text-sm tracking-wider text-[#002D62] dark:text-zinc-100 uppercase leading-snug">
-                ANGKORVERSES
+                ANGKOR VERSE
               </div>
             </div>
           </Link>
@@ -137,19 +181,33 @@ export default function TouristLayout() {
 
             {/* 2. TOURS & BOOKINGS (Triggers Mega-Menu with Red Underline like ACADEMICS in Picture 2) */}
             <div
-              className="h-full flex flex-col justify-center items-center group relative cursor-pointer"
+              className="h-full flex flex-col justify-center items-center group relative"
               onMouseEnter={handleOpenMegaMenu}
-              onClick={() => setIsMegaMenuOpen(!isMegaMenuOpen)}
             >
-              <Link
-                to="/tours"
-                className={`text-xs xl:text-sm font-bold tracking-wider uppercase transition-colors flex items-center gap-1 ${isToursActive || isDestinationsActive || isMegaMenuOpen
-                  ? 'text-red-600 dark:text-red-500'
-                  : 'text-[#002D62] dark:text-zinc-200 group-hover:text-red-600 dark:group-hover:text-red-400'
-                  }`}
-              >
-                <span>TOURS & BOOKINGS</span>
-              </Link>
+              <div className="flex items-center gap-1">
+                <Link
+                  to="/tours"
+                  className={`text-xs xl:text-sm font-bold tracking-wider uppercase transition-colors ${isToursActive || isDestinationsActive || isMegaMenuOpen
+                    ? 'text-red-600 dark:text-red-500'
+                    : 'text-[#002D62] dark:text-zinc-200 group-hover:text-red-600 dark:group-hover:text-red-400'
+                    }`}
+                >
+                  TOURS & BOOKINGS
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => setIsMegaMenuOpen((open) => !open)}
+                  aria-label="Toggle tours and bookings menu"
+                  aria-expanded={isMegaMenuOpen}
+                  aria-controls="tourism-mega-menu"
+                  className="p-1 rounded text-current hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+                >
+                  <ChevronDown
+                    size={14}
+                    className={`transition-transform duration-200 ${isMegaMenuOpen ? 'rotate-180' : ''}`}
+                  />
+                </button>
+              </div>
               <span className={`w-full h-1 mt-1.5 rounded-full transition-all duration-200 ${isToursActive || isDestinationsActive || isMegaMenuOpen
                 ? 'bg-red-600 dark:bg-red-500'
                 : 'bg-transparent group-hover:bg-red-600/40'
@@ -205,6 +263,7 @@ export default function TouristLayout() {
                   to="/notifications"
                   className="relative p-2 rounded-xl text-slate-500 hover:text-slate-800 dark:text-zinc-400 dark:hover:text-zinc-100 hover:bg-slate-100 dark:hover:bg-zinc-800 transition"
                   title="Notifications"
+                  aria-label={`Notifications${unreadCount > 0 ? `, ${unreadCount} unread` : ''}`}
                 >
                   <Bell size={17} />
                   {unreadCount > 0 && (
@@ -218,7 +277,10 @@ export default function TouristLayout() {
                 <div className="relative">
                   <button
                     type="button"
-                    onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
+                    onClick={() => setIsProfileMenuOpen((open) => !open)}
+                    aria-label="Open account menu"
+                    aria-expanded={isProfileMenuOpen}
+                    aria-controls="tourist-profile-menu"
                     className="flex items-center gap-2 p-1 rounded-xl hover:bg-slate-100 dark:hover:bg-zinc-800 transition cursor-pointer"
                   >
                     <div className="w-8 h-8 rounded-full bg-[#002D62] text-white flex items-center justify-center text-xs font-bold ring-2 ring-blue-500/20 overflow-hidden">
@@ -233,6 +295,7 @@ export default function TouristLayout() {
 
                   {isProfileMenuOpen && (
                     <div
+                      id="tourist-profile-menu"
                       className="absolute right-0 mt-2 w-56 rounded-2xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 shadow-xl py-2 z-50 animate-dropdown"
                       onMouseLeave={() => setIsProfileMenuOpen(false)}
                     >
@@ -312,7 +375,9 @@ export default function TouristLayout() {
               type="button"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className="lg:hidden p-2 rounded-xl text-slate-600 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-zinc-800 transition cursor-pointer"
-              aria-label="Open mobile menu"
+              aria-label={isMobileMenuOpen ? 'Close mobile menu' : 'Open mobile menu'}
+              aria-expanded={isMobileMenuOpen}
+              aria-controls="tourist-mobile-navigation"
             >
               {isMobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
             </button>
@@ -322,6 +387,9 @@ export default function TouristLayout() {
         {/* 3. MEGA-MENU DROPDOWN CARD (Floating White Card Exactly Matching Picture 2) */}
         {isMegaMenuOpen && (
           <div
+            id="tourism-mega-menu"
+            role="region"
+            aria-label="Tours, bookings, and destinations menu"
             className="hidden lg:block absolute left-0 right-0 top-full pt-1 z-50 pointer-events-auto"
             onMouseEnter={handleOpenMegaMenu}
             onMouseLeave={handleCloseMegaMenu}
@@ -425,7 +493,10 @@ export default function TouristLayout() {
 
         {/* 4. Mobile Drawer Navigation */}
         {isMobileMenuOpen && (
-          <div className="lg:hidden border-t border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-4 pt-3 pb-6 space-y-4 max-h-[80vh] overflow-y-auto">
+          <div
+            id="tourist-mobile-navigation"
+            className="lg:hidden border-t border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-4 pt-3 pb-6 space-y-4 max-h-[80vh] overflow-y-auto"
+          >
             <Link
               to="/"
               onClick={() => setIsMobileMenuOpen(false)}
@@ -553,13 +624,13 @@ export default function TouristLayout() {
             {/* Brand Intro */}
             <div className="md:col-span-1">
               <div className="flex items-center gap-2.5 mb-3">
-                <img src={logoImg} alt="AngkorVerses Logo" className="w-8 h-8 object-contain" />
+                <img src={logoImg} alt="Angkor Verse AI logo" className="w-8 h-8 object-contain" />
                 <span className="font-extrabold text-lg text-slate-900 dark:text-white">
-                  AngkorVerses
+                  Angkor Verse AI
                 </span>
               </div>
               <p className="text-xs text-slate-500 dark:text-zinc-400 leading-relaxed mb-4">
-                The premier digital gateway to explore ancient Khmer heritage, vibrant provincial culture, pristine islands, and authentic Cambodian culinary experiences.
+                Your digital gateway to discover Cambodia’s ancient Khmer heritage, vibrant provincial culture, beautiful islands, and authentic local experiences.
               </p>
               <div className="flex items-center gap-2 text-xs font-medium text-[#002D62] dark:text-blue-400">
                 <MapPin size={14} />
@@ -619,7 +690,7 @@ export default function TouristLayout() {
 
           <div className="border-t border-slate-100 dark:border-zinc-900 pt-6 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-400 dark:text-zinc-500 gap-3">
             <div>
-              © {new Date().getFullYear()} AngkorVerses — Ministry of Tourism, Kingdom of Cambodia. All rights reserved.
+              © {new Date().getFullYear()} Angkor Verse AI. All rights reserved.
             </div>
             <div className="flex items-center gap-4">
               <Link to="/support" className="hover:underline">Privacy Policy</Link>

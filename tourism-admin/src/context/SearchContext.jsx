@@ -3,9 +3,9 @@ import { useLocation } from 'react-router-dom';
 
 const SearchContext = createContext({
   searchTerm: '',
-  setSearchTerm: () => {},
+  setSearchTerm: () => { },
   placeholder: 'Search in pages...',
-  setPlaceholder: () => {},
+  setPlaceholder: () => { },
 });
 
 export const SearchProvider = ({ children }) => {
@@ -41,15 +41,15 @@ export const SearchProvider = ({ children }) => {
 
   const placeholder = customPlaceholder || defaultPlaceholder;
 
+  const contextValue = useMemo(() => ({
+    searchTerm,
+    setSearchTerm,
+    placeholder,
+    setPlaceholder: setCustomPlaceholder,
+  }), [searchTerm, placeholder]);
+
   return (
-    <SearchContext.Provider
-      value={{
-        searchTerm,
-        setSearchTerm,
-        placeholder,
-        setPlaceholder: setCustomPlaceholder,
-      }}
-    >
+    <SearchContext.Provider value={contextValue}>
       {children}
     </SearchContext.Provider>
   );
@@ -60,9 +60,9 @@ export const useSearch = () => {
   if (!context) {
     return {
       searchTerm: '',
-      setSearchTerm: () => {},
+      setSearchTerm: () => { },
       placeholder: 'Search in pages...',
-      setPlaceholder: () => {},
+      setPlaceholder: () => { },
     };
   }
   return context;

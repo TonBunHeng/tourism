@@ -1,46 +1,43 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import tourismLogo from '../../assets/images/tourism_logo.png';
-import { useLanguage } from '../../i18n';
 
-const MINIMUM_LOADING_TIME = 800;
+const ROUTE_TRANSITION_MS = 180;
 
 export default function RouteLoadingOverlay() {
   const { pathname } = useLocation();
-  const { currentLang } = useLanguage();
-  const [isLoading, setIsLoading] = useState(true);
-  const viewKey = `${pathname}:${currentLang}`;
-  const previousView = useRef(viewKey);
+  const [isLoading, setIsLoading] = useState(false);
+  const isFirstMount = useRef(true);
 
-  // Keep the first view behind the loader as well, including after a browser refresh.
   useEffect(() => {
-    const timeoutId = window.setTimeout(() => setIsLoading(false), MINIMUM_LOADING_TIME);
-    return () => window.clearTimeout(timeoutId);
-  }, []);
+    // Avoid blocking on initial mount since ProtectedRoute and individual pages handle initial loading
+    if (isFirstMount.current) {
+      isFirstMount.current = false;
+      return undefined;
+    }
 
-  useLayoutEffect(() => {
-    if (previousView.current === viewKey) return undefined;
-    previousView.current = viewKey;
-
+    // Snappy, non-blocking visual feedback when switching routes
     setIsLoading(true);
-    const timeoutId = window.setTimeout(() => setIsLoading(false), MINIMUM_LOADING_TIME);
-    return () => window.clearTimeout(timeoutId);
-  }, [viewKey]);
+    const timeoutId = window.setTimeout(() => {
+      setIsLoading(false);
+    }, ROUTE_TRANSITION_MS);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [pathname]);
+
+  if (!isLoading) {
+    return null;
+  }
 
   return (
-    <>
-      <span className="sr-only" role="status" aria-live="polite">
-        {isLoading ? 'Loading page' : ''}
-      </span>
-      {isLoading && (
-        <div className="route-loading-overlay" aria-hidden="true">
-          <div className="route-loading-content">
-            <div className="route-loading-ring">
-              <img src={tourismLogo} alt="" className="route-loading-logo" />
-            </div>
-          </div>
+    <div className="route-loading-overlay pointer-events-none" aria-hidden="true">
+      <div className="route-loading-content pointer-events-none">
+        <div className="route-loading-ring">
+          <img src={tourismLogo} alt="" className="route-loading-logo" />
         </div>
-      )}
-    </>
+      </div>
+    </div>
   );
 }

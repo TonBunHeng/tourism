@@ -313,7 +313,7 @@ export default function Destinations() {
                   />
                   <div className="absolute top-3 left-3">
                     <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#003E83] text-white shadow-xs">
-                      {place.category?.name || 'Destination'}
+                      {place.category?.name || (typeof place.category === 'string' ? place.category : place.category_name) || 'Destination'}
                     </span>
                   </div>
 
@@ -359,7 +359,7 @@ export default function Destinations() {
                   <div>
                     <div className="flex items-center gap-1 text-[11px] text-[#003E83] dark:text-blue-400 font-semibold mb-1">
                       <MapPin size={12} className="shrink-0" />
-                      <span className="truncate">{place.province?.name || place.location || 'Cambodia'}</span>
+                      <span className="truncate">{place.province?.name || (typeof place.province === 'string' ? place.province : place.province_name) || place.location || 'Cambodia'}</span>
                     </div>
                     <h3 className="font-extrabold text-sm text-slate-900 dark:text-white group-hover:text-[#003E83] dark:group-hover:text-blue-400 transition-colors line-clamp-1">
                       {place.name}

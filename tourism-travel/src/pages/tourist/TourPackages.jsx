@@ -90,12 +90,19 @@ export default function TourPackages() {
 
     setIsSubmittingBooking(true);
     try {
+      const guestNum = Number(guestsCount) || 1;
+      const unitPrice = Number(activeTourForBooking.price) || 0;
+      const calculatedTotal = unitPrice * guestNum;
+
       const payload = {
+        business_id: activeTourForBooking.business_id || 1,
         tour_id: activeTourForBooking.id,
         booking_date: bookingDate,
-        guests_count: Number(guestsCount) || 1,
-        special_requests: bookingNotes.trim() || undefined,
-        total_amount: (Number(activeTourForBooking.price) || 0) * (Number(guestsCount) || 1)
+        number_of_guests: guestNum,
+        guests_count: guestNum,
+        special_requests: `[Tour: ${activeTourForBooking.title}] ${bookingNotes.trim()}`.trim() || undefined,
+        total_price: calculatedTotal,
+        total_amount: calculatedTotal,
       };
 
       const res = await travelService.createBooking(payload);

@@ -313,7 +313,7 @@ export default function TouristHome() {
                     </span>
                     <span className="flex items-center gap-1">
                       <Users size={12} className="text-slate-400 shrink-0" />
-                      <span>{b.guests_count || 1} guest(s)</span>
+                      <span>{b.guests_count || b.number_of_guests || 1} guest(s)</span>
                     </span>
                   </div>
                 </div>
@@ -362,7 +362,7 @@ export default function TouristHome() {
                     />
                     <div className="absolute top-3 left-3 flex items-center gap-1.5">
                       <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-[#003E83] text-white shadow-md">
-                        {place.category?.name || 'Heritage'}
+                        {place.category?.name || (typeof place.category === 'string' ? place.category : place.category_name) || 'Heritage'}
                       </span>
                     </div>
                     {place.rating && (
@@ -378,7 +378,7 @@ export default function TouristHome() {
                     <div>
                       <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-zinc-400 mb-1">
                         <MapPin size={13} className="text-[#003E83] dark:text-blue-400 shrink-0" />
-                        <span>{place.province?.name || place.location || 'Cambodia'}</span>
+                        <span>{place.province?.name || (typeof place.province === 'string' ? place.province : place.province_name) || place.location || 'Cambodia'}</span>
                       </div>
                       <h3 className="font-extrabold text-base text-slate-900 dark:text-white group-hover:text-[#003E83] dark:group-hover:text-blue-400 transition-colors line-clamp-1">
                         {place.name}
@@ -485,7 +485,7 @@ export default function TouristHome() {
 
                 <div>
                   <div className="text-[10px] font-semibold text-[#003E83] dark:text-blue-400 mb-0.5">
-                    {place.province?.name || 'Cambodia'}
+                    {place.province?.name || (typeof place.province === 'string' ? place.province : place.province_name) || 'Cambodia'}
                   </div>
                   <h4 className="font-bold text-xs sm:text-sm text-slate-900 dark:text-white group-hover:text-[#003E83] dark:group-hover:text-blue-400 transition-colors line-clamp-1">
                     {place.name}
