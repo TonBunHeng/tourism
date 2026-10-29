@@ -1,8 +1,10 @@
 import axios from 'axios';
 
 // Base API URL configuration
-const RAW_API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000/api/travel';
-export const ROOT_API_URL = RAW_API_URL.replace(/\/travel\/?$/, ''); // e.g. http://127.0.0.1:8000/api
+const RAW_API_URL = (import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000/api/travel')
+  .trim()
+  .replace(/\/+$/, '');
+export const ROOT_API_URL = RAW_API_URL.replace(/\/travel$/i, ''); // e.g. http://127.0.0.1:8000/api
 export const TRAVEL_API_URL = `${ROOT_API_URL}/travel`;
 export const BUSINESS_API_URL = `${ROOT_API_URL}/business`;
 export const AI_CHAT_SERVICE_URL = import.meta.env.VITE_AI_CHAT_URL || 'http://127.0.0.1:8001';

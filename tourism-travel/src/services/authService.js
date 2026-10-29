@@ -1,13 +1,14 @@
 import api, { GOOGLE_REDIRECT_URL } from './api';
 
 export const normalizeRole = (role) => {
-  if (!role) return 'user';
+  if (!role) return 'unknown';
   const cleaned = String(role).toLowerCase().trim().replace(/[\s/-]+/g, '_');
   if (['super_admin', 'superadmin'].includes(cleaned)) return 'super_admin';
   if (['admin', 'administrator'].includes(cleaned)) return 'admin';
   if (['guide_editor', 'guide', 'editor', 'tourism_content_editor', 'content_editor'].includes(cleaned)) return 'guide_editor';
   if (['business_owner', 'business', 'owner'].includes(cleaned)) return 'business_owner';
-  return 'user';
+  if (['user', 'tourist', 'traveler', 'member'].includes(cleaned)) return 'user';
+  return cleaned || 'unknown';
 };
 
 export const isBusinessOwner = (role) => {
@@ -72,10 +73,8 @@ export const authService = {
     return res;
   },
 
-  redirectToGoogle(desiredRole = null) {
-    if (desiredRole) {
-      localStorage.setItem('pending_oauth_role', desiredRole);
-    }
+  redirectToGoogle() {
+    localStorage.removeItem('pending_oauth_role');
     window.location.href = GOOGLE_REDIRECT_URL;
   },
 

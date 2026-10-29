@@ -21,13 +21,13 @@ export default function Login() {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
-  const from = location.state?.from?.pathname;
+  const from = location.state?.from;
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const err = params.get('error');
     if (err) {
-      setErrorMessage(decodeURIComponent(err));
+      setErrorMessage(err);
     }
   }, [location.search]);
 
@@ -45,8 +45,12 @@ export default function Login() {
       const res = await login({ email: email.trim(), password });
       if (res?.success && res.data?.user) {
         const userRole = normalizeRole(res.data.user.role);
-        if (from) {
-          navigate(from, { replace: true });
+        if (from?.pathname?.startsWith('/') && !from.pathname.startsWith('//')) {
+          navigate({
+            pathname: from.pathname,
+            search: from.search || '',
+            hash: from.hash || '',
+          }, { replace: true });
         } else if (userRole === 'business_owner') {
           navigate('/business/dashboard', { replace: true });
         } else {

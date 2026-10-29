@@ -18,7 +18,7 @@ import LoadingSpinner from '../../components/common/LoadingSpinner';
 import Badge from '../../components/common/Badge';
 
 export default function BusinessProfile() {
-  const { selectedBusiness } = useOutletContext();
+  const { selectedBusiness, refreshBusinesses } = useOutletContext();
   const { showSuccess, showError, showConfirm } = useAlert();
 
   const [activeBusinessId, setActiveBusinessId] = useState(selectedBusiness?.id || null);
@@ -130,6 +130,7 @@ export default function BusinessProfile() {
           showSuccess('New business profile created! Application submitted for Ministry verification.', 'Business Created');
           if (created?.id) {
             setActiveBusinessId(created.id);
+            await refreshBusinesses?.(created.id);
             loadBusinessDetails(created.id);
           }
         }

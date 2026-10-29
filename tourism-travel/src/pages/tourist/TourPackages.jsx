@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { 
   Sparkles, 
@@ -9,7 +9,6 @@ import {
   Calendar, 
   X, 
   Check, 
-  MessageSquare,
   ShieldCheck
 } from 'lucide-react';
 import travelService from '../../services/travelService';
@@ -18,6 +17,8 @@ import LoadingSpinner from '../../components/common/LoadingSpinner';
 import EmptyState from '../../components/common/EmptyState';
 import Pagination from '../../components/common/Pagination';
 
+const ITEMS_PER_PAGE = 9;
+
 export default function TourPackages() {
   const { showSuccess, showError } = useAlert();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -25,9 +26,8 @@ export default function TourPackages() {
   const [tours, setTours] = useState([]);
   const [destinations, setDestinations] = useState(['All']);
   const [currentPage, setCurrentPage] = useState(1);
+  const [pagination, setPagination] = useState({ current_page: 1, last_page: 1, total: 0, per_page: ITEMS_PER_PAGE });
   const [isLoading, setIsLoading] = useState(true);
-
-  const ITEMS_PER_PAGE = 9;
 
   // Filters
   const search = searchParams.get('search') || '';
@@ -44,17 +44,22 @@ export default function TourPackages() {
   // Tour Details Modal
   const [activeTourDetails, setActiveTourDetails] = useState(null);
 
-  const loadTours = () => {
+  const loadTours = useCallback(() => {
+    let isMounted = true;
     setIsLoading(true);
     travelService.getTours({
+      page: currentPage,
+      per_page: ITEMS_PER_PAGE,
       search: search || undefined,
       destination: selectedDestination !== 'All' ? selectedDestination : undefined,
       duration: selectedDuration !== 'All' ? selectedDuration : undefined,
     })
       .then((res) => {
+        if (!isMounted) return;
         if (res?.success) {
           const list = res.data?.tours || res.data?.data || res.data || [];
           setTours(Array.isArray(list) ? list : []);
+          if (res.data?.pagination) setPagination(res.data.pagination);
           if (Array.isArray(res.data?.destinations)) {
             setDestinations(res.data.destinations);
           }
@@ -63,18 +68,19 @@ export default function TourPackages() {
         }
       })
       .catch((err) => {
+        if (!isMounted) return;
         console.error('Failed to load tours from API:', err);
         setTours([]);
       })
       .finally(() => {
-        setIsLoading(false);
+        if (isMounted) setIsLoading(false);
       });
-  };
+    return () => { isMounted = false; };
+  }, [currentPage, search, selectedDestination, selectedDuration]);
 
   useEffect(() => {
-    setCurrentPage(1);
-    loadTours();
-  }, [search, selectedDestination, selectedDuration]);
+    return loadTours();
+  }, [loadTours]);
 
   const handleFilterChange = (key, value) => {
     const next = new URLSearchParams(searchParams);
@@ -83,6 +89,7 @@ export default function TourPackages() {
     } else {
       next.set(key, value);
     }
+    setCurrentPage(1);
     setSearchParams(next);
   };
 
@@ -100,7 +107,7 @@ export default function TourPackages() {
       const calculatedTotal = unitPrice * guestNum;
 
       const payload = {
-        business_id: activeTourForBooking.business_id || 1,
+        business_id: activeTourForBooking.business_id || undefined,
         tour_id: activeTourForBooking.id,
         booking_date: bookingDate,
         number_of_guests: guestNum,
@@ -112,7 +119,7 @@ export default function TourPackages() {
 
       const res = await travelService.createBooking(payload);
       if (res?.success) {
-        showSuccess(`Your booking for "${activeTourForBooking.title}" has been saved to the database.`, 'Booking Confirmed');
+        showSuccess(`Your booking request for "${activeTourForBooking.title}" has been submitted.`, 'Request Submitted');
         setActiveTourForBooking(null);
         setBookingDate('');
         setBookingNotes('');
@@ -126,8 +133,8 @@ export default function TourPackages() {
     }
   };
 
-  const totalPages = Math.ceil(tours.length / ITEMS_PER_PAGE);
-  const paginatedTours = tours.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
+  const totalPages = pagination.last_page;
+  const paginatedTours = tours;
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-10">
@@ -302,8 +309,8 @@ export default function TourPackages() {
           <Pagination
             currentPage={currentPage}
             lastPage={totalPages}
-            total={tours.length}
-            perPage={ITEMS_PER_PAGE}
+            total={pagination.total}
+            perPage={pagination.per_page}
             onPageChange={(page) => {
               setCurrentPage(page);
               window.scrollTo({ top: 0, behavior: 'smooth' });

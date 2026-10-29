@@ -31,7 +31,7 @@ export default function BusinessBookings() {
   // Detail Modal
   const [activeBooking, setActiveBooking] = useState(null);
 
-  const fetchBookings = useCallback((targetPage = page) => {
+  const fetchBookings = useCallback((targetPage) => {
     setIsLoading(true);
     const params = {
       page: targetPage,
@@ -67,19 +67,18 @@ export default function BusinessBookings() {
       .finally(() => {
         setIsLoading(false);
       });
-  }, [page, search, statusFilter, paymentStatusFilter, dateFrom, dateTo, selectedBusiness]);
+  }, [search, statusFilter, paymentStatusFilter, dateFrom, dateTo, selectedBusiness?.id]);
 
   useEffect(() => {
-    fetchBookings(1);
-    setPage(1);
-  }, [fetchBookings]);
+    fetchBookings(page);
+  }, [fetchBookings, page]);
 
   const handleConfirm = async (id) => {
     try {
       const res = await businessOwnerService.confirmBooking(id);
       if (res?.success) {
         showSuccess('Booking confirmed! Traveler has been notified.');
-        fetchBookings();
+        fetchBookings(page);
         if (activeBooking?.id === id) setActiveBooking(null);
       }
     } catch (err) {
@@ -92,7 +91,7 @@ export default function BusinessBookings() {
       const res = await businessOwnerService.completeBooking(id);
       if (res?.success) {
         showSuccess('Booking marked as completed! Payment recorded.');
-        fetchBookings();
+        fetchBookings(page);
         if (activeBooking?.id === id) setActiveBooking(null);
       }
     } catch (err) {
@@ -113,7 +112,7 @@ export default function BusinessBookings() {
       const res = await businessOwnerService.rejectBooking(id, 'Capacity unavailable');
       if (res?.success) {
         showSuccess('Reservation declined.');
-        fetchBookings();
+        fetchBookings(page);
         if (activeBooking?.id === id) setActiveBooking(null);
       }
     } catch (err) {
@@ -160,7 +159,10 @@ export default function BusinessBookings() {
             <input
               type="text"
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={(e) => {
+                setSearch(e.target.value);
+                setPage(1);
+              }}
               placeholder="Search reference or guest name..."
               className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800 text-xs sm:text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#002D62]"
             />
@@ -170,7 +172,10 @@ export default function BusinessBookings() {
           <div>
             <select
               value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
+              onChange={(e) => {
+                setStatusFilter(e.target.value);
+                setPage(1);
+              }}
               className="w-full px-3 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800 text-xs sm:text-sm text-slate-700 dark:text-zinc-200 focus:outline-none focus:ring-2 focus:ring-[#002D62]"
             >
               <option value="">All Statuses</option>
@@ -185,7 +190,10 @@ export default function BusinessBookings() {
           <div>
             <select
               value={paymentStatusFilter}
-              onChange={(e) => setPaymentStatusFilter(e.target.value)}
+              onChange={(e) => {
+                setPaymentStatusFilter(e.target.value);
+                setPage(1);
+              }}
               className="w-full px-3 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800 text-xs sm:text-sm text-slate-700 dark:text-zinc-200 focus:outline-none focus:ring-2 focus:ring-[#002D62]"
             >
               <option value="">All Payments</option>
@@ -200,7 +208,10 @@ export default function BusinessBookings() {
             <input
               type="date"
               value={dateFrom}
-              onChange={(e) => setDateFrom(e.target.value)}
+              onChange={(e) => {
+                setDateFrom(e.target.value);
+                setPage(1);
+              }}
               className="w-full px-3 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800 text-xs sm:text-sm text-slate-700 dark:text-zinc-200"
             />
           </div>
@@ -210,7 +221,10 @@ export default function BusinessBookings() {
             <input
               type="date"
               value={dateTo}
-              onChange={(e) => setDateTo(e.target.value)}
+              onChange={(e) => {
+                setDateTo(e.target.value);
+                setPage(1);
+              }}
               className="w-full px-3 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800 text-xs sm:text-sm text-slate-700 dark:text-zinc-200"
             />
           </div>
@@ -335,7 +349,6 @@ export default function BusinessBookings() {
               perPage={pagination.per_page}
               onPageChange={(p) => {
                 setPage(p);
-                fetchBookings(p);
               }}
             />
           </div>

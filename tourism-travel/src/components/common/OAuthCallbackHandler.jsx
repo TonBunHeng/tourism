@@ -15,11 +15,20 @@ export default function OAuthCallbackHandler() {
     const token = searchParams.get('token');
     const rawUser = searchParams.get('user');
     const error = searchParams.get('error');
+    const isCallbackPath = location.pathname === '/auth/google/callback' || location.pathname === '/auth/callback';
 
     if (error) {
-      showError(decodeURIComponent(error));
+      showError('Google authentication failed. Please try again.');
       // Clean query params
       window.history.replaceState({}, document.title, location.pathname);
+      if (isCallbackPath) {
+        navigate('/login', { replace: true });
+      }
+      return;
+    }
+
+    if (!token && isCallbackPath) {
+      navigate('/login', { replace: true });
       return;
     }
 
@@ -37,13 +46,7 @@ export default function OAuthCallbackHandler() {
         }
       }
 
-      const pendingRole = localStorage.getItem('pending_oauth_role');
-      if (pendingRole) {
-        localStorage.removeItem('pending_oauth_role');
-        if (userObj && (!userObj.role || userObj.role === 'User' || userObj.role === 'user')) {
-          userObj.role = pendingRole === 'business_owner' ? 'Business Owner' : 'User';
-        }
-      }
+      localStorage.removeItem('pending_oauth_role');
 
       handleOAuthCallback(token, userObj);
 
@@ -52,14 +55,13 @@ export default function OAuthCallbackHandler() {
 
       showSuccess(`Welcome, ${userObj?.name || 'Traveler'}! You are now signed in with Google.`, 'Google Connected');
 
-      const role = normalizeRole(userObj?.role || pendingRole);
+      const role = normalizeRole(userObj?.role);
       if (role === 'business_owner') {
         navigate('/business/dashboard', { replace: true });
       } else if (
         location.pathname === '/login' ||
         location.pathname === '/register' ||
-        location.pathname === '/auth/google/callback' ||
-        location.pathname === '/auth/callback'
+        isCallbackPath
       ) {
         navigate('/', { replace: true });
       }

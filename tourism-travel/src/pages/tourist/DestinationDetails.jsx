@@ -117,7 +117,6 @@ export default function DestinationDetails() {
     try {
       const count = parseInt(guestsCount, 10) || 1;
       const payload = {
-        business_id: 1,
         place_id: place.id,
         booking_date: bookingDate,
         booking_time: bookingTime,

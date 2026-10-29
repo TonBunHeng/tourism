@@ -5,9 +5,6 @@ import {
   Search, 
   Star, 
   MapPin, 
-  Phone, 
-  Globe, 
-  Clock, 
   X, 
   CheckCircle2, 
   MessageSquare
@@ -48,7 +45,7 @@ export default function Businesses() {
     setIsLoading(true);
 
     Promise.allSettled([
-      travelService.getBusinesses(),
+      travelService.getBusinesses({ per_page: 50 }),
       travelService.getCategories(),
       travelService.getProvinces()
     ])

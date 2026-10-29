@@ -13,6 +13,13 @@ import { useAlert } from '../../context/AlertContext';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import EmptyState from '../../components/common/EmptyState';
 
+const resolveNotificationLink = (link) => {
+  if (typeof link !== 'string' || !link.startsWith('/')) return '/business/notifications';
+  if (link.startsWith('/business/bookings/')) return '/business/bookings';
+  if (link.startsWith('/bookings/')) return '/bookings';
+  return link;
+};
+
 export default function BusinessNotifications() {
   const { showSuccess, showError } = useAlert();
 
@@ -157,7 +164,7 @@ export default function BusinessNotifications() {
                 <div className="flex items-center justify-between pt-1 text-xs">
                   {n.link ? (
                     <a
-                      href={n.link}
+                      href={resolveNotificationLink(n.link)}
                       className="text-xs font-semibold text-[#002D62] dark:text-blue-400 hover:underline flex items-center gap-1"
                     >
                       <span>View Booking / Item</span>

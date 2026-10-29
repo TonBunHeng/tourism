@@ -55,9 +55,10 @@ export default function AppRoutes() {
         <AlertProvider>
           <OAuthCallbackHandler />
           <Routes>
-            {/* Google OAuth Callback Redirection Endpoint */}
-            <Route path="/auth/google/callback" element={<Navigate to="/" replace />} />
-            <Route path="/auth/callback" element={<Navigate to="/" replace />} />
+            {/* Keep OAuth callback query parameters mounted until the callback
+                handler stores the session and redirects the visitor. */}
+            <Route path="/auth/google/callback" element={<OAuthCallbackPending />} />
+            <Route path="/auth/callback" element={<OAuthCallbackPending />} />
 
             {/* Guest / Public Routes (redirect if already logged in) */}
             <Route element={<PublicRoute />}>
@@ -125,5 +126,13 @@ export default function AppRoutes() {
         </AlertProvider>
       </AuthProvider>
     </BrowserRouter>
+  );
+}
+
+function OAuthCallbackPending() {
+  return (
+    <main className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-zinc-950 text-sm text-slate-600 dark:text-zinc-300">
+      Completing sign in…
+    </main>
   );
 }

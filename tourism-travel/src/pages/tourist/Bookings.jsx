@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   Calendar, 
@@ -14,16 +14,18 @@ import EmptyState from '../../components/common/EmptyState';
 import Badge from '../../components/common/Badge';
 import Pagination from '../../components/common/Pagination';
 
+const ITEMS_PER_PAGE = 9;
+
 export default function Bookings() {
   const { showSuccess, showError, showConfirm } = useAlert();
 
   const [bookings, setBookings] = useState([]);
+  const [bookingStats, setBookingStats] = useState({});
+  const [pagination, setPagination] = useState({ current_page: 1, last_page: 1, total: 0, per_page: 9 });
   const [selectedFilter, setSelectedFilter] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
   const [activeBookingDetails, setActiveBookingDetails] = useState(null);
-
-  const ITEMS_PER_PAGE = 9;
 
   // Review Modal
   const [selectedBookingForReview, setSelectedBookingForReview] = useState(null);
@@ -31,13 +33,19 @@ export default function Bookings() {
   const [reviewComment, setReviewComment] = useState('');
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
 
-  const fetchBookings = () => {
+  const fetchBookings = useCallback(() => {
     setIsLoading(true);
-    travelService.getBookings()
+    travelService.getBookings({
+      page: currentPage,
+      per_page: ITEMS_PER_PAGE,
+      status: selectedFilter !== 'all' ? selectedFilter : undefined,
+    })
       .then((res) => {
         if (res?.success) {
           const list = res.data?.bookings || res.data?.data || res.data || [];
           setBookings(Array.isArray(list) ? list : []);
+          setBookingStats(res.data?.statistics || {});
+          if (res.data?.pagination) setPagination(res.data.pagination);
         } else {
           setBookings([]);
         }
@@ -49,11 +57,11 @@ export default function Bookings() {
       .finally(() => {
         setIsLoading(false);
       });
-  };
+  }, [currentPage, selectedFilter]);
 
   useEffect(() => {
     fetchBookings();
-  }, []);
+  }, [fetchBookings]);
 
   const handleCancelBooking = async (bookingId) => {
     const confirmed = await showConfirm({
@@ -113,10 +121,7 @@ export default function Bookings() {
     }
   };
 
-  const filteredBookings = bookings.filter((b) => {
-    if (selectedFilter === 'all') return true;
-    return (b.status || '').toLowerCase() === selectedFilter;
-  });
+  const filteredBookings = bookings;
 
   const getStatusBadgeVariant = (status) => {
     switch ((status || '').toLowerCase()) {
@@ -133,12 +138,8 @@ export default function Bookings() {
     }
   };
 
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [selectedFilter]);
-
-  const totalPages = Math.ceil(filteredBookings.length / ITEMS_PER_PAGE);
-  const paginatedBookings = filteredBookings.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
+  const totalPages = pagination.last_page;
+  const paginatedBookings = filteredBookings;
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-10">
@@ -167,16 +168,19 @@ export default function Bookings() {
       {/* Filter Tabs */}
       <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 text-xs font-semibold overflow-x-auto">
         {[
-          { key: 'all', label: `All (${bookings.length})` },
-          { key: 'pending', label: 'Pending' },
-          { key: 'confirmed', label: 'Confirmed' },
-          { key: 'completed', label: 'Completed' },
-          { key: 'cancelled', label: 'Cancelled' },
+          { key: 'all', label: `All (${bookingStats.total ?? pagination.total})` },
+          { key: 'pending', label: `Pending (${bookingStats.pending ?? 0})` },
+          { key: 'confirmed', label: `Confirmed (${bookingStats.confirmed ?? 0})` },
+          { key: 'completed', label: `Completed (${bookingStats.completed ?? 0})` },
+          { key: 'cancelled', label: `Cancelled (${bookingStats.cancelled ?? 0})` },
         ].map((tab) => (
           <button
             key={tab.key}
             type="button"
-            onClick={() => setSelectedFilter(tab.key)}
+            onClick={() => {
+              setCurrentPage(1);
+              setSelectedFilter(tab.key);
+            }}
             className={`px-4 py-2 rounded-xl transition cursor-pointer whitespace-nowrap ${
               selectedFilter === tab.key
                 ? 'bg-[#002D62] text-white shadow-xs'
@@ -299,8 +303,8 @@ export default function Bookings() {
           <Pagination
             currentPage={currentPage}
             lastPage={totalPages}
-            total={filteredBookings.length}
-            perPage={ITEMS_PER_PAGE}
+            total={pagination.total}
+            perPage={pagination.per_page}
             onPageChange={(page) => {
               setCurrentPage(page);
               window.scrollTo({ top: 0, behavior: 'smooth' });

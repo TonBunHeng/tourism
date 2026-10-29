@@ -213,16 +213,14 @@ export const businessOwnerService = {
   },
 
   async exportReportsCsv(params = {}) {
-    const token = localStorage.getItem('auth_token') || localStorage.getItem('token');
-    const response = await axios.get(`${BUSINESS_API_URL}/reports/export`, {
+    const response = await businessApi.get('/reports/export', {
       params: { ...params, format: 'csv' },
       responseType: 'blob',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
     });
 
-    const blob = new Blob([response.data], { type: 'text/csv;charset=utf-8;' });
+    const blob = response instanceof Blob
+      ? response
+      : new Blob([response], { type: 'text/csv;charset=utf-8;' });
     const url = window.URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;

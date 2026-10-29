@@ -138,22 +138,25 @@ export const aiChatService = {
 
       if (res.data) {
         const d = res.data;
-        const inner = d.data || {};
-        const replyText = inner.message || inner.answer || d.message || d.answer || '';
-        
-        return {
-          success: true,
-          reply: replyText,
-          message: replyText,
-          response: replyText,
-          sessionId: d.session_id || inner.session_id || sessionId,
-          suggestions: inner.suggestions || d.suggestions || [],
-          sources: inner.sources || d.sources || [],
-          relatedPlaces: inner.related_places || d.related_places || [],
-          weather: inner.weather || null,
-          currency: inner.currency || null,
-          data: inner,
-        };
+        const inner = d.data && typeof d.data === 'object' ? d.data : {};
+        const replyText = inner.response || inner.reply || inner.message || inner.answer || inner.content ||
+          d.response || d.reply || d.message || d.answer || (typeof d.data === 'string' ? d.data : '');
+
+        if (replyText) {
+          return {
+            success: true,
+            reply: replyText,
+            message: replyText,
+            response: replyText,
+            sessionId: d.session_id || inner.session_id || sessionId,
+            suggestions: inner.suggestions || d.suggestions || [],
+            sources: inner.sources || d.sources || [],
+            relatedPlaces: inner.related_places || d.related_places || [],
+            weather: inner.weather || d.weather || null,
+            currency: inner.currency || d.currency || null,
+            data: inner,
+          };
+        }
       }
     } catch {
       // aichatbot service not directly reachable, try backend proxy next

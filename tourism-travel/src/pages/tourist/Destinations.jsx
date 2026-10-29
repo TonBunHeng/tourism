@@ -29,7 +29,9 @@ export default function Destinations() {
 
   // Filters from query params
   const search = searchParams.get('search') || '';
-  const categoryId = searchParams.get('category') || '';
+  // `category_id` is the API filter. Keep accepting the older `category`
+  // query parameter so existing links continue to resolve.
+  const categoryId = searchParams.get('category_id') || searchParams.get('category') || '';
   const provinceId = searchParams.get('province') || '';
   const minRating = searchParams.get('rating') || '';
   const sortBy = searchParams.get('sort_by') || 'popular';

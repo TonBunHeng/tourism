@@ -60,7 +60,14 @@ export default function BusinessReports() {
 
   const summary = reportData?.summary || {};
   const topServices = reportData?.top_services || [];
-  const statusBreakdown = reportData?.status_breakdown || reportData?.bookings_by_status || {};
+  const rawStatusBreakdown = reportData?.booking_status_breakdown || reportData?.status_breakdown || reportData?.bookings_by_status || {};
+  const statusBreakdown = Array.isArray(rawStatusBreakdown)
+    ? rawStatusBreakdown.reduce((counts, item) => {
+        const status = String(item.status || '').toLowerCase();
+        if (status) counts[status] = Number(item.count) || 0;
+        return counts;
+      }, {})
+    : rawStatusBreakdown;
 
   return (
     <div className="space-y-8">
@@ -178,6 +185,7 @@ export default function BusinessReports() {
                   { label: 'Completed', count: statusBreakdown.completed || 0, color: 'bg-blue-500' },
                   { label: 'Pending Action', count: statusBreakdown.pending || 0, color: 'bg-amber-500' },
                   { label: 'Cancelled', count: statusBreakdown.cancelled || 0, color: 'bg-rose-500' },
+                  { label: 'Rejected', count: statusBreakdown.rejected || 0, color: 'bg-red-500' },
                 ].map((item) => (
                   <div key={item.label} className="space-y-1">
                     <div className="flex items-center justify-between text-xs">

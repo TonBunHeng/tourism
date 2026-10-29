@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { 
   UserCheck, 
@@ -7,14 +7,15 @@ import {
   MapPin, 
   CheckCircle2, 
   Calendar, 
-  X,
-  Phone
+  X
 } from 'lucide-react';
 import travelService from '../../services/travelService';
 import { useAlert } from '../../context/AlertContext';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import EmptyState from '../../components/common/EmptyState';
 import Pagination from '../../components/common/Pagination';
+
+const ITEMS_PER_PAGE = 9;
 
 export default function TourGuides() {
   const { showSuccess, showError } = useAlert();
@@ -23,9 +24,8 @@ export default function TourGuides() {
   const [guides, setGuides] = useState([]);
   const [availableLanguages, setAvailableLanguages] = useState(['All']);
   const [currentPage, setCurrentPage] = useState(1);
+  const [pagination, setPagination] = useState({ current_page: 1, last_page: 1, total: 0, per_page: ITEMS_PER_PAGE });
   const [isLoading, setIsLoading] = useState(true);
-
-  const ITEMS_PER_PAGE = 9;
 
   // Filters
   const search = searchParams.get('search') || '';
@@ -42,17 +42,22 @@ export default function TourGuides() {
   // Guide Details Modal
   const [activeGuideDetails, setActiveGuideDetails] = useState(null);
 
-  const loadGuides = () => {
+  const loadGuides = useCallback(() => {
+    let isMounted = true;
     setIsLoading(true);
     travelService.getGuides({
+      page: currentPage,
+      per_page: ITEMS_PER_PAGE,
       search: search || undefined,
       province: selectedProvince !== 'All' ? selectedProvince : undefined,
       language: selectedLanguage !== 'All' ? selectedLanguage : undefined,
     })
       .then((res) => {
+        if (!isMounted) return;
         if (res?.success) {
           const raw = res.data?.guides || res.data?.data || res.data || [];
           setGuides(Array.isArray(raw) ? raw : []);
+          if (res.data?.pagination) setPagination(res.data.pagination);
           if (Array.isArray(res.data?.available_languages)) {
             setAvailableLanguages(['All', ...res.data.available_languages]);
           }
@@ -61,18 +66,19 @@ export default function TourGuides() {
         }
       })
       .catch((err) => {
+        if (!isMounted) return;
         console.error('Failed to load guides from API:', err);
         setGuides([]);
       })
       .finally(() => {
-        setIsLoading(false);
+        if (isMounted) setIsLoading(false);
       });
-  };
+    return () => { isMounted = false; };
+  }, [currentPage, search, selectedProvince, selectedLanguage]);
 
   useEffect(() => {
-    setCurrentPage(1);
-    loadGuides();
-  }, [search, selectedProvince, selectedLanguage]);
+    return loadGuides();
+  }, [loadGuides]);
 
   const handleFilterChange = (key, value) => {
     const next = new URLSearchParams(searchParams);
@@ -81,6 +87,7 @@ export default function TourGuides() {
     } else {
       next.set(key, value);
     }
+    setCurrentPage(1);
     setSearchParams(next);
   };
 
@@ -98,7 +105,7 @@ export default function TourGuides() {
 
       // Create reservation or inquiry
       await travelService.createBooking({
-        business_id: selectedGuideForHire.business_id || 1,
+        business_id: selectedGuideForHire.business_id || undefined,
         guide_id: selectedGuideForHire.id,
         booking_date: hireDate,
         number_of_guests: guestNum,
@@ -119,8 +126,8 @@ export default function TourGuides() {
     }
   };
 
-  const totalPages = Math.ceil(guides.length / ITEMS_PER_PAGE);
-  const paginatedGuides = guides.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
+  const totalPages = pagination.last_page;
+  const paginatedGuides = guides;
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-10">
@@ -307,8 +314,8 @@ export default function TourGuides() {
           <Pagination
             currentPage={currentPage}
             lastPage={totalPages}
-            total={guides.length}
-            perPage={ITEMS_PER_PAGE}
+            total={pagination.total}
+            perPage={pagination.per_page}
             onPageChange={(page) => {
               setCurrentPage(page);
               window.scrollTo({ top: 0, behavior: 'smooth' });

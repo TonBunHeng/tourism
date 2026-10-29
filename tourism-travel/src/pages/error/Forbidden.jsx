@@ -3,7 +3,12 @@ import { ShieldAlert, Home, Briefcase, ExternalLink } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
 export default function Forbidden() {
-  const { user, isBusinessOwner } = useAuth();
+  const { user, isBusinessOwner, isAdmin } = useAuth();
+  const localHost = ['localhost', '127.0.0.1'].includes(window.location.hostname);
+  const defaultAdminUrl = localHost
+    ? `${window.location.protocol}//${window.location.hostname}:5174`
+    : `${window.location.origin}/admin`;
+  const adminPortalUrl = import.meta.env.VITE_ADMIN_URL || defaultAdminUrl;
 
   return (
     <div className="min-h-screen flex items-center justify-center p-6 bg-slate-50 dark:bg-zinc-950 text-slate-800 dark:text-zinc-100">
@@ -25,11 +30,11 @@ export default function Forbidden() {
         <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-zinc-800/60 border border-slate-200/80 dark:border-zinc-700/60 text-xs text-slate-600 dark:text-zinc-300 mb-6 text-left space-y-1">
           <div>• <strong>Tourists / Travelers:</strong> Access exploration, bookings, and AI assistant.</div>
           <div>• <strong>Business Owners:</strong> Access business management hub at <code>/business/dashboard</code>.</div>
-          <div>• <strong>Ministry Admins / Editors:</strong> Must sign in at Admin Portal (:5174).</div>
+          <div>• <strong>Ministry Admins / Editors:</strong> Sign in through the Ministry Admin Portal.</div>
         </div>
 
         <div className="flex flex-col gap-2.5">
-          {isBusinessOwner ? (
+          {isBusinessOwner || isAdmin ? (
             <Link
               to="/business/dashboard"
               className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-[#002D62] hover:bg-[#001f44] text-white text-xs font-semibold transition"
@@ -48,12 +53,12 @@ export default function Forbidden() {
           )}
 
           <a
-            href="http://localhost:5174"
+            href={adminPortalUrl}
             target="_blank"
             rel="noreferrer"
             className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 text-xs font-semibold text-slate-700 dark:text-zinc-300 hover:bg-slate-50 dark:hover:bg-zinc-800 transition"
           >
-            <span>Ministry Admin Portal (Port 5174)</span>
+            <span>Ministry Admin Portal</span>
             <ExternalLink size={14} />
           </a>
         </div>

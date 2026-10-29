@@ -134,8 +134,8 @@ export const travelService = {
   },
 
   // Bookings (Tourist)
-  async getBookings() {
-    return await api.get('/bookings');
+  async getBookings(params = {}) {
+    return await api.get('/bookings', { params });
   },
 
   async getBooking(id) {

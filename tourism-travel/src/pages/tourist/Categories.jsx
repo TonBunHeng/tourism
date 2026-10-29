@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Tags, MapPin } from 'lucide-react';
+import { Tags } from 'lucide-react';
 import travelService from '../../services/travelService';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import EmptyState from '../../components/common/EmptyState';
@@ -73,7 +73,7 @@ export default function Categories() {
             {paginatedCategories.map((c) => (
               <Link
                 key={c.id}
-                to={`/destinations?category=${c.id}`}
+                to={`/destinations?category_id=${encodeURIComponent(c.id)}`}
                 className="group rounded-3xl bg-white dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800 shadow-xs hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col justify-between"
               >
                 <div>

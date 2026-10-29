@@ -72,7 +72,9 @@ export default function Register() {
     } catch (err) {
       if (err.errors && typeof err.errors === 'object') {
         const firstErrorKey = Object.keys(err.errors)[0];
-        setErrorMessage(err.errors[firstErrorKey][0] || err.message);
+        const fieldErrors = err.errors[firstErrorKey];
+        const firstFieldError = Array.isArray(fieldErrors) ? fieldErrors[0] : fieldErrors;
+        setErrorMessage(typeof firstFieldError === 'string' ? firstFieldError : err.message || 'Registration failed. Please check your details.');
       } else {
         setErrorMessage(err.message || 'Registration failed. Please check your details.');
       }

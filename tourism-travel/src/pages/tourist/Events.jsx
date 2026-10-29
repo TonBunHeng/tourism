@@ -1,9 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { 
   Calendar, 
   MapPin, 
-  Sparkles, 
-  CalendarCheck,
   X
 } from 'lucide-react';
 import travelService from '../../services/travelService';
@@ -11,21 +9,28 @@ import LoadingSpinner from '../../components/common/LoadingSpinner';
 import EmptyState from '../../components/common/EmptyState';
 import Pagination from '../../components/common/Pagination';
 
+const ITEMS_PER_PAGE = 9;
+
 export default function Events() {
   const [events, setEvents] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [pagination, setPagination] = useState({ current_page: 1, last_page: 1, total: 0, per_page: 9 });
   const [isLoading, setIsLoading] = useState(true);
   const [activeEventDetails, setActiveEventDetails] = useState(null);
 
-  const ITEMS_PER_PAGE = 9;
-
-  const loadEvents = () => {
+  const loadEvents = useCallback(() => {
     setIsLoading(true);
-    travelService.getEvents()
+    travelService.getEvents({ page: currentPage, per_page: ITEMS_PER_PAGE })
       .then((res) => {
         if (res?.success) {
           const raw = res.data?.events || res.data?.data || res.data || [];
           setEvents(Array.isArray(raw) ? raw : []);
+          setPagination({
+            current_page: res.meta?.current_page || currentPage,
+            last_page: res.meta?.last_page || 1,
+            total: res.meta?.total || 0,
+            per_page: res.meta?.per_page || ITEMS_PER_PAGE,
+          });
         } else {
           setEvents([]);
         }
@@ -37,14 +42,14 @@ export default function Events() {
       .finally(() => {
         setIsLoading(false);
       });
-  };
+  }, [currentPage]);
 
   useEffect(() => {
     loadEvents();
-  }, []);
+  }, [loadEvents]);
 
-  const totalPages = Math.ceil(events.length / ITEMS_PER_PAGE);
-  const paginatedEvents = events.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
+  const totalPages = pagination.last_page;
+  const paginatedEvents = events;
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-10">
@@ -147,8 +152,8 @@ export default function Events() {
           <Pagination
             currentPage={currentPage}
             lastPage={totalPages}
-            total={events.length}
-            perPage={ITEMS_PER_PAGE}
+            total={pagination.total}
+            perPage={pagination.per_page}
             onPageChange={(page) => {
               setCurrentPage(page);
               window.scrollTo({ top: 0, behavior: 'smooth' });

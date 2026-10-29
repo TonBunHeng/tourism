@@ -49,11 +49,16 @@ export default function GoogleButton({
       return;
     }
 
+    if (role === 'business_owner') {
+      showError('Google registration for business-owner accounts is not available yet. Please register with your email address.');
+      return;
+    }
+
     // Default: Redirect to Google OAuth endpoint
     try {
       isNavigatingRef.current = true;
       setInternalLoading(true);
-      redirectToGoogle(role);
+      redirectToGoogle();
     } catch (err) {
       isNavigatingRef.current = false;
       setInternalLoading(false);

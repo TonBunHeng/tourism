@@ -14,13 +14,19 @@ import {
   Clock,
   RefreshCw,
   Inbox,
-  CheckCircle2,
-  Info
+  CheckCircle2
 } from 'lucide-react';
 import notificationService from '../../services/notificationService';
 import { useAlert } from '../../context/AlertContext';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import EmptyState from '../../components/common/EmptyState';
+
+const resolveNotificationLink = (link) => {
+  if (typeof link !== 'string' || !link.startsWith('/')) return '/notifications';
+  if (link.startsWith('/business/bookings/')) return '/business/bookings';
+  if (link.startsWith('/bookings/')) return '/bookings';
+  return link;
+};
 
 export default function Notifications() {
   const { showSuccess, showError } = useAlert();
@@ -363,7 +369,7 @@ export default function Notifications() {
                     {n.link && (
                       <div className="pt-1">
                         <Link
-                          to={n.link}
+                          to={resolveNotificationLink(n.link)}
                           className="inline-flex items-center gap-1.5 text-xs font-bold text-[#002D62] dark:text-blue-400 hover:underline"
                         >
                           <span>View Details & Item</span>

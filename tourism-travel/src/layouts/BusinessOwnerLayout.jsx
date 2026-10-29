@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, 
@@ -52,19 +52,28 @@ export default function BusinessOwnerLayout() {
     localStorage.setItem('business_sidebar_expanded', JSON.stringify(isSidebarExpanded));
   }, [isSidebarExpanded]);
 
-  useEffect(() => {
-    businessOwnerService.getBusinesses()
-      .then((res) => {
-        if (res?.success && res.data?.businesses) {
-          const list = Array.isArray(res.data.businesses) ? res.data.businesses : [];
-          setBusinesses(list);
-          if (list.length > 0) {
-            setSelectedBusiness(list[0]);
-          }
-        }
-      })
-      .catch(() => {});
+  const refreshBusinesses = useCallback(async (preferredBusinessId = null) => {
+    try {
+      const res = await businessOwnerService.getBusinesses();
+      if (!res?.success) return;
+
+      const rawBusinesses = res.data?.businesses || res.data || [];
+      const list = Array.isArray(rawBusinesses) ? rawBusinesses : [];
+      setBusinesses(list);
+      setSelectedBusiness((current) =>
+        list.find((business) => business.id === preferredBusinessId) ||
+        list.find((business) => business.id === current?.id) ||
+        list[0] ||
+        null
+      );
+    } catch {
+      // Keep the current portal state if the refresh request fails.
+    }
   }, []);
+
+  useEffect(() => {
+    refreshBusinesses();
+  }, [refreshBusinesses]);
 
   const handleToggleTheme = () => {
     const next = toggleTheme(theme);
@@ -367,7 +376,7 @@ export default function BusinessOwnerLayout() {
 
         {/* Content Body */}
         <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
-          <Outlet context={{ selectedBusiness, businesses }} />
+          <Outlet context={{ selectedBusiness, businesses, refreshBusinesses }} />
         </main>
       </div>
     </div>
