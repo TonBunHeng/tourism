@@ -95,7 +95,7 @@ export default function BusinessReviews() {
     <div className="space-y-8">
       {/* Title */}
       <div>
-        <div className="text-xs font-semibold text-[#003E83] dark:text-blue-400 uppercase tracking-wider mb-1">
+        <div className="text-xs font-semibold text-[#002D62] dark:text-blue-400 uppercase tracking-wider mb-1">
           Reputation & Reviews ({selectedBusiness.name})
         </div>
         <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
@@ -133,7 +133,7 @@ export default function BusinessReviews() {
               onClick={() => setSelectedRating(star)}
               className={`px-3 py-1.5 rounded-xl border transition cursor-pointer flex items-center gap-1 ${
                 selectedRating === star
-                  ? 'bg-[#003E83] text-white border-[#003E83]'
+                  ? 'bg-[#002D62] text-white border-[#002D62]'
                   : 'bg-white dark:bg-zinc-800 border-slate-200 dark:border-zinc-700 text-slate-600 dark:text-zinc-300 hover:bg-slate-50'
               }`}
             >
@@ -168,7 +168,7 @@ export default function BusinessReviews() {
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-full bg-[#003E83] text-white flex items-center justify-center font-bold text-xs">
+                  <div className="w-8 h-8 rounded-full bg-[#002D62] text-white flex items-center justify-center font-bold text-xs">
                     {r.user?.name ? r.user.name.charAt(0).toUpperCase() : 'G'}
                   </div>
                   <div>
@@ -200,7 +200,7 @@ export default function BusinessReviews() {
               {/* Owner Reply if exists */}
               {(r.owner_reply || r.reply) && (
                 <div className="p-3.5 rounded-2xl bg-blue-50/70 dark:bg-blue-950/40 border border-blue-200/80 dark:border-blue-900/60 text-xs space-y-1">
-                  <div className="font-bold text-[#003E83] dark:text-blue-300 flex items-center gap-1.5">
+                  <div className="font-bold text-[#002D62] dark:text-blue-300 flex items-center gap-1.5">
                     <CheckCircle2 size={13} />
                     <span>Official Response from {selectedBusiness.name}:</span>
                   </div>
@@ -262,7 +262,7 @@ export default function BusinessReviews() {
                 <button
                   type="submit"
                   disabled={isSubmittingReply}
-                  className="flex-1 py-2.5 rounded-xl bg-[#003E83] hover:bg-[#002e62] disabled:opacity-50 text-white text-xs font-bold"
+                  className="flex-1 py-2.5 rounded-xl bg-[#002D62] hover:bg-[#001f44] disabled:opacity-50 text-white text-xs font-bold"
                 >
                   {isSubmittingReply ? 'Publishing...' : 'Publish Reply'}
                 </button>

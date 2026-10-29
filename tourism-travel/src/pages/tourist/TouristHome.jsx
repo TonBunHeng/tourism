@@ -6,8 +6,6 @@ import {
   MapPin, 
   Star, 
   Calendar, 
-  ArrowRight, 
-  ChevronRight,
   Compass,
   Heart,
   Users
@@ -99,7 +97,7 @@ export default function TouristHome() {
   return (
     <div className="space-y-14 pb-16">
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-[#003E83] via-[#002e62] to-[#0a192f] text-white pt-16 pb-24 sm:py-24 px-4 sm:px-6 lg:px-8">
+      <section className="relative overflow-hidden bg-gradient-to-b from-[#002D62] via-[#001f44] to-[#0a192f] text-white pt-16 pb-24 sm:py-24 px-4 sm:px-6 lg:px-8">
         <div className="absolute inset-0 opacity-15 mix-blend-overlay pointer-events-none bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:16px_16px]"></div>
         
         <div className="relative max-w-5xl mx-auto text-center">
@@ -135,7 +133,7 @@ export default function TouristHome() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search temples, hotels, activities..."
-                className="w-full pl-10 pr-4 py-3 rounded-xl bg-slate-50 dark:bg-zinc-800/80 text-xs sm:text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#003E83]"
+                className="w-full pl-10 pr-4 py-3 rounded-xl bg-slate-50 dark:bg-zinc-800/80 text-xs sm:text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#002D62]"
               />
             </div>
 
@@ -144,7 +142,7 @@ export default function TouristHome() {
               <select
                 value={selectedProvince}
                 onChange={(e) => setSelectedProvince(e.target.value)}
-                className="w-full px-3 py-3 rounded-xl bg-slate-50 dark:bg-zinc-800/80 text-xs sm:text-sm text-slate-700 dark:text-zinc-200 focus:outline-none focus:ring-2 focus:ring-[#003E83]"
+                className="w-full px-3 py-3 rounded-xl bg-slate-50 dark:bg-zinc-800/80 text-xs sm:text-sm text-slate-700 dark:text-zinc-200 focus:outline-none focus:ring-2 focus:ring-[#002D62]"
               >
                 <option value="">All Provinces</option>
                 {provinces.map((p) => (
@@ -160,7 +158,7 @@ export default function TouristHome() {
               <select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
-                className="w-full px-3 py-3 rounded-xl bg-slate-50 dark:bg-zinc-800/80 text-xs sm:text-sm text-slate-700 dark:text-zinc-200 focus:outline-none focus:ring-2 focus:ring-[#003E83]"
+                className="w-full px-3 py-3 rounded-xl bg-slate-50 dark:bg-zinc-800/80 text-xs sm:text-sm text-slate-700 dark:text-zinc-200 focus:outline-none focus:ring-2 focus:ring-[#002D62]"
               >
                 <option value="">All Categories</option>
                 {categories.map((c) => (
@@ -174,7 +172,7 @@ export default function TouristHome() {
             {/* Submit Button */}
             <button
               type="submit"
-              className="w-full md:w-auto px-6 py-3 rounded-xl bg-[#003E83] hover:bg-[#002e62] text-white text-xs sm:text-sm font-bold shadow-md transition flex items-center justify-center gap-2 cursor-pointer shrink-0"
+              className="w-full md:w-auto px-6 py-3 rounded-xl bg-[#002D62] hover:bg-[#001f44] text-white text-xs sm:text-sm font-bold shadow-md transition flex items-center justify-center gap-2 cursor-pointer shrink-0"
             >
               <Search size={16} />
               <span>Search Places</span>
@@ -228,7 +226,7 @@ export default function TouristHome() {
             to="/destinations"
             className="p-5 rounded-2xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 shadow-md hover:shadow-xl hover:border-blue-400 dark:hover:border-blue-500/50 transition-all group flex flex-col justify-between"
           >
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#003E83] to-blue-600 text-white flex items-center justify-center mb-3 shadow-md">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#002D62] to-blue-600 text-white flex items-center justify-center mb-3 shadow-md">
               <Compass size={20} />
             </div>
             <div>
@@ -281,14 +279,13 @@ export default function TouristHome() {
           <section className="p-5 sm:p-6 rounded-3xl bg-blue-50/70 dark:bg-zinc-900/80 border border-blue-200 dark:border-blue-900/60 shadow-xs">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
-                <Calendar size={18} className="text-[#003E83] dark:text-blue-400" />
+                <Calendar size={18} className="text-[#002D62] dark:text-blue-400" />
                 <h3 className="text-sm font-bold text-slate-900 dark:text-white">
                   Your Recent & Upcoming Travel Reservations
                 </h3>
               </div>
-              <Link to="/bookings" className="text-xs font-semibold text-[#003E83] dark:text-blue-400 hover:underline flex items-center gap-1">
-                <span>View All ({userBookings.length})</span>
-                <ChevronRight size={14} />
+              <Link to="/bookings" className="px-3.5 py-1.5 rounded-xl bg-slate-100 dark:bg-zinc-800 hover:bg-slate-200 dark:hover:bg-zinc-700 text-slate-800 dark:text-zinc-200 font-semibold transition text-xs shadow-xs">
+                View All ({userBookings.length})
               </Link>
             </div>
 
@@ -326,7 +323,7 @@ export default function TouristHome() {
         <section>
           <div className="flex items-center justify-between mb-6">
             <div>
-              <div className="text-xs font-bold uppercase tracking-wider text-[#003E83] dark:text-blue-400">
+              <div className="text-xs font-bold uppercase tracking-wider text-[#002D62] dark:text-blue-400">
                 Hand-picked Highlights
               </div>
               <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
@@ -335,10 +332,9 @@ export default function TouristHome() {
             </div>
             <Link
               to="/destinations?featured=true"
-              className="text-xs font-semibold text-[#003E83] dark:text-blue-400 hover:underline flex items-center gap-1"
+              className="px-3.5 py-1.5 rounded-xl bg-slate-100 dark:bg-zinc-800 hover:bg-slate-200 dark:hover:bg-zinc-700 text-slate-800 dark:text-zinc-200 font-semibold transition text-xs shadow-xs"
             >
-              <span>Explore All</span>
-              <ArrowRight size={14} />
+              Explore All
             </Link>
           </div>
 
@@ -347,7 +343,7 @@ export default function TouristHome() {
           ) : featuredPlaces.length === 0 ? (
             <EmptyState title="No featured destinations yet" description="Check back soon for curated travel highlights." />
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
               {featuredPlaces.map((place) => (
                 <div
                   key={place.id}
@@ -361,7 +357,7 @@ export default function TouristHome() {
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                     <div className="absolute top-3 left-3 flex items-center gap-1.5">
-                      <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-[#003E83] text-white shadow-md">
+                      <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-[#002D62] text-white shadow-md">
                         {place.category?.name || (typeof place.category === 'string' ? place.category : place.category_name) || 'Heritage'}
                       </span>
                     </div>
@@ -377,10 +373,10 @@ export default function TouristHome() {
                   <div className="p-5 flex-1 flex flex-col justify-between">
                     <div>
                       <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-zinc-400 mb-1">
-                        <MapPin size={13} className="text-[#003E83] dark:text-blue-400 shrink-0" />
+                        <MapPin size={13} className="text-[#002D62] dark:text-blue-400 shrink-0" />
                         <span>{place.province?.name || (typeof place.province === 'string' ? place.province : place.province_name) || place.location || 'Cambodia'}</span>
                       </div>
-                      <h3 className="font-extrabold text-base text-slate-900 dark:text-white group-hover:text-[#003E83] dark:group-hover:text-blue-400 transition-colors line-clamp-1">
+                      <h3 className="font-extrabold text-base text-slate-900 dark:text-white group-hover:text-[#002D62] dark:group-hover:text-blue-400 transition-colors line-clamp-1">
                         {place.name}
                       </h3>
                       <p className="mt-1.5 text-xs text-slate-600 dark:text-zinc-400 line-clamp-2 leading-relaxed">
@@ -388,7 +384,7 @@ export default function TouristHome() {
                       </p>
                     </div>
 
-                    <div className="mt-4 pt-3 border-t border-slate-100 dark:border-zinc-800 flex items-center justify-between text-xs">
+                    <div className="mt-4 pt-4 border-t border-slate-100 dark:border-zinc-800 flex items-center justify-between text-xs">
                       <div className="font-semibold text-slate-700 dark:text-zinc-300">
                         {place.entrance_fee || place.price ? (
                           <span>{place.entrance_fee || place.price}</span>
@@ -398,10 +394,9 @@ export default function TouristHome() {
                       </div>
                       <Link
                         to={`/destinations/${place.id}`}
-                        className="inline-flex items-center gap-1 font-bold text-[#003E83] dark:text-blue-400 hover:underline"
+                        className="px-4 py-2 rounded-xl bg-[#002D62] hover:bg-[#001f44] text-white text-xs font-bold transition shadow-xs"
                       >
-                        <span>View Details</span>
-                        <ChevronRight size={14} />
+                        Details
                       </Link>
                     </div>
                   </div>
@@ -446,7 +441,7 @@ export default function TouristHome() {
         <section>
           <div className="flex items-center justify-between mb-6">
             <div>
-              <div className="text-xs font-bold uppercase tracking-wider text-[#003E83] dark:text-blue-400">
+              <div className="text-xs font-bold uppercase tracking-wider text-[#002D62] dark:text-blue-400">
                 Visitor Favorites
               </div>
               <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
@@ -455,10 +450,9 @@ export default function TouristHome() {
             </div>
             <Link
               to="/destinations?sort=popular"
-              className="text-xs font-semibold text-[#003E83] dark:text-blue-400 hover:underline flex items-center gap-1"
+              className="px-3.5 py-1.5 rounded-xl bg-slate-100 dark:bg-zinc-800 hover:bg-slate-200 dark:hover:bg-zinc-700 text-slate-800 dark:text-zinc-200 font-semibold transition text-xs shadow-xs"
             >
-              <span>View All</span>
-              <ArrowRight size={14} />
+              View All
             </Link>
           </div>
 
@@ -484,10 +478,10 @@ export default function TouristHome() {
                 </div>
 
                 <div>
-                  <div className="text-[10px] font-semibold text-[#003E83] dark:text-blue-400 mb-0.5">
+                  <div className="text-[10px] font-semibold text-[#002D62] dark:text-blue-400 mb-0.5">
                     {place.province?.name || (typeof place.province === 'string' ? place.province : place.province_name) || 'Cambodia'}
                   </div>
-                  <h4 className="font-bold text-xs sm:text-sm text-slate-900 dark:text-white group-hover:text-[#003E83] dark:group-hover:text-blue-400 transition-colors line-clamp-1">
+                  <h4 className="font-bold text-xs sm:text-sm text-slate-900 dark:text-white group-hover:text-[#002D62] dark:group-hover:text-blue-400 transition-colors line-clamp-1">
                     {place.name}
                   </h4>
                   <p className="mt-1 text-[11px] text-slate-500 dark:text-zinc-400 line-clamp-2">

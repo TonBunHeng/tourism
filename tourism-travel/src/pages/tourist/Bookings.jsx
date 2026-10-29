@@ -4,7 +4,6 @@ import {
   Calendar, 
   Clock, 
   Users, 
-  ChevronRight,
   Star,
   X
 } from 'lucide-react';
@@ -13,14 +12,18 @@ import { useAlert } from '../../context/AlertContext';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import EmptyState from '../../components/common/EmptyState';
 import Badge from '../../components/common/Badge';
+import Pagination from '../../components/common/Pagination';
 
 export default function Bookings() {
   const { showSuccess, showError, showConfirm } = useAlert();
 
   const [bookings, setBookings] = useState([]);
   const [selectedFilter, setSelectedFilter] = useState('all');
+  const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
   const [activeBookingDetails, setActiveBookingDetails] = useState(null);
+
+  const ITEMS_PER_PAGE = 9;
 
   // Review Modal
   const [selectedBookingForReview, setSelectedBookingForReview] = useState(null);
@@ -130,8 +133,15 @@ export default function Bookings() {
     }
   };
 
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedFilter]);
+
+  const totalPages = Math.ceil(filteredBookings.length / ITEMS_PER_PAGE);
+  const paginatedBookings = filteredBookings.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
+
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-10">
       {/* Title */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -196,93 +206,106 @@ export default function Bookings() {
           }
         />
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {filteredBookings.map((b) => (
-            <div
-              key={b.id}
-              className="p-5 rounded-3xl bg-white dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800 shadow-xs hover:shadow-md transition-all flex flex-col justify-between"
-            >
-              <div>
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-[11px] font-mono font-bold text-slate-400">
-                    #{b.booking_reference || `BK-${b.id}`}
-                  </span>
-                  <Badge variant={getStatusBadgeVariant(b.status)}>
-                    {b.status || 'pending'}
-                  </Badge>
-                </div>
-
-                <h3 className="font-extrabold text-base text-slate-900 dark:text-white line-clamp-1">
-                  {b.service?.name || b.place?.name || b.business?.name || b.tour?.title || 'Tour Reservation'}
-                </h3>
-
-                <div className="mt-3 space-y-1.5 text-xs text-slate-600 dark:text-zinc-400">
-                  <div className="flex items-center gap-2">
-                    <Calendar size={14} className="text-[#002D62] dark:text-blue-400 shrink-0" />
-                    <span><strong>Date:</strong> {b.booking_date}</span>
+        <div className="space-y-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {paginatedBookings.map((b) => (
+              <div
+                key={b.id}
+                className="p-6 rounded-3xl bg-white dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800 shadow-xs hover:shadow-md transition-all flex flex-col justify-between"
+              >
+                <div>
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-[11px] font-mono font-bold text-slate-400">
+                      #{b.booking_reference || `BK-${b.id}`}
+                    </span>
+                    <Badge variant={getStatusBadgeVariant(b.status)}>
+                      {b.status || 'pending'}
+                    </Badge>
                   </div>
-                  {b.booking_time && (
+
+                  <h3 className="font-extrabold text-base text-slate-900 dark:text-white line-clamp-1">
+                    {b.service?.name || b.place?.name || b.business?.name || b.tour?.title || 'Tour Reservation'}
+                  </h3>
+
+                  <div className="mt-3.5 space-y-2 text-xs text-slate-600 dark:text-zinc-400">
                     <div className="flex items-center gap-2">
-                      <Clock size={14} className="text-[#002D62] dark:text-blue-400 shrink-0" />
-                      <span><strong>Time:</strong> {b.booking_time}</span>
+                      <Calendar size={14} className="text-[#002D62] dark:text-blue-400 shrink-0" />
+                      <span><strong>Date:</strong> {b.booking_date}</span>
+                    </div>
+                    {b.booking_time && (
+                      <div className="flex items-center gap-2">
+                        <Clock size={14} className="text-[#002D62] dark:text-blue-400 shrink-0" />
+                        <span><strong>Time:</strong> {b.booking_time}</span>
+                      </div>
+                    )}
+                    <div className="flex items-center gap-2">
+                      <Users size={14} className="text-[#002D62] dark:text-blue-400 shrink-0" />
+                      <span><strong>Guests:</strong> {b.guests_count || b.number_of_guests || 1} participant(s)</span>
+                    </div>
+                  </div>
+
+                  {b.special_requests && (
+                    <div className="mt-3.5 p-3 rounded-xl bg-slate-50 dark:bg-zinc-800/60 text-[11px] text-slate-600 dark:text-zinc-400">
+                      <span className="font-bold text-slate-700 dark:text-zinc-300 block mb-0.5">Special Requests:</span>
+                      <p className="line-clamp-2">{b.special_requests}</p>
                     </div>
                   )}
+                </div>
+
+                <div className="mt-5 pt-3.5 border-t border-slate-100 dark:border-zinc-800 flex items-center justify-between text-xs">
+                  <div>
+                    <div className="text-[10px] text-slate-400 uppercase font-semibold">Total Price</div>
+                    <div className="font-extrabold text-slate-900 dark:text-white text-sm">
+                      {b.total_amount || b.total_price ? `$${Number(b.total_amount || b.total_price).toFixed(2)}` : 'Inquiry / Free'}
+                    </div>
+                  </div>
+
                   <div className="flex items-center gap-2">
-                    <Users size={14} className="text-[#002D62] dark:text-blue-400 shrink-0" />
-                    <span><strong>Guests:</strong> {b.guests_count || b.number_of_guests || 1} participant(s)</span>
-                  </div>
-                </div>
+                    {b.status === 'completed' && (
+                      <button
+                        type="button"
+                        onClick={() => setSelectedBookingForReview(b)}
+                        className="px-3 py-1.5 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 hover:bg-amber-500/20 font-bold flex items-center gap-1 transition cursor-pointer text-xs"
+                      >
+                        <Star size={12} className="fill-amber-400 text-amber-400" />
+                        <span>Review</span>
+                      </button>
+                    )}
 
-                {b.special_requests && (
-                  <div className="mt-3 p-2.5 rounded-xl bg-slate-50 dark:bg-zinc-800/60 text-[11px] text-slate-600 dark:text-zinc-400">
-                    <span className="font-bold text-slate-700 dark:text-zinc-300 block mb-0.5">Special Requests:</span>
-                    <p className="line-clamp-2">{b.special_requests}</p>
-                  </div>
-                )}
-              </div>
+                    {(b.status === 'pending' || b.status === 'confirmed') && (
+                      <button
+                        type="button"
+                        onClick={() => handleCancelBooking(b.id)}
+                        className="px-3 py-1.5 rounded-xl border border-rose-200 dark:border-rose-900/60 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 font-semibold transition cursor-pointer text-xs"
+                      >
+                        Cancel
+                      </button>
+                    )}
 
-              <div className="mt-5 pt-3 border-t border-slate-100 dark:border-zinc-800 flex items-center justify-between text-xs">
-                <div>
-                  <div className="text-[10px] text-slate-400 uppercase font-semibold">Total Price</div>
-                  <div className="font-extrabold text-slate-900 dark:text-white text-sm">
-                    {b.total_amount || b.total_price ? `$${Number(b.total_amount || b.total_price).toFixed(2)}` : 'Inquiry / Free'}
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  {b.status === 'completed' && (
                     <button
                       type="button"
-                      onClick={() => setSelectedBookingForReview(b)}
-                      className="px-3 py-1.5 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 hover:bg-amber-500/20 font-bold flex items-center gap-1 transition cursor-pointer text-xs"
+                      onClick={() => setActiveBookingDetails(b)}
+                      className="px-3.5 py-1.5 rounded-xl bg-[#002D62] hover:bg-[#001f44] text-white font-bold transition shadow-xs text-xs cursor-pointer"
                     >
-                      <Star size={12} className="fill-amber-400 text-amber-400" />
-                      <span>Review</span>
+                      Details
                     </button>
-                  )}
-
-                  {(b.status === 'pending' || b.status === 'confirmed') && (
-                    <button
-                      type="button"
-                      onClick={() => handleCancelBooking(b.id)}
-                      className="px-3 py-1.5 rounded-xl border border-rose-200 dark:border-rose-900/60 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 font-semibold transition cursor-pointer text-xs"
-                    >
-                      Cancel
-                    </button>
-                  )}
-
-                  <button
-                    type="button"
-                    onClick={() => setActiveBookingDetails(b)}
-                    className="p-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-zinc-800 text-slate-600 dark:text-zinc-300 transition cursor-pointer"
-                    title="View Booking Details"
-                  >
-                    <ChevronRight size={18} />
-                  </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
+
+          {/* Pagination */}
+          <Pagination
+            currentPage={currentPage}
+            lastPage={totalPages}
+            total={filteredBookings.length}
+            perPage={ITEMS_PER_PAGE}
+            onPageChange={(page) => {
+              setCurrentPage(page);
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+          />
         </div>
       )}
 

@@ -32,7 +32,7 @@ export default function Forbidden() {
           {isBusinessOwner ? (
             <Link
               to="/business/dashboard"
-              className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-[#003E83] hover:bg-[#002e62] text-white text-xs font-semibold transition"
+              className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-[#002D62] hover:bg-[#001f44] text-white text-xs font-semibold transition"
             >
               <Briefcase size={16} />
               <span>Return to Business Hub</span>
@@ -40,7 +40,7 @@ export default function Forbidden() {
           ) : (
             <Link
               to="/"
-              className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-[#003E83] hover:bg-[#002e62] text-white text-xs font-semibold transition"
+              className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-[#002D62] hover:bg-[#001f44] text-white text-xs font-semibold transition"
             >
               <Home size={16} />
               <span>Return to Tourist Home</span>

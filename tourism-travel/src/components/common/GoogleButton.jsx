@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Loader2 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useAlert } from '../../context/AlertContext';
@@ -37,11 +37,12 @@ export default function GoogleButton({
   const { redirectToGoogle } = useAuth();
   const { showError } = useAlert();
   const [internalLoading, setInternalLoading] = useState(false);
+  const isNavigatingRef = useRef(false);
 
   const loading = isLoading || internalLoading;
 
   const handleClick = async (e) => {
-    if (loading || disabled) return;
+    if (loading || disabled || isNavigatingRef.current) return;
 
     if (onClick) {
       onClick(e);
@@ -50,9 +51,11 @@ export default function GoogleButton({
 
     // Default: Redirect to Google OAuth endpoint
     try {
+      isNavigatingRef.current = true;
       setInternalLoading(true);
       redirectToGoogle(role);
     } catch (err) {
+      isNavigatingRef.current = false;
       setInternalLoading(false);
       showError(err.message || 'Could not initiate Google authentication.');
     }

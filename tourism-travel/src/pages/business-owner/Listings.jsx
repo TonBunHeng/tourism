@@ -155,7 +155,7 @@ export default function Listings() {
       {/* Title & Action */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <div className="text-xs font-semibold text-[#003E83] dark:text-blue-400 uppercase tracking-wider mb-1">
+          <div className="text-xs font-semibold text-[#002D62] dark:text-blue-400 uppercase tracking-wider mb-1">
             Service Catalog ({selectedBusiness.name})
           </div>
           <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
@@ -169,7 +169,7 @@ export default function Listings() {
         <button
           type="button"
           onClick={handleOpenCreate}
-          className="px-4 py-2.5 rounded-xl bg-[#003E83] hover:bg-[#002e62] text-white text-xs font-bold shadow-sm transition flex items-center gap-1.5 cursor-pointer self-start sm:self-auto"
+          className="px-4 py-2.5 rounded-xl bg-[#002D62] hover:bg-[#001f44] text-white text-xs font-bold shadow-sm transition flex items-center gap-1.5 cursor-pointer self-start sm:self-auto"
         >
           <Plus size={15} />
           <span>Add New Service</span>
@@ -188,7 +188,7 @@ export default function Listings() {
             <button
               type="button"
               onClick={handleOpenCreate}
-              className="px-4 py-2 rounded-xl bg-[#003E83] text-white text-xs font-bold shadow-sm"
+              className="px-4 py-2 rounded-xl bg-[#002D62] text-white text-xs font-bold shadow-sm"
             >
               Add First Service
             </button>
@@ -220,11 +220,11 @@ export default function Listings() {
 
                 <div className="mt-4 pt-3 border-t border-slate-100 dark:border-zinc-800 grid grid-cols-2 gap-2 text-xs text-slate-600 dark:text-zinc-400">
                   <div className="flex items-center gap-1.5">
-                    <Clock size={13} className="text-[#003E83] dark:text-blue-400 shrink-0" />
+                    <Clock size={13} className="text-[#002D62] dark:text-blue-400 shrink-0" />
                     <span>{svc.duration || 'Flexible'}</span>
                   </div>
                   <div className="flex items-center gap-1.5">
-                    <Users size={13} className="text-[#003E83] dark:text-blue-400 shrink-0" />
+                    <Users size={13} className="text-[#002D62] dark:text-blue-400 shrink-0" />
                     <span>Max: {svc.capacity || '10'} guests</span>
                   </div>
                 </div>
@@ -370,7 +370,7 @@ export default function Listings() {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="flex-1 py-2.5 rounded-xl bg-[#003E83] hover:bg-[#002e62] disabled:opacity-50 text-white text-xs font-bold"
+                  className="flex-1 py-2.5 rounded-xl bg-[#002D62] hover:bg-[#001f44] disabled:opacity-50 text-white text-xs font-bold"
                 >
                   {isSubmitting ? 'Saving...' : editingService ? 'Update Service' : 'Publish Service'}
                 </button>

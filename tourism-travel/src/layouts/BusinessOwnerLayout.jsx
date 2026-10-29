@@ -102,7 +102,7 @@ export default function BusinessOwnerLayout() {
             <img src={logoImg} alt="AngkorVerses Logo" className="w-8 h-8 object-contain shrink-0" />
             {isSidebarExpanded && (
               <div className="leading-tight">
-                <span className="font-extrabold text-base tracking-tight bg-gradient-to-r from-[#003E83] to-blue-600 dark:from-blue-400 dark:to-indigo-300 bg-clip-text text-transparent">
+                <span className="font-extrabold text-base tracking-tight bg-gradient-to-r from-[#002D62] to-blue-600 dark:from-blue-400 dark:to-indigo-300 bg-clip-text text-transparent">
                   AngkorVerses
                 </span>
                 <span className="block text-[10px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-widest">
@@ -146,12 +146,12 @@ export default function BusinessOwnerLayout() {
                     )}
                   </div>
                 </div>
-                <Building2 size={16} className="text-[#003E83] dark:text-blue-400 shrink-0" />
+                <Building2 size={16} className="text-[#002D62] dark:text-blue-400 shrink-0" />
               </div>
             ) : (
               <Link 
                 to="/business/profile" 
-                className="block text-center p-2 rounded-xl border border-dashed border-slate-300 dark:border-zinc-700 text-xs font-semibold text-[#003E83] dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-zinc-800 transition"
+                className="block text-center p-2 rounded-xl border border-dashed border-slate-300 dark:border-zinc-700 text-xs font-semibold text-[#002D62] dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-zinc-800 transition"
               >
                 + Register Business Profile
               </Link>
@@ -172,7 +172,7 @@ export default function BusinessOwnerLayout() {
                 to={item.path}
                 className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium transition ${
                   isActive
-                    ? 'bg-[#003E83] text-white shadow-sm font-semibold'
+                    ? 'bg-[#002D62] text-white shadow-sm font-semibold'
                     : 'text-slate-600 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-zinc-800 hover:text-slate-900 dark:hover:text-white'
                 }`}
                 title={!isSidebarExpanded ? item.label : undefined}
@@ -250,7 +250,7 @@ export default function BusinessOwnerLayout() {
                 onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
                 className="flex items-center gap-2.5 p-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-zinc-800 transition cursor-pointer"
               >
-                <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#003E83] to-blue-600 text-white flex items-center justify-center text-xs font-bold ring-2 ring-blue-500/20 overflow-hidden">
+                <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#002D62] to-blue-600 text-white flex items-center justify-center text-xs font-bold ring-2 ring-blue-500/20 overflow-hidden">
                   {user?.avatar ? (
                     <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
                   ) : (
@@ -343,7 +343,7 @@ export default function BusinessOwnerLayout() {
                   onClick={() => setIsMobileMenuOpen(false)}
                   className={`flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold ${
                     isActive
-                      ? 'bg-[#003E83] text-white'
+                      ? 'bg-[#002D62] text-white'
                       : 'text-slate-700 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-zinc-800'
                   }`}
                 >

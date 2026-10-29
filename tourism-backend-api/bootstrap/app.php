@@ -27,6 +27,14 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
+        $exceptions->render(function (\Illuminate\Http\Exceptions\ThrottleRequestsException $e, Request $request) {
+            if ($request->is('*auth/google*') || $request->is('*oauth*')) {
+                $frontendUrl = env('FRONTEND_URL', 'http://localhost:5175');
+                $retryAfter = $e->getHeaders()['Retry-After'] ?? 60;
+                return redirect($frontendUrl . '/login?error=' . urlencode("Too many connection attempts. Please wait {$retryAfter} seconds before trying again."));
+            }
+        });
+
         $exceptions->shouldRenderJsonWhen(
             fn (Request $request) => true,
         );

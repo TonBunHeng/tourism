@@ -55,7 +55,12 @@ export default function OAuthCallbackHandler() {
       const role = normalizeRole(userObj?.role || pendingRole);
       if (role === 'business_owner') {
         navigate('/business/dashboard', { replace: true });
-      } else if (location.pathname === '/login' || location.pathname === '/register' || location.pathname === '/auth/google/callback') {
+      } else if (
+        location.pathname === '/login' ||
+        location.pathname === '/register' ||
+        location.pathname === '/auth/google/callback' ||
+        location.pathname === '/auth/callback'
+      ) {
         navigate('/', { replace: true });
       }
     }

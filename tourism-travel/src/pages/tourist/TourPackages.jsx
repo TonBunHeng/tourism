@@ -16,6 +16,7 @@ import travelService from '../../services/travelService';
 import { useAlert } from '../../context/AlertContext';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import EmptyState from '../../components/common/EmptyState';
+import Pagination from '../../components/common/Pagination';
 
 export default function TourPackages() {
   const { showSuccess, showError } = useAlert();
@@ -23,7 +24,10 @@ export default function TourPackages() {
 
   const [tours, setTours] = useState([]);
   const [destinations, setDestinations] = useState(['All']);
+  const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
+
+  const ITEMS_PER_PAGE = 9;
 
   // Filters
   const search = searchParams.get('search') || '';
@@ -68,6 +72,7 @@ export default function TourPackages() {
   };
 
   useEffect(() => {
+    setCurrentPage(1);
     loadTours();
   }, [search, selectedDestination, selectedDuration]);
 
@@ -121,19 +126,21 @@ export default function TourPackages() {
     }
   };
 
+  const totalPages = Math.ceil(tours.length / ITEMS_PER_PAGE);
+  const paginatedTours = tours.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
+
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-      {/* Hero Banner */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-amber-700 via-rose-800 to-[#002D62] text-white p-8 sm:p-12 shadow-xl">
-        <div className="relative max-w-2xl space-y-3">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md text-xs font-semibold text-amber-200 border border-white/20">
-            <Sparkles size={13} className="text-amber-300" />
-            <span>Tour Packages Database</span>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-10">
+      {/* Title */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <div className="text-xs font-semibold text-[#002D62] dark:text-blue-400 uppercase tracking-wider mb-1">
+            Tour Packages Database
           </div>
-          <h1 className="text-3xl sm:text-4xl font-black tracking-tight leading-tight">
+          <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
             Guided Tour Packages
           </h1>
-          <p className="text-xs sm:text-sm text-blue-100/90 leading-relaxed font-light">
+          <p className="text-xs sm:text-sm text-slate-500 dark:text-zinc-400 mt-1">
             Explore curated tour packages recorded in the central database.
           </p>
         </div>
@@ -201,93 +208,107 @@ export default function TourPackages() {
           description="There are currently no active tour records available matching this filter."
         />
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {tours.map((t) => (
-            <div
-              key={t.id}
-              className="group rounded-3xl bg-white dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800 shadow-xs hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col justify-between"
-            >
-              <div>
-                <div className="relative h-52 w-full overflow-hidden bg-slate-100 dark:bg-zinc-800">
-                  {t.image ? (
-                    <img
-                      src={t.image}
-                      alt={t.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex flex-col items-center justify-center text-slate-400">
-                      <Sparkles size={32} />
-                      <span className="text-[11px] mt-1">Tour Package</span>
-                    </div>
-                  )}
+        <div className="space-y-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {paginatedTours.map((t) => (
+              <div
+                key={t.id}
+                className="group rounded-3xl bg-white dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800 shadow-xs hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col justify-between"
+              >
+                <div>
+                  <div className="relative h-52 w-full overflow-hidden bg-slate-100 dark:bg-zinc-800">
+                    {t.image ? (
+                      <img
+                        src={t.image}
+                        alt={t.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex flex-col items-center justify-center text-slate-400">
+                        <Sparkles size={32} />
+                        <span className="text-[11px] mt-1">Tour Package</span>
+                      </div>
+                    )}
 
-                  {t.badge && (
-                    <div className="absolute top-3 left-3">
-                      <span className="px-2.5 py-1 rounded-full bg-amber-500/95 text-white text-[10px] font-bold tracking-wide shadow-sm">
-                        {t.badge}
+                    {t.badge && (
+                      <div className="absolute top-3 left-3">
+                        <span className="px-2.5 py-1 rounded-full bg-amber-500/95 text-white text-[10px] font-bold tracking-wide shadow-sm">
+                          {t.badge}
+                        </span>
+                      </div>
+                    )}
+
+                    <div className="absolute bottom-3 right-3 px-3 py-1 rounded-xl bg-black/75 backdrop-blur-md text-white font-black text-sm">
+                      ${t.price} <span className="text-[10px] font-normal text-white/80">/ person</span>
+                    </div>
+                  </div>
+
+                  <div className="p-6 space-y-3.5">
+                    <div className="flex items-center gap-3 text-xs text-slate-500 dark:text-zinc-400">
+                      <span className="flex items-center gap-1">
+                        <Clock size={13} className="text-[#002D62] dark:text-blue-400" />
+                        <span>{t.duration}</span>
+                      </span>
+                      <span>•</span>
+                      <span className="flex items-center gap-1">
+                        <MapPin size={13} className="text-rose-500" />
+                        <span>{t.destination || t.province}</span>
                       </span>
                     </div>
-                  )}
 
-                  <div className="absolute bottom-3 right-3 px-3 py-1 rounded-xl bg-black/75 backdrop-blur-md text-white font-black text-sm">
-                    ${t.price} <span className="text-[10px] font-normal text-white/80">/ person</span>
-                  </div>
-                </div>
+                    <h3 className="font-extrabold text-base text-slate-900 dark:text-white group-hover:text-[#002D62] dark:group-hover:text-blue-400 transition-colors line-clamp-2">
+                      {t.title}
+                    </h3>
 
-                <div className="p-5 space-y-3">
-                  <div className="flex items-center gap-3 text-xs text-slate-500 dark:text-zinc-400">
-                    <span className="flex items-center gap-1">
-                      <Clock size={13} className="text-[#002D62] dark:text-blue-400" />
-                      <span>{t.duration}</span>
-                    </span>
-                    <span>•</span>
-                    <span className="flex items-center gap-1">
-                      <MapPin size={13} className="text-rose-500" />
-                      <span>{t.destination || t.province}</span>
-                    </span>
-                  </div>
-
-                  <h3 className="font-extrabold text-base text-slate-900 dark:text-white group-hover:text-[#002D62] dark:group-hover:text-blue-400 transition-colors line-clamp-2">
-                    {t.title}
-                  </h3>
-
-                  <div className="flex items-center gap-2 text-xs">
-                    <div className="flex items-center gap-1 text-amber-500 font-bold bg-amber-50 dark:bg-amber-950/40 px-2 py-0.5 rounded-md">
-                      <Star size={13} className="fill-amber-400 text-amber-400" />
-                      <span>{t.rating || 0}</span>
+                    <div className="flex items-center gap-2 text-xs">
+                      <div className="flex items-center gap-1 text-amber-500 font-bold bg-amber-50 dark:bg-amber-950/40 px-2 py-0.5 rounded-md">
+                        <Star size={13} className="fill-amber-400 text-amber-400" />
+                        <span>{t.rating || 0}</span>
+                      </div>
+                      <span className="text-slate-500 dark:text-zinc-400">
+                        ({t.reviewsCount || 0} reviews)
+                      </span>
                     </div>
-                    <span className="text-slate-500 dark:text-zinc-400">
-                      ({t.reviewsCount || 0} reviews)
-                    </span>
-                  </div>
 
-                  <p className="text-xs text-slate-600 dark:text-zinc-400 line-clamp-2 leading-relaxed">
-                    {t.description || 'No description provided.'}
-                  </p>
+                    <p className="text-xs text-slate-600 dark:text-zinc-400 line-clamp-2 leading-relaxed">
+                      {t.description || 'No description provided.'}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="px-6 py-4 border-t border-slate-100 dark:border-zinc-800/80 flex items-center justify-between gap-2 text-xs">
+                  <button
+                    type="button"
+                    onClick={() => setActiveTourDetails(t)}
+                    className="px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-zinc-800 hover:bg-slate-200 dark:hover:bg-zinc-700 text-slate-800 dark:text-zinc-200 font-semibold transition cursor-pointer"
+                  >
+                    Details
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setActiveTourForBooking(t)}
+                    className="px-4 py-2 rounded-xl bg-[#002D62] hover:bg-[#001f44] text-white font-bold transition shadow-xs flex items-center gap-1.5 cursor-pointer"
+                  >
+                    <Calendar size={13} />
+                    <span>Book Now</span>
+                  </button>
                 </div>
               </div>
+            ))}
+          </div>
 
-              <div className="p-5 pt-0 border-t border-slate-100 dark:border-zinc-800/80 flex items-center justify-between gap-2 mt-4 text-xs">
-                <button
-                  type="button"
-                  onClick={() => setActiveTourDetails(t)}
-                  className="px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-zinc-800 hover:bg-slate-200 dark:hover:bg-zinc-700 text-slate-800 dark:text-zinc-200 font-semibold transition cursor-pointer"
-                >
-                  Details
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setActiveTourForBooking(t)}
-                  className="px-4 py-2 rounded-xl bg-[#002D62] hover:bg-[#001f44] text-white font-bold transition shadow-xs flex items-center gap-1.5 cursor-pointer"
-                >
-                  <Calendar size={13} />
-                  <span>Book Now</span>
-                </button>
-              </div>
-            </div>
-          ))}
+          {/* Pagination */}
+          <Pagination
+            currentPage={currentPage}
+            lastPage={totalPages}
+            total={tours.length}
+            perPage={ITEMS_PER_PAGE}
+            onPageChange={(page) => {
+              setCurrentPage(page);
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+          />
         </div>
       )}
 

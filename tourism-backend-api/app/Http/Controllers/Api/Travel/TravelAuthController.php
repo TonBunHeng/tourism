@@ -33,7 +33,8 @@ class TravelAuthController extends Controller
         $ip = $request->ip();
         $throttleKey = 'travel_register:' . $ip;
 
-        if (RateLimiter::tooManyAttempts($throttleKey, 5)) {
+        $maxAttempts = app()->environment('local') ? 100 : 15;
+        if (RateLimiter::tooManyAttempts($throttleKey, $maxAttempts)) {
             $seconds = RateLimiter::availableIn($throttleKey);
             return $this->errorResponse("Too many registration attempts. Please try again in {$seconds} seconds.", 429);
         }
@@ -117,7 +118,8 @@ class TravelAuthController extends Controller
 
         $throttleKey = 'travel_login:' . Str::lower($email) . '|' . $ip;
 
-        if (RateLimiter::tooManyAttempts($throttleKey, 10)) {
+        $maxAttempts = app()->environment('local') ? 100 : 30;
+        if (RateLimiter::tooManyAttempts($throttleKey, $maxAttempts)) {
             $seconds = RateLimiter::availableIn($throttleKey);
             return $this->errorResponse("Too many login attempts. Please try again in {$seconds} seconds.", 429);
         }
@@ -278,7 +280,8 @@ class TravelAuthController extends Controller
         $ip = $request->ip();
         $throttleKey = 'travel_oauth_google:' . $ip;
 
-        if (RateLimiter::tooManyAttempts($throttleKey, 10)) {
+        $maxAttempts = app()->environment('local') ? 100 : 30;
+        if (RateLimiter::tooManyAttempts($throttleKey, $maxAttempts)) {
             $seconds = RateLimiter::availableIn($throttleKey);
             return $this->errorResponse("Too many authentication attempts. Please try again in {$seconds} seconds.", 429);
         }
@@ -387,17 +390,28 @@ class TravelAuthController extends Controller
 
     public function redirectToGoogle()
     {
-        return Socialite::driver('google')->stateless()->redirect();
+        try {
+            $clientId = config('services.google.client_id');
+            if (empty($clientId) || $clientId === 'your_google_client_id_here') {
+                $frontendUrl = env('FRONTEND_URL', 'http://localhost:5175');
+                return redirect($frontendUrl . '/login?error=' . urlencode('Google OAuth is not configured yet in backend. Please check GOOGLE_CLIENT_ID.'));
+            }
+
+            return Socialite::driver('google')->stateless()->redirect();
+        } catch (\Throwable $e) {
+            $frontendUrl = env('FRONTEND_URL', 'http://localhost:5175');
+            return redirect($frontendUrl . '/login?error=' . urlencode('Google connection error: ' . $e->getMessage()));
+        }
     }
 
     public function handleGoogleCallback()
     {
-        $frontendUrl = env('FRONTEND_URL', 'http://localhost:5174');
+        $frontendUrl = env('FRONTEND_URL', 'http://localhost:5175');
 
         try {
             $googleUser = Socialite::driver('google')->stateless()->user();
         } catch (\Throwable $e) {
-            return redirect($frontendUrl . '/login?error=' . urlencode('Google authentication failed.'));
+            return redirect($frontendUrl . '/login?error=' . urlencode('Google authentication failed: ' . $e->getMessage()));
         }
 
         $googleId = $googleUser->getId();

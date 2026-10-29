@@ -91,7 +91,7 @@ export default function BusinessNotifications() {
     <div className="max-w-4xl mx-auto space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <div className="text-xs font-semibold text-[#003E83] dark:text-blue-400 uppercase tracking-wider mb-1">
+          <div className="text-xs font-semibold text-[#002D62] dark:text-blue-400 uppercase tracking-wider mb-1">
             Activity Feed
           </div>
           <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
@@ -158,7 +158,7 @@ export default function BusinessNotifications() {
                   {n.link ? (
                     <a
                       href={n.link}
-                      className="text-xs font-semibold text-[#003E83] dark:text-blue-400 hover:underline flex items-center gap-1"
+                      className="text-xs font-semibold text-[#002D62] dark:text-blue-400 hover:underline flex items-center gap-1"
                     >
                       <span>View Booking / Item</span>
                       <ExternalLink size={12} />

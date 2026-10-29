@@ -188,7 +188,7 @@ export default function DestinationDetails() {
       <div className="max-w-3xl mx-auto px-4 py-16 text-center">
         <h2 className="text-xl font-bold text-slate-800 dark:text-white mb-2">Destination Not Found</h2>
         <p className="text-xs text-slate-500 dark:text-zinc-400 mb-6">The requested destination could not be retrieved from the catalog.</p>
-        <Link to="/destinations" className="px-5 py-2.5 rounded-xl bg-[#003E83] text-white text-xs font-semibold">
+        <Link to="/destinations" className="px-5 py-2.5 rounded-xl bg-[#002D62] hover:bg-[#001f44] text-white text-xs font-semibold">
           Back to Destinations
         </Link>
       </div>
@@ -201,7 +201,7 @@ export default function DestinationDetails() {
       <div className="flex items-center justify-between">
         <Link
           to="/destinations"
-          className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 dark:text-zinc-400 hover:text-[#003E83] dark:hover:text-blue-400 transition"
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 dark:text-zinc-400 hover:text-[#002D62] dark:hover:text-blue-400 transition"
         >
           <ChevronLeft size={16} />
           <span>Back to Destinations</span>
@@ -244,7 +244,7 @@ export default function DestinationDetails() {
               className="w-full h-full object-cover"
             />
             <div className="absolute top-4 left-4 flex items-center gap-2">
-              <span className="px-3 py-1 rounded-full text-xs font-bold bg-[#003E83] text-white shadow-md">
+              <span className="px-3 py-1 rounded-full text-xs font-bold bg-[#002D62] text-white shadow-md">
                 {place.category?.name || (typeof place.category === 'string' ? place.category : place.category_name) || 'Heritage & Cultural'}
               </span>
               <span className="px-3 py-1 rounded-full text-xs font-bold bg-black/60 backdrop-blur-md text-white shadow-md">
@@ -263,11 +263,11 @@ export default function DestinationDetails() {
 
           {/* Title & Location Header */}
           <div>
-            <div className="flex items-center gap-2 text-xs font-semibold text-[#003E83] dark:text-blue-400 mb-1">
+            <div className="flex items-center gap-2 text-xs font-semibold text-[#002D62] dark:text-blue-400 mb-1">
               <MapPin size={15} />
               <span>{place.location || place.address || `${place.province?.name || (typeof place.province === 'string' ? place.province : place.province_name) || 'Cambodia'}`}</span>
             </div>
-            <h1 className="text-2xl sm:text-4xl font-black text-slate-900 dark:text-white tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
               {place.name}
             </h1>
           </div>
@@ -275,7 +275,7 @@ export default function DestinationDetails() {
           {/* Quick Specifications Strip */}
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-2">
             <div className="p-3.5 rounded-2xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 flex items-center gap-3">
-              <div className="p-2.5 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-[#003E83] dark:text-blue-400">
+              <div className="p-2.5 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-[#002D62] dark:text-blue-400">
                 <Clock size={18} />
               </div>
               <div>
@@ -355,7 +355,7 @@ export default function DestinationDetails() {
                     setIsBookingModalOpen(true);
                   }
                 }}
-                className="w-full py-3.5 px-4 rounded-xl bg-[#003E83] hover:bg-[#002e62] text-white text-xs sm:text-sm font-bold shadow-md transition flex items-center justify-center gap-2 cursor-pointer"
+                className="w-full py-3.5 px-4 rounded-xl bg-[#002D62] hover:bg-[#001f44] text-white text-xs sm:text-sm font-bold shadow-md transition flex items-center justify-center gap-2 cursor-pointer"
               >
                 <Calendar size={16} />
                 <span>Book Guided Tour / Visit</span>
@@ -405,7 +405,7 @@ export default function DestinationDetails() {
                 setIsReviewModalOpen(true);
               }
             }}
-            className="px-4 py-2.5 rounded-xl border border-[#003E83] dark:border-blue-500 text-[#003E83] dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-zinc-800 text-xs font-bold transition flex items-center gap-2 cursor-pointer self-start sm:self-auto"
+            className="px-4 py-2.5 rounded-xl border border-[#002D62] dark:border-blue-500 text-[#002D62] dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-zinc-800 text-xs font-bold transition flex items-center gap-2 cursor-pointer self-start sm:self-auto"
           >
             <MessageSquare size={15} />
             <span>Write a Review</span>
@@ -420,7 +420,7 @@ export default function DestinationDetails() {
             <button
               type="button"
               onClick={() => setIsReviewModalOpen(true)}
-              className="px-4 py-2 rounded-xl bg-[#003E83] text-white text-xs font-semibold"
+              className="px-4 py-2 rounded-xl bg-[#002D62] hover:bg-[#001f44] text-white text-xs font-semibold"
             >
               Share Your Experience
             </button>
@@ -435,7 +435,7 @@ export default function DestinationDetails() {
                 <div>
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
-                      <div className="w-7 h-7 rounded-full bg-[#003E83] text-white text-xs font-bold flex items-center justify-center">
+                      <div className="w-7 h-7 rounded-full bg-[#002D62] text-white text-xs font-bold flex items-center justify-center">
                         {rev.user?.name ? rev.user.name.charAt(0).toUpperCase() : 'T'}
                       </div>
                       <span className="text-xs font-bold text-slate-900 dark:text-white">
@@ -550,7 +550,7 @@ export default function DestinationDetails() {
                 <button
                   type="submit"
                   disabled={isSubmittingBooking}
-                  className="flex-1 py-2.5 rounded-xl bg-[#003E83] hover:bg-[#002e62] disabled:opacity-50 text-white text-xs font-bold"
+                  className="flex-1 py-2.5 rounded-xl bg-[#002D62] hover:bg-[#001f44] disabled:opacity-50 text-white text-xs font-bold"
                 >
                   {isSubmittingBooking ? 'Submitting...' : 'Confirm Inquiry'}
                 </button>
@@ -634,7 +634,7 @@ export default function DestinationDetails() {
                 <button
                   type="submit"
                   disabled={isSubmittingReview}
-                  className="flex-1 py-2.5 rounded-xl bg-[#003E83] hover:bg-[#002e62] disabled:opacity-50 text-white text-xs font-bold"
+                  className="flex-1 py-2.5 rounded-xl bg-[#002D62] hover:bg-[#001f44] disabled:opacity-50 text-white text-xs font-bold"
                 >
                   {isSubmittingReview ? 'Posting Review...' : 'Submit Review'}
                 </button>

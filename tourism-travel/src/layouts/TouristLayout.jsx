@@ -38,9 +38,9 @@ export default function TouristLayout() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
 
-  // Mega Menu State
-  const [isMegaMenuOpen, setIsMegaMenuOpen] = useState(false);
-  const megaMenuTimeoutRef = useRef(null);
+  // Dropdown & Mega Menu State ('destinations' | 'tours' | null)
+  const [activeDropdown, setActiveDropdown] = useState(null);
+  const dropdownTimeoutRef = useRef(null);
 
   // Refresh the notification badge when authentication or route changes.
   // Ignore late responses after navigation/unmount and reset on sign-out.
@@ -78,22 +78,22 @@ export default function TouristLayout() {
 
   // Close navigation menus whenever the route changes.
   useEffect(() => {
-    setIsMegaMenuOpen(false);
+    setActiveDropdown(null);
     setIsMobileMenuOpen(false);
     setIsProfileMenuOpen(false);
 
-    if (megaMenuTimeoutRef.current) {
-      clearTimeout(megaMenuTimeoutRef.current);
-      megaMenuTimeoutRef.current = null;
+    if (dropdownTimeoutRef.current) {
+      clearTimeout(dropdownTimeoutRef.current);
+      dropdownTimeoutRef.current = null;
     }
   }, [location.pathname]);
 
   // Do not leave a pending timeout behind when this layout unmounts.
   useEffect(() => {
     return () => {
-      if (megaMenuTimeoutRef.current) {
-        clearTimeout(megaMenuTimeoutRef.current);
-        megaMenuTimeoutRef.current = null;
+      if (dropdownTimeoutRef.current) {
+        clearTimeout(dropdownTimeoutRef.current);
+        dropdownTimeoutRef.current = null;
       }
     };
   }, []);
@@ -103,23 +103,23 @@ export default function TouristLayout() {
     setTheme(next);
   };
 
-  const handleOpenMegaMenu = () => {
-    if (megaMenuTimeoutRef.current) {
-      clearTimeout(megaMenuTimeoutRef.current);
-      megaMenuTimeoutRef.current = null;
+  const handleOpenDropdown = (menuKey) => {
+    if (dropdownTimeoutRef.current) {
+      clearTimeout(dropdownTimeoutRef.current);
+      dropdownTimeoutRef.current = null;
     }
 
-    setIsMegaMenuOpen(true);
+    setActiveDropdown(menuKey);
   };
 
-  const handleCloseMegaMenu = () => {
-    if (megaMenuTimeoutRef.current) {
-      clearTimeout(megaMenuTimeoutRef.current);
+  const handleCloseDropdown = () => {
+    if (dropdownTimeoutRef.current) {
+      clearTimeout(dropdownTimeoutRef.current);
     }
 
-    megaMenuTimeoutRef.current = setTimeout(() => {
-      setIsMegaMenuOpen(false);
-      megaMenuTimeoutRef.current = null;
+    dropdownTimeoutRef.current = setTimeout(() => {
+      setActiveDropdown(null);
+      dropdownTimeoutRef.current = null;
     }, 200);
   };
 
@@ -130,22 +130,105 @@ export default function TouristLayout() {
     (p) => location.pathname === p || (p !== '/' && location.pathname.startsWith(p))
   );
 
-  const isToursActive = ['/tours', '/tour-packages', '/guides', '/tour-guides', '/bookings'].some(
+  const isToursActive = ['/tours', '/tour-packages', '/guides', '/tour-guides', '/bookings', '/businesses', '/favorites'].some(
     (p) => location.pathname === p || location.pathname.startsWith(p)
   );
 
-  const isBusinessesActive = location.pathname.startsWith('/businesses');
   const isSupportActive = location.pathname.startsWith('/support');
+
+  const isItemActive = (path, aliases = []) => {
+    const allPaths = [path, ...aliases];
+    return allPaths.some((p) => location.pathname === p || (p !== '/' && location.pathname.startsWith(p + '/')));
+  };
+
+  const destinationsMenuItems = [
+    {
+      to: '/destinations',
+      aliases: ['/places'],
+      title: 'Places & Sites',
+      description: 'Temples, landmarks, and parks',
+      icon: MapPin,
+      iconClass: 'bg-blue-50 dark:bg-blue-950/60 text-[#002D62] dark:text-blue-400',
+    },
+    {
+      to: '/categories',
+      title: 'Categories',
+      description: 'Historical, eco, and coastal spots',
+      icon: Tags,
+      iconClass: 'bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400',
+    },
+    {
+      to: '/provinces',
+      title: '25 Provinces',
+      description: 'Nationwide regional discovery',
+      icon: Globe,
+      iconClass: 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400',
+    },
+    {
+      to: '/galleries',
+      title: 'Photo Galleries',
+      description: 'Scenic captures & temple photos',
+      icon: Images,
+      iconClass: 'bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400',
+    },
+    {
+      to: '/events',
+      title: 'Events & Festivals',
+      description: 'Cultural festivals & celebrations',
+      icon: CalendarDays,
+      iconClass: 'bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400',
+    },
+  ];
+
+  const toursMenuItems = [
+    {
+      to: '/tours',
+      aliases: ['/tour-packages'],
+      title: 'Tour Packages',
+      description: 'Curated itineraries & circuits',
+      icon: Sparkles,
+      iconClass: 'bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400',
+    },
+    {
+      to: '/guides',
+      aliases: ['/tour-guides'],
+      title: 'Tour Guides',
+      description: 'Accredited local guides',
+      icon: UserCheck,
+      iconClass: 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400',
+    },
+    {
+      to: '/bookings',
+      title: 'My Bookings',
+      description: 'View & manage reservations',
+      icon: CalendarCheck,
+      iconClass: 'bg-blue-50 dark:bg-blue-950/60 text-[#002D62] dark:text-blue-400',
+    },
+    {
+      to: '/businesses',
+      title: 'Businesses',
+      description: 'Verified service partners',
+      icon: Building2,
+      iconClass: 'bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400',
+    },
+    {
+      to: '/favorites',
+      title: 'Saved Wishlist',
+      description: 'Bookmarked tours & saved trips',
+      icon: Heart,
+      iconClass: 'bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400',
+    },
+  ];
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-[#09090b] text-slate-800 dark:text-zinc-100 flex flex-col font-sans transition-colors duration-200">
       <header
         className="sticky top-0 z-40 bg-white dark:bg-zinc-900 border-b border-slate-200/80 dark:border-zinc-800 shadow-sm transition-colors"
-        onMouseLeave={handleCloseMegaMenu}
+        onMouseLeave={handleCloseDropdown}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-[88px] flex items-center justify-between relative">
 
-          {/* Left: Round Emblem Logo + Dual-Line Khmer & English Branding (Matches Picture 2) */}
+          {/* Left: Round Emblem Logo + Dual-Line Khmer & English Branding */}
           <Link to="/" className="flex items-center gap-3.5 group shrink-0">
             <img
               src={logoImg}
@@ -162,7 +245,7 @@ export default function TouristLayout() {
             </div>
           </Link>
 
-          {/* Center-Right: Navigation Links Styled EXACTLY like Picture 2 (4 Items: ABOUT, TOURS & BOOKINGS, PARTNERSHIP, RESEARCH) */}
+          {/* Center-Right: Navigation Links (ABOUT, DESTINATIONS & EXPLORATION, TOURS & BOOKINGS, RESEARCH) */}
           <nav className="hidden lg:flex items-center h-full gap-8 xl:gap-10">
             {/* 1. ABOUT */}
             <Link
@@ -173,21 +256,56 @@ export default function TouristLayout() {
                 ? 'text-red-600 dark:text-red-500'
                 : 'text-[#002D62] dark:text-zinc-200 group-hover:text-red-600 dark:group-hover:text-red-400'
                 }`}>
-                ABOUT
+                HOME
               </span>
               <span className={`w-full h-1 mt-1.5 rounded-full transition-all duration-200 ${isExploreActive ? 'bg-red-600 dark:bg-red-500' : 'bg-transparent group-hover:bg-red-600/40'
                 }`} />
             </Link>
 
-            {/* 2. TOURS & BOOKINGS (Triggers Mega-Menu with Red Underline like ACADEMICS in Picture 2) */}
+            {/* 2. DESTINATIONS & EXPLORATION */}
             <div
               className="h-full flex flex-col justify-center items-center group relative"
-              onMouseEnter={handleOpenMegaMenu}
+              onMouseEnter={() => handleOpenDropdown('destinations')}
+            >
+              <div className="flex items-center gap-1">
+                <Link
+                  to="/destinations"
+                  className={`text-xs xl:text-sm font-bold tracking-wider uppercase transition-colors ${isDestinationsActive || activeDropdown === 'destinations'
+                    ? 'text-red-600 dark:text-red-500'
+                    : 'text-[#002D62] dark:text-zinc-200 group-hover:text-red-600 dark:group-hover:text-red-400'
+                    }`}
+                >
+                  DESTINATIONS & EXPLORATION
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => setActiveDropdown((curr) => curr === 'destinations' ? null : 'destinations')}
+                  aria-label="Toggle destinations and exploration menu"
+                  aria-expanded={activeDropdown === 'destinations'}
+                  aria-controls="destinations-dropdown-menu"
+                  className="p-1 rounded text-current hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+                >
+                  <ChevronDown
+                    size={14}
+                    className={`transition-transform duration-200 ${isDestinationsActive || activeDropdown === 'destinations' ? 'text-red-600 dark:text-red-500' : ''} ${activeDropdown === 'destinations' ? 'rotate-180' : ''}`}
+                  />
+                </button>
+              </div>
+              <span className={`w-full h-1 mt-1.5 rounded-full transition-all duration-200 ${isDestinationsActive || activeDropdown === 'destinations'
+                ? 'bg-red-600 dark:bg-red-500'
+                : 'bg-transparent group-hover:bg-red-600/40'
+                }`} />
+            </div>
+
+            {/* 3. TOURS & BOOKINGS (Includes Tours, Guides, Bookings, Businesses, and Wishlist) */}
+            <div
+              className="h-full flex flex-col justify-center items-center group relative"
+              onMouseEnter={() => handleOpenDropdown('tours')}
             >
               <div className="flex items-center gap-1">
                 <Link
                   to="/tours"
-                  className={`text-xs xl:text-sm font-bold tracking-wider uppercase transition-colors ${isToursActive || isDestinationsActive || isMegaMenuOpen
+                  className={`text-xs xl:text-sm font-bold tracking-wider uppercase transition-colors ${isToursActive || activeDropdown === 'tours'
                     ? 'text-red-600 dark:text-red-500'
                     : 'text-[#002D62] dark:text-zinc-200 group-hover:text-red-600 dark:group-hover:text-red-400'
                     }`}
@@ -196,38 +314,23 @@ export default function TouristLayout() {
                 </Link>
                 <button
                   type="button"
-                  onClick={() => setIsMegaMenuOpen((open) => !open)}
+                  onClick={() => setActiveDropdown((curr) => curr === 'tours' ? null : 'tours')}
                   aria-label="Toggle tours and bookings menu"
-                  aria-expanded={isMegaMenuOpen}
-                  aria-controls="tourism-mega-menu"
+                  aria-expanded={activeDropdown === 'tours'}
+                  aria-controls="tours-dropdown-menu"
                   className="p-1 rounded text-current hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
                 >
                   <ChevronDown
                     size={14}
-                    className={`transition-transform duration-200 ${isMegaMenuOpen ? 'rotate-180' : ''}`}
+                    className={`transition-transform duration-200 ${isToursActive || activeDropdown === 'tours' ? 'text-red-600 dark:text-red-500' : ''} ${activeDropdown === 'tours' ? 'rotate-180' : ''}`}
                   />
                 </button>
               </div>
-              <span className={`w-full h-1 mt-1.5 rounded-full transition-all duration-200 ${isToursActive || isDestinationsActive || isMegaMenuOpen
+              <span className={`w-full h-1 mt-1.5 rounded-full transition-all duration-200 ${isToursActive || activeDropdown === 'tours'
                 ? 'bg-red-600 dark:bg-red-500'
                 : 'bg-transparent group-hover:bg-red-600/40'
                 }`} />
             </div>
-
-            {/* 3. PARTNERSHIP */}
-            <Link
-              to="/businesses"
-              className="h-full flex flex-col justify-center items-center group relative cursor-pointer"
-            >
-              <span className={`text-xs xl:text-sm font-bold tracking-wider uppercase transition-colors ${isBusinessesActive
-                ? 'text-red-600 dark:text-red-500'
-                : 'text-[#002D62] dark:text-zinc-200 group-hover:text-red-600 dark:group-hover:text-red-400'
-                }`}>
-                PARTNERSHIP
-              </span>
-              <span className={`w-full h-1 mt-1.5 rounded-full transition-all duration-200 ${isBusinessesActive ? 'bg-red-600 dark:bg-red-500' : 'bg-transparent group-hover:bg-red-600/40'
-                }`} />
-            </Link>
 
             {/* 4. RESEARCH */}
             <Link
@@ -281,7 +384,9 @@ export default function TouristLayout() {
                     aria-label="Open account menu"
                     aria-expanded={isProfileMenuOpen}
                     aria-controls="tourist-profile-menu"
-                    className="flex items-center gap-2 p-1 rounded-xl hover:bg-slate-100 dark:hover:bg-zinc-800 transition cursor-pointer"
+                    className={`flex items-center gap-2 p-1 rounded-xl hover:bg-slate-100 dark:hover:bg-zinc-800 transition cursor-pointer ${
+                      location.pathname === '/profile' ? 'ring-2 ring-red-500/80 bg-red-50/30 dark:bg-red-950/20' : ''
+                    }`}
                   >
                     <div className="w-8 h-8 rounded-full bg-[#002D62] text-white flex items-center justify-center text-xs font-bold ring-2 ring-blue-500/20 overflow-hidden">
                       {user?.avatar ? (
@@ -290,7 +395,7 @@ export default function TouristLayout() {
                         user?.name ? user.name.charAt(0).toUpperCase() : 'U'
                       )}
                     </div>
-                    <ChevronDown size={13} className="text-slate-400" />
+                    <ChevronDown size={13} className={location.pathname === '/profile' ? 'text-red-500 font-bold' : 'text-slate-400'} />
                   </button>
 
                   {isProfileMenuOpen && (
@@ -312,25 +417,37 @@ export default function TouristLayout() {
                         <Link
                           to="/profile"
                           onClick={() => setIsProfileMenuOpen(false)}
-                          className="flex items-center gap-2 px-4 py-2 text-xs font-medium text-slate-700 dark:text-zinc-300 hover:bg-slate-50 dark:hover:bg-zinc-800"
+                          className={`flex items-center gap-2 px-4 py-2 text-xs font-medium transition ${
+                            location.pathname === '/profile'
+                              ? 'text-red-600 dark:text-red-400 font-bold bg-red-50 dark:bg-red-950/40'
+                              : 'text-slate-700 dark:text-zinc-300 hover:bg-slate-50 dark:hover:bg-zinc-800'
+                          }`}
                         >
-                          <User size={14} className="text-slate-400" />
+                          <User size={14} className={location.pathname === '/profile' ? 'text-red-600 dark:text-red-400' : 'text-slate-400'} />
                           <span>My Profile</span>
                         </Link>
                         <Link
                           to="/bookings"
                           onClick={() => setIsProfileMenuOpen(false)}
-                          className="flex items-center gap-2 px-4 py-2 text-xs font-medium text-slate-700 dark:text-zinc-300 hover:bg-slate-50 dark:hover:bg-zinc-800"
+                          className={`flex items-center gap-2 px-4 py-2 text-xs font-medium transition ${
+                            location.pathname === '/bookings'
+                              ? 'text-red-600 dark:text-red-400 font-bold bg-red-50 dark:bg-red-950/40'
+                              : 'text-slate-700 dark:text-zinc-300 hover:bg-slate-50 dark:hover:bg-zinc-800'
+                          }`}
                         >
-                          <Calendar size={14} className="text-slate-400" />
+                          <Calendar size={14} className={location.pathname === '/bookings' ? 'text-red-600 dark:text-red-400' : 'text-slate-400'} />
                           <span>My Bookings</span>
                         </Link>
                         <Link
                           to="/favorites"
                           onClick={() => setIsProfileMenuOpen(false)}
-                          className="flex items-center gap-2 px-4 py-2 text-xs font-medium text-slate-700 dark:text-zinc-300 hover:bg-slate-50 dark:hover:bg-zinc-800"
+                          className={`flex items-center gap-2 px-4 py-2 text-xs font-medium transition ${
+                            location.pathname === '/favorites'
+                              ? 'text-red-600 dark:text-red-400 font-bold bg-red-50 dark:bg-red-950/40'
+                              : 'text-slate-700 dark:text-zinc-300 hover:bg-slate-50 dark:hover:bg-zinc-800'
+                          }`}
                         >
-                          <Heart size={14} className="text-rose-500" />
+                          <Heart size={14} className={location.pathname === '/favorites' ? 'text-red-600 fill-red-600' : 'text-rose-500'} />
                           <span>Saved Wishlist</span>
                         </Link>
                       </div>
@@ -384,108 +501,169 @@ export default function TouristLayout() {
           </div>
         </div>
 
-        {/* 3. MEGA-MENU DROPDOWN CARD (Floating White Card Exactly Matching Picture 2) */}
-        {isMegaMenuOpen && (
+        {/* 3.1 DESTINATIONS DROPDOWN MENU */}
+        {activeDropdown === 'destinations' && (
           <div
-            id="tourism-mega-menu"
+            id="destinations-dropdown-menu"
             role="region"
-            aria-label="Tours, bookings, and destinations menu"
+            aria-label="Destinations menu"
             className="hidden lg:block absolute left-0 right-0 top-full pt-1 z-50 pointer-events-auto"
-            onMouseEnter={handleOpenMegaMenu}
-            onMouseLeave={handleCloseMegaMenu}
+            onMouseEnter={() => handleOpenDropdown('destinations')}
+            onMouseLeave={handleCloseDropdown}
           >
-            <div className="max-w-5xl mx-auto px-2">
-              <div className="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl border border-slate-200/80 dark:border-zinc-800 p-8 grid grid-cols-12 gap-8 items-start animate-dropdown">
-                {/* Middle Section: Tours & Bookings (Clean typography like Faculty in Picture 2) */}
-                <div className="col-span-5 space-y-5">
-                  <h3 className="text-base font-extrabold text-[#002D62] dark:text-blue-400 tracking-wide">
-                    Tours & Bookings
-                  </h3>
-
-                  <div className="space-y-3 text-sm">
-                    <Link
-                      to="/businesses"
-                      onClick={() => setIsMegaMenuOpen(false)}
-                      className="block font-semibold text-slate-700 dark:text-zinc-200 hover:text-red-600 dark:hover:text-red-400 transition-colors"
-                    >
-                      Businesses
-                    </Link>
-
-                    <Link
-                      to="/bookings"
-                      onClick={() => setIsMegaMenuOpen(false)}
-                      className="block font-semibold text-slate-700 dark:text-zinc-200 hover:text-red-600 dark:hover:text-red-400 transition-colors"
-                    >
-                      Bookings
-                    </Link>
-
-                    <Link
-                      to="/tours"
-                      onClick={() => setIsMegaMenuOpen(false)}
-                      className="block font-semibold text-slate-700 dark:text-zinc-200 hover:text-red-600 dark:hover:text-red-400 transition-colors"
-                    >
-                      Tour Packages
-                    </Link>
-
-                    <Link
-                      to="/guides"
-                      onClick={() => setIsMegaMenuOpen(false)}
-                      className="block font-semibold text-slate-700 dark:text-zinc-200 hover:text-red-600 dark:hover:text-red-400 transition-colors"
-                    >
-                      Tour Guides
-                    </Link>
+            <div className="max-w-4xl mx-auto px-4">
+              <div className="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl border border-slate-200/80 dark:border-zinc-800 p-6 animate-dropdown">
+                <div className="flex items-center justify-between border-b border-slate-100 dark:border-zinc-800 pb-3 mb-4">
+                  <div>
+                    <h3 className="text-base font-extrabold text-[#002D62] dark:text-blue-400 tracking-wide">
+                      Destinations & Exploration
+                    </h3>
+                    <p className="text-xs text-slate-500 dark:text-zinc-400 mt-0.5">
+                      Explore Cambodia's historic landmarks, 25 provinces, and cultural treasures.
+                    </p>
                   </div>
+                  <Link
+                    to="/destinations"
+                    onClick={() => setActiveDropdown(null)}
+                    className="px-3.5 py-1.5 rounded-xl bg-[#002D62] hover:bg-[#001f44] text-white text-xs font-bold transition shadow-xs"
+                  >
+                    View All
+                  </Link>
                 </div>
 
-                {/* Right Section: Destinations (Clean typography with Divider line like Programs & Courses in Picture 2) */}
-                <div className="col-span-4 border-l border-slate-200 dark:border-zinc-800 pl-8 space-y-4">
-                  <h3 className="text-base font-extrabold text-[#002D62] dark:text-blue-400 tracking-wide">
-                    Destinations
-                  </h3>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                  {destinationsMenuItems.map((item) => {
+                    const Icon = item.icon;
+                    const active = isItemActive(item.to, item.aliases);
 
-                  <div className="space-y-3 text-sm">
-                    <Link
-                      to="/categories"
-                      onClick={() => setIsMegaMenuOpen(false)}
-                      className="block font-semibold text-slate-700 dark:text-zinc-200 hover:text-red-600 dark:hover:text-red-400 transition-colors"
-                    >
-                      Categories
-                    </Link>
+                    return (
+                      <Link
+                        key={item.to}
+                        to={item.to}
+                        onClick={() => setActiveDropdown(null)}
+                        className={`group flex items-start gap-3 p-3 rounded-xl transition ${
+                          active
+                            ? 'bg-red-50/80 dark:bg-red-950/40 ring-1 ring-red-200 dark:ring-red-900/60 shadow-xs'
+                            : 'hover:bg-slate-50 dark:hover:bg-zinc-800'
+                        }`}
+                      >
+                        <div
+                          className={`p-2 rounded-xl transition-all ${
+                            active
+                              ? 'bg-red-600 text-white shadow-xs scale-105'
+                              : `${item.iconClass} group-hover:scale-105`
+                          }`}
+                        >
+                          <Icon size={18} />
+                        </div>
+                        <div>
+                          <div
+                            className={`text-sm font-bold transition-colors ${
+                              active
+                                ? 'text-red-600 dark:text-red-400 font-extrabold'
+                                : 'text-slate-800 dark:text-white group-hover:text-red-600 dark:group-hover:text-red-400'
+                            }`}
+                          >
+                            {item.title}
+                          </div>
+                          <div
+                            className={`text-xs mt-0.5 transition-colors ${
+                              active
+                                ? 'text-red-600/80 dark:text-red-400/80 font-medium'
+                                : 'text-slate-500 dark:text-zinc-400'
+                            }`}
+                          >
+                            {item.description}
+                          </div>
+                        </div>
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
-                    <Link
-                      to="/destinations"
-                      onClick={() => setIsMegaMenuOpen(false)}
-                      className="block font-semibold text-slate-700 dark:text-zinc-200 hover:text-red-600 dark:hover:text-red-400 transition-colors"
-                    >
-                      Places
-                    </Link>
-
-                    <Link
-                      to="/provinces"
-                      onClick={() => setIsMegaMenuOpen(false)}
-                      className="block font-semibold text-slate-700 dark:text-zinc-200 hover:text-red-600 dark:hover:text-red-400 transition-colors"
-                    >
-                      Provinces
-                    </Link>
-
-                    <Link
-                      to="/galleries"
-                      onClick={() => setIsMegaMenuOpen(false)}
-                      className="block font-semibold text-slate-700 dark:text-zinc-200 hover:text-red-600 dark:hover:text-red-400 transition-colors"
-                    >
-                      Galleries
-                    </Link>
-
-                    <Link
-                      to="/events"
-                      onClick={() => setIsMegaMenuOpen(false)}
-                      className="block font-semibold text-slate-700 dark:text-zinc-200 hover:text-red-600 dark:hover:text-red-400 transition-colors"
-                    >
-                      Events
-                    </Link>
+        {/* 3.2 TOURS & BOOKINGS DROPDOWN MENU (No Destinations) */}
+        {activeDropdown === 'tours' && (
+          <div
+            id="tours-dropdown-menu"
+            role="region"
+            aria-label="Tours and bookings menu"
+            className="hidden lg:block absolute left-0 right-0 top-full pt-1 z-50 pointer-events-auto"
+            onMouseEnter={() => handleOpenDropdown('tours')}
+            onMouseLeave={handleCloseDropdown}
+          >
+            <div className="max-w-4xl mx-auto px-4">
+              <div className="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl border border-slate-200/80 dark:border-zinc-800 p-6 animate-dropdown">
+                <div className="flex items-center justify-between border-b border-slate-100 dark:border-zinc-800 pb-3 mb-4">
+                  <div>
+                    <h3 className="text-base font-extrabold text-[#002D62] dark:text-blue-400 tracking-wide">
+                      Tours & Bookings
+                    </h3>
+                    <p className="text-xs text-slate-500 dark:text-zinc-400 mt-0.5">
+                      Curated guided experiences, certified guides, and reservation management.
+                    </p>
                   </div>
+                  <Link
+                    to="/tours"
+                    onClick={() => setActiveDropdown(null)}
+                    className="px-3.5 py-1.5 rounded-xl bg-[#002D62] hover:bg-[#001f44] text-white text-xs font-bold transition shadow-xs"
+                  >
+                    View All
+                  </Link>
                 </div>
 
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                  {toursMenuItems.map((item) => {
+                    const Icon = item.icon;
+                    const active = isItemActive(item.to, item.aliases);
+
+                    return (
+                      <Link
+                        key={item.to}
+                        to={item.to}
+                        onClick={() => setActiveDropdown(null)}
+                        className={`group flex items-start gap-3 p-3 rounded-xl transition ${
+                          active
+                            ? 'bg-red-50/80 dark:bg-red-950/40 ring-1 ring-red-200 dark:ring-red-900/60 shadow-xs'
+                            : 'hover:bg-slate-50 dark:hover:bg-zinc-800'
+                        }`}
+                      >
+                        <div
+                          className={`p-2 rounded-xl transition-all ${
+                            active
+                              ? 'bg-red-600 text-white shadow-xs scale-105'
+                              : `${item.iconClass} group-hover:scale-105`
+                          }`}
+                        >
+                          <Icon size={18} />
+                        </div>
+                        <div>
+                          <div
+                            className={`text-sm font-bold transition-colors ${
+                              active
+                                ? 'text-red-600 dark:text-red-400 font-extrabold'
+                                : 'text-slate-800 dark:text-white group-hover:text-red-600 dark:group-hover:text-red-400'
+                            }`}
+                          >
+                            {item.title}
+                          </div>
+                          <div
+                            className={`text-xs mt-0.5 transition-colors ${
+                              active
+                                ? 'text-red-600/80 dark:text-red-400/80 font-medium'
+                                : 'text-slate-500 dark:text-zinc-400'
+                            }`}
+                          >
+                            {item.description}
+                          </div>
+                        </div>
+                      </Link>
+                    );
+                  })}
+                </div>
               </div>
             </div>
           </div>
@@ -500,110 +678,77 @@ export default function TouristLayout() {
             <Link
               to="/"
               onClick={() => setIsMobileMenuOpen(false)}
-              className="flex items-center justify-between px-3 py-2 rounded-xl text-sm font-bold text-slate-800 dark:text-white hover:bg-slate-100 dark:hover:bg-zinc-800"
+              className={`flex items-center justify-between px-3 py-2 rounded-xl text-sm font-bold transition ${
+                isExploreActive
+                  ? 'bg-red-50 dark:bg-red-950/50 text-red-600 dark:text-red-400'
+                  : 'text-slate-800 dark:text-white hover:bg-slate-100 dark:hover:bg-zinc-800'
+              }`}
             >
               <span>About / Explore</span>
-              <ArrowRight size={14} className="text-slate-400" />
+              <ArrowRight size={14} className={isExploreActive ? 'text-red-600 dark:text-red-400' : 'text-slate-400'} />
             </Link>
 
-            {/* Tours & Bookings */}
+            {/* Destinations & Exploration */}
             <div className="space-y-1">
+              <div className="text-[10px] uppercase font-bold text-[#002D62] dark:text-blue-400 tracking-wider px-3 mb-1">
+                Destinations & Exploration
+              </div>
+              {destinationsMenuItems.map((item) => {
+                const Icon = item.icon;
+                const active = isItemActive(item.to, item.aliases);
+                return (
+                  <Link
+                    key={item.to}
+                    to={item.to}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className={`flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition ${
+                      active
+                        ? 'bg-red-50 dark:bg-red-950/50 text-red-600 dark:text-red-400 font-bold'
+                        : 'text-slate-700 dark:text-zinc-200 hover:bg-slate-100 dark:hover:bg-zinc-800'
+                    }`}
+                  >
+                    <Icon size={15} className={active ? 'text-red-600 dark:text-red-400' : 'text-slate-400'} />
+                    <span>{item.title}</span>
+                  </Link>
+                );
+              })}
+            </div>
+
+            {/* Tours & Bookings */}
+            <div className="space-y-1 pt-2 border-t border-slate-100 dark:border-zinc-800">
               <div className="text-[10px] uppercase font-bold text-[#002D62] dark:text-blue-400 tracking-wider px-3 mb-1">
                 Tours & Bookings
               </div>
-              <Link
-                to="/businesses"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-zinc-200 hover:bg-slate-100 dark:hover:bg-zinc-800"
-              >
-                <Building2 size={15} className="text-[#002D62]" />
-                <span>Businesses</span>
-              </Link>
-              <Link
-                to="/bookings"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-zinc-200 hover:bg-slate-100 dark:hover:bg-zinc-800"
-              >
-                <CalendarCheck size={15} className="text-emerald-500" />
-                <span>Bookings</span>
-              </Link>
-              <Link
-                to="/tours"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-zinc-200 hover:bg-slate-100 dark:hover:bg-zinc-800"
-              >
-                <Sparkles size={15} className="text-amber-500" />
-                <span>Tour Packages</span>
-              </Link>
-              <Link
-                to="/guides"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-zinc-200 hover:bg-slate-100 dark:hover:bg-zinc-800"
-              >
-                <UserCheck size={15} className="text-emerald-600" />
-                <span>Tour Guides</span>
-              </Link>
-            </div>
-
-            {/* Destinations */}
-            <div className="space-y-1 pt-2 border-t border-slate-100 dark:border-zinc-800">
-              <div className="text-[10px] uppercase font-bold text-[#002D62] dark:text-blue-400 tracking-wider px-3 mb-1">
-                Destinations
-              </div>
-              <Link
-                to="/categories"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-zinc-200 hover:bg-slate-100 dark:hover:bg-zinc-800"
-              >
-                <Tags size={15} className="text-purple-500" />
-                <span>Categories</span>
-              </Link>
-              <Link
-                to="/destinations"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-zinc-200 hover:bg-slate-100 dark:hover:bg-zinc-800"
-              >
-                <MapPin size={15} className="text-rose-500" />
-                <span>Places</span>
-              </Link>
-              <Link
-                to="/provinces"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-zinc-200 hover:bg-slate-100 dark:hover:bg-zinc-800"
-              >
-                <Globe size={15} className="text-blue-500" />
-                <span>Provinces</span>
-              </Link>
-              <Link
-                to="/galleries"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-zinc-200 hover:bg-slate-100 dark:hover:bg-zinc-800"
-              >
-                <Images size={15} className="text-indigo-500" />
-                <span>Galleries</span>
-              </Link>
-              <Link
-                to="/events"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-zinc-200 hover:bg-slate-100 dark:hover:bg-zinc-800"
-              >
-                <CalendarDays size={15} className="text-amber-500" />
-                <span>Events</span>
-              </Link>
+              {toursMenuItems.map((item) => {
+                const Icon = item.icon;
+                const active = isItemActive(item.to, item.aliases);
+                return (
+                  <Link
+                    key={item.to}
+                    to={item.to}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className={`flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition ${
+                      active
+                        ? 'bg-red-50 dark:bg-red-950/50 text-red-600 dark:text-red-400 font-bold'
+                        : 'text-slate-700 dark:text-zinc-200 hover:bg-slate-100 dark:hover:bg-zinc-800'
+                    }`}
+                  >
+                    <Icon size={15} className={active ? 'text-red-600 dark:text-red-400' : 'text-slate-400'} />
+                    <span>{item.title}</span>
+                  </Link>
+                );
+              })}
             </div>
 
             <div className="pt-2 border-t border-slate-100 dark:border-zinc-800 space-y-1">
               <Link
-                to="/businesses"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="block px-3 py-2 rounded-xl text-xs font-semibold text-slate-600 dark:text-zinc-400 hover:bg-slate-100 dark:hover:bg-zinc-800"
-              >
-                Partnership
-              </Link>
-              <Link
                 to="/support"
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="block px-3 py-2 rounded-xl text-xs font-semibold text-slate-600 dark:text-zinc-400 hover:bg-slate-100 dark:hover:bg-zinc-800"
+                className={`block px-3 py-2 rounded-xl text-xs font-semibold transition ${
+                  isSupportActive
+                    ? 'bg-red-50 dark:bg-red-950/50 text-red-600 dark:text-red-400 font-bold'
+                    : 'text-slate-600 dark:text-zinc-400 hover:bg-slate-100 dark:hover:bg-zinc-800'
+                }`}
               >
                 Research & Support
               </Link>

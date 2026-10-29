@@ -97,7 +97,7 @@ export default function Availability() {
     <div className="max-w-4xl mx-auto space-y-8">
       {/* Title */}
       <div>
-        <div className="text-xs font-semibold text-[#003E83] dark:text-blue-400 uppercase tracking-wider mb-1">
+        <div className="text-xs font-semibold text-[#002D62] dark:text-blue-400 uppercase tracking-wider mb-1">
           Operating Schedule ({selectedBusiness.name})
         </div>
         <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
@@ -157,7 +157,7 @@ export default function Availability() {
                     type="checkbox"
                     checked={Boolean(item.is_closed)}
                     onChange={(e) => handleHourChange(idx, 'is_closed', e.target.checked)}
-                    className="w-4 h-4 rounded text-[#003E83] focus:ring-[#003E83]"
+                    className="w-4 h-4 rounded text-[#002D62] focus:ring-[#002D62]"
                   />
                   <span>Closed</span>
                 </label>
@@ -169,7 +169,7 @@ export default function Availability() {
             <button
               type="submit"
               disabled={isSaving}
-              className="px-8 py-3 rounded-xl bg-[#003E83] hover:bg-[#002e62] disabled:opacity-50 text-white text-xs sm:text-sm font-bold shadow-md transition flex items-center gap-2 cursor-pointer"
+              className="px-8 py-3 rounded-xl bg-[#002D62] hover:bg-[#001f44] disabled:opacity-50 text-white text-xs sm:text-sm font-bold shadow-md transition flex items-center gap-2 cursor-pointer"
             >
               {isSaving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
               <span>Save Operating Schedule</span>

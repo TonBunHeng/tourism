@@ -16,6 +16,7 @@ import travelService from '../../services/travelService';
 import { useAlert } from '../../context/AlertContext';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import EmptyState from '../../components/common/EmptyState';
+import Pagination from '../../components/common/Pagination';
 
 export default function Businesses() {
   const { showSuccess, showError } = useAlert();
@@ -24,7 +25,10 @@ export default function Businesses() {
   const [businesses, setBusinesses] = useState([]);
   const [categories, setCategories] = useState([]);
   const [provinces, setProvinces] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
+
+  const ITEMS_PER_PAGE = 9;
 
   // Filter States
   const search = searchParams.get('search') || '';
@@ -140,19 +144,22 @@ export default function Businesses() {
     }
   };
 
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search, selectedCategory, selectedProvince, minRating]);
+
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-      {/* Header Banner */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-[#002D62] via-blue-900 to-indigo-950 text-white p-8 sm:p-12 shadow-xl">
-        <div className="relative max-w-2xl space-y-3">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md text-xs font-semibold text-blue-200 border border-white/20">
-            <Building2 size={13} className="text-amber-300" />
-            <span>Tourism Directory Database</span>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-10">
+      {/* Title */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <div className="text-xs font-semibold text-[#002D62] dark:text-blue-400 uppercase tracking-wider mb-1">
+            Tourism Directory Database
           </div>
-          <h1 className="text-3xl sm:text-4xl font-black tracking-tight leading-tight">
+          <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
             Registered Businesses
           </h1>
-          <p className="text-xs sm:text-sm text-blue-100/90 leading-relaxed font-light">
+          <p className="text-xs sm:text-sm text-slate-500 dark:text-zinc-400 mt-1">
             Browse verified tourism businesses and service providers registered in the database.
           </p>
         </div>
@@ -259,116 +266,132 @@ export default function Businesses() {
           }
         />
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredBusinesses.map((b) => {
-            const categoryName = b.category?.name || (typeof b.category === 'string' ? b.category : 'General Business');
-            const provinceName = b.province?.name || (typeof b.province === 'string' ? b.province : b.address);
-            const coverImage = b.cover_image_url || b.image || b.images?.[0]?.image_url;
+        <div className="space-y-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {filteredBusinesses
+              .slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE)
+              .map((b) => {
+                const categoryName = b.category?.name || (typeof b.category === 'string' ? b.category : 'General Business');
+                const provinceName = b.province?.name || (typeof b.province === 'string' ? b.province : b.address);
+                const coverImage = b.cover_image_url || b.image || b.images?.[0]?.image_url;
 
-            return (
-              <div
-                key={b.id}
-                className="group rounded-3xl bg-white dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800 shadow-xs hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col justify-between"
-              >
-                <div>
-                  {/* Photo & Badges */}
-                  <div className="relative h-48 w-full overflow-hidden bg-slate-100 dark:bg-zinc-800">
-                    {coverImage ? (
-                      <img
-                        src={coverImage}
-                        alt={b.name}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex flex-col items-center justify-center text-slate-400">
-                        <Building2 size={32} />
-                        <span className="text-[11px] mt-1">No Image Available</span>
-                      </div>
-                    )}
-
-                    <div className="absolute top-3 left-3 flex flex-wrap gap-1.5">
-                      <span className="px-2.5 py-1 rounded-full bg-[#002D62]/90 backdrop-blur-md text-white text-[10px] font-bold tracking-wide shadow-sm">
-                        {categoryName}
-                      </span>
-                      {b.status && (
-                        <span className="px-2 py-0.5 rounded-full bg-emerald-600/90 text-white text-[10px] font-bold flex items-center gap-1 shadow-sm">
-                          <CheckCircle2 size={10} />
-                          <span>{b.status}</span>
-                        </span>
-                      )}
-                    </div>
-
-                    {b.price_range && (
-                      <div className="absolute top-3 right-3 px-2 py-1 rounded-full bg-black/60 backdrop-blur-md text-white text-[10px] font-mono font-bold">
-                        {b.price_range}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Content */}
-                  <div className="p-5 space-y-3">
-                    <h3 className="font-extrabold text-base text-slate-900 dark:text-white group-hover:text-[#002D62] dark:group-hover:text-blue-400 transition-colors line-clamp-1">
-                      {b.name}
-                    </h3>
-
-                    {/* Rating & Reviews */}
-                    <div className="flex items-center gap-2 text-xs">
-                      <div className="flex items-center gap-1 text-amber-500 font-bold bg-amber-50 dark:bg-amber-950/40 px-2 py-0.5 rounded-md">
-                        <Star size={13} className="fill-amber-400 text-amber-400" />
-                        <span>{Number(b.rating || 0).toFixed(1)}</span>
-                      </div>
-                      <span className="text-slate-500 dark:text-zinc-400 font-medium">
-                        ({b.review_count || (b.reviews?.length || 0)} reviews)
-                      </span>
-                      {provinceName && (
-                        <>
-                          <span className="text-slate-300 dark:text-zinc-700">•</span>
-                          <div className="flex items-center gap-1 text-slate-500 dark:text-zinc-400 truncate">
-                            <MapPin size={12} className="text-rose-500 shrink-0" />
-                            <span className="truncate">{provinceName}</span>
+                return (
+                  <div
+                    key={b.id}
+                    className="group rounded-3xl bg-white dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800 shadow-xs hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col justify-between"
+                  >
+                    <div>
+                      {/* Photo & Badges */}
+                      <div className="relative h-52 w-full overflow-hidden bg-slate-100 dark:bg-zinc-800">
+                        {coverImage ? (
+                          <img
+                            src={coverImage}
+                            alt={b.name}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex flex-col items-center justify-center text-slate-400">
+                            <Building2 size={32} />
+                            <span className="text-[11px] mt-1">No Image Available</span>
                           </div>
-                        </>
-                      )}
+                        )}
+
+                        <div className="absolute top-3 left-3 flex flex-wrap gap-1.5">
+                          <span className="px-2.5 py-1 rounded-full bg-[#002D62]/90 backdrop-blur-md text-white text-[10px] font-bold tracking-wide shadow-sm">
+                            {categoryName}
+                          </span>
+                          {b.status && (
+                            <span className="px-2 py-0.5 rounded-full bg-emerald-600/90 text-white text-[10px] font-bold flex items-center gap-1 shadow-sm">
+                              <CheckCircle2 size={10} />
+                              <span>{b.status}</span>
+                            </span>
+                          )}
+                        </div>
+
+                        {b.price_range && (
+                          <div className="absolute top-3 right-3 px-2 py-1 rounded-full bg-black/60 backdrop-blur-md text-white text-[10px] font-mono font-bold">
+                            {b.price_range}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Content */}
+                      <div className="p-6 space-y-3.5">
+                        <h3 className="font-extrabold text-base text-slate-900 dark:text-white group-hover:text-[#002D62] dark:group-hover:text-blue-400 transition-colors line-clamp-1">
+                          {b.name}
+                        </h3>
+
+                        {/* Rating & Reviews */}
+                        <div className="flex items-center gap-2 text-xs">
+                          <div className="flex items-center gap-1 text-amber-500 font-bold bg-amber-50 dark:bg-amber-950/40 px-2 py-0.5 rounded-md">
+                            <Star size={13} className="fill-amber-400 text-amber-400" />
+                            <span>{Number(b.rating || 0).toFixed(1)}</span>
+                          </div>
+                          <span className="text-slate-500 dark:text-zinc-400 font-medium">
+                            ({b.review_count || (b.reviews?.length || 0)} reviews)
+                          </span>
+                          {provinceName && (
+                            <>
+                              <span className="text-slate-300 dark:text-zinc-700">•</span>
+                              <div className="flex items-center gap-1 text-slate-500 dark:text-zinc-400 truncate">
+                                <MapPin size={12} className="text-rose-500 shrink-0" />
+                                <span className="truncate">{provinceName}</span>
+                              </div>
+                            </>
+                          )}
+                        </div>
+
+                        <p className="text-xs text-slate-600 dark:text-zinc-400 line-clamp-2 leading-relaxed">
+                          {b.description || 'No description provided.'}
+                        </p>
+
+                        {b.services && Array.isArray(b.services) && b.services.length > 0 && (
+                          <div className="flex flex-wrap gap-1 pt-1">
+                            {b.services.slice(0, 3).map((s, idx) => (
+                              <span key={idx} className="text-[10px] font-medium px-2 py-0.5 rounded-md bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-300">
+                                {typeof s === 'string' ? s : s.name}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                     </div>
 
-                    <p className="text-xs text-slate-600 dark:text-zinc-400 line-clamp-2 leading-relaxed">
-                      {b.description || 'No description provided.'}
-                    </p>
+                    {/* Footer Buttons */}
+                    <div className="px-6 py-4 border-t border-slate-100 dark:border-zinc-800/80 flex items-center justify-between gap-2 text-xs">
+                      <button
+                        type="button"
+                        onClick={() => setActiveBusinessDetails(b)}
+                        className="px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-zinc-800 hover:bg-slate-200 dark:hover:bg-zinc-700 text-slate-800 dark:text-zinc-200 font-semibold transition cursor-pointer"
+                      >
+                        View Details
+                      </button>
 
-                    {b.services && Array.isArray(b.services) && b.services.length > 0 && (
-                      <div className="flex flex-wrap gap-1 pt-1">
-                        {b.services.slice(0, 3).map((s, idx) => (
-                          <span key={idx} className="text-[10px] font-medium px-2 py-0.5 rounded-md bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-300">
-                            {typeof s === 'string' ? s : s.name}
-                          </span>
-                        ))}
-                      </div>
-                    )}
+                      <button
+                        type="button"
+                        onClick={() => setSelectedBusinessForReview(b)}
+                        className="px-3.5 py-2 rounded-xl bg-[#002D62] hover:bg-[#001f44] text-white font-semibold flex items-center gap-1.5 transition cursor-pointer shadow-xs"
+                      >
+                        <MessageSquare size={13} />
+                        <span>Review</span>
+                      </button>
+                    </div>
                   </div>
-                </div>
+                );
+              })}
+          </div>
 
-                {/* Footer Buttons */}
-                <div className="p-5 pt-0 border-t border-slate-100 dark:border-zinc-800/80 flex items-center justify-between gap-2 mt-4 text-xs">
-                  <button
-                    type="button"
-                    onClick={() => setActiveBusinessDetails(b)}
-                    className="px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-zinc-800 hover:bg-slate-200 dark:hover:bg-zinc-700 text-slate-800 dark:text-zinc-200 font-semibold transition cursor-pointer"
-                  >
-                    View Details
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setSelectedBusinessForReview(b)}
-                    className="px-3.5 py-2 rounded-xl bg-[#002D62] hover:bg-[#001f44] text-white font-semibold flex items-center gap-1.5 transition cursor-pointer shadow-xs"
-                  >
-                    <MessageSquare size={13} />
-                    <span>Review</span>
-                  </button>
-                </div>
-              </div>
-            );
-          })}
+          {/* Pagination */}
+          <Pagination
+            currentPage={currentPage}
+            lastPage={Math.ceil(filteredBusinesses.length / ITEMS_PER_PAGE)}
+            total={filteredBusinesses.length}
+            perPage={ITEMS_PER_PAGE}
+            onPageChange={(page) => {
+              setCurrentPage(page);
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+          />
         </div>
       )}
 

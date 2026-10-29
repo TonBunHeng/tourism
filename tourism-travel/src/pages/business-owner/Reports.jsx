@@ -67,7 +67,7 @@ export default function BusinessReports() {
       {/* Title & Actions */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <div className="text-xs font-semibold text-[#003E83] dark:text-blue-400 uppercase tracking-wider mb-1">
+          <div className="text-xs font-semibold text-[#002D62] dark:text-blue-400 uppercase tracking-wider mb-1">
             Financial & Operations Audit
           </div>
           <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
@@ -126,7 +126,7 @@ export default function BusinessReports() {
 
             <div className="p-5 rounded-3xl bg-white dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800 shadow-xs">
               <div className="text-xs font-semibold text-slate-500 dark:text-zinc-400 mb-1 flex items-center gap-1.5">
-                <CalendarCheck size={14} className="text-[#003E83] dark:text-blue-400" />
+                <CalendarCheck size={14} className="text-[#002D62] dark:text-blue-400" />
                 <span>Total Bookings</span>
               </div>
               <div className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">

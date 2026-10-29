@@ -121,7 +121,7 @@ export default function BusinessDashboard() {
   return (
     <div className="space-y-8">
       {/* Top Banner / Business Verification Overview */}
-      <div className="p-6 rounded-3xl bg-gradient-to-r from-[#003E83] to-blue-800 text-white shadow-md flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div className="p-6 rounded-3xl bg-gradient-to-r from-[#002D62] to-blue-800 text-white shadow-md flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className="text-xs font-bold uppercase tracking-wider text-amber-300">
@@ -148,7 +148,7 @@ export default function BusinessDashboard() {
         <div className="flex items-center gap-2.5">
           <Link
             to="/business/listings"
-            className="px-4 py-2.5 rounded-xl bg-white text-[#003E83] font-bold text-xs shadow-sm hover:bg-blue-50 transition flex items-center gap-1.5 shrink-0"
+            className="px-4 py-2.5 rounded-xl bg-white text-[#002D62] font-bold text-xs shadow-sm hover:bg-blue-50 transition flex items-center gap-1.5 shrink-0"
           >
             <Plus size={15} />
             <span>Add Service</span>
@@ -167,7 +167,7 @@ export default function BusinessDashboard() {
         <div className="p-5 rounded-3xl bg-white dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800 shadow-xs flex flex-col justify-between">
           <div className="flex items-center justify-between mb-3">
             <span className="text-xs font-semibold text-slate-500 dark:text-zinc-400">Total Bookings</span>
-            <div className="p-2 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-[#003E83] dark:text-blue-400">
+            <div className="p-2 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-[#002D62] dark:text-blue-400">
               <CalendarCheck size={18} />
             </div>
           </div>
@@ -251,7 +251,7 @@ export default function BusinessDashboard() {
             </div>
             <Link
               to="/business/bookings"
-              className="text-xs font-bold text-[#003E83] dark:text-blue-400 hover:underline flex items-center gap-1"
+              className="text-xs font-bold text-[#002D62] dark:text-blue-400 hover:underline flex items-center gap-1"
             >
               <span>View All</span>
               <ChevronRight size={14} />
@@ -339,7 +339,7 @@ export default function BusinessDashboard() {
             </h3>
             <Link
               to="/business/reviews"
-              className="text-xs font-bold text-[#003E83] dark:text-blue-400 hover:underline"
+              className="text-xs font-bold text-[#002D62] dark:text-blue-400 hover:underline"
             >
               All Reviews
             </Link>
@@ -372,13 +372,13 @@ export default function BusinessDashboard() {
 
           {/* Quick Action Box */}
           <div className="p-4 rounded-2xl bg-blue-50/70 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-900/60 text-xs space-y-2">
-            <span className="font-bold text-[#003E83] dark:text-blue-300 block">Performance Reports</span>
+            <span className="font-bold text-[#002D62] dark:text-blue-300 block">Performance Reports</span>
             <p className="text-slate-600 dark:text-zinc-400">
               Download audited revenue statements and booking logs in CSV spreadsheet format.
             </p>
             <Link
               to="/business/reports"
-              className="font-bold text-[#003E83] dark:text-blue-400 hover:underline inline-flex items-center gap-1"
+              className="font-bold text-[#002D62] dark:text-blue-400 hover:underline inline-flex items-center gap-1"
             >
               <span>Open Reports & Export</span>
               <ArrowUpRight size={13} />

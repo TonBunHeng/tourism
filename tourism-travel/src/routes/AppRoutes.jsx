@@ -57,6 +57,7 @@ export default function AppRoutes() {
           <Routes>
             {/* Google OAuth Callback Redirection Endpoint */}
             <Route path="/auth/google/callback" element={<Navigate to="/" replace />} />
+            <Route path="/auth/callback" element={<Navigate to="/" replace />} />
 
             {/* Guest / Public Routes (redirect if already logged in) */}
             <Route element={<PublicRoute />}>

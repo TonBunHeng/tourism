@@ -100,19 +100,20 @@ Route::middleware($aiThrottle)->group(function () {
 |--------------------------------------------------------------------------
 */
 $travelReadThrottle = app()->environment('local') ? 'throttle:1000,1' : 'throttle:300,1';
-$travelAuthThrottle = app()->environment('local') ? 'throttle:1000,1' : 'throttle:300,1';
+$travelAuthThrottle = app()->environment('local') ? 'throttle:1000,1' : 'throttle:60,1';
+$travelOAuthThrottle = app()->environment('local') ? 'throttle:1000,1' : 'throttle:120,1';
 
-Route::prefix('travel')->group(function () use ($travelReadThrottle, $travelAuthThrottle, $aiThrottle) {
+Route::prefix('travel')->group(function () use ($travelReadThrottle, $travelAuthThrottle, $travelOAuthThrottle, $aiThrottle) {
 
-    // 1.1 Public Authentication (Strictly Rate-Limited against Brute Force)
-    Route::middleware('throttle:5,1')->group(function () {
+    // 1.1 Public Authentication (Rate-Limited against Brute Force)
+    Route::middleware($travelAuthThrottle)->group(function () {
         Route::post('/auth/register', [TravelAuthController::class, 'register']);
         Route::post('/auth/login', [TravelAuthController::class, 'login']);
         Route::post('/auth/google', [TravelAuthController::class, 'googleLogin']);
     });
 
-    // OAuth Redirect/Callbacks (Throttled; ensure stateless PKCE or web session middleware is used)
-    Route::middleware('throttle:10,1')->group(function () {
+    // OAuth Redirect/Callbacks (Protected by OAuth Throttle, generous for OAuth handshakes)
+    Route::middleware($travelOAuthThrottle)->group(function () {
         Route::get('/auth/google/redirect', [TravelAuthController::class, 'redirectToGoogle']);
         Route::get('/auth/google/callback', [TravelAuthController::class, 'handleGoogleCallback']);
     });
@@ -408,8 +409,9 @@ Route::prefix('guide')
 |--------------------------------------------------------------------------
 */
 
-// Public Auth & Login (Strictly Rate-Limited)
-Route::middleware('throttle:5,1')->group(function () {
+// Public Auth & Login (Rate-Limited)
+$adminAuthThrottle = app()->environment('local') ? 'throttle:1000,1' : 'throttle:60,1';
+Route::middleware($adminAuthThrottle)->group(function () {
     Route::post('/auth/login', [AuthController::class, 'login'])->name('login');
     Route::post('/auth/register', [AuthController::class, 'register']);
 });

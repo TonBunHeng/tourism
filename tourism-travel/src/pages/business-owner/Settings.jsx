@@ -83,7 +83,7 @@ export default function BusinessSettings() {
     <div className="max-w-4xl mx-auto space-y-8">
       {/* Title */}
       <div>
-        <div className="text-xs font-semibold text-[#003E83] dark:text-blue-400 uppercase tracking-wider mb-1">
+        <div className="text-xs font-semibold text-[#002D62] dark:text-blue-400 uppercase tracking-wider mb-1">
           Preferences & Security
         </div>
         <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
@@ -99,7 +99,7 @@ export default function BusinessSettings() {
         <div className="p-6 rounded-3xl bg-white dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800 shadow-sm space-y-3">
           <div className="flex items-center justify-between">
             <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
-              <Store size={18} className="text-[#003E83] dark:text-blue-400" />
+              <Store size={18} className="text-[#002D62] dark:text-blue-400" />
               <span>Business Registration & Verification</span>
             </h3>
 
@@ -180,7 +180,7 @@ export default function BusinessSettings() {
       {/* Password Management */}
       <div className="p-6 sm:p-8 rounded-3xl bg-white dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800 shadow-sm space-y-4">
         <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
-          <Lock size={18} className="text-[#003E83] dark:text-blue-400" />
+          <Lock size={18} className="text-[#002D62] dark:text-blue-400" />
           <span>Change Password</span>
         </h3>
 
@@ -228,7 +228,7 @@ export default function BusinessSettings() {
             <button
               type="submit"
               disabled={isUpdatingPassword}
-              className="px-6 py-2.5 rounded-xl bg-[#003E83] hover:bg-[#002e62] disabled:opacity-50 text-white text-xs font-bold transition flex items-center gap-2 cursor-pointer"
+              className="px-6 py-2.5 rounded-xl bg-[#002D62] hover:bg-[#001f44] disabled:opacity-50 text-white text-xs font-bold transition flex items-center gap-2 cursor-pointer"
             >
               {isUpdatingPassword ? <Loader2 size={15} className="animate-spin" /> : <Save size={15} />}
               <span>Save New Password</span>
@@ -253,7 +253,7 @@ export default function BusinessSettings() {
               type="checkbox"
               checked={notifyBookings}
               onChange={(e) => setNotifyBookings(e.target.checked)}
-              className="w-4 h-4 rounded text-[#003E83] focus:ring-[#003E83]"
+              className="w-4 h-4 rounded text-[#002D62] focus:ring-[#002D62]"
             />
           </label>
 
@@ -266,7 +266,7 @@ export default function BusinessSettings() {
               type="checkbox"
               checked={notifyReviews}
               onChange={(e) => setNotifyReviews(e.target.checked)}
-              className="w-4 h-4 rounded text-[#003E83] focus:ring-[#003E83]"
+              className="w-4 h-4 rounded text-[#002D62] focus:ring-[#002D62]"
             />
           </label>
 
@@ -279,7 +279,7 @@ export default function BusinessSettings() {
               type="checkbox"
               checked={notifyMarketing}
               onChange={(e) => setNotifyMarketing(e.target.checked)}
-              className="w-4 h-4 rounded text-[#003E83] focus:ring-[#003E83]"
+              className="w-4 h-4 rounded text-[#002D62] focus:ring-[#002D62]"
             />
           </label>
         </div>

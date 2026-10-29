@@ -226,18 +226,17 @@ export default function Support() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-      {/* Hero Banner matching screenshot design */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-amber-700 via-rose-800 to-[#002D62] text-white p-8 sm:p-12 shadow-xl">
-        <div className="relative max-w-2xl space-y-3">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md text-xs font-semibold text-amber-200 border border-white/20">
-            <Sparkles size={13} className="text-amber-300" />
-            <span>Official Support & Assistance</span>
+      {/* Title */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <div className="text-xs font-semibold text-[#002D62] dark:text-blue-400 uppercase tracking-wider mb-1">
+            Official Support & Assistance
           </div>
-          <h1 className="text-3xl sm:text-4xl font-black tracking-tight leading-tight">
-            Help Center & Official Support
+          <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
+            Help Center & Support
           </h1>
-          <p className="text-xs sm:text-sm text-blue-100/90 leading-relaxed font-light">
-            Access 24/7 nationwide emergency hotlines, verified tourist FAQs, or submit an official travel inquiry directly to the ministry team.
+          <p className="text-xs sm:text-sm text-slate-500 dark:text-zinc-400 mt-1">
+            Access 24/7 nationwide emergency hotlines, verified tourist FAQs, or submit an official travel inquiry.
           </p>
         </div>
       </div>
@@ -374,7 +373,7 @@ export default function Support() {
                   </div>
                 </div>
 
-                <div className="p-5 pt-0 border-t border-slate-100 dark:border-zinc-800/80 flex items-center justify-between gap-2 mt-4 text-xs">
+                <div className="px-6 py-4 border-t border-slate-100 dark:border-zinc-800/80 flex items-center justify-between gap-2 text-xs">
                   <button
                     type="button"
                     onClick={() => handleCopyNumber(item.fullNumber, item.id)}

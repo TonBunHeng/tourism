@@ -82,7 +82,7 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#09090b] flex flex-col justify-center py-12 sm:px-6 lg:px-8 font-sans selection:bg-[#003E83] selection:text-white">
+    <div className="min-h-screen bg-slate-50 dark:bg-[#09090b] flex flex-col justify-center py-12 sm:px-6 lg:px-8 font-sans selection:bg-[#002D62] selection:text-white">
       <div className="sm:mx-auto sm:w-full sm:max-w-xl text-center">
         <h2 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">
           Create your account
@@ -105,17 +105,17 @@ export default function Register() {
                 onClick={() => setRole('user')}
                 className={`p-3.5 rounded-2xl border text-left transition flex items-start gap-3 cursor-pointer ${
                   role === 'user'
-                    ? 'border-[#003E83] dark:border-blue-500 bg-blue-50/60 dark:bg-blue-950/30 ring-2 ring-blue-500/20'
+                    ? 'border-[#002D62] dark:border-blue-500 bg-blue-50/60 dark:bg-blue-950/30 ring-2 ring-blue-500/20'
                     : 'border-slate-200 dark:border-zinc-800 hover:border-slate-300 dark:hover:border-zinc-700 bg-slate-50 dark:bg-zinc-800/40'
                 }`}
               >
-                <div className={`p-2 rounded-xl shrink-0 ${role === 'user' ? 'bg-[#003E83] text-white' : 'bg-slate-200 dark:bg-zinc-700 text-slate-600 dark:text-zinc-300'}`}>
+                <div className={`p-2 rounded-xl shrink-0 ${role === 'user' ? 'bg-[#002D62] text-white' : 'bg-slate-200 dark:bg-zinc-700 text-slate-600 dark:text-zinc-300'}`}>
                   <Compass size={18} />
                 </div>
                 <div>
                   <div className="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
                     <span>Tourist / Explorer</span>
-                    {role === 'user' && <CheckCircle2 size={13} className="text-[#003E83] dark:text-blue-400" />}
+                    {role === 'user' && <CheckCircle2 size={13} className="text-[#002D62] dark:text-blue-400" />}
                   </div>
                   <div className="text-[11px] text-slate-500 dark:text-zinc-400 mt-0.5 leading-snug">
                     Explore destinations, chat with AI, save favorites & book tours.
@@ -187,7 +187,7 @@ export default function Register() {
                     onChange={(e) => setName(e.target.value)}
                     placeholder={role === 'business_owner' ? 'Sokha Chanthou' : 'VIT Vong'}
                     required
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800/80 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#003E83] transition"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800/80 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#002D62] transition"
                   />
                 </div>
               </div>
@@ -206,7 +206,7 @@ export default function Register() {
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="email@example.com"
                     required
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800/80 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#003E83] transition"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800/80 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#002D62] transition"
                   />
                 </div>
               </div>
@@ -227,7 +227,7 @@ export default function Register() {
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••"
                     required
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800/80 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#003E83] transition"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800/80 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#002D62] transition"
                   />
                 </div>
               </div>
@@ -246,7 +246,7 @@ export default function Register() {
                     onChange={(e) => setPasswordConfirmation(e.target.value)}
                     placeholder="••••••••"
                     required
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800/80 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#003E83] transition"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800/80 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#002D62] transition"
                   />
                 </div>
               </div>
@@ -266,7 +266,7 @@ export default function Register() {
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     placeholder="+855 12 345 678"
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800/80 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#003E83] transition"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800/80 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#002D62] transition"
                   />
                 </div>
               </div>
@@ -282,7 +282,7 @@ export default function Register() {
                   <select
                     value={location}
                     onChange={(e) => setLocation(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800/80 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#003E83] transition"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800/80 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#002D62] transition"
                   >
                     <option value="Siem Reap">Siem Reap (Angkor)</option>
                     <option value="Phnom Penh">Phnom Penh</option>
@@ -307,14 +307,14 @@ export default function Register() {
                 onChange={(e) => setBio(e.target.value)}
                 rows={2}
                 placeholder={role === 'business_owner' ? 'e.g., Traditional Khmer Restaurant in Siem Reap specializing in Amok...' : 'e.g., Heritage lover excited to photograph ancient Khmer temples...'}
-                className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800/80 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#003E83] transition"
+                className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800/80 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#002D62] transition"
               />
             </div>
 
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full mt-2 py-3 px-4 rounded-xl bg-[#003E83] hover:bg-[#002e62] disabled:opacity-50 text-white font-semibold text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer"
+              className="w-full mt-2 py-3 px-4 rounded-xl bg-[#002D62] hover:bg-[#001f44] disabled:opacity-50 text-white font-semibold text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer"
             >
               {isLoading ? (
                 <>
@@ -332,7 +332,7 @@ export default function Register() {
 
           <div className="mt-5 text-center text-xs text-slate-500 dark:text-zinc-400">
             Already registered?{' '}
-            <Link to="/login" className="font-semibold text-[#003E83] dark:text-blue-400 hover:underline">
+            <Link to="/login" className="font-semibold text-[#002D62] dark:text-blue-400 hover:underline">
               Sign In to Your Account
             </Link>
           </div>

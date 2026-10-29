@@ -175,23 +175,33 @@ export default function Notifications() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-      {/* Hero Banner matching screenshot design */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-amber-700 via-rose-800 to-[#002D62] text-white p-8 sm:p-12 shadow-xl">
-        <div className="relative max-w-2xl space-y-3">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md text-xs font-semibold text-amber-200 border border-white/20">
-            <Sparkles size={13} className="text-amber-300" />
-            <span>Live Alerts & Updates</span>
+      {/* Title */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <div className="text-xs font-semibold text-[#002D62] dark:text-blue-400 uppercase tracking-wider mb-1">
+            Live Alerts & Updates
           </div>
-          <h1 className="text-3xl sm:text-4xl font-black tracking-tight leading-tight">
+          <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
             Travel Notifications & Alerts
           </h1>
-          <p className="text-xs sm:text-sm text-blue-100/90 leading-relaxed font-light">
-            Stay updated with your latest booking statuses, guided tour announcements, emergency travel advisories, and system notices.
+          <p className="text-xs sm:text-sm text-slate-500 dark:text-zinc-400 mt-1">
+            Stay updated with your latest booking statuses, guided tour announcements, and advisories.
           </p>
         </div>
+
+        {unreadCount > 0 && (
+          <button
+            type="button"
+            onClick={handleMarkAllRead}
+            className="px-4 py-2.5 rounded-xl bg-[#002D62] hover:bg-[#001f44] text-white text-xs font-bold shadow-sm transition self-start sm:self-auto flex items-center gap-1.5 cursor-pointer"
+          >
+            <CheckCheck size={14} />
+            <span>Mark All as Read</span>
+          </button>
+        )}
       </div>
 
-      {/* Filter and Search Bar matching screenshot design */}
+      {/* Filter and Search Bar */}
       <div className="bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 rounded-2xl p-4 sm:p-5 shadow-xs space-y-3">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           {/* Search Input */}

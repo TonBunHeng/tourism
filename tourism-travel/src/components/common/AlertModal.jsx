@@ -78,7 +78,7 @@ export default function AlertModal({
       case 'info':
       default:
         return (
-          <div className="w-14 h-14 rounded-full bg-blue-500/10 text-[#003E83] dark:text-blue-400 flex items-center justify-center">
+          <div className="w-14 h-14 rounded-full bg-blue-500/10 text-[#002D62] dark:text-blue-400 flex items-center justify-center">
             <Info size={26} />
           </div>
         );
@@ -101,7 +101,7 @@ export default function AlertModal({
     if (type === 'warning') {
       return 'bg-amber-600 hover:bg-amber-700 text-white';
     }
-    return 'bg-[#003E83] hover:bg-[#002e62] text-white';
+    return 'bg-[#002D62] hover:bg-[#001f44] text-white';
   };
 
   return createPortal(

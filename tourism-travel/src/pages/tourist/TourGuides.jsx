@@ -14,6 +14,7 @@ import travelService from '../../services/travelService';
 import { useAlert } from '../../context/AlertContext';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import EmptyState from '../../components/common/EmptyState';
+import Pagination from '../../components/common/Pagination';
 
 export default function TourGuides() {
   const { showSuccess, showError } = useAlert();
@@ -21,7 +22,10 @@ export default function TourGuides() {
 
   const [guides, setGuides] = useState([]);
   const [availableLanguages, setAvailableLanguages] = useState(['All']);
+  const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
+
+  const ITEMS_PER_PAGE = 9;
 
   // Filters
   const search = searchParams.get('search') || '';
@@ -66,6 +70,7 @@ export default function TourGuides() {
   };
 
   useEffect(() => {
+    setCurrentPage(1);
     loadGuides();
   }, [search, selectedProvince, selectedLanguage]);
 
@@ -114,19 +119,21 @@ export default function TourGuides() {
     }
   };
 
+  const totalPages = Math.ceil(guides.length / ITEMS_PER_PAGE);
+  const paginatedGuides = guides.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
+
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-      {/* Header Banner */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-emerald-800 via-teal-900 to-[#002D62] text-white p-8 sm:p-12 shadow-xl">
-        <div className="relative max-w-2xl space-y-3">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md text-xs font-semibold text-emerald-200 border border-white/20">
-            <UserCheck size={13} className="text-amber-300" />
-            <span>Tour Guides Database</span>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-10">
+      {/* Title */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <div className="text-xs font-semibold text-[#002D62] dark:text-blue-400 uppercase tracking-wider mb-1">
+            Tour Guides Database
           </div>
-          <h1 className="text-3xl sm:text-4xl font-black tracking-tight leading-tight">
+          <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
             Accredited Tour Guides
           </h1>
-          <p className="text-xs sm:text-sm text-blue-100/90 leading-relaxed font-light">
+          <p className="text-xs sm:text-sm text-slate-500 dark:text-zinc-400 mt-1">
             Search licensed tour guides registered with the Ministry of Tourism.
           </p>
         </div>
@@ -192,107 +199,121 @@ export default function TourGuides() {
           description="There are currently no registered guide profiles matching your search criteria."
         />
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {guides.map((g) => (
-            <div
-              key={g.id}
-              className="group rounded-3xl bg-white dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800 shadow-xs hover:shadow-xl transition-all duration-300 p-6 flex flex-col justify-between space-y-4"
-            >
-              <div className="space-y-4">
-                <div className="flex items-start gap-4">
-                  <div className="relative shrink-0">
-                    {g.avatar ? (
-                      <img
-                        src={g.avatar}
-                        alt={g.name}
-                        className="w-16 h-16 rounded-2xl object-cover ring-2 ring-emerald-500/30"
-                      />
-                    ) : (
-                      <div className="w-16 h-16 rounded-2xl bg-[#002D62] text-white flex items-center justify-center font-bold text-lg">
-                        {g.name?.charAt(0) || 'G'}
-                      </div>
-                    )}
-                    <div className="absolute -bottom-1 -right-1 p-0.5 rounded-full bg-emerald-500 text-white">
-                      <CheckCircle2 size={12} />
-                    </div>
-                  </div>
-
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between gap-1">
-                      <h3 className="font-extrabold text-base text-slate-900 dark:text-white truncate">
-                        {g.name}
-                      </h3>
-                      {g.daily_rate && (
-                        <span className="text-[11px] font-mono font-bold text-emerald-600 dark:text-emerald-400 shrink-0">
-                          ${g.daily_rate}/day
-                        </span>
+        <div className="space-y-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {paginatedGuides.map((g) => (
+              <div
+                key={g.id}
+                className="group rounded-3xl bg-white dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800 shadow-xs hover:shadow-xl transition-all duration-300 p-6 flex flex-col justify-between space-y-4"
+              >
+                <div className="space-y-4">
+                  <div className="flex items-start gap-4">
+                    <div className="relative shrink-0">
+                      {g.avatar ? (
+                        <img
+                          src={g.avatar}
+                          alt={g.name}
+                          className="w-16 h-16 rounded-2xl object-cover ring-2 ring-emerald-500/30"
+                        />
+                      ) : (
+                        <div className="w-16 h-16 rounded-2xl bg-[#002D62] text-white flex items-center justify-center font-bold text-lg">
+                          {g.name?.charAt(0) || 'G'}
+                        </div>
                       )}
-                    </div>
-
-                    <p className="text-xs text-[#002D62] dark:text-blue-400 font-semibold line-clamp-1 mt-0.5">
-                      {g.title || 'Tour Guide'}
-                    </p>
-
-                    <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-zinc-400 mt-1">
-                      <div className="flex items-center gap-1 text-amber-500 font-bold">
-                        <Star size={12} className="fill-amber-400 text-amber-400" />
-                        <span>{g.rating || 0}</span>
+                      <div className="absolute -bottom-1 -right-1 p-0.5 rounded-full bg-emerald-500 text-white">
+                        <CheckCircle2 size={12} />
                       </div>
-                      <span>({g.review_count || 0} reviews)</span>
+                    </div>
+
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between gap-1">
+                        <h3 className="font-extrabold text-base text-slate-900 dark:text-white truncate">
+                          {g.name}
+                        </h3>
+                        {g.daily_rate && (
+                          <span className="text-[11px] font-mono font-bold text-emerald-600 dark:text-emerald-400 shrink-0">
+                            ${g.daily_rate}/day
+                          </span>
+                        )}
+                      </div>
+
+                      <p className="text-xs text-[#002D62] dark:text-blue-400 font-semibold line-clamp-1 mt-0.5">
+                        {g.title || 'Tour Guide'}
+                      </p>
+
+                      <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-zinc-400 mt-1">
+                        <div className="flex items-center gap-1 text-amber-500 font-bold">
+                          <Star size={12} className="fill-amber-400 text-amber-400" />
+                          <span>{g.rating || 0}</span>
+                        </div>
+                        <span>({g.review_count || 0} reviews)</span>
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                <div className="flex items-center justify-between text-xs text-slate-500 dark:text-zinc-400 pt-1 border-t border-slate-100 dark:border-zinc-800">
-                  <div className="flex items-center gap-1 truncate">
-                    <MapPin size={12} className="text-rose-500 shrink-0" />
-                    <span>{g.location || g.province || 'Cambodia'}</span>
+                  <div className="flex items-center justify-between text-xs text-slate-500 dark:text-zinc-400 pt-1 border-t border-slate-100 dark:border-zinc-800">
+                    <div className="flex items-center gap-1 truncate">
+                      <MapPin size={12} className="text-rose-500 shrink-0" />
+                      <span>{g.location || g.province || 'Cambodia'}</span>
+                    </div>
+                    {g.license_no && (
+                      <span className="font-mono text-[10px] bg-slate-100 dark:bg-zinc-800 px-2 py-0.5 rounded text-slate-600 dark:text-zinc-300">
+                        {g.license_no}
+                      </span>
+                    )}
                   </div>
-                  {g.license_no && (
-                    <span className="font-mono text-[10px] bg-slate-100 dark:bg-zinc-800 px-2 py-0.5 rounded text-slate-600 dark:text-zinc-300">
-                      {g.license_no}
-                    </span>
+
+                  {g.languages && Array.isArray(g.languages) && g.languages.length > 0 && (
+                    <div className="space-y-1">
+                      <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Languages</span>
+                      <div className="flex flex-wrap gap-1">
+                        {g.languages.map((l, i) => (
+                          <span key={i} className="text-[10px] font-medium px-2 py-0.5 rounded-md bg-blue-50 dark:bg-blue-950/40 text-[#002D62] dark:text-blue-300">
+                            {l}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
                   )}
+
+                  <p className="text-xs text-slate-600 dark:text-zinc-400 line-clamp-2 leading-relaxed">
+                    {g.bio || 'No biography recorded in database.'}
+                  </p>
                 </div>
 
-                {g.languages && Array.isArray(g.languages) && g.languages.length > 0 && (
-                  <div className="space-y-1">
-                    <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Languages</span>
-                    <div className="flex flex-wrap gap-1">
-                      {g.languages.map((l, i) => (
-                        <span key={i} className="text-[10px] font-medium px-2 py-0.5 rounded-md bg-blue-50 dark:bg-blue-950/40 text-[#002D62] dark:text-blue-300">
-                          {l}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
+                <div className="pt-4 border-t border-slate-100 dark:border-zinc-800/80 flex items-center justify-between gap-2 text-xs">
+                  <button
+                    type="button"
+                    onClick={() => setActiveGuideDetails(g)}
+                    className="px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-zinc-800 hover:bg-slate-200 dark:hover:bg-zinc-700 text-slate-800 dark:text-zinc-200 font-semibold transition cursor-pointer"
+                  >
+                    View Profile
+                  </button>
 
-                <p className="text-xs text-slate-600 dark:text-zinc-400 line-clamp-2 leading-relaxed">
-                  {g.bio || 'No biography recorded in database.'}
-                </p>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedGuideForHire(g)}
+                    className="px-4 py-2 rounded-xl bg-[#002D62] hover:bg-[#001f44] text-white font-bold transition shadow-xs flex items-center gap-1.5 cursor-pointer"
+                  >
+                    <Calendar size={13} />
+                    <span>Hire Guide</span>
+                  </button>
+                </div>
               </div>
+            ))}
+          </div>
 
-              <div className="pt-3 border-t border-slate-100 dark:border-zinc-800/80 flex items-center justify-between gap-2 text-xs">
-                <button
-                  type="button"
-                  onClick={() => setActiveGuideDetails(g)}
-                  className="px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-zinc-800 hover:bg-slate-200 dark:hover:bg-zinc-700 text-slate-800 dark:text-zinc-200 font-semibold transition cursor-pointer"
-                >
-                  View Profile
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setSelectedGuideForHire(g)}
-                  className="px-4 py-2 rounded-xl bg-[#002D62] hover:bg-[#001f44] text-white font-bold transition shadow-xs flex items-center gap-1.5 cursor-pointer"
-                >
-                  <Calendar size={13} />
-                  <span>Hire Guide</span>
-                </button>
-              </div>
-            </div>
-          ))}
+          {/* Pagination */}
+          <Pagination
+            currentPage={currentPage}
+            lastPage={totalPages}
+            total={guides.length}
+            perPage={ITEMS_PER_PAGE}
+            onPageChange={(page) => {
+              setCurrentPage(page);
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+          />
         </div>
       )}
 

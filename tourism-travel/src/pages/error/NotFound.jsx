@@ -19,7 +19,7 @@ export default function NotFound() {
 
         <Link
           to="/"
-          className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-[#003E83] hover:bg-[#002e62] text-white text-xs font-semibold shadow-sm transition"
+          className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-[#002D62] hover:bg-[#001f44] text-white text-xs font-semibold shadow-sm transition"
         >
           <Home size={16} />
           <span>Return to Homepage</span>

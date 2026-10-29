@@ -191,7 +191,7 @@ export default function BusinessProfile() {
       {/* Title */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <div className="text-xs font-semibold text-[#003E83] dark:text-blue-400 uppercase tracking-wider mb-1">
+          <div className="text-xs font-semibold text-[#002D62] dark:text-blue-400 uppercase tracking-wider mb-1">
             Establishment Profile
           </div>
           <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
@@ -220,7 +220,7 @@ export default function BusinessProfile() {
           {/* Core Information Card */}
           <div className="p-6 sm:p-8 rounded-3xl bg-white dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800 shadow-sm space-y-5">
             <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
-              <Store size={18} className="text-[#003E83] dark:text-blue-400" />
+              <Store size={18} className="text-[#002D62] dark:text-blue-400" />
               <span>General Information</span>
             </h3>
 
@@ -306,7 +306,7 @@ export default function BusinessProfile() {
           {/* Contact Details Card */}
           <div className="p-6 sm:p-8 rounded-3xl bg-white dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800 shadow-sm space-y-4">
             <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
-              <Phone size={18} className="text-[#003E83] dark:text-blue-400" />
+              <Phone size={18} className="text-[#002D62] dark:text-blue-400" />
               <span>Contact & Booking Inquiries</span>
             </h3>
 
@@ -358,7 +358,7 @@ export default function BusinessProfile() {
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                    <Camera size={18} className="text-[#003E83] dark:text-blue-400" />
+                    <Camera size={18} className="text-[#002D62] dark:text-blue-400" />
                     <span>Business Photo Showcase</span>
                   </h3>
                   <p className="text-xs text-slate-500 dark:text-zinc-400">
@@ -366,7 +366,7 @@ export default function BusinessProfile() {
                   </p>
                 </div>
 
-                <label className="px-4 py-2 rounded-xl bg-[#003E83] hover:bg-[#002e62] text-white text-xs font-bold transition flex items-center gap-1.5 cursor-pointer">
+                <label className="px-4 py-2 rounded-xl bg-[#002D62] hover:bg-[#001f44] text-white text-xs font-bold transition flex items-center gap-1.5 cursor-pointer">
                   <Plus size={15} />
                   <span>Upload Photo</span>
                   <input
@@ -414,7 +414,7 @@ export default function BusinessProfile() {
             <button
               type="submit"
               disabled={isSaving}
-              className="px-8 py-3 rounded-xl bg-[#003E83] hover:bg-[#002e62] disabled:opacity-50 text-white text-xs sm:text-sm font-bold shadow-md transition flex items-center gap-2 cursor-pointer"
+              className="px-8 py-3 rounded-xl bg-[#002D62] hover:bg-[#001f44] disabled:opacity-50 text-white text-xs sm:text-sm font-bold shadow-md transition flex items-center gap-2 cursor-pointer"
             >
               {isSaving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
               <span>Save Business Profile</span>

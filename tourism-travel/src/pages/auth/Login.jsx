@@ -61,7 +61,7 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#09090b] flex flex-col justify-center py-12 sm:px-6 lg:px-8 font-sans selection:bg-[#003E83] selection:text-white">
+    <div className="min-h-screen bg-slate-50 dark:bg-[#09090b] flex flex-col justify-center py-12 sm:px-6 lg:px-8 font-sans selection:bg-[#002D62] selection:text-white">
       <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
         <h2 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">
           Sign in to your account
@@ -108,7 +108,7 @@ export default function Login() {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="name@example.com"
                   required
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800/80 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#003E83] dark:focus:ring-blue-500 transition"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800/80 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#002D62] dark:focus:ring-blue-500 transition"
                 />
               </div>
             </div>
@@ -127,7 +127,7 @@ export default function Login() {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
                   required
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800/80 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#003E83] dark:focus:ring-blue-500 transition"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800/80 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#002D62] dark:focus:ring-blue-500 transition"
                 />
               </div>
             </div>
@@ -135,7 +135,7 @@ export default function Login() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full mt-2 py-3 px-4 rounded-xl bg-[#003E83] hover:bg-[#002e62] disabled:opacity-50 text-white font-semibold text-sm shadow-md shadow-blue-900/10 transition flex items-center justify-center gap-2 cursor-pointer"
+              className="w-full mt-2 py-3 px-4 rounded-xl bg-[#002D62] hover:bg-[#001f44] disabled:opacity-50 text-white font-semibold text-sm shadow-md shadow-blue-900/10 transition flex items-center justify-center gap-2 cursor-pointer"
             >
               {isLoading ? (
                 <>
@@ -154,7 +154,7 @@ export default function Login() {
           {/* Registration link */}
           <div className="mt-5 text-center text-xs text-slate-500 dark:text-zinc-400">
             Don't have an account yet?{' '}
-            <Link to="/register" className="font-semibold text-[#003E83] dark:text-blue-400 hover:underline">
+            <Link to="/register" className="font-semibold text-[#002D62] dark:text-blue-400 hover:underline">
               Create an Account
             </Link>
           </div>

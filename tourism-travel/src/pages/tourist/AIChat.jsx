@@ -7,7 +7,6 @@ import {
   CloudSun, 
   DollarSign, 
   Landmark,
-  ArrowRight,
   ArrowLeft,
   MoreHorizontal,
   X,
@@ -1022,10 +1021,9 @@ export default function AIChat() {
                 </div>
                 <Link
                   to="/destinations"
-                  className="px-3.5 py-2 rounded-xl bg-zinc-900 hover:bg-black text-white text-xs font-bold flex items-center gap-1 transition"
+                  className="px-3.5 py-2 rounded-xl bg-zinc-900 hover:bg-black text-white text-xs font-bold transition shadow-xs"
                 >
-                  <span>Catalog</span>
-                  <ArrowRight size={13} />
+                  Catalog
                 </Link>
               </div>
             </div>
