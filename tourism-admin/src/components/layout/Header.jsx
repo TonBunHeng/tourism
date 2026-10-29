@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   Bell, Search, User, Settings, LogOut, Menu,
-  X, MessageCircle, Globe, Sun, Moon, Loader2
+  X, Globe, Sun, Moon, Loader2
 } from "lucide-react";
 import { getInitialTheme, applyTheme, THEME_CHANGE_EVENT, isDarkTheme } from '../../utils/Theme';
 import LogoutAlert from './LogoutAlert';

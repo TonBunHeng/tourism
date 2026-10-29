@@ -92,7 +92,7 @@ export default function Businesses() {
   const filteredBusinesses = useMemo(() => {
     return businesses.filter(b => {
       const statusMatch = statusFilter === 'all' || b.verification_status === statusFilter;
-      const q = search.toLowerCase().trim();
+      const q = (search || '').toLowerCase().trim();
       const searchMatch = !q ||
         b.name?.toLowerCase().includes(q) ||
         b.owner?.name?.toLowerCase().includes(q) ||

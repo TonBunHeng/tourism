@@ -6,7 +6,7 @@ import {
   LayoutGrid, MapPinned, Tags, Images, CalendarDays,
   Star, Heart, Trash2, Settings, LogOut,
   Users, User, X, FileText, ShieldCheck, Bell, Globe, Building2,
-  CalendarCheck, Sparkles, UserCheck, ChevronDown, Compass, BarChart2, Activity
+  CalendarCheck, Sparkles, UserCheck, ChevronDown, Compass, Activity
 } from "lucide-react";
 import LogoutAlert from './LogoutAlert';
 import { isFullAdminRole, normalizeRole } from '../../services/authService';

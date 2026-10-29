@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import en from './en';
-import kh from './kh';
+import en from './en/index.js';
+import kh from './kh/index.js';
 
 export const translations = {
   EN: en,
