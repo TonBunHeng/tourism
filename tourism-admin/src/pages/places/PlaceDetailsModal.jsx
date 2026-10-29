@@ -94,7 +94,7 @@ export default function PlaceDetailsModal({ place, onClose, onEditPlace }) {
               </span>
               <p className="text-sm font-medium text-[var(--color-warning-text)] dark:text-[var(--color-warning-dark-text)] mt-1 flex items-center gap-1">
                 <Star className="w-4 h-4 fill-[var(--color-warning-text)] dark:fill-[var(--color-warning-dark-text)] text-[var(--color-warning-text)] dark:text-[var(--color-warning-dark-text)]" />
-                {place.rating} / 5.0
+                {Number(place.rating ?? 0).toFixed(1)} / 5.0
               </p>
             </div>
             <div className="bg-[var(--color-surface-hover-light)] dark:bg-[var(--color-surface-hover-dark)]/50 p-3.5 rounded-md border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]">

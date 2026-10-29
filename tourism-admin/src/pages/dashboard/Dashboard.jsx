@@ -16,6 +16,7 @@ import RecentActivity from './RecentActivity';
 import dashboardService from '../../services/dashboardService';
 import { getPageCache, setPageCache } from '../../utils/pageCache';
 import { useLanguage } from '../../i18n';
+import authService, { isFullAdminRole, isSuperAdminRole } from '../../services/authService';
 
 export default function Dashboard() {
   const { t } = useLanguage();
@@ -55,6 +56,9 @@ export default function Dashboard() {
 
   const pendingVerifications = dashboardData?.stats?.pending_verifications || 0;
   const pendingBookings = dashboardData?.stats?.pending_bookings || 0;
+  const role = authService.getCurrentUser()?.role;
+  const isPrivileged = isFullAdminRole(role);
+  const isSuperAdmin = isSuperAdminRole(role);
 
   // Comprehensive System Shortcuts - All 18 modules
   const allShortcuts = [
@@ -66,17 +70,23 @@ export default function Dashboard() {
     { name: 'Provinces', nameKey: 'dashboard.scProvinces', path: '/provinces', icon: Globe, color: 'text-teal-600 dark:text-teal-400', bg: 'bg-teal-50 dark:bg-teal-950/40', desc: 'Tourism regions', descKey: 'dashboard.scProvincesDesc' },
     { name: 'Galleries', nameKey: 'dashboard.scGalleries', path: '/galleries', icon: Images, color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-950/40', desc: 'Photos & media', descKey: 'dashboard.scGalleriesDesc' },
     { name: 'Events', nameKey: 'dashboard.scEvents', path: '/events', icon: CalendarDays, color: 'text-rose-600 dark:text-rose-400', bg: 'bg-rose-50 dark:bg-rose-950/40', desc: 'Festivals schedule', descKey: 'dashboard.scEventsDesc' },
-    { name: 'Businesses', nameKey: 'dashboard.scBusinesses', path: '/businesses', icon: Building2, color: 'text-amber-600 dark:text-amber-400', bg: 'bg-amber-50 dark:bg-amber-950/40', desc: 'Commercial partners', descKey: 'dashboard.scBusinessesDesc' },
+    { name: 'Businesses', nameKey: 'dashboard.scBusinesses', path: '/businesses', requires: 'privileged', icon: Building2, color: 'text-amber-600 dark:text-amber-400', bg: 'bg-amber-50 dark:bg-amber-950/40', desc: 'Commercial partners', descKey: 'dashboard.scBusinessesDesc' },
     { name: 'Ratings & Reviews', nameKey: 'dashboard.scRatingsReviews', path: '/ratings', icon: Star, color: 'text-yellow-500 dark:text-yellow-400', bg: 'bg-yellow-50 dark:bg-yellow-950/40', desc: 'Traveler feedback', descKey: 'dashboard.scRatingsReviewsDesc' },
     { name: 'Saved Favorites', nameKey: 'dashboard.scSavedFavorites', path: '/favorites', icon: Heart, color: 'text-pink-600 dark:text-pink-400', bg: 'bg-pink-50 dark:bg-pink-950/40', desc: 'Wishlist items', descKey: 'dashboard.scSavedFavoritesDesc' },
     { name: 'Notifications', nameKey: 'dashboard.scNotifications', path: '/notifications', icon: Bell, color: 'text-sky-600 dark:text-sky-400', bg: 'bg-sky-50 dark:bg-sky-950/40', desc: 'System alerts', descKey: 'dashboard.scNotificationsDesc' },
-    { name: 'Reports', nameKey: 'dashboard.scReports', path: '/reports', icon: FileText, color: 'text-slate-600 dark:text-slate-400', bg: 'bg-slate-100 dark:bg-zinc-800', desc: 'Analytics & exports', descKey: 'dashboard.scReportsDesc' },
-    { name: 'Users', nameKey: 'dashboard.scUsers', path: '/users', icon: Users, color: 'text-blue-700 dark:text-blue-400', bg: 'bg-blue-50 dark:bg-blue-900/40', desc: 'Accounts & roles', descKey: 'dashboard.scUsersDesc' },
-    { name: 'Security Alerts', nameKey: 'dashboard.scSecurity', path: '/security', icon: ShieldCheck, color: 'text-red-600 dark:text-red-400', bg: 'bg-red-50 dark:bg-red-950/40', desc: 'System protections', descKey: 'dashboard.scSecurityDesc' },
-    { name: 'Deletion Requests', nameKey: 'dashboard.scDeletion', path: '/deletion-requests', icon: Trash2, color: 'text-orange-600 dark:text-orange-400', bg: 'bg-orange-50 dark:bg-orange-950/40', desc: 'Account removals', descKey: 'dashboard.scDeletionDesc' },
-    { name: 'Settings', nameKey: 'dashboard.scSettings', path: '/settings', icon: Settings, color: 'text-zinc-600 dark:text-zinc-400', bg: 'bg-zinc-100 dark:bg-zinc-800', desc: 'System settings', descKey: 'dashboard.scSettingsDesc' },
+    { name: 'Reports', nameKey: 'dashboard.scReports', path: '/reports', requires: 'privileged', icon: FileText, color: 'text-slate-600 dark:text-slate-400', bg: 'bg-slate-100 dark:bg-zinc-800', desc: 'Analytics & exports', descKey: 'dashboard.scReportsDesc' },
+    { name: 'Users', nameKey: 'dashboard.scUsers', path: '/users', requires: 'privileged', icon: Users, color: 'text-blue-700 dark:text-blue-400', bg: 'bg-blue-50 dark:bg-blue-900/40', desc: 'Accounts & roles', descKey: 'dashboard.scUsersDesc' },
+    { name: 'Security Alerts', nameKey: 'dashboard.scSecurity', path: '/security', requires: 'privileged', icon: ShieldCheck, color: 'text-red-600 dark:text-red-400', bg: 'bg-red-50 dark:bg-red-950/40', desc: 'System protections', descKey: 'dashboard.scSecurityDesc' },
+    { name: 'Deletion Requests', nameKey: 'dashboard.scDeletion', path: '/deletion-requests', requires: 'super_admin', icon: Trash2, color: 'text-orange-600 dark:text-orange-400', bg: 'bg-orange-50 dark:bg-orange-950/40', desc: 'Account removals', descKey: 'dashboard.scDeletionDesc' },
+    { name: 'Settings', nameKey: 'dashboard.scSettings', path: '/settings', requires: 'privileged', icon: Settings, color: 'text-zinc-600 dark:text-zinc-400', bg: 'bg-zinc-100 dark:bg-zinc-800', desc: 'System settings', descKey: 'dashboard.scSettingsDesc' },
     { name: 'Profile', nameKey: 'dashboard.scProfile', path: '/profile', icon: User, color: 'text-indigo-700 dark:text-indigo-400', bg: 'bg-indigo-50 dark:bg-indigo-950/40', desc: 'Admin account', descKey: 'dashboard.scProfileDesc' },
   ];
+
+  const visibleShortcuts = allShortcuts.filter((item) => (
+    !item.requires ||
+    (item.requires === 'privileged' && isPrivileged) ||
+    (item.requires === 'super_admin' && isSuperAdmin)
+  ));
 
   return (
     <div className="flex flex-col space-y-6">
@@ -84,7 +94,7 @@ export default function Dashboard() {
       <DashboardHeader
         timeRange={timeRange}
         onTimeRangeChange={setTimeRange}
-        isLoading={isLoading}
+        canViewReports={isPrivileged}
       />
 
       {/* 2. Urgent Attention Banner (Pending Bookings & Verifications) */}
@@ -118,7 +128,7 @@ export default function Dashboard() {
                 <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             )}
-            {pendingVerifications > 0 && (
+            {isPrivileged && pendingVerifications > 0 && (
               <Link
                 to="/businesses"
                 className="px-3 py-1.5 rounded-md text-xs font-semibold bg-white dark:bg-zinc-800 border border-amber-300 dark:border-amber-700 text-amber-800 dark:text-amber-300 hover:bg-amber-100/50 transition-colors flex items-center gap-1"
@@ -190,7 +200,7 @@ export default function Dashboard() {
               <Sparkles className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
               <span>{t('dashboard.shortcutsTitle', 'Quick Management Shortcuts')}</span>
               <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200/60 dark:border-indigo-900/60">
-                {t('dashboard.shortcutsBadge', '{count} Modules').replace('{count}', allShortcuts.length)}
+                {t('dashboard.shortcutsBadge', '{count} Modules').replace('{count}', visibleShortcuts.length)}
               </span>
             </h3>
             <p className="text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
@@ -200,7 +210,7 @@ export default function Dashboard() {
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
-          {allShortcuts.map((item) => {
+          {visibleShortcuts.map((item) => {
             const Icon = item.icon;
             const title = t(item.nameKey, item.name);
             const description = t(item.descKey, item.desc);

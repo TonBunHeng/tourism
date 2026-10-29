@@ -241,7 +241,6 @@ const Reports = {
   tfToday: "ថ្ងៃនេះ",
   tfThisWeek: "សប្តាហ៍នេះ",
   tfThisMonth: "ខែនេះ",
-  tfYear2026: "២០២៦",
   btnReset: "កំណត់ឡើងវិញ",
 
   // Chart 1: Ingestion Velocity
@@ -295,6 +294,7 @@ const Reports = {
   tooltipTotal: "សរុប",
   lineNewRecordsIngested: "កំណត់ត្រាថ្មីបានបញ្ចូល",
   lineCumulativeTotal: "សរុបបង្កើន",
+  statusPendingReview: "កំពុងរង់ចាំ / ពិនិត្យ",
 };
 
 export default Reports;

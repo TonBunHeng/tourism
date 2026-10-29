@@ -458,10 +458,10 @@ export default function PlaceModal({
                   <input
                     type="number"
                     step="0.1"
-                    min="1"
+                    min="0"
                     max="5"
-                    value={safeFormData.rating || 5.0}
-                    onChange={(e) => updateField('rating', parseFloat(e.target.value) || 5.0)}
+                    value={safeFormData.rating ?? 0}
+                    onChange={(e) => updateField('rating', e.target.value === '' ? '' : Number(e.target.value))}
                     className="w-full pl-9 pr-4 py-2.5 bg-[var(--color-bg-light)] dark:bg-[var(--color-input-dark-bg)] border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]/70 rounded-md text-sm text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] focus:outline-none focus:ring-2 focus:ring-[var(--color-input)] transition-all"
                   />
                 </div>

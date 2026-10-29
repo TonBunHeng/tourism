@@ -34,7 +34,7 @@ export default function ProvinceDetailsModal({ province, onClose, onEditProvince
     switch (status) {
       case 'Active': return t('provinces.statusActive', 'Active');
       case 'Inactive': return t('provinces.statusInactive', 'Inactive');
-      default: return status || t('provinces.statusActive', 'Active');
+      default: return status || '—';
     }
   };
 
@@ -90,8 +90,8 @@ export default function ProvinceDetailsModal({ province, onClose, onEditProvince
               <span className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
                 {t('provinces.labelStatus', 'Status')}
               </span>
-              <p className="text-sm font-medium text-[var(--color-success-text)] dark:text-[var(--color-success-dark-text)] mt-1 flex items-center gap-1.5">
-                <Check className="w-3.5 h-3.5" />
+              <p className="text-sm font-medium text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mt-1 flex items-center gap-1.5">
+                {province.status === 'Active' && <Check className="w-3.5 h-3.5" />}
                 {getStatusLabel(province.status)}
               </p>
             </div>
@@ -104,7 +104,7 @@ export default function ProvinceDetailsModal({ province, onClose, onEditProvince
               </span>
               <p className="text-sm font-medium text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] mt-1 flex items-center gap-1.5">
                 <Users className="w-3.5 h-3.5 text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]" />
-                {province.population}
+                {province.population || '—'}
               </p>
             </div>
             <div className="bg-[var(--color-surface-hover-light)] dark:bg-[var(--color-surface-hover-dark)]/50 p-3.5 rounded-md border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]">
@@ -113,7 +113,7 @@ export default function ProvinceDetailsModal({ province, onClose, onEditProvince
               </span>
               <p className="text-sm font-medium text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] mt-1 flex items-center gap-1.5">
                 <Navigation className="w-3.5 h-3.5 text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]" />
-                {province.area}
+                {province.area || '—'}
               </p>
             </div>
           </div>
@@ -125,8 +125,8 @@ export default function ProvinceDetailsModal({ province, onClose, onEditProvince
               </span>
               <p className="text-sm font-medium text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] mt-1">
                 {t('provinces.districtsCommunesSummary', '{districts} Districts, {communes} Communes')
-                  .replace('{districts}', province.districts ?? 0)
-                  .replace('{communes}', province.communes ?? 0)}
+                  .replace('{districts}', province.districts ?? '—')
+                  .replace('{communes}', province.communes ?? '—')}
               </p>
             </div>
             <div className="bg-[var(--color-surface-hover-light)] dark:bg-[var(--color-surface-hover-dark)]/50 p-3.5 rounded-md border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]">
@@ -136,8 +136,8 @@ export default function ProvinceDetailsModal({ province, onClose, onEditProvince
               <p className="text-sm font-medium text-[var(--color-warning-text)] dark:text-[var(--color-warning-dark-text)] mt-1 flex items-center gap-1">
                 <Star className="w-3.5 h-3.5 fill-[var(--color-warning-text)] dark:fill-[var(--color-warning-dark-text)]" />
                 {t('provinces.ratingPlacesSummary', '{rating} ({places} places)')
-                  .replace('{rating}', province.rating || '0')
-                  .replace('{places}', province.places ?? 0)}
+                  .replace('{rating}', province.rating ?? '—')
+                  .replace('{places}', province.places ?? '—')}
               </p>
             </div>
           </div>
@@ -146,7 +146,7 @@ export default function ProvinceDetailsModal({ province, onClose, onEditProvince
             <span className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
               {t('provinces.labelDescription', 'Description')}
             </span>
-            <p className="text-sm text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mt-1">{province.description}</p>
+            <p className="text-sm text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mt-1">{province.description || '—'}</p>
           </div>
         </div>
 

@@ -13,9 +13,8 @@ export default function Footer() {
         </span>
       </div>
 
-      <div className="flex items-center gap-2 text-xs text-emerald-600 dark:text-emerald-400 font-medium">
-        <span className="w-2 h-2 rounded-md bg-emerald-500 animate-pulse" />
-        <span>{t('footer.systemOnline', 'System Online')}</span>
+      <div className="text-xs text-gray-500 dark:text-zinc-400 font-medium">
+        <span>{t('common.adminPortal', 'Admin Portal')}</span>
       </div>
     </footer>
   );

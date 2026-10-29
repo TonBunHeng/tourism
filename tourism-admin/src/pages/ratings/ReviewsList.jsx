@@ -52,7 +52,7 @@ export default function ReviewsList({
           const userName = typeof review.user === 'object' ? review.user.name : review.user;
           const userVerified = typeof review.user === 'object' ? review.user.verified : review.verified;
           const placeName = typeof review.place === 'object' ? review.place.name : review.place;
-          const placeLocation = typeof review.place === 'object' ? review.place.location : 'Cambodia';
+          const placeLocation = typeof review.place === 'object' ? review.place.location : '';
           const repliesList = Array.isArray(review.replies) ? review.replies : [];
           const repliesCount = typeof review.replies === 'number' ? review.replies : repliesList.length;
 

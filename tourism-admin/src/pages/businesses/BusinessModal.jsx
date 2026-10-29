@@ -71,10 +71,10 @@ export default function BusinessModal({
 
   const [formData, setFormData] = useState({
     name: '',
-    category_id: '1',
-    category_name: 'Hospitality & Hotels',
-    province: 'Siem Reap',
-    price_tier: '$$',
+    category_id: '',
+    category_name: '',
+    province: '',
+    price_tier: '',
     image: '',
     description: '',
     address: '',
@@ -139,14 +139,14 @@ export default function BusinessModal({
         editingBusiness.thumbnail ||
         editingBusiness.logo ||
         (Array.isArray(editingBusiness.images) ? editingBusiness.images[0] : '') ||
-        'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&q=80&w=800';
+        '';
 
       setFormData({
         name: editingBusiness.name || '',
-        category_id: String(editingBusiness.category?.id || editingBusiness.category_id || '1'),
-        category_name: editingBusiness.category?.name || editingBusiness.category_name || editingBusiness.category || 'Hospitality & Hotels',
-        province: editingBusiness.province?.name || editingBusiness.province || 'Siem Reap',
-        price_tier: editingBusiness.price_tier || editingBusiness.price || '$$',
+        category_id: String(editingBusiness.category?.id || editingBusiness.category_id || ''),
+        category_name: editingBusiness.category?.name || editingBusiness.category_name || editingBusiness.category || '',
+        province: editingBusiness.province?.name || editingBusiness.province || '',
+        price_tier: editingBusiness.price_tier || editingBusiness.price || '',
         image: existingImg,
         description: editingBusiness.description || '',
         address: editingBusiness.address || '',
@@ -164,10 +164,10 @@ export default function BusinessModal({
     } else {
       setFormData({
         name: '',
-        category_id: '1',
-        category_name: 'Hospitality & Hotels',
-        province: 'Siem Reap',
-        price_tier: '$$',
+        category_id: '',
+        category_name: '',
+        province: '',
+        price_tier: '',
         image: '',
         description: '',
         address: '',
@@ -245,6 +245,8 @@ export default function BusinessModal({
   const validate = () => {
     const newErrors = {};
     if (!formData.name.trim()) newErrors.name = t('businesses.nameRequired', 'Business name is required');
+    if (!formData.category_name) newErrors.category_name = t('businesses.categoryRequired', 'Business category is required');
+    if (!formData.province) newErrors.province = t('businesses.provinceRequired', 'Province is required');
     if (!formData.owner_name.trim()) newErrors.owner_name = t('businesses.ownerNameRequired', 'Owner name is required');
     if (!formData.owner_email.trim()) newErrors.owner_email = t('businesses.ownerEmailRequired', 'Owner email is required');
     return newErrors;
@@ -342,10 +344,12 @@ export default function BusinessModal({
                     }}
                     className="w-full px-3 py-2 bg-[var(--color-bg-light)] dark:bg-[var(--color-input-dark-bg)] border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]/70 rounded-md text-xs sm:text-sm text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] focus:outline-none focus:ring-2 focus:ring-[var(--color-input)] transition-all cursor-pointer"
                   >
+                    <option value="">{t('businesses.selectCategory', 'Select a category')}</option>
                     {categories.map((c) => (
                       <option key={c.id || c.name} value={c.name}>{c.name}</option>
                     ))}
                   </select>
+                  {errors.category_name && <p className="text-xs text-red-500 dark:text-red-400 mt-1">{errors.category_name}</p>}
                 </div>
 
                 {/* Province */}
@@ -358,10 +362,12 @@ export default function BusinessModal({
                     onChange={(e) => handleChange('province', e.target.value)}
                     className="w-full px-3 py-2 bg-[var(--color-bg-light)] dark:bg-[var(--color-input-dark-bg)] border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]/70 rounded-md text-xs sm:text-sm text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] focus:outline-none focus:ring-2 focus:ring-[var(--color-input)] transition-all cursor-pointer"
                   >
+                    <option value="">{t('businesses.selectProvince', 'Select a province')}</option>
                     {PROVINCES.map((p) => (
                       <option key={p} value={p}>{p}</option>
                     ))}
                   </select>
+                  {errors.province && <p className="text-xs text-red-500 dark:text-red-400 mt-1">{errors.province}</p>}
                 </div>
 
                 {/* Price Tier */}
@@ -374,6 +380,7 @@ export default function BusinessModal({
                     onChange={(e) => handleChange('price_tier', e.target.value)}
                     className="w-full px-3 py-2 bg-[var(--color-bg-light)] dark:bg-[var(--color-input-dark-bg)] border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]/70 rounded-md text-xs sm:text-sm text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] focus:outline-none focus:ring-2 focus:ring-[var(--color-input)] transition-all cursor-pointer"
                   >
+                    <option value="">{t('businesses.selectPriceTier', 'Select a price tier (optional)')}</option>
                     {priceTiers.map((tier) => (
                       <option key={tier.value} value={tier.value}>{tier.label}</option>
                     ))}

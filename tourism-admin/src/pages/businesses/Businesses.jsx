@@ -58,8 +58,8 @@ export default function Businesses() {
         ...item,
         image: item.image || item.image_url || item.cover_image || item.photo || 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&q=80&w=800',
         price_tier: item.price_tier || '$$',
-        latitude: item.latitude || '13.3610',
-        longitude: item.longitude || '103.8590'
+        latitude: item.latitude ?? null,
+        longitude: item.longitude ?? null
       }));
       setBusinesses(mapped);
       let computedStats;
@@ -124,9 +124,6 @@ export default function Businesses() {
     setActionLoading(business.id);
     try {
       await businessService.approve(business.id);
-    } catch (err) {
-      // Fallback update in state
-    } finally {
       setBusinesses(prev => prev.map(b => b.id === business.id ? { ...b, verification_status: 'approved' } : b));
       if (viewingBusiness && viewingBusiness.id === business.id) {
         setViewingBusiness(prev => ({ ...prev, verification_status: 'approved' }));
@@ -135,6 +132,9 @@ export default function Businesses() {
         t('businesses.approvedSuccess', 'Business profile "{name}" has been approved and activated on AngkorVerses.').replace('{name}', business.name),
         t('businesses.approvedTitle', 'Profile Approved')
       );
+    } catch (err) {
+      showError(err.message || t('businesses.approveFailed', 'Failed to approve business profile.'), t('businesses.errorTitle', 'Action Failed'));
+    } finally {
       setActionLoading(null);
     }
   };
@@ -190,7 +190,7 @@ export default function Businesses() {
         );
       }
     } catch (err) {
-      setBusinesses(prev => prev.map(b => b.id === targetBusiness.id ? { ...b, verification_status: actionType === 'reject' ? 'rejected' : 'suspended' } : b));
+      showError(err.message || t('businesses.statusUpdateFailed', 'Failed to update business status.'), t('businesses.errorTitle', 'Action Failed'));
     } finally {
       setActionLoading(null);
     }
@@ -201,9 +201,6 @@ export default function Businesses() {
     setActionLoading(business.id);
     try {
       await businessService.activate(business.id);
-    } catch (err) {
-      // Fallback
-    } finally {
       setBusinesses(prev => prev.map(b => b.id === business.id ? { ...b, verification_status: 'approved' } : b));
       if (viewingBusiness && viewingBusiness.id === business.id) {
         setViewingBusiness(prev => ({ ...prev, verification_status: 'approved' }));
@@ -212,6 +209,9 @@ export default function Businesses() {
         t('businesses.reactivatedSuccess', 'Business profile "{name}" has been reactivated.').replace('{name}', business.name),
         t('businesses.reactivatedTitle', 'Profile Reactivated')
       );
+    } catch (err) {
+      showError(err.message || t('businesses.activateFailed', 'Failed to reactivate business profile.'), t('businesses.errorTitle', 'Action Failed'));
+    } finally {
       setActionLoading(null);
     }
   };
@@ -230,9 +230,6 @@ export default function Businesses() {
     setActionLoading(business.id);
     try {
       await businessService.delete(business.id);
-    } catch (err) {
-      // Fallback
-    } finally {
       setBusinesses(prev => prev.filter(b => b.id !== business.id));
       if (viewingBusiness && viewingBusiness.id === business.id) {
         setViewingBusiness(null);
@@ -241,6 +238,9 @@ export default function Businesses() {
         t('businesses.deletedSuccess', 'Business profile "{name}" has been removed.').replace('{name}', business.name),
         t('businesses.deletedTitle', 'Profile Deleted')
       );
+    } catch (err) {
+      showError(err.message || t('businesses.deleteFailed', 'Failed to delete business profile.'), t('businesses.errorTitle', 'Action Failed'));
+    } finally {
       setActionLoading(null);
     }
   };
@@ -258,8 +258,8 @@ export default function Businesses() {
           category_name: formData.category_name || b.category_name,
           image: formData.image !== undefined ? formData.image : b.image,
           price_tier: formData.price_tier || b.price_tier,
-          latitude: formData.latitude || b.latitude,
-          longitude: formData.longitude || b.longitude,
+          latitude: formData.latitude ?? b.latitude,
+          longitude: formData.longitude ?? b.longitude,
           phone: formData.phone || formData.owner_phone || b.phone,
           email: formData.email || formData.owner_email || b.email,
           owner: {
@@ -274,30 +274,12 @@ export default function Businesses() {
           t('businesses.updatedTitle', 'Changes Saved')
         );
       } else {
-        const newId = Date.now();
-        const newBiz = {
-          id: newId,
-          name: formData.name,
-          category: { id: formData.category_id, name: formData.category_name },
-          category_name: formData.category_name,
-          owner: { name: formData.owner_name, email: formData.owner_email, phone: formData.owner_phone },
-          province: { name: formData.province },
-          address: formData.address,
-          phone: formData.phone || formData.owner_phone,
-          email: formData.email || formData.owner_email,
-          image: formData.image,
-          price_tier: formData.price_tier,
-          latitude: formData.latitude,
-          longitude: formData.longitude,
-          verification_status: formData.verification_status || 'pending',
-          license_number: formData.license_number || 'MOT-2024-REG',
-          rating: 5.0,
-          created_at: new Date().toISOString(),
-          description: formData.description,
-          website: formData.website
-        };
-        await businessService.create(formData).catch(() => {});
-        setBusinesses(prev => [newBiz, ...prev]);
+        const res = await businessService.create(formData);
+        const created = res?.data?.data || res?.data || res;
+        if (res?.success === false || !created?.id) {
+          throw new Error(res?.message || t('businesses.errorSaving', 'The server did not return the created business.'));
+        }
+        setBusinesses(prev => [{ ...created, image: created.image || created.image_url || formData.image }, ...prev]);
         showSuccess(
           t('businesses.createdSuccess', 'New business profile "{name}" registered successfully.').replace('{name}', formData.name),
           t('businesses.createdTitle', 'Business Created')
@@ -558,10 +540,10 @@ export default function Businesses() {
 
                       <td className="px-4 py-3.5">
                         <div className="text-xs text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] font-medium">
-                          {b.province?.name || b.province || 'Siem Reap'}
+                          {b.province?.name || b.province || '—'}
                         </div>
                         <div className="text-[11px] font-mono text-[var(--color-text-muted-light)] dark:text-[var(--color-text-secondary-dark)]">
-                          {b.license_number || 'MOT-2024-REG'}
+                          {b.license_number || '—'}
                         </div>
                       </td>
 

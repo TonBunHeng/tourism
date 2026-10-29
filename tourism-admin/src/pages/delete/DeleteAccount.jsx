@@ -71,7 +71,7 @@ export default function DeleteAccount() {
             id: req.id,
             user: {
               name: req.user_name || userObj.name || "App User",
-              email: req.user_email || userObj.email || "user@example.com",
+              email: req.user_email || userObj.email || "",
               phone: userObj.phone || "",
               avatar: userObj.avatar || null,
               role: userObj.role || "User"
@@ -84,7 +84,7 @@ export default function DeleteAccount() {
             additionalInfo: req.additional_info || "",
             status: req.status || "pending",
             urgency: req.urgency || "medium",
-            requestedDate: req.created_at?.split("T")[0] || new Date().toISOString().split("T")[0],
+            requestedDate: req.created_at?.split("T")[0] || "—",
             processedDate: req.processed_at?.split("T")[0] || null,
             processedBy: req.processed_by_name || null,
             adminNotes: req.admin_notes || ""

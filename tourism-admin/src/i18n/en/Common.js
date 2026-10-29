@@ -22,6 +22,11 @@ const Common = {
   noData: "No data found",
   back: "Back",
   close: "Close",
+  previous: "Previous",
+  next: "Next",
+  paginationShowing: "Showing",
+  paginationOf: "of",
+  paginationGoToPage: "Go to page {page}",
   refresh: "Refresh",
   all: "All",
   yes: "Yes",
@@ -34,6 +39,7 @@ const Common = {
   create: "Create",
   addNew: "Add New",
   note: "Note",
+  success: "Success",
 };
 
 export default Common;

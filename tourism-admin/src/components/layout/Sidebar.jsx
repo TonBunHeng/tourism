@@ -90,7 +90,7 @@ const NAV_SECTIONS = [
         ],
       },
       { name: 'Profile', key: 'sidebar.profile', icon: User, path: '/profile' },
-      { name: 'Settings', key: 'sidebar.settings', icon: Settings, path: '/settings' },
+      { name: 'Settings', key: 'sidebar.settings', icon: Settings, path: '/settings', requires: 'privileged' },
       { name: 'Logout', key: 'sidebar.logout', icon: LogOut, action: 'logout' },
     ],
   },
@@ -638,9 +638,6 @@ export default function Sidebar({ isOpen, setIsOpen, isExpanded, setIsExpanded }
       <LogoutAlert
         isOpen={showLogoutAlert}
         onClose={() => setShowLogoutAlert(false)}
-        // TODO: clear token + user here (or inside LogoutAlert) and
-        // dispatch `user-profile-updated` so the UI resets immediately.
-        onLogout={() => { }}
       />
     </>
   );

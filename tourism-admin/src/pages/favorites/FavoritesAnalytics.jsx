@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import {
   ArrowLeft,
   Heart,
@@ -31,7 +31,9 @@ import { Link } from 'react-router-dom';
 import favoriteService from '../../services/favoriteService';
 import { useLanguage } from '../../i18n';
 
-export default function FavoritesAnalytics({ favorites: initialFavorites = [] }) {
+const EMPTY_FAVORITES = Object.freeze([]);
+
+export default function FavoritesAnalytics({ favorites: initialFavorites = EMPTY_FAVORITES }) {
   const { t } = useLanguage();
   const [favorites, setFavorites] = useState(initialFavorites);
   const [timeframe, setTimeframe] = useState('Year');
@@ -47,7 +49,7 @@ export default function FavoritesAnalytics({ favorites: initialFavorites = [] })
       case 'Week': return t('favorites.tfWeek');
       case 'Month': return t('favorites.tfMonth');
       case 'Year':
-      default: return t('favorites.tfYear');
+      default: return t('favorites.tfYear', { year: new Date().getFullYear() });
     }
   }, [timeframe, t]);
 
@@ -58,11 +60,7 @@ export default function FavoritesAnalytics({ favorites: initialFavorites = [] })
     }
   }, [initialFavorites]);
 
-  useEffect(() => {
-    fetchAnalytics();
-  }, [timeframe, selectedCategory, visitFilter]);
-
-  const fetchAnalytics = async () => {
+  const fetchAnalytics = useCallback(async () => {
     setIsLoading(true);
     try {
       const res = await favoriteService.getAnalytics({
@@ -84,7 +82,11 @@ export default function FavoritesAnalytics({ favorites: initialFavorites = [] })
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [timeframe, selectedCategory, visitFilter, initialFavorites]);
+
+  useEffect(() => {
+    fetchAnalytics();
+  }, [fetchAnalytics]);
 
   const safeFavorites = useMemo(() => (Array.isArray(favorites) ? favorites : []), [favorites]);
 
@@ -113,33 +115,33 @@ export default function FavoritesAnalytics({ favorites: initialFavorites = [] })
         const dStr = f.created_at || f.saved_date || f.dateAdded;
         if (!dStr) return false;
         const d = new Date(dStr);
-        return !isNaN(d.getTime()) && Math.abs(now - d) <= 24 * 60 * 60 * 1000;
+        return !isNaN(d.getTime()) && d <= now && now - d <= 24 * 60 * 60 * 1000;
       });
-      return dayFiltered.length > 0 ? dayFiltered : result;
+      return dayFiltered;
     } else if (timeframe === 'Week') {
       const weekFiltered = result.filter(f => {
         const dStr = f.created_at || f.saved_date || f.dateAdded;
         if (!dStr) return false;
         const d = new Date(dStr);
-        return !isNaN(d.getTime()) && Math.abs(now - d) <= 7 * 24 * 60 * 60 * 1000;
+        return !isNaN(d.getTime()) && d <= now && now - d <= 7 * 24 * 60 * 60 * 1000;
       });
-      return weekFiltered.length > 0 ? weekFiltered : result;
+      return weekFiltered;
     } else if (timeframe === 'Month') {
       const monthFiltered = result.filter(f => {
         const dStr = f.created_at || f.saved_date || f.dateAdded;
         if (!dStr) return false;
         const d = new Date(dStr);
-        return !isNaN(d.getTime()) && Math.abs(now - d) <= 30 * 24 * 60 * 60 * 1000;
+        return !isNaN(d.getTime()) && d <= now && now - d <= 30 * 24 * 60 * 60 * 1000;
       });
-      return monthFiltered.length > 0 ? monthFiltered : result;
+      return monthFiltered;
     } else if (timeframe === 'Year') {
       const yearFiltered = result.filter(f => {
         const dStr = f.created_at || f.saved_date || f.dateAdded;
         if (!dStr) return true;
         const d = new Date(dStr);
-        return !isNaN(d.getTime()) && (d.getFullYear() === 2026 || d.getFullYear() === now.getFullYear());
+        return !isNaN(d.getTime()) && d.getFullYear() === now.getFullYear();
       });
-      return yearFiltered.length > 0 ? yearFiltered : result;
+      return yearFiltered;
     }
 
     return result;
@@ -213,7 +215,7 @@ export default function FavoritesAnalytics({ favorites: initialFavorites = [] })
         const label = labels[idx];
         const count = Number(apiItem.newSaves ?? apiItem.count ?? apiItem.saves ?? 0);
         runningTotal += count;
-        const visited = Number(apiItem.visitedCount ?? apiItem.visited ?? Math.round(count * 0.6));
+        const visited = Number(apiItem.visitedCount ?? apiItem.visited ?? 0);
         const planned = Math.max(0, count - visited);
         return {
           month: label,
@@ -448,7 +450,7 @@ export default function FavoritesAnalytics({ favorites: initialFavorites = [] })
                 onChange={(e) => setTimeframe(e.target.value)}
                 className="appearance-none w-full sm:w-auto pl-3.5 pr-8 py-2 border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] rounded-md bg-[var(--color-white)] dark:bg-[var(--color-bg-dark)] text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] text-xs md:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[var(--color-input)] focus:border-transparent cursor-pointer shadow-xs"
               >
-                <option value="Year">{t('favorites.tfYear')}</option>
+                <option value="Year">{t('favorites.tfYear', { year: new Date().getFullYear() })}</option>
                 <option value="Month">{t('favorites.tfMonth')}</option>
                 <option value="Week">{t('favorites.tfWeek')}</option>
                 <option value="Day">{t('favorites.tfToday')}</option>

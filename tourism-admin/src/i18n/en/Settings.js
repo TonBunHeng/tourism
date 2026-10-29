@@ -259,7 +259,12 @@ const Settings = {
   btnConfirmRestore: "Confirm Restore",
   restoringDb: "Restoring...",
   dbRestoredTitle: "Database Restored",
-  dbRestoredMsg: "Database state restored successfully from \"{name}\"."
+  dbRestoredMsg: "Database state restored successfully from \"{name}\".",
+  backupUnavailable: "This maintenance action is not connected to the server yet.",
+  backupUnavailableTitle: "Action unavailable",
+  sessionsUnavailable: "Session management is not connected to the server yet.",
+  actionUnavailableTitle: "Action unavailable",
+  noSessionsAvailable: "No session data is available from the server."
 };
 
 export default Settings;

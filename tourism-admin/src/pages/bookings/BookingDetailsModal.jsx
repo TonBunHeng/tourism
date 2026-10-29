@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import {
-  CalendarCheck, User, Mail, Phone, MapPin, DollarSign,
+  User, Mail, Phone, DollarSign,
   Clock, Users, CheckCircle2, AlertCircle, XCircle, Trash2,
   Copy, Check, X, Building2, CreditCard, ExternalLink
 } from 'lucide-react';
@@ -59,10 +59,13 @@ export default function BookingDetailsModal({
     }
   };
 
-  const formattedDate = new Date(booking.created_at || Date.now()).toLocaleDateString(
-    currentLang === 'KH' ? 'km-KH' : 'en-US',
-    { year: 'numeric', month: 'short', day: 'numeric' }
-  );
+  const createdAt = booking.created_at ? new Date(booking.created_at) : null;
+  const formattedDate = createdAt && !Number.isNaN(createdAt.getTime())
+    ? createdAt.toLocaleDateString(
+      currentLang === 'KH' ? 'km-KH' : 'en-US',
+      { year: 'numeric', month: 'short', day: 'numeric' }
+    )
+    : '—';
 
   return createPortal(
     <div
@@ -152,7 +155,7 @@ export default function BookingDetailsModal({
                 <Users className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" /> {t('bookings.partySize', 'Party Size')}
               </span>
               <p className="text-sm font-bold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] mt-1">
-                {booking.number_of_guests || 1} {booking.number_of_guests === 1 ? t('bookings.guestSingle', 'Guest') : t('bookings.guestPlural', 'Guests')}
+                {booking.number_of_guests ?? 'N/A'} {booking.number_of_guests === 1 ? t('bookings.guestSingle', 'Guest') : t('bookings.guestPlural', 'Guests')}
               </p>
             </div>
 

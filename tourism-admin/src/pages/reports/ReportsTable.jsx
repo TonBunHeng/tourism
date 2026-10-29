@@ -712,7 +712,7 @@ export default function ReportsTable({
                         <div className="flex items-center gap-1">
                           <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-500 shrink-0" />
                           <span className="text-xs font-bold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">
-                            {Number(row.rating || 5.0).toFixed(1)}
+                            {Number(row.rating ?? 0).toFixed(1)}
                           </span>
                         </div>
                       </td>
@@ -1019,7 +1019,7 @@ export default function ReportsTable({
                   </div>
                   <div className="p-3 rounded-md bg-[var(--color-surface-hover-light)]/40 dark:bg-zinc-900/40 border border-[var(--color-border-subtle-light)] dark:border-zinc-800 space-y-1">
                     <span className="text-[11px] font-medium text-[var(--color-text-muted-light)] dark:text-zinc-400 block">{t('reports.modalLocationAddress', 'Location Address')}</span>
-                    <p className="font-medium text-[var(--color-text-primary-light)] dark:text-white">{selectedItem.location || 'Cambodia'}</p>
+                    <p className="font-medium text-[var(--color-text-primary-light)] dark:text-white">{selectedItem.location || '—'}</p>
                     <span className="text-[11px] text-[var(--color-text-muted-light)] dark:text-zinc-400 block pt-1 font-mono">
                       {t('reports.modalCreatedDate', { date: selectedItem.createdAt || selectedItem.date }, `Created Date: ${selectedItem.createdAt || selectedItem.date}`)}
                     </span>
@@ -1075,7 +1075,7 @@ export default function ReportsTable({
                       <span className="text-[11px] font-medium text-[var(--color-text-muted-light)] dark:text-zinc-400 block">{t('reports.modalRating', 'Rating')}</span>
                       <span className="font-bold text-amber-500 inline-flex items-center gap-1">
                         <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-                        {Number(selectedItem.rating || 5.0).toFixed(1)}
+                        {Number(selectedItem.rating ?? 0).toFixed(1)}
                       </span>
                     </div>
                   </div>

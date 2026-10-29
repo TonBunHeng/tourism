@@ -13,6 +13,7 @@ export default function GalleryEditModal({
 }) {
   const { t } = useLanguage();
   const [isUploading, setIsUploading] = useState(false);
+  const [uploadError, setUploadError] = useState('');
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -35,16 +36,8 @@ export default function GalleryEditModal({
     if (!file) return;
 
     const isVideo = file.type.startsWith('video/');
-    const localUrl = URL.createObjectURL(file);
     const sizeStr = `${(file.size / (1024 * 1024)).toFixed(1)} MB`;
-
-    onEditingMediaChange({
-      ...editingMedia,
-      url: localUrl,
-      type: isVideo ? 'video' : 'image',
-      size: sizeStr
-    });
-
+    setUploadError('');
     setIsUploading(true);
     try {
       const res = await uploadService.uploadFile(file, 'gallery');
@@ -54,11 +47,13 @@ export default function GalleryEditModal({
           url: res.data.url,
           type: res.data.type || (isVideo ? 'video' : 'image'),
           size: res.data.file_size || sizeStr,
-          dimensions: res.data.dimensions || editingMedia.dimensions || '1920x1080'
+          dimensions: res.data.dimensions || editingMedia.dimensions || ''
         });
+      } else {
+        setUploadError(res?.message || t('gallery.errorUploadFailed', 'File upload failed. Please try again.'));
       }
     } catch (err) {
-      console.warn('Backend file upload fallback:', err);
+      setUploadError(err.message || t('gallery.errorUploadFailed', 'File upload failed. Please try again.'));
     } finally {
       setIsUploading(false);
     }
@@ -114,6 +109,10 @@ export default function GalleryEditModal({
             <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
               {t('gallery.labelMediaFile', 'Media File (Picture / Video)')}
             </label>
+
+            {uploadError && (
+              <p role="alert" className="text-xs text-red-600 dark:text-red-400">{uploadError}</p>
+            )}
 
             {editingMedia.url ? (
               <div className="relative w-full h-44 rounded-md overflow-hidden border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] group shadow-sm">

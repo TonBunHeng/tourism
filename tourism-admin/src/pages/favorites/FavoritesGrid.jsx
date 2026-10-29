@@ -65,7 +65,7 @@ export default function FavoritesGrid({
         const IconComponent = favorite.icon || Landmark;
         const isVisited = Boolean(favorite.visited || favorite.status === 'Visited');
         const isSelected = selectedFavorites.includes(favorite.id);
-        const ratingVal = Number(favorite.rating || favorite.place?.rating || 5.0).toFixed(1);
+        const ratingVal = Number(favorite.rating ?? favorite.place?.rating ?? 0).toFixed(1);
         const reviewsCount = favorite.reviewsCount ?? favorite.reviews ?? favorite.place?.reviews_count ?? 0;
 
         const userInfo = favorite.user || {};
@@ -150,7 +150,7 @@ export default function FavoritesGrid({
 
                 <p className="text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] flex items-center gap-1.5 mt-1">
                   <MapPin className="w-3.5 h-3.5 text-[var(--color-rose-badge-text)] shrink-0" />
-                  <span className="truncate">{favorite.location || 'Cambodia'}</span>
+                  <span className="truncate">{favorite.location || '—'}</span>
                 </p>
 
                 {/* Traveler / User Info Highlight */}
@@ -186,17 +186,17 @@ export default function FavoritesGrid({
 
                   <div className="flex items-center gap-1 text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] min-w-0">
                     <DollarSign className="w-3.5 h-3.5 shrink-0 text-[var(--color-text-muted-light)]" />
-                    <span className="truncate">{favorite.price || 'Free'}</span>
+                    <span className="truncate">{favorite.price || '—'}</span>
                   </div>
 
                   <div className="flex items-center gap-1 text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] min-w-0">
                     <Clock className="w-3.5 h-3.5 shrink-0 text-[var(--color-text-muted-light)]" />
-                    <span className="truncate">{favorite.bestTime || 'Morning'}</span>
+                    <span className="truncate">{favorite.bestTime || '—'}</span>
                   </div>
 
                   <div className="flex items-center gap-1 text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] min-w-0">
                     <Compass className="w-3.5 h-3.5 shrink-0 text-[var(--color-text-muted-light)]" />
-                    <span className="truncate">{favorite.duration || '2-3 Hours'}</span>
+                    <span className="truncate">{favorite.duration || '—'}</span>
                   </div>
                 </div>
               </div>

@@ -89,11 +89,11 @@ export default function Ratings() {
       if (res.success && res.data) {
         const formatted = res.data.map((r) => ({
           ...r,
-          user: r.user || { name: r.user_name || "Traveler", email: r.user_email || "user@example.com" },
+          user: r.user || { name: r.user_name || "Traveler", email: r.user_email || "" },
           place: r.place || { name: r.place_name || "Attraction" },
           title: r.title || "User Review",
           comment: r.comment || "",
-          status: r.status || "Approved",
+          status: r.status || "Unknown",
           replies: r.replies || [],
         }));
         setReviews(formatted);

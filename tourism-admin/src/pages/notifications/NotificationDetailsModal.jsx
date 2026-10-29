@@ -96,12 +96,13 @@ export default function NotificationDetailsModal({
     (notification.type || '').toLowerCase() === 'security' ||
     (notification.title || '').toLowerCase().includes('security');
 
-  const formattedDate = notification.created_at
-    ? new Date(notification.created_at).toLocaleString(undefined, {
+  const createdAt = notification.created_at ? new Date(notification.created_at) : null;
+  const formattedDate = createdAt && !Number.isNaN(createdAt.getTime())
+    ? createdAt.toLocaleString(undefined, {
       dateStyle: 'medium',
       timeStyle: 'short'
     })
-    : t('notifications.timeRecent');
+    : '—';
 
   return (
     <div

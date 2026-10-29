@@ -114,6 +114,7 @@ const Gallery = {
   mediaUploadedTitle: "បានបង្ហោះមេឌៀ",
   uploadFailedMsg: "មិនអាចបង្កើតឯកសារមេឌៀបានទេ។",
   uploadFailedTitle: "ការបង្ហោះបរាជ័យ",
+  errorUploadFailed: "ការបង្ហោះឯកសារបរាជ័យ។ សូមព្យាយាមម្តងទៀត។",
 };
 
 export default Gallery;

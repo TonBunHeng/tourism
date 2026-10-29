@@ -111,7 +111,7 @@ const Ratings = {
   tfToday: "Today",
   tfWeek: "This Week",
   tfMonth: "This Month",
-  tfYear: "2026",
+  tfYear: "{year}",
   statPositiveSentiment: "Positive Sentiment",
   subtextPositiveSentiment: "{count} of {total} rated 4-5★",
   statVerifiedReviews: "Verified Reviews",
@@ -156,6 +156,8 @@ const Ratings = {
   overallScoreBadge: "Overall Score: {score} ★ ({count} Reviews)",
   scoreTrajectory: "Score Trajectory (Prevailing)",
   inMonthAvg: "In-Month Average Score",
+  pillCountSingle: "1 review",
+  pillCount: "{count} reviews recorded",
 };
 
 export default Ratings;

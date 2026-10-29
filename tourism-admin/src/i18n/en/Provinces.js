@@ -107,6 +107,11 @@ const Provinces = {
   provinceCreatedTitle: "Province Created",
   saveFailedMsg: "Failed to save province.",
   saveFailedTitle: "Save Failed",
+  statActiveRegionsPage: "Active on This Page",
+  subtextActiveRegionsPage: "{pct}% of loaded regions",
+  statPopulationOnPage: "Population on This Page",
+  subtextPopulationOnPage: "Population recorded for loaded regions",
+  statPlacesOnPage: "Places on This Page",
 };
 
 export default Provinces;

@@ -36,22 +36,14 @@ export default function Forbidden() {
 
   useEffect(() => {
     document.body.style.overflow = 'hidden';
-    const handleKeyDown = (e) => {
-      if (e.key === 'Escape') {
-        handleBackToDashboard();
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
     return () => {
       document.body.style.overflow = 'unset';
-      window.removeEventListener('keydown', handleKeyDown);
     };
   }, []);
 
   return createPortal(
     <div
       className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-alert-backdrop"
-      onClick={handleBackToDashboard}
       role="dialog"
       aria-modal="true"
     >

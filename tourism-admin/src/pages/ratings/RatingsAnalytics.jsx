@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import {
   ArrowLeft,
   Star,
@@ -32,7 +32,9 @@ import { Link } from 'react-router-dom';
 import reviewService from '../../services/reviewService';
 import { useLanguage } from '../../i18n';
 
-export default function RatingsAnalytics({ reviews: initialReviews = [] }) {
+const EMPTY_REVIEWS = Object.freeze([]);
+
+export default function RatingsAnalytics({ reviews: initialReviews = EMPTY_REVIEWS }) {
   const { t } = useLanguage();
   const [reviews, setReviews] = useState(initialReviews);
   const [timeframe, setTimeframe] = useState('Year');
@@ -48,7 +50,7 @@ export default function RatingsAnalytics({ reviews: initialReviews = [] }) {
       case 'Week': return t('ratings.tfWeek', 'This Week');
       case 'Month': return t('ratings.tfMonth', 'This Month');
       case 'Year':
-      default: return t('ratings.tfYear', '2026');
+      default: return t('ratings.tfYear', { year: new Date().getFullYear() });
     }
   }, [timeframe, t]);
 
@@ -59,11 +61,7 @@ export default function RatingsAnalytics({ reviews: initialReviews = [] }) {
     }
   }, [initialReviews]);
 
-  useEffect(() => {
-    fetchAnalytics();
-  }, [timeframe, selectedCategory, ratingFilter]);
-
-  const fetchAnalytics = async () => {
+  const fetchAnalytics = useCallback(async () => {
     setIsLoading(true);
     try {
       const res = await reviewService.getAnalytics({
@@ -86,7 +84,11 @@ export default function RatingsAnalytics({ reviews: initialReviews = [] }) {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [timeframe, selectedCategory, ratingFilter, initialReviews]);
+
+  useEffect(() => {
+    fetchAnalytics();
+  }, [fetchAnalytics]);
 
   // Extract all categories dynamically from backend analytics or reviews
   const categories = useMemo(() => {
@@ -129,33 +131,33 @@ export default function RatingsAnalytics({ reviews: initialReviews = [] }) {
         const dateStr = r.created_at || r.date;
         if (!dateStr) return false;
         const d = new Date(dateStr);
-        return !isNaN(d.getTime()) && Math.abs(now - d) <= 24 * 60 * 60 * 1000;
+        return !isNaN(d.getTime()) && d <= now && now - d <= 24 * 60 * 60 * 1000;
       });
-      return dayFiltered.length > 0 ? dayFiltered : result;
+      return dayFiltered;
     } else if (timeframe === 'Week') {
       const weekFiltered = result.filter(r => {
         const dateStr = r.created_at || r.date;
         if (!dateStr) return false;
         const d = new Date(dateStr);
-        return !isNaN(d.getTime()) && Math.abs(now - d) <= 7 * 24 * 60 * 60 * 1000;
+        return !isNaN(d.getTime()) && d <= now && now - d <= 7 * 24 * 60 * 60 * 1000;
       });
-      return weekFiltered.length > 0 ? weekFiltered : result;
+      return weekFiltered;
     } else if (timeframe === 'Month') {
       const monthFiltered = result.filter(r => {
         const dateStr = r.created_at || r.date;
         if (!dateStr) return false;
         const d = new Date(dateStr);
-        return !isNaN(d.getTime()) && Math.abs(now - d) <= 30 * 24 * 60 * 60 * 1000;
+        return !isNaN(d.getTime()) && d <= now && now - d <= 30 * 24 * 60 * 60 * 1000;
       });
-      return monthFiltered.length > 0 ? monthFiltered : result;
+      return monthFiltered;
     } else if (timeframe === 'Year') {
       const yearFiltered = result.filter(r => {
         const dateStr = r.created_at || r.date;
         if (!dateStr) return true;
         const d = new Date(dateStr);
-        return !isNaN(d.getTime()) && (d.getFullYear() === 2026 || d.getFullYear() === now.getFullYear());
+        return !isNaN(d.getTime()) && d.getFullYear() === now.getFullYear();
       });
-      return yearFiltered.length > 0 ? yearFiltered : result;
+      return yearFiltered;
     }
 
     return result;
@@ -230,7 +232,7 @@ export default function RatingsAnalytics({ reviews: initialReviews = [] }) {
         const positive = Number(apiItem.positive ?? Math.round(count * 0.7));
         const neutral = Number(apiItem.neutral ?? Math.round(count * 0.2));
         const critical = Math.max(0, count - positive - neutral);
-        const avg = apiItem.avgRating ?? apiItem.avg_rating ?? 4.5;
+        const avg = apiItem.avgRating ?? apiItem.avg_rating ?? 0;
         return {
           month: label,
           label: label,
@@ -284,7 +286,7 @@ export default function RatingsAnalytics({ reviews: initialReviews = [] }) {
         runningCount += mReviews.length;
       }
 
-      const scoreTrajectory = runningCount > 0 ? Number((runningSum / runningCount).toFixed(1)) : (bucketAvg || 4.5);
+      const scoreTrajectory = runningCount > 0 ? Number((runningSum / runningCount).toFixed(1)) : (bucketAvg || 0);
 
       return {
         month: label,
@@ -317,7 +319,7 @@ export default function RatingsAnalytics({ reviews: initialReviews = [] }) {
     } else {
       const counts = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
       filteredReviews.forEach(r => {
-        const stars = Math.round(Number(r.rating || 5));
+        const stars = Math.round(Number(r.rating ?? 0));
         if (stars >= 1 && stars <= 5) {
           counts[stars] = (counts[stars] || 0) + 1;
         }

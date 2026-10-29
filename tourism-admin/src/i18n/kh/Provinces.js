@@ -107,6 +107,11 @@ const Provinces = {
   provinceCreatedTitle: "បានបង្កើតខេត្តថ្មី",
   saveFailedMsg: "មិនអាចរក្សាទុកខេត្ត/រាជធានីបានទេ។",
   saveFailedTitle: "ការរក្សាទុកបរាជ័យ",
+  statActiveRegionsPage: "តំបន់សកម្មក្នុងទំព័រនេះ",
+  subtextActiveRegionsPage: "{pct}% នៃតំបន់ដែលបានផ្ទុក",
+  statPopulationOnPage: "ចំនួនប្រជាជនក្នុងទំព័រនេះ",
+  subtextPopulationOnPage: "ចំនួនប្រជាជនដែលបានកត់ត្រាក្នុងតំបន់ដែលបានផ្ទុក",
+  statPlacesOnPage: "ទីកន្លែងក្នុងទំព័រនេះ",
 };
 
 export default Provinces;

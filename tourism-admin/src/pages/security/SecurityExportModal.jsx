@@ -43,11 +43,11 @@ export default function SecurityExportModal({ isOpen, onClose, alerts = [], meta
       const rows = alerts.map((alert, idx) => [
         idx + 1,
         alert.email || 'Unknown',
-        alert.ip_address || '127.0.0.1',
-        `${alert.attempts || 1} tries`,
+        alert.ip_address || 'N/A',
+        `${alert.attempts ?? 0} tries`,
         alert.type || 'Alert',
         alert.is_read ? 'Acknowledged' : 'Active Alert',
-        alert.created_at ? new Date(alert.created_at).toLocaleString() : 'Recent'
+        alert.created_at ? new Date(alert.created_at).toLocaleString() : 'N/A'
       ]);
 
       const result = exportToPDF({
@@ -86,8 +86,8 @@ export default function SecurityExportModal({ isOpen, onClose, alerts = [], meta
       const excelData = alerts.map((alert, idx) => ({
         '#': idx + 1,
         'Target Account': alert.email || 'Unknown',
-        'Source IP': alert.ip_address || '127.0.0.1',
-        'Failed Attempts': alert.attempts || 1,
+        'Source IP': alert.ip_address || 'N/A',
+        'Failed Attempts': alert.attempts ?? 0,
         'Alert Type': alert.type || 'Alert',
         'Incident Status': alert.is_read ? 'Acknowledged' : 'Active Alert',
         'Message': alert.message || '',

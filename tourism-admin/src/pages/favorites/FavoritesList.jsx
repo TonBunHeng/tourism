@@ -192,7 +192,7 @@ export default function FavoritesList({
                 const IconComponent = favorite.icon || Landmark;
                 const isVisited = Boolean(favorite.visited || favorite.status === 'Visited');
                 const isSelected = selectedFavorites.includes(favorite.id);
-                const ratingVal = Number(favorite.rating || favorite.place?.rating || 5.0).toFixed(1);
+                const ratingVal = Number(favorite.rating ?? favorite.place?.rating ?? 0).toFixed(1);
                 const reviewsCount = favorite.reviewsCount ?? favorite.reviews ?? favorite.place?.reviews_count ?? 0;
 
                 const userInfo = favorite.user || {};

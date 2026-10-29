@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import { useLanguage } from '../../i18n';
@@ -20,10 +20,14 @@ const CAMBODIA_PROVINCES = [
 
 const PROVINCE_KEYS = {
   'Siem Reap & Angkor': 'provSiemReap',
+  'Siem Reap': 'provSiemReap',
   'Phnom Penh': 'provPhnomPenh',
   'Battambang': 'provBattambang',
   'Kampot & Kep': 'provKampotKep',
+  'Kampot': 'provKampotKep',
+  'Kep': 'provKampotKep',
   'Preah Sihanouk': 'provSihanouk',
+  'Sihanoukville': 'provSihanouk',
   'Koh Kong': 'provKohKong',
   'Mondulkiri': 'provMondulkiri',
   'Ratanakiri': 'provRatanakiri',
@@ -118,6 +122,11 @@ export default function GuideModal({
     const newErrors = {};
     if (!formData.name.trim()) {
       newErrors.name = t('guides.nameRequired', 'Full name is required');
+    }
+    if (!formData.email.trim()) {
+      newErrors.email = t('guides.emailRequired', 'Email address is required');
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim())) {
+      newErrors.email = t('guides.emailInvalid', 'Please enter a valid email address');
     }
     if (!formData.license_no.trim()) {
       newErrors.license_no = t('guides.licenseRequired', 'MoT License number is required');
@@ -240,15 +249,18 @@ export default function GuideModal({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-semibold text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">
-                  {t('guides.emailAddress', 'Email Address')}
+                  {t('guides.emailAddress', 'Email Address')} <span className="text-rose-500">*</span>
                 </label>
                 <input
                   type="email"
                   value={formData.email}
                   onChange={(e) => handleChange('email', e.target.value)}
                   placeholder={t('guides.emailPlaceholder', 'guide@cambodiatourism.gov.kh')}
-                  className="w-full px-3 py-2 border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--color-input)] focus:border-transparent bg-[var(--color-white)] dark:bg-[var(--color-bg-dark)] text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] text-sm"
+                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--color-input)] focus:border-transparent bg-[var(--color-white)] dark:bg-[var(--color-bg-dark)] text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] text-sm ${
+                    errors.email ? 'border-rose-400' : 'border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]'
+                  }`}
                 />
+                {errors.email && <p className="text-[11px] text-rose-500 mt-1">{errors.email}</p>}
               </div>
 
               <div>

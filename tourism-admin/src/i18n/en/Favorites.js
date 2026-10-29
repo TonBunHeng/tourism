@@ -139,7 +139,7 @@ const Favorites = {
   tfToday: "Today",
   tfWeek: "This Week",
   tfMonth: "This Month",
-  tfYear: "2026",
+  tfYear: "{year}",
   chartGrowthTitle: "Favorites Growth & Retention Trajectory ({timeframe})",
   chartGrowthSubtitle: "Volume of bookmarked destinations and traveler conversion pace",
   chartCategoryTitle: "Category Distribution & Visit Conversion",
@@ -151,6 +151,9 @@ const Favorites = {
   overallScoreBadge: "Avg Score: {score} ★ ({count} Places)",
   cumulativeGrowthTitle: "Cumulative Growth Trajectory",
   cumulativeGrowthSubtitle: "Total accumulated favorite places over time",
+  statusUpdateFailed: "Failed to update visit status.",
+  bulkDeletePartialFailure: "{count} favorite(s) could not be deleted.",
+  bulkStatusPartialFailure: "{count} favorite(s) could not be updated.",
 };
 
 export default Favorites;

@@ -1,9 +1,8 @@
-import React from 'react';
 import { Landmark, MessageSquare, Image, User, Calendar, Bell, Clock, ArrowRight, CalendarCheck } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../../i18n';
 
-export default function RecentActivity({ activities, recentPlaces }) {
+export default function RecentActivity({ activities }) {
   const navigate = useNavigate();
   const { t } = useLanguage();
 
@@ -82,26 +81,7 @@ export default function RecentActivity({ activities, recentPlaces }) {
     }
   };
 
-  const defaultActivities = [
-    { id: 1, user: 'Admin System', type: 'place', action: 'Published new destination', target: 'Angkor Wat Complex', time: '5m ago' },
-    { id: 2, user: 'Sarah Jenkins', type: 'review', action: 'Submitted 5-star review for', target: 'Bayon Temple', time: '22m ago' },
-    { id: 3, user: 'David Kim', type: 'user', action: 'Registered verified traveler profile', target: '', time: '1h ago' },
-    { id: 4, user: 'Media Hub', type: 'gallery', action: 'Uploaded high-res gallery for', target: 'Ta Prohm', time: '3h ago' },
-    { id: 5, user: 'Events Team', type: 'event', action: 'Scheduled cultural festival', target: 'Water Festival 2026', time: '5h ago' }
-  ];
-
-  const list = (Array.isArray(activities) && activities.length > 0
-    ? activities
-    : (Array.isArray(recentPlaces) && recentPlaces.length > 0
-        ? recentPlaces.map(rp => ({
-            id: rp.id,
-            user: 'Admin',
-            type: 'place',
-            action: 'Added new place',
-            target: rp.name,
-            time: 'Recently'
-          }))
-        : defaultActivities)).slice(0, 5);
+  const list = (Array.isArray(activities) ? activities : []).slice(0, 5);
 
   return (
     <div className="bg-[var(--color-white)] dark:bg-[var(--color-bg-dark)] rounded-md shadow-sm border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] p-5 flex flex-col h-full">

@@ -139,7 +139,7 @@ const Favorites = {
   tfToday: "ថ្ងៃនេះ",
   tfWeek: "សប្តាហ៍នេះ",
   tfMonth: "ខែនេះ",
-  tfYear: "២០២៦",
+  tfYear: "{year}",
   chartGrowthTitle: "គន្លងកំណើន និងការរក្សាទុកចំណូលចិត្ត ({timeframe})",
   chartGrowthSubtitle: "បរិមាណគោលដៅទេសចរណ៍ដែលបានចំណាំ និងល្បឿនបំប្លែងការទៅដល់របស់ភ្ញៀវទេសចរ",
   chartCategoryTitle: "ការបែងចែកប្រភេទ និងការបំប្លែងការទៅដល់",
@@ -151,6 +151,9 @@ const Favorites = {
   overallScoreBadge: "ពិន្ទុមធ្យម៖ {score} ★ ({count} ទីកន្លែង)",
   cumulativeGrowthTitle: "គន្លងកំណើនសរុប",
   cumulativeGrowthSubtitle: "ចំនួនគោលដៅទេសចរណ៍ចំណូលចិត្តសរុបតាមពេលវេលា",
+  statusUpdateFailed: "មិនអាចធ្វើបច្ចុប្បន្នភាពស្ថានភាពការទៅទស្សនាបានទេ។",
+  bulkDeletePartialFailure: "មិនអាចលុបចំណូលចិត្តចំនួន {count} បានទេ។",
+  bulkStatusPartialFailure: "មិនអាចធ្វើបច្ចុប្បន្នភាពចំណូលចិត្តចំនួន {count} បានទេ។",
 };
 
 export default Favorites;

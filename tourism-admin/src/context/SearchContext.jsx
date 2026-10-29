@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
+import { createContext, useContext, useState, useEffect, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
 
 const SearchContext = createContext({
@@ -31,6 +31,7 @@ export const SearchProvider = ({ children }) => {
     if (path.includes('/reviews') || path.includes('/ratings')) return 'Search reviews...';
     if (path.includes('/favorites')) return 'Search saved destinations...';
     if (path.includes('/businesses') || path.includes('/business')) return 'Search businesses...';
+    if (path.includes('/guides') || path.includes('/guide')) return 'Search tour guides...';
     if (path.includes('/reports')) return 'Search reports...';
     if (path.includes('/security')) return 'Search security incidents...';
     if (path.includes('/tracking')) return 'Search user activities...';

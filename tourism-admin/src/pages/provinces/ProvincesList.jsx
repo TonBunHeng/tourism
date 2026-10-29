@@ -33,7 +33,7 @@ export default function ProvincesList({
     switch (status) {
       case 'Active': return t('provinces.statusActive', 'Active');
       case 'Inactive': return t('provinces.statusInactive', 'Inactive');
-      default: return status || t('provinces.statusActive', 'Active');
+      default: return status || '—';
     }
   };
 

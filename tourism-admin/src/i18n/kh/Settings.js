@@ -259,7 +259,12 @@ const Settings = {
   btnConfirmRestore: "បញ្ជាក់ការស្តារឡើងវិញ",
   restoringDb: "កំពុងស្តារឡើងវិញ...",
   dbRestoredTitle: "បានស្តារមូលដ្ឋានទិន្នន័យឡើងវិញ",
-  dbRestoredMsg: "ស្ថានភាពមូលដ្ឋានទិន្នន័យត្រូវបានស្តារឡើងវិញដោយជោគជ័យពី \"{name}\"។"
+  dbRestoredMsg: "ស្ថានភាពមូលដ្ឋានទិន្នន័យត្រូវបានស្តារឡើងវិញដោយជោគជ័យពី \"{name}\"។",
+  backupUnavailable: "សកម្មភាពថែទាំនេះមិនទាន់ភ្ជាប់ទៅម៉ាស៊ីនមេទេ។",
+  backupUnavailableTitle: "សកម្មភាពមិនទាន់មាន",
+  sessionsUnavailable: "ការគ្រប់គ្រងសម័យមិនទាន់ភ្ជាប់ទៅម៉ាស៊ីនមេទេ។",
+  actionUnavailableTitle: "សកម្មភាពមិនទាន់មាន",
+  noSessionsAvailable: "មិនមានទិន្នន័យសម័យពីម៉ាស៊ីនមេទេ។"
 };
 
 export default Settings;

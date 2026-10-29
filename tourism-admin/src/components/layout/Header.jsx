@@ -28,18 +28,18 @@ export default function Header({ toggleSidebar, isSidebarOpen, isExpanded, toggl
   const [userName, setUserName] = useState(() => {
     try {
       const u = JSON.parse(localStorage.getItem('user') || '{}');
-      return u.name || u.username || 'Admin User';
+      return u.name || u.username || 'User';
     } catch (e) {
-      return 'Admin User';
+      return 'User';
     }
   });
 
   const [userEmail, setUserEmail] = useState(() => {
     try {
       const u = JSON.parse(localStorage.getItem('user') || '{}');
-      return u.email || 'admin@tourism.gov.kh';
+      return u.email || '';
     } catch (e) {
-      return 'admin@tourism.gov.kh';
+      return '';
     }
   });
 
@@ -60,11 +60,13 @@ export default function Header({ toggleSidebar, isSidebarOpen, isExpanded, toggl
   const langRef = useRef(null);
 
   const formatTimeAgo = (dateString) => {
-    if (!dateString) return 'Just now';
+    if (!dateString) return '—';
     try {
       const now = new Date();
       const date = new Date(dateString);
       const diffSec = Math.floor((now - date) / 1000);
+      if (Number.isNaN(date.getTime())) return '—';
+      if (diffSec < 0) return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
 
       if (diffSec < 60) return 'Just now';
       const diffMin = Math.floor(diffSec / 60);
@@ -87,10 +89,13 @@ export default function Header({ toggleSidebar, isSidebarOpen, isExpanded, toggl
       const notifs = Array.isArray(data) ? data : (data.data || []);
       setNotifications(notifs);
 
-      if (res?.meta?.unread_count !== undefined) {
-        setUnreadCount(res.meta.unread_count);
+      const unreadMeta = res?.meta?.unread_count ?? res?.data?.meta?.unread_count;
+      if (unreadMeta !== undefined) {
+        setUnreadCount(Number(unreadMeta) || 0);
       } else {
-        setUnreadCount(notifs.filter(n => !n.read).length);
+        const unreadRes = await notificationService.getUnreadCount();
+        const unread = unreadRes?.unread_count ?? unreadRes?.data?.unread_count;
+        setUnreadCount(unread !== undefined ? (Number(unread) || 0) : notifs.filter(n => !n.read).length);
       }
     } catch (e) {
       // Graceful silence on network error
@@ -117,10 +122,14 @@ export default function Header({ toggleSidebar, isSidebarOpen, isExpanded, toggl
     const handleProfileUpdate = () => {
       try {
         const u = JSON.parse(localStorage.getItem('user') || '{}');
-        if (u.name || u.username) setUserName(u.name || u.username);
-        if (u.email) setUserEmail(u.email);
+        setUserName(u.name || u.username || 'User');
+        setUserEmail(u.email || '');
         setUserAvatar(u.image || u.avatar || u.profile_photo_url || null);
-      } catch (e) {}
+      } catch (e) {
+        setUserName('User');
+        setUserEmail('');
+        setUserAvatar(null);
+      }
     };
 
     window.addEventListener('profile-updated', handleProfileUpdate);

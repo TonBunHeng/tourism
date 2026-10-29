@@ -51,12 +51,12 @@ export default function Favorites() {
     name: "",
     category: "",
     location: "",
-    price: "Free",
-    bestTime: "Morning",
-    duration: "2-3 Hours",
+    price: "",
+    bestTime: "",
+    duration: "",
     description: "",
     image: "",
-    rating: 5.0,
+    rating: 0,
     tags: []
   });
 
@@ -138,22 +138,22 @@ export default function Favorites() {
             name: place.name || fav.name || "Favorite Destination",
             category: catName,
             icon: iconMap[catName] || Landmark,
-            location: place.address || place.province || place.province_detail?.name || fav.location || "Cambodia",
-            rating: Number(place.rating || fav.rating || 5.0),
+            location: place.address || place.province || place.province_detail?.name || fav.location || '',
+            rating: Number(place.rating ?? fav.rating ?? 0),
             reviewsCount: Number(place.reviews_count || fav.reviews || place.reviews || 0),
             reviews: Number(place.reviews_count || fav.reviews || place.reviews || 0),
             visitors: Number(place.visitors_count || place.visitors || 0),
             image: place.image_url || place.image || fav.image || "https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&q=80&w=600",
             visited: isVisited,
             status: isVisited ? "Visited" : "To Visit",
-            saved_date: fav.saved_date || (fav.created_at ? new Date(fav.created_at).toISOString().split('T')[0] : "Recently"),
-            dateAdded: fav.saved_date || (fav.created_at ? new Date(fav.created_at).toISOString().split('T')[0] : "Recently"),
+            saved_date: fav.saved_date || (fav.created_at ? new Date(fav.created_at).toISOString().split('T')[0] : ''),
+            dateAdded: fav.saved_date || (fav.created_at ? new Date(fav.created_at).toISOString().split('T')[0] : ''),
             created_at: fav.created_at || fav.saved_date,
-            bestTime: place.best_time || place.bestTime || fav.best_time || "Morning",
-            duration: place.duration || fav.duration || "2-3 Hours",
-            price: place.price || fav.price || "Free",
+            bestTime: place.best_time || place.bestTime || fav.best_time || "",
+            duration: place.duration || fav.duration || "",
+            price: place.price || fav.price || "",
             description: place.description || fav.description || "",
-            tags: place.tags || [catName, "Travel", "Cambodia"]
+            tags: place.tags || []
           };
         });
 
@@ -200,6 +200,9 @@ export default function Favorites() {
   };
 
   const handleToggleStatus = async (favId) => {
+    const favorite = favorites.find((item) => item.id === favId);
+    if (!favorite) return;
+    const wasVisited = Boolean(favorite.visited || favorite.status === 'Visited');
     try {
       await favoriteService.toggleVisited(favId);
       setFavorites((prev) =>
@@ -207,14 +210,14 @@ export default function Favorites() {
           f.id === favId
             ? {
               ...f,
-              visited: !f.visited,
-              status: !f.visited ? "Visited" : "To Visit"
+              visited: !wasVisited,
+              status: wasVisited ? "To Visit" : "Visited"
             }
             : f
         )
       );
     } catch (e) {
-      console.error("Failed to toggle visited status", e);
+      showError(e.message || t('favorites.statusUpdateFailed', 'Failed to update visit status.'), t('favorites.statusUpdateTitle', 'Status Update Failed'));
     }
   };
 
@@ -249,34 +252,57 @@ export default function Favorites() {
     });
     if (!confirmed) return;
 
-    try {
-      await Promise.all(
-        selectedFavorites.map((id) => favoriteService.deleteFavorite(id))
+    const results = await Promise.allSettled(
+      selectedFavorites.map((id) => favoriteService.deleteFavorite(id))
+    );
+    const deletedIds = selectedFavorites.filter((_, index) => results[index].status === 'fulfilled');
+    const failedCount = results.length - deletedIds.length;
+    if (deletedIds.length > 0) {
+      setFavorites((prev) => prev.filter((f) => !deletedIds.includes(f.id)));
+      setSelectedFavorites((prev) => prev.filter((id) => !deletedIds.includes(id)));
+      showSuccess(t('favorites.bulkDeleteSuccess', { count: deletedIds.length }), t('favorites.deleteSuccessTitle'));
+    }
+    if (failedCount > 0) {
+      showError(
+        t('favorites.bulkDeletePartialFailure', '{count} favorite(s) could not be deleted.').replace('{count}', failedCount),
+        t('favorites.bulkDeleteConfirmTitle')
       );
-      setFavorites((prev) => prev.filter((f) => !selectedFavorites.includes(f.id)));
-      setSelectedFavorites([]);
-      showSuccess(t('favorites.bulkDeleteSuccess', { count: selectedFavorites.length }), t('favorites.deleteSuccessTitle'));
-    } catch (e) {
-      showError(e.message || t('favorites.deleteFailed'), t('favorites.bulkDeleteConfirmTitle'));
     }
   };
 
   const handleBulkMarkVisited = async () => {
-    try {
-      await Promise.all(
-        selectedFavorites.map((id) => favoriteService.toggleVisited(id))
-      );
+    const favoritesToMark = favorites.filter((favorite) =>
+      selectedFavorites.includes(favorite.id) &&
+      !Boolean(favorite.visited || favorite.status === 'Visited')
+    );
+    if (favoritesToMark.length === 0) {
+      setSelectedFavorites([]);
+      return;
+    }
+
+    const results = await Promise.allSettled(
+      favoritesToMark.map((favorite) => favoriteService.toggleVisited(favorite.id))
+    );
+    const visitedIds = favoritesToMark
+      .filter((_, index) => results[index].status === 'fulfilled')
+      .map((favorite) => favorite.id);
+    const failedCount = results.length - visitedIds.length;
+    if (visitedIds.length > 0) {
       setFavorites((prev) =>
         prev.map((f) =>
-          selectedFavorites.includes(f.id)
+          visitedIds.includes(f.id)
             ? { ...f, visited: true, status: "Visited" }
             : f
         )
       );
-      setSelectedFavorites([]);
+      setSelectedFavorites((prev) => prev.filter((id) => !visitedIds.includes(id)));
       showSuccess(t('favorites.statusUpdateSuccess', { status: t('favorites.statusVisited') }), t('favorites.statusUpdateTitle'));
-    } catch (e) {
-      showError(e.message || t('favorites.deleteFailed'), t('favorites.statusUpdateTitle'));
+    }
+    if (failedCount > 0) {
+      showError(
+        t('favorites.bulkStatusPartialFailure', '{count} favorite(s) could not be updated.').replace('{count}', failedCount),
+        t('favorites.statusUpdateTitle')
+      );
     }
   };
 
@@ -326,12 +352,12 @@ export default function Favorites() {
           name: "",
           category: "",
           location: "",
-          price: "Free",
-          bestTime: "Morning",
-          duration: "2-3 Hours",
+          price: "",
+          bestTime: "",
+          duration: "",
           description: "",
           image: "",
-          rating: 5.0,
+          rating: 0,
           tags: []
         });
         showSuccess(t('favorites.placeAddedSuccess', { name: placeRes.data.name || newPlace.name }), t('favorites.placeAddedTitle'));

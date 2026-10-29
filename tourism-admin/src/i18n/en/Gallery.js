@@ -114,6 +114,7 @@ const Gallery = {
   mediaUploadedTitle: "Media Uploaded",
   uploadFailedMsg: "Failed to create media item.",
   uploadFailedTitle: "Upload Failed",
+  errorUploadFailed: "File upload failed. Please try again.",
 };
 
 export default Gallery;

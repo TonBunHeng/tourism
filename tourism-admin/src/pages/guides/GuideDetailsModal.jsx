@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import {
   Mail, Phone, MapPin, CheckCircle2,
@@ -10,10 +10,14 @@ import { getStatusColor } from '../../utils/StatusUtils';
 
 const PROVINCE_KEYS = {
   'Siem Reap & Angkor': 'provSiemReap',
+  'Siem Reap': 'provSiemReap',
   'Phnom Penh': 'provPhnomPenh',
   'Battambang': 'provBattambang',
   'Kampot & Kep': 'provKampotKep',
+  'Kampot': 'provKampotKep',
+  'Kep': 'provKampotKep',
   'Preah Sihanouk': 'provSihanouk',
+  'Sihanoukville': 'provSihanouk',
   'Koh Kong': 'provKohKong',
   'Mondulkiri': 'provMondulkiri',
   'Ratanakiri': 'provRatanakiri',
@@ -122,7 +126,7 @@ export default function GuideDetailsModal({
                 <DollarSign className="w-3.5 h-3.5 text-[#003E83] dark:text-blue-400" /> {t('guides.metricDailyRate', 'Daily Rate')}
               </span>
               <p className="text-base font-bold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] mt-1">
-                ${guide.daily_rate || '45'} <span className="text-xs font-normal text-[var(--color-text-muted-light)]">{t('guides.perDay', '/ day')}</span>
+                ${guide.daily_rate ?? '45'} <span className="text-xs font-normal text-[var(--color-text-muted-light)]">{t('guides.perDay', '/ day')}</span>
               </p>
             </div>
 
@@ -131,7 +135,7 @@ export default function GuideDetailsModal({
                 <Clock className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" /> {t('guides.metricExperience', 'Experience')}
               </span>
               <p className="text-base font-bold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] mt-1">
-                {guide.experience_years || '5'}+ <span className="text-xs font-normal text-[var(--color-text-muted-light)]">{t('guides.yearsPlus', 'years')}</span>
+                {guide.experience_years ?? '5'}+ <span className="text-xs font-normal text-[var(--color-text-muted-light)]">{t('guides.yearsPlus', 'years')}</span>
               </p>
             </div>
 

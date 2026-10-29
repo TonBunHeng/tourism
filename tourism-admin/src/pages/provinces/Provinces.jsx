@@ -69,9 +69,9 @@ export default function Provinces() {
 
         const formatted = rawItems.map(p => ({
           ...p,
-          districts: p.districts_count ?? p.districts ?? 0,
-          communes: p.communes_count ?? p.communes ?? 0,
-          places: p.places_count ?? p.places ?? 0,
+          districts: p.districts_count ?? p.districts ?? null,
+          communes: p.communes_count ?? p.communes ?? null,
+          places: p.places_count ?? p.places ?? null,
           icon: Landmark,
         }));
         setProvinces(formatted);
@@ -207,9 +207,9 @@ export default function Provinces() {
       type: provObj.type || 'Province',
       population: provObj.population || '',
       area: provObj.area || '',
-      districts_count: provObj.districts || provObj.districts_count || 0,
-      communes_count: provObj.communes || provObj.communes_count || 0,
-      status: provObj.status || 'Active',
+      districts_count: provObj.districts ?? provObj.districts_count ?? '',
+      communes_count: provObj.communes ?? provObj.communes_count ?? '',
+      status: provObj.status || '',
       description: provObj.description || ''
     });
     setIsAddModalOpen(true);
@@ -229,7 +229,9 @@ export default function Provinces() {
 
     try {
       if (editingProvince) {
-        await provinceService.updateProvince(editingProvince.id, formData);
+        const payload = { ...formData };
+        if (!payload.status) delete payload.status;
+        await provinceService.updateProvince(editingProvince.id, payload);
         showSuccess(
           t('provinces.provinceUpdatedSuccess', 'Province "{name}" has been updated successfully.').replace('{name}', formData.name),
           t('provinces.provinceUpdatedTitle', 'Province Updated')
@@ -260,7 +262,7 @@ export default function Provinces() {
       <ProvincesHeader onOpenAddModal={openAddModal} />
 
       {/* Stats Cards */}
-      <ProvincesStats provinces={provinces} />
+      <ProvincesStats provinces={provinces} totalRecords={totalRecords} />
 
       {/* Main Content Card */}
       <div className="bg-[var(--color-white)] dark:bg-[var(--color-bg-dark)] rounded-md shadow-sm border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] overflow-hidden flex-1">

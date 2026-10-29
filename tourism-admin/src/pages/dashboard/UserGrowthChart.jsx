@@ -24,6 +24,7 @@ const labelMapKh = {
 
 export default function UserGrowthChart({ growthData, timeRange = 'yearly', isLoading = false }) {
   const { t, currentLang } = useLanguage();
+  const currentYear = new Date().getFullYear();
   const isKh = currentLang === 'KH';
 
   // Purely database-driven: if growthData is empty or loading, fallback appropriately by timeRange
@@ -77,7 +78,7 @@ export default function UserGrowthChart({ growthData, timeRange = 'yearly', isLo
         return t('dashboard.growthSubtitleMonthly', 'Weekly active engagement and visits from database (This Month)');
       case 'yearly':
       default:
-        return t('dashboard.growthSubtitleYearly', 'Monthly active engagement and visits from database (2026)');
+        return t('dashboard.growthSubtitleYearly', { year: currentYear }, 'Monthly active engagement and visits from database ({year})');
     }
   };
 
@@ -91,7 +92,7 @@ export default function UserGrowthChart({ growthData, timeRange = 'yearly', isLo
         return t('dashboard.registeredTravelersMonthly', '{count} Registered Travelers (This Month)').replace('{count}', totalTravelers.toLocaleString());
       case 'yearly':
       default:
-        return t('dashboard.registeredTravelersYearly', '{count} Registered Travelers (2026)').replace('{count}', totalTravelers.toLocaleString());
+        return t('dashboard.registeredTravelersYearly', { count: totalTravelers.toLocaleString(), year: currentYear }, '{count} Registered Travelers ({year})');
     }
   };
 

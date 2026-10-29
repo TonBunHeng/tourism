@@ -27,10 +27,11 @@ const safeStr = (val, fallback = '') => {
   return String(val);
 };
 
-const safeDateStr = (dateVal, fallback = '2026-08-18') => {
+const safeDateStr = (dateVal, fallback = 'N/A') => {
   if (!dateVal) return fallback;
   try {
-    return String(dateVal).split('T')[0];
+    const value = String(dateVal).split('T')[0];
+    return value || fallback;
   } catch {
     return fallback;
   }
@@ -73,7 +74,7 @@ export default function Reports() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
   const { showConfirm, showSuccess, showError } = useAlert();
-  const [totalExports, setTotalExports] = useState(16);
+  const [totalExports, setTotalExports] = useState(0);
 
   const [isLoading, setIsLoading] = useState(() => !getPageCache('reports_datasets'));
 
@@ -124,7 +125,7 @@ export default function Reports() {
       // 1. Formatted Places
       const formattedPlaces = rawPlaces.filter(Boolean).map(p => {
         const catName = safeStr(p.category_name || (typeof p.category === 'object' ? p.category?.name : p.category), 'General');
-        const provName = safeStr(p.province_name || (typeof p.province === 'object' ? p.province?.name : p.province), 'Siem Reap');
+        const provName = safeStr(p.province_name || (typeof p.province === 'object' ? p.province?.name : p.province), 'N/A');
         const placeDate = safeDateStr(p.created_at || p.createdAt);
         const pName = safeStr(p.name, 'Unnamed Place');
         return {
@@ -133,11 +134,11 @@ export default function Reports() {
           name: pName,
           category: catName,
           province: provName,
-          rating: Number(p.rating || 4.5),
+          rating: Number(p.rating ?? 0),
           reviews: Number(p.reviews_count || 0),
-          status: safeStr(p.status, 'Active'),
+          status: safeStr(p.status, 'Unknown'),
           createdAt: placeDate,
-          location: safeStr(p.address, 'Cambodia'),
+          location: safeStr(p.address, 'N/A'),
           primaryName: pName,
           secondaryDetail: `${catName} • ${provName}`,
           date: placeDate
@@ -148,8 +149,8 @@ export default function Reports() {
       const formattedEvents = rawEvents.filter(Boolean).map(e => {
         const startDate = safeDateStr(e.start_date || e.startDate);
         const endDate = safeDateStr(e.end_date || e.endDate);
-        const loc = safeStr(e.location, 'Phnom Penh');
-        const eTitle = safeStr(e.title, 'Upcoming Event');
+        const loc = safeStr(e.location, 'N/A');
+        const eTitle = safeStr(e.title, 'Untitled Event');
         return {
           id: e.id,
           entityType: 'Event',
@@ -157,8 +158,8 @@ export default function Reports() {
           location: loc,
           startDate,
           endDate,
-          attendees: Number(e.attendees_count || 500),
-          status: safeStr(e.status, 'Upcoming'),
+          attendees: Number(e.attendees_count ?? 0),
+          status: safeStr(e.status, 'Unknown'),
           primaryName: eTitle,
           secondaryDetail: loc,
           date: startDate
@@ -167,7 +168,7 @@ export default function Reports() {
 
       // 3. Formatted Tours
       const formattedTours = rawTours.filter(Boolean).map(t => {
-        const dest = safeStr(t.destination || (typeof t.province === 'object' ? t.province?.name : t.province), 'Siem Reap');
+        const dest = safeStr(t.destination || (typeof t.province === 'object' ? t.province?.name : t.province), 'N/A');
         const tourPrice = parseFloat(t.price || t.price_per_person || 0);
         const tourCat = safeStr(typeof t.category === 'object' ? t.category?.name : t.category, 'Tour Package');
         const tourDate = safeDateStr(t.created_at);
@@ -177,13 +178,13 @@ export default function Reports() {
           entityType: 'Tour',
           title: tourTitle,
           destination: dest,
-          duration: safeStr(t.duration || (t.duration_days ? `${t.duration_days} Days` : '1 Full Day')),
+          duration: safeStr(t.duration || (t.duration_days ? `${t.duration_days} Days` : null), 'N/A'),
           price_per_person: tourPrice,
-          rating: parseFloat(t.rating || 5.0),
+          rating: Number(t.rating ?? 0),
           reviews_count: Number(t.reviews_count || 0),
-          status: String(t.status || '').toLowerCase() === 'active' ? 'Active' : safeStr(t.status, 'Active'),
+          status: String(t.status || '').toLowerCase() === 'active' ? 'Active' : safeStr(t.status, 'Unknown'),
           category: tourCat,
-          description: safeStr(t.description, 'Curated travel experience in Cambodia.'),
+          description: safeStr(t.description, 'N/A'),
           primaryName: tourTitle,
           secondaryDetail: `${dest} • $${tourPrice} / person`,
           date: tourDate
@@ -192,15 +193,15 @@ export default function Reports() {
 
       // 4. Formatted Bookings
       const formattedBookings = rawBookings.filter(Boolean).map(b => {
-        const code = safeStr(b.booking_code || b.booking_reference || `BK-${b.id || Math.floor(1000 + Math.random() * 9000)}`);
-        const sName = safeStr(b.service?.name || b.service_name, 'Travel Experience');
-        const bName = safeStr(b.business?.name || b.business_name, 'Hospitality Partner');
-        const cName = safeStr(b.user?.name || b.customer_name, 'Traveler');
-        const cEmail = safeStr(b.user?.email || b.customer_email, 'guest@example.com');
+        const code = safeStr(b.booking_code || b.booking_reference || (b.id ? `BK-${b.id}` : null), 'N/A');
+        const sName = safeStr(b.service?.name || b.service_name, 'N/A');
+        const bName = safeStr(b.business?.name || b.business_name, 'N/A');
+        const cName = safeStr(b.user?.name || b.customer_name, 'N/A');
+        const cEmail = safeStr(b.user?.email || b.customer_email, 'N/A');
         const price = Number(b.total_price) || 0;
         const bDate = safeDateStr(b.booking_date || b.created_at);
         const bStatus = String(b.status || '').toLowerCase();
-        const normStatus = bStatus === 'confirmed' ? 'Active' : (bStatus === 'pending' ? 'Pending' : safeStr(b.status, 'Active'));
+        const normStatus = bStatus === 'confirmed' ? 'Active' : (bStatus === 'pending' ? 'Pending' : safeStr(b.status, 'Unknown'));
         return {
           id: b.id,
           entityType: 'Booking',
@@ -232,7 +233,7 @@ export default function Reports() {
           role: uRole,
           joinedDate: uDate,
           reviewsCount: Number(u.reviews_count || 0),
-          status: safeStr(u.status, 'Active'),
+          status: safeStr(u.status, 'Unknown'),
           primaryName: uName,
           secondaryDetail: `${uRole} • ${uEmail}`,
           date: uDate
@@ -241,11 +242,11 @@ export default function Reports() {
 
       // 6. Formatted Reviews
       const formattedReviews = rawReviews.filter(Boolean).map(r => {
-        const uName = safeStr(r.user_name || (typeof r.user === 'object' ? r.user?.name : r.user), 'Traveler');
-        const pName = safeStr(r.place_name || (typeof r.place === 'object' ? r.place?.name : r.place), 'Attraction');
+        const uName = safeStr(r.user_name || (typeof r.user === 'object' ? r.user?.name : r.user), 'N/A');
+        const pName = safeStr(r.place_name || (typeof r.place === 'object' ? r.place?.name : r.place), 'N/A');
         const commentStr = safeStr(r.comment || r.title, '');
         const rDate = safeDateStr(r.created_at || r.date);
-        const rRating = Number(r.rating || 5);
+        const rRating = Number(r.rating ?? 0);
         return {
           id: r.id,
           entityType: 'Review',
@@ -256,7 +257,7 @@ export default function Reports() {
           comment: commentStr,
           createdAt: rDate,
           date: rDate,
-          status: safeStr(r.status, 'Approved'),
+          status: safeStr(r.status, 'Unknown'),
           primaryName: `${uName} on ${pName}`,
           secondaryDetail: `${rRating.toFixed(1)}★ • ${commentStr ? `"${commentStr.slice(0, 40)}..."` : 'Feedback'}`
         };
@@ -265,7 +266,7 @@ export default function Reports() {
       // 7. Formatted Categories
       const formattedCategories = rawCategories.filter(Boolean).map(c => {
         const cName = safeStr(c.name, 'Category');
-        const cDesc = safeStr(c.description, 'Category description');
+        const cDesc = safeStr(c.description, 'N/A');
         const cPlaces = Number(c.places_count || 0);
         const cDate = safeDateStr(c.created_at);
         return {
@@ -274,7 +275,7 @@ export default function Reports() {
           name: cName,
           description: cDesc,
           totalPlaces: cPlaces,
-          status: safeStr(c.status, 'Active'),
+          status: safeStr(c.status, 'Unknown'),
           primaryName: cName,
           secondaryDetail: `${cPlaces} Places Listed`,
           date: cDate
@@ -428,7 +429,7 @@ export default function Reports() {
           r.id,
           r.primaryName || r.name || r.title || r.userName || 'N/A',
           r.secondaryDetail || r.category || r.destination || r.email || 'N/A',
-          r.status || 'Active',
+          r.status || 'Unknown',
           r.date || r.createdAt || r.startDate || 'N/A'
         ]);
       } else if (activeTab === 'places') {
@@ -518,7 +519,7 @@ export default function Reports() {
               'Record ID': r.id,
               'Title / Subject': r.primaryName || r.name || r.title || r.booking_code || r.userName || '',
               'Category / Detail': r.secondaryDetail || r.category || r.destination || r.role || '',
-              'Status': r.status || 'Active',
+              'Status': r.status || 'Unknown',
               'Date': r.date || r.createdAt || r.startDate || ''
             }))
           },

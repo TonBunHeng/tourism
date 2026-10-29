@@ -170,6 +170,16 @@ const Businesses = {
   approveProfile: "Approve Profile",
   defaultCategory: "Hospitality",
   defaultOwner: "Business Owner",
+  categoryRequired: "Business category is required.",
+  provinceRequired: "Province is required.",
+  selectCategory: "Select a category",
+  selectProvince: "Select a province",
+  selectPriceTier: "Select a price tier (optional)",
+  approveFailed: "Failed to approve business profile.",
+  errorTitle: "Action Failed",
+  statusUpdateFailed: "Failed to update business status.",
+  activateFailed: "Failed to reactivate business profile.",
+  deleteFailed: "Failed to delete business profile.",
 };
 
 export default Businesses;

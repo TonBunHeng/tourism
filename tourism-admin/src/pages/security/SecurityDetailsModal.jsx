@@ -163,7 +163,7 @@ export default function SecurityDetailsModal({
                   <p className="text-[10px] text-slate-400 uppercase font-semibold">
                     {t('security.labelSourceIp', 'Source IP Address')}
                   </p>
-                  <p className="font-bold text-slate-900 dark:text-zinc-100 mt-0.5 font-mono">{alert.ip_address || '127.0.0.1'}</p>
+                  <p className="font-bold text-slate-900 dark:text-zinc-100 mt-0.5 font-mono">{alert.ip_address || 'N/A'}</p>
                 </div>
               </div>
 

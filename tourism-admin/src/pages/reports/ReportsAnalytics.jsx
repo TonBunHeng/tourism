@@ -61,7 +61,7 @@ export default function ReportsAnalytics({ datasets: initialDatasets = null }) {
       case 'Week': return t('reports.tfThisWeek', 'This Week');
       case 'Month': return t('reports.tfThisMonth', 'This Month');
       case 'Year':
-      default: return t('reports.tfYear2026', '2026');
+      default: return t('reports.tfYear', String(new Date().getFullYear()));
     }
   }, [timeframe, t]);
 
@@ -134,10 +134,10 @@ export default function ReportsAnalytics({ datasets: initialDatasets = null }) {
             id: p.id,
             name: p.name || 'Unnamed Place',
             category: p.category_name || (typeof p.category === 'object' ? p.category?.name : p.category) || 'General',
-            province: p.province_name || (typeof p.province === 'object' ? p.province?.name : p.province) || 'Cambodia',
+            province: p.province_name || (typeof p.province === 'object' ? p.province?.name : p.province) || '—',
             rating: Number(p.rating || 0),
             reviews: Number(p.reviews_count || 0),
-            status: p.status || 'Active',
+            status: p.status || 'Unknown',
             createdAt: p.created_at ? String(p.created_at).split('T')[0] : null,
             type: 'Place'
           }));
@@ -146,11 +146,11 @@ export default function ReportsAnalytics({ datasets: initialDatasets = null }) {
             id: e.id,
             title: e.title || 'Event',
             name: e.title || 'Event',
-            location: e.location || 'Cambodia',
+            location: e.location || '—',
             startDate: e.start_date ? String(e.start_date).split('T')[0] : (e.created_at ? String(e.created_at).split('T')[0] : null),
             endDate: e.end_date ? String(e.end_date).split('T')[0] : null,
             attendees: Number(e.attendees_count || 0),
-            status: e.status || 'Upcoming',
+            status: e.status || 'Unknown',
             createdAt: e.created_at ? String(e.created_at).split('T')[0] : null,
             type: 'Event'
           }));
@@ -162,7 +162,7 @@ export default function ReportsAnalytics({ datasets: initialDatasets = null }) {
             role: u.role || 'User',
             joinedDate: u.created_at ? String(u.created_at).split('T')[0] : null,
             createdAt: u.created_at ? String(u.created_at).split('T')[0] : null,
-            status: u.status || 'Active',
+            status: u.status || 'Unknown',
             type: 'User'
           }));
 
@@ -174,7 +174,7 @@ export default function ReportsAnalytics({ datasets: initialDatasets = null }) {
             comment: r.comment || '',
             date: r.created_at ? String(r.created_at).split('T')[0] : null,
             createdAt: r.created_at ? String(r.created_at).split('T')[0] : null,
-            status: r.status || 'Approved',
+            status: r.status || 'Unknown',
             type: 'Review'
           }));
 
@@ -183,7 +183,7 @@ export default function ReportsAnalytics({ datasets: initialDatasets = null }) {
             name: c.name || 'Category',
             description: c.description || '',
             totalPlaces: Number(c.places_count || 0),
-            status: c.status || 'Active',
+            status: c.status || 'Unknown',
             createdAt: c.created_at ? String(c.created_at).split('T')[0] : null,
             type: 'Category'
           }));
@@ -260,33 +260,33 @@ export default function ReportsAnalytics({ datasets: initialDatasets = null }) {
         const dStr = item.createdAt || item.startDate || item.joinedDate || item.date;
         if (!dStr) return false;
         const d = new Date(dStr);
-        return !isNaN(d.getTime()) && Math.abs(now - d) <= 24 * 60 * 60 * 1000;
+        return !isNaN(d.getTime()) && d <= now && now - d <= 24 * 60 * 60 * 1000;
       });
-      return dayFiltered.length > 0 ? dayFiltered : items;
+      return dayFiltered;
     } else if (timeframe === 'Week') {
       const weekFiltered = items.filter(item => {
         const dStr = item.createdAt || item.startDate || item.joinedDate || item.date;
         if (!dStr) return false;
         const d = new Date(dStr);
-        return !isNaN(d.getTime()) && Math.abs(now - d) <= 7 * 24 * 60 * 60 * 1000;
+        return !isNaN(d.getTime()) && d <= now && now - d <= 7 * 24 * 60 * 60 * 1000;
       });
-      return weekFiltered.length > 0 ? weekFiltered : items;
+      return weekFiltered;
     } else if (timeframe === 'Month') {
       const monthFiltered = items.filter(item => {
         const dStr = item.createdAt || item.startDate || item.joinedDate || item.date;
         if (!dStr) return false;
         const d = new Date(dStr);
-        return !isNaN(d.getTime()) && Math.abs(now - d) <= 30 * 24 * 60 * 60 * 1000;
+        return !isNaN(d.getTime()) && d <= now && now - d <= 30 * 24 * 60 * 60 * 1000;
       });
-      return monthFiltered.length > 0 ? monthFiltered : items;
+      return monthFiltered;
     } else if (timeframe === 'Year') {
       const yearFiltered = items.filter(item => {
         const dStr = item.createdAt || item.startDate || item.joinedDate || item.date;
         if (!dStr) return true;
         const d = new Date(dStr);
-        return !isNaN(d.getTime()) && (d.getFullYear() === 2026 || d.getFullYear() === now.getFullYear());
+        return !isNaN(d.getTime()) && d.getFullYear() === now.getFullYear();
       });
-      return yearFiltered.length > 0 ? yearFiltered : items;
+      return yearFiltered;
     }
 
     return items;
@@ -458,7 +458,7 @@ export default function ReportsAnalytics({ datasets: initialDatasets = null }) {
       });
     } else if (selectedDataset === 'reviews') {
       reviews.forEach(r => {
-        const key = `${r.rating || 5} Stars`;
+        const key = `${r.rating ?? 0} Stars`;
         map[key] = (map[key] || 0) + 1;
       });
     } else if (selectedDataset === 'categories') {

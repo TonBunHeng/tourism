@@ -76,10 +76,10 @@ export default function Gallery() {
           type: item.type || "image",
           url: item.url,
           category: item.category || item.category_name || "General",
-          size: item.size || item.file_size || "2.4 MB",
-          dimensions: item.dimensions || "1920x1080",
+          size: item.size || item.file_size || "N/A",
+          dimensions: item.dimensions || "N/A",
           uploadedBy: item.uploader_name || item.user?.name || "Admin",
-          uploadDate: item.uploadDate || (item.created_at ? item.created_at.split("T")[0] : "2026-08-18"),
+          uploadDate: item.uploadDate || (item.created_at ? item.created_at.split("T")[0] : "—"),
           views: Number(item.views_count ?? item.views ?? 0),
           likes: Number(item.likes_count ?? item.likes ?? 0),
           status: item.status || "Published",
@@ -205,8 +205,8 @@ export default function Gallery() {
         type: editingMedia.type || "image",
         category: editingMedia.category,
         url: editingMedia.url,
-        file_size: editingMedia.size || editingMedia.file_size || "2.4 MB",
-        dimensions: editingMedia.dimensions || "1920x1080",
+        file_size: editingMedia.size || editingMedia.file_size || null,
+        dimensions: editingMedia.dimensions || null,
         status: editingMedia.status || "Published"
       });
       setIsEditOpen(false);
@@ -231,8 +231,8 @@ export default function Gallery() {
         type: newMedia.type || "image",
         url: newMedia.url,
         category: newMedia.category,
-        file_size: newMedia.size || "2.4 MB",
-        dimensions: newMedia.dimensions || "1920x1080",
+        file_size: newMedia.fileSize || newMedia.size || null,
+        dimensions: newMedia.dimensions || null,
         status: newMedia.status || "Published"
       });
       setIsUploadModalOpen(false);

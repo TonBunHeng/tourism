@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import {
   Bell,
@@ -26,6 +26,8 @@ import NotificationDetailsModal from './NotificationDetailsModal';
 import SimplePagination from '../../components/common/SimplePagination';
 import { getPageCache, setPageCache } from '../../utils/pageCache';
 
+const NOTIFICATION_CATEGORIES = ['All', 'Alerts', 'Reviews', 'Messages', 'Users', 'System'];
+
 export default function Notifications() {
   const { t } = useLanguage();
   const { showConfirm, showSuccess, showError } = useAlert();
@@ -35,9 +37,9 @@ export default function Notifications() {
   // Tab persistence via URL search param + sessionStorage
   const [filterCategory, setFilterCategory] = useState(() => {
     const tabFromUrl = searchParams.get('tab');
-    if (tabFromUrl && tabFromUrl.toLowerCase() !== 'security') return tabFromUrl;
+    if (NOTIFICATION_CATEGORIES.includes(tabFromUrl)) return tabFromUrl;
     const tabFromStorage = sessionStorage.getItem('notifications_active_tab');
-    if (tabFromStorage && tabFromStorage.toLowerCase() !== 'security') return tabFromStorage;
+    if (NOTIFICATION_CATEGORIES.includes(tabFromStorage)) return tabFromStorage;
     return 'All';
   });
 
@@ -53,8 +55,16 @@ export default function Notifications() {
   // Selected Notification for Details Modal
   const [selectedNotification, setSelectedNotification] = useState(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
+  const markingReadIds = useRef(new Set());
 
-  const categories = ['All', 'Alerts', 'Reviews', 'Messages', 'Users', 'System'];
+  const categories = NOTIFICATION_CATEGORIES;
+
+  useEffect(() => {
+    const tabFromUrl = searchParams.get('tab');
+    const nextTab = NOTIFICATION_CATEGORIES.includes(tabFromUrl) ? tabFromUrl : 'All';
+    if (nextTab !== filterCategory) setFilterCategory(nextTab);
+    sessionStorage.setItem('notifications_active_tab', nextTab);
+  }, [searchParams, filterCategory]);
 
   const getCategoryLabel = (cat) => {
     switch ((cat || '').toLowerCase()) {
@@ -74,19 +84,22 @@ export default function Notifications() {
     setCurrentPage(1);
     sessionStorage.setItem('notifications_active_tab', cat);
     if (cat === 'All') {
-      searchParams.delete('tab');
-      setSearchParams(searchParams, { replace: true });
+      setSearchParams({}, { replace: true });
     } else {
       setSearchParams({ tab: cat }, { replace: true });
     }
   };
 
   const formatTimeAgo = (dateString) => {
-    if (!dateString) return t('notifications.timeRecent');
+    if (!dateString) return '—';
     try {
       const now = new Date();
       const date = new Date(dateString);
       const diffSec = Math.floor((now - date) / 1000);
+      if (Number.isNaN(date.getTime())) return '—';
+      if (diffSec < 0) {
+        return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+      }
 
       if (diffSec < 60) return t('notifications.timeJustNow');
       const diffMin = Math.floor(diffSec / 60);
@@ -186,7 +199,7 @@ export default function Notifications() {
         setUnreadCount(unread);
       } else {
         const unreadRes = await notificationService.getUnreadCount();
-        unread = unreadRes?.unread_count || 0;
+        unread = Number(unreadRes?.unread_count ?? unreadRes?.data?.unread_count ?? 0) || 0;
         setUnreadCount(unread);
       }
 
@@ -203,7 +216,7 @@ export default function Notifications() {
   useEffect(() => {
     fetchNotifications();
 
-    const handleSync = () => fetchNotifications(true);
+    const handleSync = () => fetchNotifications();
     window.addEventListener('notifications-updated', handleSync);
     return () => window.removeEventListener('notifications-updated', handleSync);
   }, [fetchNotifications]);
@@ -220,6 +233,10 @@ export default function Notifications() {
 
   const handleMarkAsRead = async (id, e) => {
     if (e) e.stopPropagation();
+    if (markingReadIds.current.has(id)) return;
+    const wasUnread = notifications.some(n => n.id === id && !n.read);
+    if (!wasUnread) return;
+    markingReadIds.current.add(id);
     try {
       await notificationService.markAsRead(id);
       setNotifications(prev =>
@@ -228,10 +245,13 @@ export default function Notifications() {
       if (selectedNotification && selectedNotification.id === id) {
         setSelectedNotification(prev => ({ ...prev, read: true }));
       }
-      setUnreadCount(prev => Math.max(0, prev - 1));
+      if (wasUnread) setUnreadCount(prev => Math.max(0, prev - 1));
       window.dispatchEvent(new CustomEvent('notifications-updated'));
     } catch (err) {
       console.error('Mark read error:', err);
+      showError(err.message || 'Failed to mark notification as read.', 'Error');
+    } finally {
+      markingReadIds.current.delete(id);
     }
   };
 
@@ -247,6 +267,7 @@ export default function Notifications() {
       try {
         await notificationService.markAllRead();
         setNotifications(prev => prev.map(n => ({ ...n, read: true, read_at: new Date().toISOString() })));
+        setSelectedNotification(prev => prev ? { ...prev, read: true, read_at: new Date().toISOString() } : prev);
         setUnreadCount(0);
         window.dispatchEvent(new CustomEvent('notifications-updated'));
       } catch (err) {

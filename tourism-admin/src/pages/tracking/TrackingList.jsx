@@ -68,7 +68,7 @@ export default function TrackingList({
   };
 
   const formatTimestamp = (dateStr) => {
-    if (!dateStr) return { relative: t('tracking.timeJustNow', 'Just now'), full: '' };
+    if (!dateStr) return { relative: 'N/A', full: '' };
     const date = new Date(dateStr);
     const now = new Date();
     const diffMs = now - date;
@@ -102,7 +102,7 @@ export default function TrackingList({
             const ActionIcon = actionInfo.icon;
             const timeData = formatTimestamp(log.created_at);
             const userName = log.user_name || log.user?.name || t('tracking.staffUser', 'Staff User');
-            const userEmail = log.user?.email || (log.ip_address ? `IP: ${log.ip_address}` : 'staff@angkorverses.com');
+            const userEmail = log.user?.email || (log.ip_address ? `IP: ${log.ip_address}` : 'N/A');
 
             return (
               <div

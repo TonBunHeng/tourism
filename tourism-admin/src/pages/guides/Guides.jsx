@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import {
   Users, ShieldCheck, MapPin, Languages, CheckCircle,
   AlertCircle, Eye, Edit, Trash2, Plus, RefreshCw, ChevronDown
@@ -15,10 +15,14 @@ import { getPageCache, setPageCache } from '../../utils/pageCache';
 
 const PROVINCE_KEYS = {
   'Siem Reap & Angkor': 'provSiemReap',
+  'Siem Reap': 'provSiemReap',
   'Phnom Penh': 'provPhnomPenh',
   'Battambang': 'provBattambang',
   'Kampot & Kep': 'provKampotKep',
+  'Kampot': 'provKampotKep',
+  'Kep': 'provKampotKep',
   'Preah Sihanouk': 'provSihanouk',
+  'Sihanoukville': 'provSihanouk',
   'Koh Kong': 'provKohKong',
   'Mondulkiri': 'provMondulkiri',
   'Ratanakiri': 'provRatanakiri',
@@ -42,9 +46,8 @@ export default function Guides() {
   const { showConfirm, showSuccess, showError } = useAlert();
   const { searchTerm: search } = useSearch();
 
-  const cachedGuides = getPageCache('guides_data');
-  const [guides, setGuides] = useState(() => cachedGuides || []);
-  const [loading, setLoading] = useState(() => !cachedGuides);
+  const [guides, setGuides] = useState(() => getPageCache('guides_data') || []);
+  const [loading, setLoading] = useState(() => !getPageCache('guides_data'));
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [statusFilter, setStatusFilter] = useState('all');
   const [languageFilter, setLanguageFilter] = useState('All');
@@ -79,12 +82,12 @@ export default function Guides() {
       setPageCache('guides_data', mapped);
     } catch (err) {
       console.warn('Backend guides fetch notice:', err);
-      if (!cachedGuides) setGuides([]);
+      if (!getPageCache('guides_data')) setGuides([]);
     } finally {
       setIsRefreshing(false);
       setLoading(false);
     }
-  }, [cachedGuides]);
+  }, []);
 
   useEffect(() => {
     fetchGuides();
@@ -135,7 +138,14 @@ export default function Guides() {
   // Pagination calculation
   const totalRecords = filteredGuides.length;
   const totalPages = Math.ceil(totalRecords / itemsPerPage) || 1;
-  const startIndex = (currentPage - 1) * itemsPerPage;
+
+  // Reset pagination when search query changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search]);
+
+  const safeCurrentPage = Math.min(Math.max(1, currentPage), totalPages);
+  const startIndex = (safeCurrentPage - 1) * itemsPerPage;
   const paginatedGuides = filteredGuides.slice(startIndex, startIndex + itemsPerPage);
   const endIndex = Math.min(startIndex + paginatedGuides.length, totalRecords);
 
@@ -155,24 +165,42 @@ export default function Guides() {
   const handleSaveGuide = async (payload) => {
     try {
       if (editingGuide) {
-        await guideService.updateGuide(editingGuide.id, payload);
-        setGuides(prev => prev.map(g => g.id === editingGuide.id ? { ...g, ...payload } : g));
+        const res = await guideService.updateGuide(editingGuide.id, payload);
+        const serverData = res?.data?.data || res?.data || {};
+        const updated = {
+          ...editingGuide,
+          ...payload,
+          ...(typeof serverData === 'object' ? serverData : {}),
+          status: payload.status || editingGuide.status
+        };
+        setGuides(prev => {
+          const next = prev.map(g => g.id === editingGuide.id ? updated : g);
+          setPageCache('guides_data', next);
+          return next;
+        });
         if (viewingGuide && viewingGuide.id === editingGuide.id) {
-          setViewingGuide(prev => ({ ...prev, ...payload }));
+          setViewingGuide(updated);
         }
         showSuccess(
           t('guides.guideUpdatedSuccess', 'Tour guide profile "{name}" updated successfully.').replace('{name}', payload.name),
           t('guides.changesSavedTitle', 'Changes Saved')
         );
       } else {
-        const res = await guideService.createGuide(payload).catch(() => null);
-        const newId = res?.data?.id || Date.now();
+        const res = await guideService.createGuide(payload);
+        const serverData = res?.data?.data || res?.data || {};
+        const newId = serverData?.id || res?.data?.id || Date.now();
         const created = {
           ...payload,
+          ...serverData,
           id: newId,
-          avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(payload.name)}&background=003E83&color=fff&size=200`
+          avatar: serverData?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(payload.name)}&background=003E83&color=fff&size=200`,
+          status: serverData?.status === 'verified' || serverData?.status === 'Active' || payload.status === 'Active' ? 'Active' : 'Inactive'
         };
-        setGuides(prev => [created, ...prev]);
+        setGuides(prev => {
+          const next = [created, ...prev];
+          setPageCache('guides_data', next);
+          return next;
+        });
         showSuccess(
           t('guides.guideRegisteredSuccess', 'New tour guide "{name}" accredited successfully.').replace('{name}', payload.name),
           t('guides.guideRegisteredTitle', 'Guide Registered')
@@ -181,7 +209,11 @@ export default function Guides() {
       setIsModalOpen(false);
       setEditingGuide(null);
     } catch (err) {
-      showError(err.message || t('guides.saveFailedError', 'Failed to save tour guide profile.'), t('guides.saveFailedTitle', 'Save Failed'));
+      const errMsg = err?.message ||
+        err?.response?.data?.message ||
+        (err?.response?.data?.errors ? Object.values(err.response.data.errors).flat().join(' ') : null) ||
+        t('guides.saveFailedError', 'Failed to save tour guide profile.');
+      showError(errMsg, t('guides.saveFailedTitle', 'Save Failed'));
     }
   };
 
@@ -194,7 +226,11 @@ export default function Guides() {
     } catch {
       // optimistic update
     } finally {
-      setGuides(prev => prev.map(g => g.id === guide.id ? { ...g, status: newStatus } : g));
+      setGuides(prev => {
+        const next = prev.map(g => g.id === guide.id ? { ...g, status: newStatus } : g);
+        setPageCache('guides_data', next);
+        return next;
+      });
       if (viewingGuide && viewingGuide.id === guide.id) {
         setViewingGuide(prev => ({ ...prev, status: newStatus }));
       }
@@ -222,7 +258,11 @@ export default function Guides() {
     } catch {
       // optimistic update
     } finally {
-      setGuides(prev => prev.filter(g => g.id !== guide.id));
+      setGuides(prev => {
+        const next = prev.filter(g => g.id !== guide.id);
+        setPageCache('guides_data', next);
+        return next;
+      });
       if (viewingGuide && viewingGuide.id === guide.id) {
         setViewingGuide(null);
       }
@@ -281,14 +321,25 @@ export default function Guides() {
               {t('guides.directorySubtitle', 'Review, verify, and manage licensed Cambodian tour guides, language proficiencies, and credentials.')}
             </p>
           </div>
-          <button
-            type="button"
-            onClick={() => { setEditingGuide(null); setIsModalOpen(true); }}
-            className="flex items-center justify-center gap-1.5 md:gap-2 px-4 py-2 text-xs md:text-sm font-medium rounded-md bg-[#003E83] hover:bg-[#002e62] text-white transition-colors shrink-0 w-full sm:w-auto cursor-pointer shadow-xs"
-          >
-            <Plus className="w-4 h-4 shrink-0" />
-            <span>{t('guides.registerGuideBtn', 'Register Guide')}</span>
-          </button>
+          <div className="flex items-center gap-2 self-stretch sm:self-auto">
+            <button
+              type="button"
+              onClick={fetchGuides}
+              disabled={isRefreshing}
+              className="p-2 text-xs md:text-sm font-medium rounded-md border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] hover:bg-[var(--color-surface-hover-light)] dark:hover:bg-[var(--color-surface-hover-dark)] text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] transition-colors shrink-0 cursor-pointer shadow-xs disabled:opacity-50"
+              title={t('guides.refreshTooltip', 'Refresh directory')}
+            >
+              <RefreshCw className={`w-4 h-4 shrink-0 ${isRefreshing ? 'animate-spin' : ''}`} />
+            </button>
+            <button
+              type="button"
+              onClick={() => { setEditingGuide(null); setIsModalOpen(true); }}
+              className="flex items-center justify-center gap-1.5 md:gap-2 px-4 py-2 text-xs md:text-sm font-medium rounded-md bg-[#003E83] hover:bg-[#002e62] text-white transition-colors shrink-0 w-full sm:w-auto cursor-pointer shadow-xs"
+            >
+              <Plus className="w-4 h-4 shrink-0" />
+              <span>{t('guides.registerGuideBtn', 'Register Guide')}</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -534,11 +585,10 @@ export default function Guides() {
 
                           <button
                             onClick={() => handleToggleStatus(guide)}
-                            className={`p-1.5 rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer ${
-                              isActive
-                                ? 'text-amber-600 hover:bg-amber-50 dark:text-amber-400 dark:hover:bg-amber-950/30'
-                                : 'text-emerald-600 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-950/30'
-                            }`}
+                            className={`p-1.5 rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer ${isActive
+                              ? 'text-amber-600 hover:bg-amber-50 dark:text-amber-400 dark:hover:bg-amber-950/30'
+                              : 'text-emerald-600 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-950/30'
+                              }`}
                             title={isActive ? t('guides.tooltipMarkInactive', 'Mark Inactive') : t('guides.tooltipAccreditGuide', 'Accredit Guide')}
                           >
                             <ShieldCheck className="w-4 h-4" />
@@ -579,7 +629,7 @@ export default function Guides() {
               </p>
             </div>
           ) : (
-            paginatedGuides.map((guide, index) => {
+            paginatedGuides.map((guide) => {
               const isActive = guide.status === 'Active' || guide.status === 'verified';
               const langs = Array.isArray(guide.languages)
                 ? guide.languages
@@ -652,9 +702,8 @@ export default function Guides() {
                     </button>
                     <button
                       onClick={() => handleToggleStatus(guide)}
-                      className={`p-1.5 rounded-md cursor-pointer ${
-                        isActive ? 'text-amber-600 hover:bg-amber-50' : 'text-emerald-600 hover:bg-emerald-50'
-                      }`}
+                      className={`p-1.5 rounded-md cursor-pointer ${isActive ? 'text-amber-600 hover:bg-amber-50' : 'text-emerald-600 hover:bg-emerald-50'
+                        }`}
                       title={isActive ? t('guides.tooltipMarkInactive', 'Mark Inactive') : t('guides.tooltipAccreditGuide', 'Accredit Guide')}
                     >
                       <ShieldCheck className="w-4 h-4" />
@@ -675,7 +724,7 @@ export default function Guides() {
 
         {/* Simple Pagination Footer */}
         <SimplePagination
-          currentPage={currentPage}
+          currentPage={safeCurrentPage}
           totalPages={totalPages}
           onPageChange={setCurrentPage}
           startIndex={startIndex}

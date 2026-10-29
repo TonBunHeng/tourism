@@ -140,7 +140,9 @@ export default function DashboardStats({ apiStats, timeRange = 'yearly' }) {
     },
     {
       title: t('dashboard.avgRating', 'Avg Rating'),
-      value: apiStats?.avg_rating !== undefined ? `${apiStats.avg_rating} ★` : '5.0 ★',
+      value: apiStats?.avg_rating !== undefined && apiStats?.avg_rating !== null
+        ? `${Number(apiStats.avg_rating).toFixed(1)} ★`
+        : '—',
       subtext: t('dashboard.reviewsRecorded', '{count} reviews recorded').replace('{count}', apiStats?.total_reviews || 0),
       change: defaultRates.rating,
       trend: 'up',

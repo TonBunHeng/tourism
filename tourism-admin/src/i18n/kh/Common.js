@@ -22,6 +22,11 @@ const Common = {
   noData: "មិនមានទិន្នន័យទេ",
   back: "ត្រឡប់ក្រោយ",
   close: "បិទ",
+  previous: "មុន",
+  next: "បន្ទាប់",
+  paginationShowing: "បង្ហាញ",
+  paginationOf: "ក្នុងចំណោម",
+  paginationGoToPage: "ទៅកាន់ទំព័រ {page}",
   refresh: "ផ្ទុកឡើងវិញ",
   all: "ទាំងអស់",
   yes: "បាទ/ចាស",
@@ -34,6 +39,7 @@ const Common = {
   create: "បង្កើត",
   addNew: "បន្ថែមថ្មី",
   note: "សម្គាល់",
+  success: "ជោគជ័យ",
 };
 
 export default Common;

@@ -161,7 +161,7 @@ export default function UsersList({
                   <td className="px-3 py-3.5 whitespace-nowrap text-xs text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
                     <div className="flex items-center gap-1.5 font-mono">
                       <Clock className="w-3.5 h-3.5 text-[var(--color-text-muted-light)] shrink-0" />
-                      <span>{user.lastActive === 'Just now' ? t('users.timeJustNow', 'Just now') : (user.lastActive || t('users.timeJustNow', 'Just now'))}</span>
+                      <span>{user.lastActive || '—'}</span>
                     </div>
                   </td>
 

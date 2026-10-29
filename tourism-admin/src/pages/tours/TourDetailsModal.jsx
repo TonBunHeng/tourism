@@ -124,7 +124,7 @@ export default function TourDetailsModal({
                 <Users className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" /> {t('tours.maxTravelersLabel', 'Max Travelers')}
               </span>
               <p className="text-sm font-bold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] mt-1">
-                {t('tours.upToPax', 'Up to {count}').replace('{count}', tour.max_travelers || 12)}
+                {t('tours.upToPax', 'Up to {count}').replace('{count}', tour.max_travelers ?? 'N/A')}
               </p>
             </div>
           </div>
@@ -135,7 +135,7 @@ export default function TourDetailsModal({
               <Star className="w-5 h-5 fill-amber-400 text-amber-400" />
               <div>
                 <span className="text-sm font-bold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">
-                  {tour.rating || '5.0'} / 5.0
+                  {Number(tour.rating ?? 0).toFixed(1)} / 5.0
                 </span>
                 <span className="text-xs text-[var(--color-text-muted-light)] dark:text-[var(--color-text-secondary-dark)] ml-2">
                   ({tour.reviews_count || 0} {t('tours.verifiedReviews', 'verified reviews')})

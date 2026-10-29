@@ -14,11 +14,21 @@ export default function Main() {
 
   const [isExpanded, setIsExpanded] = useState(() => {
     if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('sidebar_expanded');
-      if (saved !== null) {
-        return JSON.parse(saved);
+      try {
+        const saved = localStorage.getItem('sidebar_expanded');
+        if (saved !== null) {
+          const parsed = JSON.parse(saved);
+          if (typeof parsed === 'boolean') return parsed;
+        }
+      } catch {
+        // Fall back to the compact-sidebar preference if stored state is invalid.
       }
-      const isCompact = localStorage.getItem('compact_sidebar') === 'true';
+      let isCompact = false;
+      try {
+        isCompact = localStorage.getItem('compact_sidebar') === 'true';
+      } catch {
+        // Use the expanded layout when browser storage cannot be read.
+      }
       return !isCompact;
     }
     return true;
@@ -36,7 +46,11 @@ export default function Main() {
   }, []);
 
   useEffect(() => {
-    localStorage.setItem('sidebar_expanded', JSON.stringify(isExpanded));
+    try {
+      localStorage.setItem('sidebar_expanded', JSON.stringify(isExpanded));
+    } catch {
+      // Sidebar state remains usable for this session if storage is unavailable.
+    }
   }, [isExpanded]);
 
   // Dynamic Page Title

@@ -44,15 +44,9 @@ export default function TopPlaces({ places, topPlaces, timeRange = 'yearly', isL
   const metricLabel = getMetricLabel();
 
   const chartData = placesList.map((place, index) => {
-    const baseVisitors = Number(place.visitors_count || place.visits || (place.reviews_count * 25 + 150)) || 250;
-    const periodVisitsVal = place.period_visits != null
-      ? Number(place.period_visits)
-      : (
-        timeRange === 'today' ? Math.max(1, Math.round(baseVisitors / 365)) :
-        timeRange === 'weekly' ? Math.max(5, Math.round(baseVisitors / 52)) :
-        timeRange === 'monthly' ? Math.max(20, Math.round(baseVisitors / 12)) :
-        Math.max(100, baseVisitors)
-      );
+    const visits = place.period_visits ?? place.visitors_count ?? place.visits;
+    if (visits === null || visits === undefined || !Number.isFinite(Number(visits))) return null;
+    const periodVisitsVal = Number(visits);
 
     const reviewsCount = Number(place.reviews ?? place.reviews_count) || 0;
     const periodReviews = Number(place.period_reviews) || 0;
@@ -72,6 +66,7 @@ export default function TopPlaces({ places, topPlaces, timeRange = 'yearly', isL
       rank: index + 1,
     };
   })
+  .filter(Boolean)
   .sort((a, b) => b.displayValue - a.displayValue)
   .map((item, idx) => ({ ...item, rank: idx + 1 }));
 

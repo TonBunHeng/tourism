@@ -47,7 +47,7 @@ export default function FavoriteDetailsModal({
 
   const IconComponent = favorite.icon || Landmark;
   const isVisited = Boolean(favorite.visited || favorite.status === 'Visited');
-  const ratingVal = Number(favorite.rating || favorite.place?.rating || 5.0).toFixed(1);
+  const ratingVal = Number(favorite.rating ?? favorite.place?.rating ?? 0).toFixed(1);
   const reviewsCount = favorite.reviewsCount ?? favorite.reviews ?? favorite.place?.reviews_count ?? 0;
   const tagsList = Array.isArray(favorite.tags) ? favorite.tags : [];
 
@@ -160,7 +160,7 @@ export default function FavoriteDetailsModal({
             </h4>
             <p className="text-xs md:text-sm text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] flex items-center gap-1.5 mt-1">
               <MapPin className="w-4 h-4 text-[var(--color-rose-badge-text)] shrink-0" />
-              <span>{favorite.location || favorite.address || 'Cambodia'}</span>
+              <span>{favorite.location || favorite.address || '—'}</span>
             </p>
           </div>
 
@@ -242,10 +242,10 @@ export default function FavoriteDetailsModal({
               </span>
               <div className="flex items-center gap-1.5 mt-1.5 text-xs md:text-sm font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">
                 <Clock className="w-4 h-4 text-[var(--color-info-text)] shrink-0" />
-                <span className="truncate">{favorite.bestTime || favorite.best_time || 'Morning / Afternoon'}</span>
+                <span className="truncate">{favorite.bestTime || favorite.best_time || '—'}</span>
               </div>
               <p className="text-[11px] text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mt-1">
-                {t('favorites.labelDuration')}: {favorite.duration || '2-3 Hours'}
+                {t('favorites.labelDuration')}: {favorite.duration || '—'}
               </p>
             </div>
 
@@ -256,7 +256,7 @@ export default function FavoriteDetailsModal({
               </span>
               <div className="flex items-center gap-1 mt-1.5 text-xs md:text-sm font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">
                 <DollarSign className="w-4 h-4 text-[var(--color-success-text)] shrink-0" />
-                <span>{favorite.price || 'Free'}</span>
+                <span>{favorite.price || '—'}</span>
               </div>
               <p className="text-[11px] text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mt-1">
                 {t('favorites.labelOverview')}

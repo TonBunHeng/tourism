@@ -104,7 +104,7 @@ export default function SecurityList({
                     <div className="flex items-center gap-3 mt-2 text-xs text-[var(--color-text-muted-light)] dark:text-[var(--color-text-secondary-dark)] flex-wrap">
                       <span className="flex items-center gap-1 font-mono">
                         <Globe className="w-3.5 h-3.5" />
-                        {alert.ip_address || '127.0.0.1'}
+                        {alert.ip_address || 'N/A'}
                       </span>
                       <span className={`px-2 py-0.5 text-[10px] font-bold rounded-md border ${getSeverityBadge(alert.attempts)}`}>
                         {t('security.failedAttemptsCount', '{count} Failed Attempts', { count: alert.attempts })}
@@ -231,7 +231,7 @@ export default function SecurityList({
                       <div className="flex items-center gap-1.5">
                         <Globe className="w-3.5 h-3.5 text-[var(--color-text-muted-light)] shrink-0" />
                         <span className={alert.is_ip_blocked ? 'text-red-500 font-bold' : ''}>
-                          {alert.ip_address || '127.0.0.1'}
+                          {alert.ip_address || 'N/A'}
                         </span>
                       </div>
                     </td>

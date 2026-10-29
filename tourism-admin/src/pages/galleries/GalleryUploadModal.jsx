@@ -9,9 +9,10 @@ export default function GalleryUploadModal({ isOpen, onClose, categories = [], o
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState(categories.find(c => c !== 'All') || 'Temple');
   const [fileUrl, setFileUrl] = useState('');
+  const [uploadedUrl, setUploadedUrl] = useState('');
   const [mediaType, setMediaType] = useState('image');
-  const [fileSize, setFileSize] = useState('2.4 MB');
-  const [dimensions, setDimensions] = useState('1920x1080');
+  const [fileSize, setFileSize] = useState('');
+  const [dimensions, setDimensions] = useState('');
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState(null);
   const fileInputRef = useRef(null);
@@ -36,6 +37,8 @@ export default function GalleryUploadModal({ isOpen, onClose, categories = [], o
     const file = e.target.files?.[0];
     if (!file) return;
 
+    setUploadedUrl('');
+    setFileUrl('');
     setUploadError(null);
 
     // 1. Extension check
@@ -69,6 +72,9 @@ export default function GalleryUploadModal({ isOpen, onClose, categories = [], o
     // Local instant preview
     const localUrl = URL.createObjectURL(file);
     setFileUrl(localUrl);
+    setUploadedUrl('');
+    setUploadError(null);
+    setDimensions('');
     setFileSize(`${(file.size / (1024 * 1024)).toFixed(1)} MB`);
 
     // Upload to backend project storage
@@ -77,12 +83,15 @@ export default function GalleryUploadModal({ isOpen, onClose, categories = [], o
       const res = await uploadService.uploadFile(file, 'gallery');
       if (res.success && res.data?.url) {
         setFileUrl(res.data.url);
+        setUploadedUrl(res.data.url);
         if (res.data.type) setMediaType(res.data.type);
         if (res.data.file_size) setFileSize(res.data.file_size);
         if (res.data.dimensions) setDimensions(res.data.dimensions);
+      } else {
+        setUploadError(res?.message || t('gallery.errorUploadFailed', 'File upload failed. Please try again.'));
       }
     } catch (err) {
-      console.warn('Backend file upload fallback to local preview:', err);
+      setUploadError(err.message || t('gallery.errorUploadFailed', 'File upload failed. Please try again.'));
     } finally {
       setIsUploading(false);
     }
@@ -90,14 +99,14 @@ export default function GalleryUploadModal({ isOpen, onClose, categories = [], o
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!title.trim() || !fileUrl) return;
+    if (!title.trim() || !uploadedUrl || isUploading) return;
 
     const newMedia = {
       id: Date.now(),
       title,
       category,
       type: mediaType,
-      url: fileUrl,
+      url: uploadedUrl,
       fileSize,
       dimensions,
       views: 0,
@@ -263,7 +272,7 @@ export default function GalleryUploadModal({ isOpen, onClose, categories = [], o
             </button>
             <button 
               type="submit"
-              disabled={!title.trim() || !fileUrl || isUploading}
+              disabled={!title.trim() || !uploadedUrl || isUploading}
               className="flex-1 py-2.5 px-4 rounded-md bg-[#003E83] hover:bg-[#002e62] active:scale-[0.98] text-white font-medium text-xs sm:text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed text-center cursor-pointer shadow-xs flex items-center justify-center gap-1.5"
             >
               <Upload className="w-4 h-4" />

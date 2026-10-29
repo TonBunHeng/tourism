@@ -153,7 +153,7 @@ export default function PlacesGrid({ places, onViewPlace, onEditPlace, onDeleteP
                 <div className="flex items-center gap-1.5 flex-shrink-0">
                   <Star className="w-3.5 h-3.5 fill-[var(--color-warning-text)] text-[var(--color-warning-text)]" />
                   <span className="text-sm font-medium text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">
-                    {place.rating || '5.0'}
+                    {Number(place.rating ?? 0).toFixed(1)}
                   </span>
                 </div>
                 <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 text-xs font-medium rounded-md border flex-shrink-0 ${getStatusColor(place.status)}`}>

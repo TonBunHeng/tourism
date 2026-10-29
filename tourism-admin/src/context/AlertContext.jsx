@@ -3,6 +3,17 @@ import AlertModal from '../components/common/AlertModal';
 
 const AlertContext = createContext(null);
 
+const toAlertState = (options = {}) => ({
+  isOpen: true,
+  type: options.type || 'info',
+  title: options.title || '',
+  message: options.message || '',
+  confirmText: options.confirmText || (options.isConfirm ? 'Confirm' : 'OK'),
+  cancelText: options.cancelText || 'Cancel',
+  isConfirm: Boolean(options.isConfirm),
+  customIcon: options.customIcon || null
+});
+
 export const AlertProvider = ({ children }) => {
   const [alertState, setAlertState] = useState({
     isOpen: false,
@@ -16,47 +27,48 @@ export const AlertProvider = ({ children }) => {
   });
 
   const resolverRef = useRef(null);
+  const requestQueueRef = useRef([]);
 
-  const closeAlert = useCallback(() => {
-    setAlertState(prev => ({ ...prev, isOpen: false }));
-    if (resolverRef.current) {
-      resolverRef.current(false);
-      resolverRef.current = null;
-    }
+  const activateAlert = useCallback((options, resolve) => {
+    resolverRef.current = resolve;
+    setAlertState(toAlertState(options));
   }, []);
 
-  const handleConfirm = useCallback(() => {
-    setAlertState(prev => ({ ...prev, isOpen: false }));
-    if (resolverRef.current) {
-      resolverRef.current(true);
-      resolverRef.current = null;
+  const settleAlert = useCallback((result) => {
+    const resolveCurrent = resolverRef.current;
+    resolverRef.current = null;
+    resolveCurrent?.(result);
+
+    const nextRequest = requestQueueRef.current.shift();
+    if (nextRequest) {
+      activateAlert(nextRequest.options, nextRequest.resolve);
+    } else {
+      setAlertState(prev => ({ ...prev, isOpen: false }));
     }
-  }, []);
+  }, [activateAlert]);
+
+  const closeAlert = useCallback(() => settleAlert(false), [settleAlert]);
+  const handleConfirm = useCallback(() => settleAlert(true), [settleAlert]);
 
   /**
    * General purpose alert popup
    */
-  const showAlert = useCallback((options) => {
+  const showAlert = useCallback((options = {}) => {
     return new Promise((resolve) => {
-      resolverRef.current = resolve;
-      setAlertState({
-        isOpen: true,
-        type: options.type || 'info',
-        title: options.title || '',
-        message: options.message || '',
-        confirmText: options.confirmText || (options.isConfirm ? 'Confirm' : 'OK'),
-        cancelText: options.cancelText || 'Cancel',
-        isConfirm: Boolean(options.isConfirm),
-        customIcon: options.customIcon || null
-      });
+      const requestOptions = options || {};
+      if (resolverRef.current) {
+        requestQueueRef.current.push({ options: requestOptions, resolve });
+      } else {
+        activateAlert(requestOptions, resolve);
+      }
     });
-  }, []);
+  }, [activateAlert]);
 
   /**
    * Confirmation dialog returning Promise<boolean>
    */
   const showConfirm = useCallback((options) => {
-    const opts = typeof options === 'string' ? { message: options } : options;
+    const opts = typeof options === 'string' ? { message: options } : (options || {});
     return showAlert({
       type: opts.type || 'danger',
       title: opts.title || 'Confirmation',

@@ -122,7 +122,7 @@ export default function TrackingDetailsModal({ isOpen, onClose, log }) {
                 <span className="text-[10px] uppercase font-semibold text-gray-400 dark:text-zinc-500 block">
                   {t('tracking.labelIpAddress', 'IP Address')}
                 </span>
-                <span className="font-mono text-gray-800 dark:text-zinc-200">{log.ip_address || '127.0.0.1'}</span>
+                <span className="font-mono text-gray-800 dark:text-zinc-200">{log.ip_address || 'N/A'}</span>
               </div>
             </div>
 

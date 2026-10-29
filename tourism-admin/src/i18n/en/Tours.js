@@ -114,6 +114,8 @@ const Tours = {
   catBeach: "Beach & Island Excursion",
   catHistorical: "Historical & War History",
   catReligious: "Religious & Spiritual",
+  statusUpdateFailed: "Failed to update tour status.",
+  deleteFailed: "Failed to delete tour package.",
 };
 
 export default Tours;

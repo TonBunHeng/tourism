@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 import SimplePagination from '../../components/common/SimplePagination';
 import EventsHeader from './EventsHeader';
@@ -19,7 +19,7 @@ export default function Events() {
   const { t } = useLanguage();
   const location = useLocation();
   const { showConfirm, showSuccess, showError } = useAlert();
-  const { searchTerm, setSearchTerm } = useSearch();
+  const { searchTerm } = useSearch();
   const currentUser = authService.getCurrentUser();
   const isSuperAdmin = isSuperAdminRole(currentUser?.role);
 
@@ -80,19 +80,19 @@ export default function Events() {
           return {
             id: e.id,
             title: e.title,
-            category: e.category || 'Cultural',
+            category: e.category || 'General',
             description: e.description || '',
-            location: e.location || 'Phnom Penh, Cambodia',
+            location: e.location || 'N/A',
             date: startDate,
             start_date: startDate,
             end_date: endDate,
-            time: e.start_time || e.time || '08:00 AM',
-            start_time: e.start_time || e.time || '08:00 AM',
-            price: e.price || 'Free',
+            time: e.start_time || e.time || 'N/A',
+            start_time: e.start_time || e.time || 'N/A',
+            price: e.price ?? 'N/A',
             status: computedStatus,
-            organizer: e.organizer || 'Ministry of Tourism',
+            organizer: e.organizer || 'N/A',
             attendees: Number(e.attendees_count || 0),
-            rating: Number(e.rating || 5.0),
+            rating: Number(e.rating ?? 0),
             image_url: e.image_url || e.imageUrl || '',
             imageUrl: e.image_url || e.imageUrl || '',
             featured: Boolean(e.featured)
@@ -123,11 +123,6 @@ export default function Events() {
   useEffect(() => {
     loadEvents();
   }, [loadEvents]);
-
-  const handleSearchChange = (val) => {
-    setSearchTerm(val);
-    setCurrentPage(1);
-  };
 
   const handleCategoryChange = (val) => {
     setSelectedCategory(val);

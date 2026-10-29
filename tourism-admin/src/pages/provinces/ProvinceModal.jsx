@@ -149,7 +149,6 @@ export default function ProvinceModal({
                     onChange={(e) => onFormChange && onFormChange('population', e.target.value)}
                     placeholder={t('provinces.placeholderPopulation', 'e.g., 2,129,371')}
                     className="w-full pl-9 pr-4 py-2.5 bg-[var(--color-bg-light)] dark:bg-[var(--color-input-dark-bg)] border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]/70 rounded-md text-sm text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] placeholder-[var(--color-text-muted-light)] focus:outline-none focus:ring-2 focus:ring-[var(--color-input)] transition-all"
-                    required
                   />
                 </div>
               </div>
@@ -166,7 +165,6 @@ export default function ProvinceModal({
                     onChange={(e) => onFormChange && onFormChange('area', e.target.value)}
                     placeholder={t('provinces.placeholderArea', 'e.g., 678.46 km²')}
                     className="w-full pl-9 pr-4 py-2.5 bg-[var(--color-bg-light)] dark:bg-[var(--color-input-dark-bg)] border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]/70 rounded-md text-sm text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] placeholder-[var(--color-text-muted-light)] focus:outline-none focus:ring-2 focus:ring-[var(--color-input)] transition-all"
-                    required
                   />
                 </div>
               </div>
@@ -186,7 +184,6 @@ export default function ProvinceModal({
                     onChange={(e) => onFormChange && onFormChange('districts_count', e.target.value)}
                     placeholder={t('provinces.placeholderDistricts', 'Number of districts')}
                     className="w-full pl-9 pr-4 py-2.5 bg-[var(--color-bg-light)] dark:bg-[var(--color-input-dark-bg)] border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]/70 rounded-md text-sm text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] placeholder-[var(--color-text-muted-light)] focus:outline-none focus:ring-2 focus:ring-[var(--color-input)] transition-all"
-                    required
                   />
                 </div>
               </div>
@@ -203,7 +200,6 @@ export default function ProvinceModal({
                     onChange={(e) => onFormChange && onFormChange('communes_count', e.target.value)}
                     placeholder={t('provinces.placeholderCommunes', 'Number of communes')}
                     className="w-full pl-9 pr-4 py-2.5 bg-[var(--color-bg-light)] dark:bg-[var(--color-input-dark-bg)] border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]/70 rounded-md text-sm text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] placeholder-[var(--color-text-muted-light)] focus:outline-none focus:ring-2 focus:ring-[var(--color-input)] transition-all"
-                    required
                   />
                 </div>
               </div>
@@ -222,7 +218,6 @@ export default function ProvinceModal({
                   placeholder={t('provinces.placeholderDescription', 'Enter province description and regional attractions...')}
                   rows="3"
                   className="w-full pl-9 pr-4 py-2.5 bg-[var(--color-bg-light)] dark:bg-[var(--color-input-dark-bg)] border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]/70 rounded-md text-sm text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] placeholder-[var(--color-text-muted-light)] focus:outline-none focus:ring-2 focus:ring-[var(--color-input)] resize-none transition-all"
-                  required
                 />
               </div>
             </div>

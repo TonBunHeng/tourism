@@ -160,7 +160,7 @@ export default function FavoriteModal({
                           </p>
                           <p className="text-[11px] text-[var(--color-text-muted-light)] dark:text-[var(--color-text-secondary-dark)] flex items-center gap-1 truncate">
                             <MapPin className="w-3 h-3 text-[var(--color-rose-badge-text)] shrink-0" />
-                            <span className="truncate">{place.address || place.province || 'Cambodia'}</span>
+                            <span className="truncate">{place.address || place.province || '—'}</span>
                           </p>
                         </div>
                       </div>

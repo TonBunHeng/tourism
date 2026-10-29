@@ -111,7 +111,7 @@ const Ratings = {
   tfToday: "ថ្ងៃនេះ",
   tfWeek: "សប្តាហ៍នេះ",
   tfMonth: "ខែនេះ",
-  tfYear: "២០២៦",
+  tfYear: "{year}",
   statPositiveSentiment: "អារម្មណ៍វិជ្ជមាន",
   subtextPositiveSentiment: "{count} នៃ {total} ទទួលបាន ៤-៥★",
   statVerifiedReviews: "ការពិនិត្យបានផ្ទៀងផ្ទាត់",
@@ -156,6 +156,8 @@ const Ratings = {
   overallScoreBadge: "ពិន្ទុរួម៖ {score} ★ ({count} ការពិនិត្យ)",
   scoreTrajectory: "គន្លងពិន្ទុ (ទូទៅ)",
   inMonthAvg: "ពិន្ទុមធ្យមប្រចាំខែ",
+  pillCountSingle: "១ ការវាយតម្លៃ",
+  pillCount: "បានកត់ត្រាការវាយតម្លៃ {count}",
 };
 
 export default Ratings;

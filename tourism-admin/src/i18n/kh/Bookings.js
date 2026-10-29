@@ -98,6 +98,10 @@ const Bookings = {
   specialRequestsNotes: "សំណូមពរពិសេស & កំណត់សម្គាល់៖",
   visitPage: "ចូលមើលទំព័រ",
   markCompleted: "សម្គាល់ថាបានបញ្ចប់",
+  statusUpdateFailed: "មិនអាចធ្វើបច្ចុប្បន្នភាពស្ថានភាពការកក់បានទេ។",
+  statusUpdateFailedTitle: "បរាជ័យក្នុងការធ្វើបច្ចុប្បន្នភាព",
+  deleteFailed: "មិនអាចលុបការកក់បានទេ។",
+  deleteFailedTitle: "ការលុបបរាជ័យ",
 };
 
 export default Bookings;

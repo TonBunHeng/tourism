@@ -241,7 +241,6 @@ const Reports = {
   tfToday: "Today",
   tfThisWeek: "This Week",
   tfThisMonth: "This Month",
-  tfYear2026: "2026",
   btnReset: "Reset",
 
   // Chart 1: Ingestion Velocity
@@ -295,6 +294,7 @@ const Reports = {
   tooltipTotal: "total",
   lineNewRecordsIngested: "New Records Ingested",
   lineCumulativeTotal: "Cumulative Total",
+  statusPendingReview: "Pending / Review",
 };
 
 export default Reports;

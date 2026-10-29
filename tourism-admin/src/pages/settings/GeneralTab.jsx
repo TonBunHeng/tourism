@@ -238,7 +238,7 @@ export default function GeneralTab({ settings, setSettings }) {
             </label>
             <input
               type="text"
-              value={settings.emergencyPolice || '117'}
+              value={settings.emergencyPolice ?? '117'}
               onChange={(e) => handleChange('emergencyPolice', e.target.value)}
               placeholder="117"
               className="w-full px-3 py-2 text-sm font-mono rounded-md border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] bg-[var(--color-white)] dark:bg-[var(--color-bg-dark)] text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] focus:outline-none focus:ring-2 focus:ring-[var(--color-input)] transition-all"
@@ -251,7 +251,7 @@ export default function GeneralTab({ settings, setSettings }) {
             </label>
             <input
               type="text"
-              value={settings.emergencyAmbulance || '119'}
+              value={settings.emergencyAmbulance ?? '119'}
               onChange={(e) => handleChange('emergencyAmbulance', e.target.value)}
               placeholder="119"
               className="w-full px-3 py-2 text-sm font-mono rounded-md border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] bg-[var(--color-white)] dark:bg-[var(--color-bg-dark)] text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] focus:outline-none focus:ring-2 focus:ring-[var(--color-input)] transition-all"
@@ -264,7 +264,7 @@ export default function GeneralTab({ settings, setSettings }) {
             </label>
             <input
               type="text"
-              value={settings.emergencyFire || '118'}
+              value={settings.emergencyFire ?? '118'}
               onChange={(e) => handleChange('emergencyFire', e.target.value)}
               placeholder="118"
               className="w-full px-3 py-2 text-sm font-mono rounded-md border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] bg-[var(--color-white)] dark:bg-[var(--color-bg-dark)] text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] focus:outline-none focus:ring-2 focus:ring-[var(--color-input)] transition-all"
@@ -277,7 +277,7 @@ export default function GeneralTab({ settings, setSettings }) {
             </label>
             <input
               type="text"
-              value={settings.emergencyTouristPolice || '+855 31 322 2117'}
+              value={settings.emergencyTouristPolice ?? '+855 31 322 2117'}
               onChange={(e) => handleChange('emergencyTouristPolice', e.target.value)}
               placeholder="+855 31 322 2117"
               className="w-full px-3 py-2 text-sm font-mono rounded-md border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] bg-[var(--color-white)] dark:bg-[var(--color-bg-dark)] text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] focus:outline-none focus:ring-2 focus:ring-[var(--color-input)] transition-all"

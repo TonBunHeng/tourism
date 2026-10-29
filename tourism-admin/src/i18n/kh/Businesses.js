@@ -170,6 +170,16 @@ const Businesses = {
   approveProfile: "អនុម័តទម្រង់",
   defaultCategory: "សេវាបដិសណ្ឋារកិច្ច",
   defaultOwner: "ម្ចាស់អាជីវកម្ម",
+  categoryRequired: "ត្រូវជ្រើសរើសប្រភេទអាជីវកម្ម។",
+  provinceRequired: "ត្រូវជ្រើសរើសរាជធានី ឬខេត្ត។",
+  selectCategory: "ជ្រើសរើសប្រភេទ",
+  selectProvince: "ជ្រើសរើសរាជធានី ឬខេត្ត",
+  selectPriceTier: "ជ្រើសរើសកម្រិតតម្លៃ (ជាជម្រើស)",
+  approveFailed: "មិនអាចអនុម័តទម្រង់អាជីវកម្មបានទេ។",
+  errorTitle: "សកម្មភាពបរាជ័យ",
+  statusUpdateFailed: "មិនអាចធ្វើបច្ចុប្បន្នភាពស្ថានភាពអាជីវកម្មបានទេ។",
+  activateFailed: "មិនអាចដំណើរការទម្រង់អាជីវកម្មឡើងវិញបានទេ។",
+  deleteFailed: "មិនអាចលុបទម្រង់អាជីវកម្មបានទេ។",
 };
 
 export default Businesses;

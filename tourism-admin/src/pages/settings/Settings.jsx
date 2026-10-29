@@ -2,7 +2,15 @@ import { useState, useEffect, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import {
   getInitialTheme,
-  applyTheme
+  getInitialSidebarStyle,
+  getInitialCompactSidebar,
+  getInitialFontSize,
+  getInitialFontFamily,
+  applyTheme,
+  applySidebarStyle,
+  applyCompactSidebar,
+  applyFontSize,
+  applyFontFamily
 } from "../../utils/Theme";
 import {
   Settings as SettingsIcon,
@@ -57,6 +65,9 @@ const KEY_GROUP_MAP = {
   // Appearance
   theme: 'appearance',
   sidebarStyle: 'appearance',
+  compactSidebar: 'appearance',
+  fontSize: 'appearance',
+  fontFamily: 'appearance',
 
   // Notifications
   pushNotifications: 'notifications',
@@ -118,6 +129,9 @@ const SNAKE_TO_CAMEL = {
   favicon_file_name: 'faviconFileName',
   theme: 'theme',
   sidebar_style: 'sidebarStyle',
+  compact_sidebar: 'compactSidebar',
+  font_size: 'fontSize',
+  font_family: 'fontFamily',
   push_notifications: 'pushNotifications',
   email_notifications: 'emailNotifications',
   sms_notifications: 'smsNotifications',
@@ -164,7 +178,9 @@ const BOOLEAN_KEYS = new Set([
   'securityAlert',
   'security_alert',
   'twoFactorAuth',
-  'two_factor_auth'
+  'two_factor_auth',
+  'compactSidebar',
+  'compact_sidebar'
 ]);
 
 const SETTING_TAB_IDS = ["general", "appearance", "notifications", "security", "backup"];
@@ -247,7 +263,10 @@ export default function Settings() {
 
     // Appearance
     theme: getInitialTheme(),
-    sidebarStyle: "brand",
+    sidebarStyle: getInitialSidebarStyle(),
+    compactSidebar: getInitialCompactSidebar(),
+    fontSize: getInitialFontSize(),
+    fontFamily: getInitialFontFamily(),
 
     // Notifications
     pushNotifications: true,
@@ -266,16 +285,16 @@ export default function Settings() {
     loginAttempts: "5",
 
     // Integrations
-    googleMapsApiKey: "AIzaSyC_AngkorVersesMapsPlatform2026Key",
-    mapboxApiKey: "pk.eyJ1IjoiYW5na29ydmVyc2VzIiwiYSI6ImNsdG91cmlzbTIwMjZtYXBib3hrZXkifQ.mockMapboxToken",
-    weatherApiKey: "owm_live_cambodia_climate_api_key_2026",
+    googleMapsApiKey: "",
+    mapboxApiKey: "",
+    weatherApiKey: "",
     aiProvider: "gemini",
-    aiApiKey: "AIzaSyD_Gemini20FlashAngkorVersesTourismKey",
-    smtpHost: "smtp.mailtrap.io",
+    aiApiKey: "",
+    smtpHost: "",
     smtpPort: "587",
     smtpEncryption: "tls",
-    smtpUsername: "mailer@tourism.gov.kh",
-    smtpPassword: "khmer_tourism_smtp_2026",
+    smtpUsername: "",
+    smtpPassword: "",
 
     // Backup
     backupSchedule: "daily",
@@ -310,6 +329,11 @@ export default function Settings() {
         });
 
         loaded.theme = getInitialTheme();
+        applyTheme(loaded.theme);
+        applySidebarStyle(loaded.sidebarStyle);
+        applyCompactSidebar(loaded.compactSidebar);
+        applyFontSize(loaded.fontSize);
+        applyFontFamily(loaded.fontFamily);
         setSettings(loaded);
         if (!silent) {
           showSuccess(

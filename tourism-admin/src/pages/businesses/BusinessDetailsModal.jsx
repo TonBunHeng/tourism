@@ -117,7 +117,7 @@ export default function BusinessDetailsModal({
                 </span>
                 <span className="flex items-center gap-1">
                   <MapPin size={14} />
-                  {business.province?.name || business.province || business.address || 'Siem Reap, Cambodia'}
+                  {business.province?.name || business.province || business.address || '—'}
                 </span>
               </div>
             </div>
@@ -179,12 +179,12 @@ export default function BusinessDetailsModal({
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="p-3 bg-[var(--color-surface-hover-light)] dark:bg-[var(--color-surface-hover-dark)]/50 rounded-md border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] space-y-1">
                   <span className="text-[var(--color-text-muted-light)] text-[10px] uppercase font-semibold">{t('businesses.addressLocation', 'Address / Location')}</span>
-                  <p className="font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">{business.address || 'National Road 6, Siem Reap'}</p>
+                  <p className="font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">{business.address || '—'}</p>
                 </div>
 
                 <div className="p-3 bg-[var(--color-surface-hover-light)] dark:bg-[var(--color-surface-hover-dark)]/50 rounded-md border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] space-y-1">
                   <span className="text-[var(--color-text-muted-light)] text-[10px] uppercase font-semibold">{t('businesses.provinceRegion', 'Province / Region')}</span>
-                  <p className="font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">{business.province?.name || business.province || 'Siem Reap'}</p>
+                  <p className="font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">{business.province?.name || business.province || '—'}</p>
                 </div>
 
                 {business.price_tier && (
@@ -254,7 +254,7 @@ export default function BusinessDetailsModal({
                   <Phone className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
                   <div>
                     <span className="text-[var(--color-text-muted-light)] text-[10px] uppercase font-semibold block">{t('businesses.phoneContact', 'Phone Contact')}</span>
-                    <span className="font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">{business.owner?.phone || business.phone || '+855 12 345 678'}</span>
+                    <span className="font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">{business.owner?.phone || business.phone || '—'}</span>
                   </div>
                 </div>
 
@@ -263,7 +263,7 @@ export default function BusinessDetailsModal({
                   <div>
                     <span className="text-[var(--color-text-muted-light)] text-[10px] uppercase font-semibold block">{t('businesses.registrationDate', 'Registration Date')}</span>
                     <span className="font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">
-                      {business.created_at ? business.created_at.split('T')[0] : '2024-03-15'}
+                      {business.created_at ? business.created_at.split('T')[0] : '—'}
                     </span>
                   </div>
                 </div>
@@ -272,7 +272,7 @@ export default function BusinessDetailsModal({
                   <FileCheck className="w-4 h-4 text-purple-600 dark:text-purple-400 shrink-0" />
                   <div>
                     <span className="text-[var(--color-text-muted-light)] text-[10px] uppercase font-semibold block">{t('businesses.taxIdentification', 'Tax Identification')}</span>
-                    <span className="font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">{business.tax_id || business.license_number || 'MOT-2024-REG'}</span>
+                    <span className="font-semibold text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">{business.tax_id || business.license_number || '—'}</span>
                   </div>
                 </div>
               </div>
@@ -291,7 +291,7 @@ export default function BusinessDetailsModal({
                   </span>
                 </div>
                 <p className="text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] text-[11px]">
-                  {t('businesses.commercialLicenseNumber', 'Commercial License Number:')} <strong className="text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">{business.license_number || 'MOT-2024-REG'}</strong>
+                  {t('businesses.commercialLicenseNumber', 'Commercial License Number:')} <strong className="text-[var(--color-text-primary-light)] dark:text-[var(--color-white)]">{business.license_number || '—'}</strong>
                 </p>
               </div>
 

@@ -54,9 +54,7 @@ export default function UserDetailsModal({ isOpen, user, onClose, onEdit, onEdit
     return t('users.subFree', 'Free');
   };
 
-  const lastActiveTime = user.lastActive === 'Just now' 
-    ? t('users.timeJustNow', 'Just now') 
-    : (user.lastActive || t('users.timeJustNow', 'Just now'));
+  const lastActiveTime = user.lastActive || '—';
 
   return (
     <div

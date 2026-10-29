@@ -86,14 +86,14 @@ export default function Users() {
             ...u,
             status: capitalizedStatus,
             onlineStatus: isOnline ? "Online" : "Offline",
-            joinDate: u.created_at ? u.created_at.split("T")[0] : "2024-01-01",
-            lastActive: u.last_active_human || (u.last_active_at ? u.last_active_at.replace("T", " ").substring(0, 16) : (isOnline ? t('users.timeOnlineNow', 'Online Now') : t('users.statusOffline', 'Offline'))),
+            joinDate: u.created_at ? u.created_at.split("T")[0] : "—",
+            lastActive: u.last_active_human || (u.last_active_at ? u.last_active_at.replace("T", " ").substring(0, 16) : "—"),
             reviews: u.reviews_count || u.reviews || 0,
             favorites: u.favorites_count || u.favorites || 0,
             places: 0,
             reports: 0,
             twoFactorAuth: Boolean(u.two_factor_auth),
-            activity: u.activity_level || (isOnline ? "High" : "Medium"),
+            activity: u.activity_level || "—",
           };
         });
 

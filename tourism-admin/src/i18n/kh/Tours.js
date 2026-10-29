@@ -114,6 +114,8 @@ const Tours = {
   catBeach: "តំបន់ឆ្នេរ & កោះកម្សាន្ត",
   catHistorical: "ប្រវត្តិសាស្ត្រ & សង្គ្រាម",
   catReligious: "សាសនា & ជំនឿ",
+  statusUpdateFailed: "មិនអាចធ្វើបច្ចុប្បន្នភាពស្ថានភាពកញ្ចប់ដំណើរកម្សាន្តបានទេ។",
+  deleteFailed: "មិនអាចលុបកញ្ចប់ដំណើរកម្សាន្តបានទេ។",
 };
 
 export default Tours;

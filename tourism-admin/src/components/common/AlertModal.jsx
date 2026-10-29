@@ -42,8 +42,11 @@ export default function AlertModal({
   if (!isOpen) return null;
 
   const handleConfirm = () => {
-    if (onConfirm) onConfirm();
-    onClose?.();
+    if (onConfirm) {
+      onConfirm();
+    } else {
+      onClose?.();
+    }
   };
 
   // Simple and sleek icon presentation with soft tinted circle
@@ -111,7 +114,7 @@ export default function AlertModal({
       onClick={onClose}
       role="dialog"
       aria-modal="true"
-      aria-labelledby="alert-modal-title"
+      aria-labelledby={title ? 'alert-modal-title' : undefined}
     >
       <div
         className="bg-white dark:bg-[#18181b] rounded-md shadow-2xl max-w-sm w-full mx-4 p-6 relative border border-gray-200 dark:border-zinc-800 animate-alert-popup overflow-hidden"

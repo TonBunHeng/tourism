@@ -98,6 +98,10 @@ const Bookings = {
   specialRequestsNotes: "Special Requests & Notes:",
   visitPage: "Visit Page",
   markCompleted: "Mark Completed",
+  statusUpdateFailed: "Failed to update booking status.",
+  statusUpdateFailedTitle: "Update Failed",
+  deleteFailed: "Failed to delete booking.",
+  deleteFailedTitle: "Delete Failed",
 };
 
 export default Bookings;

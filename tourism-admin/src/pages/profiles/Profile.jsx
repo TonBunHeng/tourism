@@ -31,17 +31,17 @@ export default function Profile() {
   const { t } = useLanguage();
   const { showAlert, showConfirm } = useAlert();
   const [userData, setUserData] = useState({
-    name: 'Admin User',
-    email: 'admin@tourism.gov.kh',
-    phone: '+855 23 888 999',
-    address: 'Phnom Penh, Cambodia',
-    location: 'Phnom Penh, Cambodia',
-    bio: 'Lead Administrator for Smart Tourism Information System.',
-    joinDate: 'Aug 2026',
-    loginAt: 'Aug 18, 2026',
-    role: 'Super Admin',
-    verified: true,
-    twoFactorAuth: true
+    name: '',
+    email: '',
+    phone: '',
+    address: '',
+    location: '',
+    bio: '',
+    joinDate: '—',
+    loginAt: '—',
+    role: 'Unknown',
+    verified: false,
+    twoFactorAuth: false
   });
 
   const [profileImage, setProfileImage] = useState(null);
@@ -61,10 +61,10 @@ export default function Profile() {
 
   const populateUserData = useCallback((currentUser) => {
     if (!currentUser) return;
-    const locationVal = currentUser.address || currentUser.location || 'Phnom Penh, Cambodia';
+    const locationVal = currentUser.address || currentUser.location || '';
     const avatarVal = currentUser.avatar || currentUser.image || currentUser.profile_photo_url || null;
 
-    let formattedJoinDate = 'Aug 2026';
+    let formattedJoinDate = '—';
     if (currentUser.created_at) {
       try {
         const d = new Date(currentUser.created_at);
@@ -72,7 +72,7 @@ export default function Profile() {
       } catch (e) {}
     }
 
-    let formattedLoginAt = 'Just now';
+    let formattedLoginAt = '—';
     if (currentUser.last_active_at) {
       try {
         const d = new Date(currentUser.last_active_at);
@@ -89,8 +89,8 @@ export default function Profile() {
       bio: currentUser.bio || '',
       joinDate: formattedJoinDate,
       loginAt: formattedLoginAt,
-      role: currentUser.role || 'Admin',
-      verified: currentUser.verified !== undefined ? Boolean(currentUser.verified) : true,
+      role: currentUser.role || 'Unknown',
+      verified: currentUser.verified !== undefined ? Boolean(currentUser.verified) : false,
       twoFactorAuth: Boolean(currentUser.two_factor_auth)
     });
 
@@ -209,7 +209,7 @@ export default function Profile() {
     { label: t('profile.statTotalPhotos', 'Total Photos'), value: String(statsData.totalPhotos), subtext: t('profile.subtextTotalPhotos', 'Gallery uploads & media'), icon: Image, color: 'text-[var(--color-purple-badge-text)] dark:text-[var(--color-purple-badge-dark-text)]', bg: 'bg-[var(--color-purple-badge-bg)] dark:bg-[var(--color-purple-badge-dark-bg)]' }
   ];
 
-  const currentRole = authService.getCurrentUser()?.role || userData.role || 'Admin';
+  const currentRole = authService.getCurrentUser()?.role || userData.role || 'Unknown';
   const isSuperAdmin = isSuperAdminRole(currentRole) || normalizeRole(currentRole) === 'super_admin';
 
   const achievements = [

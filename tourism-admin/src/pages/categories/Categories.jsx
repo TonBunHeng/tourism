@@ -62,7 +62,7 @@ export default function Categories() {
           ...c,
           placeCount: c.places_count !== undefined ? Number(c.places_count) : 0,
           icon: Landmark,
-          createdAt: c.created_at ? c.created_at.split('T')[0] : '2024-01-01',
+          createdAt: c.created_at ? c.created_at.split('T')[0] : '—',
         }));
         setCategories(formatted);
         const total = res.meta ? res.meta.total : formatted.length;

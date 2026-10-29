@@ -1,4 +1,5 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useLanguage } from '../../i18n';
 
 /**
  * SimplePagination
@@ -15,19 +16,25 @@ export default function SimplePagination({
   label = 'records',
   className = '',
 }) {
-  if (!totalRecords || totalRecords <= 0) return null;
+  const { t } = useLanguage();
+  const recordCount = Number(totalRecords);
+  if (!Number.isFinite(recordCount) || recordCount <= 0) return null;
+  const pageCount = Math.max(1, Math.floor(Number(totalPages) || 1));
+  const page = Math.min(pageCount, Math.max(1, Math.floor(Number(currentPage) || 1)));
 
   // Safe range calculation
-  const from = totalRecords > 0 ? Math.min(startIndex + 1, totalRecords) : 0;
-  const to = Math.max(from, Math.min(endIndex, totalRecords));
+  const rangeStart = Math.max(0, Number(startIndex) || 0);
+  const rangeEnd = Math.min(Math.max(rangeStart, Number(endIndex) || 0), recordCount);
+  const from = rangeStart < recordCount ? rangeStart + 1 : 0;
+  const to = from ? Math.max(from, rangeEnd) : 0;
 
   // Generate 10-page window (1-10, 11-20, 21-30, etc.)
-  const startBlock = Math.floor((currentPage - 1) / 10) * 10 + 1;
-  const endBlock = Math.min(startBlock + 9, totalPages);
+  const startBlock = Math.floor((page - 1) / 10) * 10 + 1;
+  const endBlock = Math.min(startBlock + 9, pageCount);
 
   const getPageNumbers = () => {
-    if (totalPages <= 10) {
-      return Array.from({ length: totalPages }, (_, i) => i + 1);
+    if (pageCount <= 10) {
+      return Array.from({ length: pageCount }, (_, i) => i + 1);
     }
 
     const pages = [];
@@ -42,11 +49,11 @@ export default function SimplePagination({
       pages.push(i);
     }
 
-    if (endBlock < totalPages) {
-      if (endBlock < totalPages - 1) {
+    if (endBlock < pageCount) {
+      if (endBlock < pageCount - 1) {
         pages.push('...');
       }
-      pages.push(totalPages);
+      pages.push(pageCount);
     }
 
     return pages;
@@ -68,13 +75,13 @@ export default function SimplePagination({
     >
       {/* Record information: 1-10, 11-20, etc. */}
       <div className="text-sm text-gray-500 dark:text-zinc-400">
-        Showing{' '}
+        {t('common.paginationShowing', 'Showing')}{' '}
         <span className="font-semibold text-gray-900 dark:text-white">
           {from === to ? from.toLocaleString() : `${from.toLocaleString()}-${to.toLocaleString()}`}
         </span>{' '}
-        of{' '}
+        {t('common.paginationOf', 'of')}{' '}
         <span className="font-semibold text-gray-900 dark:text-white">
-          {totalRecords.toLocaleString()}
+          {recordCount.toLocaleString()}
         </span>{' '}
         {label}
       </div>
@@ -84,8 +91,8 @@ export default function SimplePagination({
         {/* Previous */}
         <button
           type="button"
-          onClick={() => onPageChange(Math.max(currentPage - 1, 1))}
-          disabled={currentPage <= 1}
+          onClick={() => onPageChange?.(Math.max(page - 1, 1))}
+          disabled={page <= 1}
           className="
             h-8 px-3
             flex items-center gap-1
@@ -101,20 +108,20 @@ export default function SimplePagination({
           "
         >
           <ChevronLeft className="w-4 h-4" />
-          <span>Previous</span>
+          <span>{t('common.previous', 'Previous')}</span>
         </button>
 
         {/* Page numbers (1-10, 11-20, etc.) */}
         {pageNumbers.map((pageNum, index) => {
           if (pageNum === '...') {
             const isLeftDots = index === 1;
-            const targetPage = isLeftDots ? Math.max(1, startBlock - 1) : Math.min(totalPages, endBlock + 1);
+            const targetPage = isLeftDots ? Math.max(1, startBlock - 1) : Math.min(pageCount, endBlock + 1);
             return (
               <button
                 key={`dots-${index}`}
                 type="button"
-                onClick={() => onPageChange(targetPage)}
-                title={isLeftDots ? `Go to page ${targetPage}` : `Go to page ${targetPage}`}
+                onClick={() => onPageChange?.(targetPage)}
+                title={t('common.paginationGoToPage', { page: targetPage }, `Go to page ${targetPage}`)}
                 className="
                   w-8 h-8
                   flex items-center justify-center
@@ -132,13 +139,13 @@ export default function SimplePagination({
             );
           }
 
-          const isActive = pageNum === currentPage;
+          const isActive = pageNum === page;
 
           return (
             <button
               key={pageNum}
               type="button"
-              onClick={() => onPageChange(pageNum)}
+              onClick={() => onPageChange?.(pageNum)}
               className={`
                 w-8 h-8
                 flex items-center justify-center
@@ -162,8 +169,8 @@ export default function SimplePagination({
         {/* Next */}
         <button
           type="button"
-          onClick={() => onPageChange(Math.min(currentPage + 1, totalPages))}
-          disabled={currentPage >= totalPages}
+          onClick={() => onPageChange?.(Math.min(page + 1, pageCount))}
+          disabled={page >= pageCount}
           className="
             h-8 px-3
             flex items-center gap-1
@@ -178,7 +185,7 @@ export default function SimplePagination({
             cursor-pointer
           "
         >
-          <span>Next</span>
+          <span>{t('common.next', 'Next')}</span>
           <ChevronRight className="w-4 h-4" />
         </button>
       </div>

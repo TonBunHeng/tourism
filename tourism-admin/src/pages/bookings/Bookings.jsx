@@ -141,9 +141,6 @@ export default function Bookings() {
     setActionLoadingId(id);
     try {
       await bookingService.updateStatus(id, newStatus, reason);
-    } catch {
-      // optimistic update
-    } finally {
       setBookings(prev => prev.map(b => b.id === id ? { ...b, status: newStatus, cancellation_reason: reason } : b));
       if (selectedBooking && selectedBooking.id === id) {
         setSelectedBooking(prev => ({ ...prev, status: newStatus, cancellation_reason: reason }));
@@ -152,6 +149,11 @@ export default function Bookings() {
         t('bookings.statusUpdatedSuccess', 'Booking status successfully changed to {status}.').replace('{status}', getStatusText(newStatus)),
         t('bookings.statusUpdatedTitle', 'Status Updated')
       );
+      return true;
+    } catch (err) {
+      showError(err.message || t('bookings.statusUpdateFailed', 'Failed to update booking status.'), t('bookings.statusUpdateFailedTitle', 'Update Failed'));
+      return false;
+    } finally {
       setActionLoadingId(null);
     }
   };
@@ -159,9 +161,11 @@ export default function Bookings() {
   // Submit cancel modal
   const handleCancelSubmit = async (reason) => {
     if (!bookingToCancel) return;
-    await handleUpdateStatus(bookingToCancel.id, 'cancelled', reason);
-    setIsCancelModalOpen(false);
-    setBookingToCancel(null);
+    const updated = await handleUpdateStatus(bookingToCancel.id, 'cancelled', reason);
+    if (updated) {
+      setIsCancelModalOpen(false);
+      setBookingToCancel(null);
+    }
   };
 
   // Delete Booking
@@ -178,9 +182,6 @@ export default function Bookings() {
     setActionLoadingId(booking.id);
     try {
       await bookingService.deleteBooking(booking.id);
-    } catch {
-      // optimistic update
-    } finally {
       setBookings(prev => prev.filter(b => b.id !== booking.id));
       if (selectedBooking && selectedBooking.id === booking.id) {
         setSelectedBooking(null);
@@ -189,6 +190,9 @@ export default function Bookings() {
         t('bookings.deletedSuccess', 'Reservation "{ref}" has been removed.').replace('{ref}', booking.booking_reference),
         t('bookings.deletedTitle', 'Booking Deleted')
       );
+    } catch (err) {
+      showError(err.message || t('bookings.deleteFailed', 'Failed to delete booking.'), t('bookings.deleteFailedTitle', 'Delete Failed'));
+    } finally {
       setActionLoadingId(null);
     }
   };
@@ -415,7 +419,7 @@ export default function Bookings() {
                           {b.booking_date}
                         </div>
                         <div className="text-[11px] text-[var(--color-text-muted-light)] dark:text-[var(--color-text-secondary-dark)]">
-                          {b.number_of_guests || 1} {b.number_of_guests === 1 ? t('bookings.guestSingle', 'Guest') : t('bookings.guestPlural', 'Guests')} • {b.booking_time || t('bookings.fullDay', 'Full day')}
+                          {b.number_of_guests ?? 'N/A'} {b.number_of_guests === 1 ? t('bookings.guestSingle', 'Guest') : t('bookings.guestPlural', 'Guests')} • {b.booking_time || t('bookings.fullDay', 'Full day')}
                         </div>
                       </td>
 

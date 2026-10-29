@@ -42,16 +42,16 @@ export default function Tours() {
         const mapped = rawList.map((item) => ({
           id: item.id,
           title: item.title || 'Untitled Tour Experience',
-          destination: item.destination || item.province || 'Siem Reap',
-          duration: item.duration || (item.duration_days ? `${item.duration_days} Days` : '1 Full Day'),
+          destination: item.destination || item.province || 'N/A',
+          duration: item.duration || (item.duration_days ? `${item.duration_days} Days` : 'N/A'),
           price_per_person: parseFloat(item.price || item.price_per_person || 0),
-          max_travelers: Number(item.max_travelers || 12),
-          rating: parseFloat(item.rating || 5.0),
+          max_travelers: Number(item.max_travelers ?? 0),
+          rating: Number(item.rating ?? 0),
           reviews_count: Number(item.reviews_count || 0),
           status: item.status === 'active' ? 'active' : 'draft',
-          category: item.category || 'Cultural & Heritage',
+          category: item.category || 'N/A',
           cover_image: item.image_url || item.cover_image || item.image || 'https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=800&q=80',
-          description: item.description || 'Curated travel experience in Cambodia.'
+          description: item.description || ''
         }));
         setTours(mapped);
         setPageCache('tours_data', mapped);
@@ -132,16 +132,13 @@ export default function Tours() {
           t('tours.packageUpdatedTitle', 'Changes Saved')
         );
       } else {
-        const res = await tourService.createTour(payload).catch(() => null);
-        const newId = res?.data?.id || Date.now();
-        const created = {
-          ...payload,
-          id: newId,
-          rating: 5.0,
-          reviews_count: 0
-        };
+        const res = await tourService.createTour(payload);
+        const created = res?.data?.data || res?.data || res;
+        if (res?.success === false || !created?.id) {
+          throw new Error(res?.message || t('tours.errorSaving', 'The server did not return the created tour package.'));
+        }
         setTours(prev => {
-          const updated = [created, ...prev];
+          const updated = [{ ...created, rating: Number(created.rating ?? 0), reviews_count: Number(created.reviews_count ?? 0) }, ...prev];
           setPageCache('tours_data', updated);
           return updated;
         });
@@ -165,9 +162,6 @@ export default function Tours() {
     const newStatus = tour.status === 'active' ? 'draft' : 'active';
     try {
       await tourService.toggleStatus(tour.id);
-    } catch {
-      // optimistic update
-    } finally {
       setTours(prev => {
         const updated = prev.map(item => item.id === tour.id ? { ...item, status: newStatus } : item);
         setPageCache('tours_data', updated);
@@ -182,8 +176,13 @@ export default function Tours() {
           .replace('{status}', newStatus === 'active' ? t('tours.statusPublished', 'Published') : t('tours.statusDraft', 'Draft')),
         t('tours.statusUpdatedTitle', 'Status Updated')
       );
+    } catch (err) {
+      showError(
+        err.message || t('tours.statusUpdateFailed', 'Failed to update tour status.'),
+        t('tours.errorSavingTitle', 'Status Update Failed')
+      );
     }
-  }, [viewingTour, showSuccess, t]);
+  }, [viewingTour, showSuccess, showError, t]);
 
   // Delete Tour
   const handleDeleteTour = useCallback(async (tour) => {
@@ -198,9 +197,6 @@ export default function Tours() {
 
     try {
       await tourService.deleteTour(tour.id);
-    } catch {
-      // optimistic update
-    } finally {
       setTours(prev => {
         const updated = prev.filter(item => item.id !== tour.id);
         setPageCache('tours_data', updated);
@@ -213,8 +209,13 @@ export default function Tours() {
         t('tours.packageDeletedSuccess', 'Tour package "{title}" has been deleted.').replace('{title}', tour.title),
         t('tours.packageDeletedTitle', 'Package Removed')
       );
+    } catch (err) {
+      showError(
+        err.message || t('tours.deleteFailed', 'Failed to delete tour package.'),
+        t('tours.errorSavingTitle', 'Delete Failed')
+      );
     }
-  }, [viewingTour, showConfirm, showSuccess, t]);
+  }, [viewingTour, showConfirm, showSuccess, showError, t]);
 
   // Modal Callbacks
   const handleCloseViewing = useCallback(() => setViewingTour(null), []);

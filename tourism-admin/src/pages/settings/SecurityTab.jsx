@@ -14,28 +14,10 @@ import { useLanguage } from '../../i18n';
 
 export default function SecurityTab({ settings, setSettings }) {
   const { t } = useLanguage();
-  const { showSuccess, showConfirm } = useAlert();
+  const { showError } = useAlert();
   const [show2FAModal, setShow2FAModal] = useState(false);
 
-  // Active Sessions State
-  const [sessions, setSessions] = useState([
-    {
-      id: 'sess_1',
-      device: 'MacBook Pro (Chrome 128.0)',
-      location: 'Phnom Penh, Cambodia',
-      ip: '103.24.58.12',
-      isCurrent: true,
-      lastActive: 'Active Now'
-    },
-    {
-      id: 'sess_2',
-      device: 'iPad Air (Safari iOS 18)',
-      location: 'Siem Reap, Cambodia',
-      ip: '119.82.251.44',
-      isCurrent: false,
-      lastActive: '2 hours ago'
-    }
-  ]);
+  const sessions = [];
 
   useEffect(() => {
     if (show2FAModal) {
@@ -60,23 +42,10 @@ export default function SecurityTab({ settings, setSettings }) {
     }));
   };
 
-  const handleRevokeSession = async (sessionId) => {
-    const confirmed = await showConfirm({
-      title: t('settings.revokeSessionConfirmTitle', 'Revoke Administrator Session'),
-      message: t('settings.revokeSessionConfirmMsg', 'Are you sure you want to terminate this remote session? The user will be immediately logged out.'),
-      confirmText: t('settings.btnRevokeConfirm', 'Revoke Session'),
-      cancelText: t('common.cancel', 'Cancel'),
-      type: 'danger'
-    });
-
-    if (confirmed) {
-      setSessions((prev) => prev.filter((s) => s.id !== sessionId));
-      showSuccess(
-        t('settings.revokeSuccessMsg', 'Remote session revoked successfully.'),
-        t('settings.revokeSuccessTitle', 'Session Terminated')
-      );
-    }
-  };
+  const handleRevokeSession = () => showError(
+    t('settings.sessionsUnavailable', 'Session management is not connected to the server yet.'),
+    t('settings.actionUnavailableTitle', 'Action unavailable')
+  );
 
   return (
     <div className="space-y-6 animate-in fade-in duration-200">
@@ -208,7 +177,11 @@ export default function SecurityTab({ settings, setSettings }) {
         </div>
 
         <div className="divide-y divide-[var(--color-border-subtle-light)] dark:divide-[var(--color-border-dark)]">
-          {sessions.map((sess) => (
+          {sessions.length === 0 ? (
+            <p className="p-6 text-sm text-center text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)]">
+              {t('settings.noSessionsAvailable', 'No session data is available from the server.')}
+            </p>
+          ) : sessions.map((sess) => (
             <div key={sess.id} className="p-4 sm:px-6 sm:py-3.5 flex items-center justify-between gap-4 hover:bg-[var(--color-surface-hover-light)]/40 dark:hover:bg-[var(--color-surface-hover-dark)]/30 transition-colors">
               <div className="flex items-center gap-3">
                 <div className={`w-9 h-9 rounded-md flex items-center justify-center shrink-0 border ${

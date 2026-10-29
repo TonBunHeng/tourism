@@ -63,11 +63,11 @@ export default function TourModal({
     if (editingTour) {
       setFormData({
         title: editingTour.title || '',
-        destination: editingTour.destination || editingTour.province || 'Siem Reap',
-        category: editingTour.category || 'Cultural & Heritage',
-        duration: editingTour.duration || '1 Full Day',
-        price_per_person: String(editingTour.price_per_person || editingTour.price || '60'),
-        max_travelers: String(editingTour.max_travelers || '12'),
+        destination: editingTour.destination || editingTour.province || '',
+        category: editingTour.category || '',
+        duration: editingTour.duration || '',
+        price_per_person: String(editingTour.price_per_person ?? editingTour.price ?? ''),
+        max_travelers: String(editingTour.max_travelers ?? ''),
         cover_image: editingTour.cover_image || editingTour.image_url || editingTour.image || '',
         description: editingTour.description || '',
         status: editingTour.status || 'active'
@@ -132,7 +132,7 @@ export default function TourModal({
         ...formData,
         price_per_person: Number(formData.price_per_person),
         price: Number(formData.price_per_person),
-        max_travelers: Number(formData.max_travelers) || 10,
+        ...(formData.max_travelers !== '' ? { max_travelers: Number(formData.max_travelers) } : {}),
         image_url: formData.cover_image
       });
     } finally {

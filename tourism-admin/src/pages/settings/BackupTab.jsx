@@ -8,7 +8,6 @@ import {
   Trash2,
   AlertTriangle,
   RefreshCw,
-  FileSpreadsheet,
   Zap
 } from 'lucide-react';
 import { useAlert } from '../../context/AlertContext';
@@ -16,42 +15,17 @@ import { useLanguage } from '../../i18n';
 
 export default function BackupTab({ settings, setSettings }) {
   const { t } = useLanguage();
-  const { showConfirm, showSuccess } = useAlert();
-  const [backups, setBackups] = useState([
-    {
-      id: '1',
-      name: 'angkorverses_db_2026-08-30_full.sql',
-      size: '148.4 MB',
-      date: '2026-08-30 02:00:00 ICT',
-      type: 'Automated Daily Snapshot',
-      status: 'Completed'
-    },
-    {
-      id: '2',
-      name: 'angkorverses_db_2026-08-29_full.sql',
-      size: '146.9 MB',
-      date: '2026-08-29 02:00:00 ICT',
-      type: 'Automated Daily Snapshot',
-      status: 'Completed'
-    },
-    {
-      id: '3',
-      name: 'angkorverses_db_2026-08-25_manual.sql',
-      size: '144.1 MB',
-      date: '2026-08-25 14:18:22 ICT',
-      type: 'Manual System Snapshot',
-      status: 'Completed'
-    }
-  ]);
+  const { showConfirm, showError } = useAlert();
+  const backups = [];
 
-  const [creatingBackup, setCreatingBackup] = useState(false);
-  const [clearingCache, setClearingCache] = useState(false);
-  const [purgingTemp, setPurgingTemp] = useState(false);
-  const [optimizingDb, setOptimizingDb] = useState(false);
+  const creatingBackup = false;
+  const clearingCache = false;
+  const purgingTemp = false;
+  const optimizingDb = false;
 
   const [restoreModalOpen, setRestoreModalOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
-  const [restoring, setRestoring] = useState(false);
+  const restoring = false;
 
   useEffect(() => {
     if (restoreModalOpen) {
@@ -76,32 +50,16 @@ export default function BackupTab({ settings, setSettings }) {
     }));
   };
 
-  const handleCreateBackup = () => {
-    setCreatingBackup(true);
-    setTimeout(() => {
-      const now = new Date();
-      const dateStr = now.toISOString().split('T')[0];
-      const timeStr = now.toTimeString().split(' ')[0];
-      const newBackup = {
-        id: String(Date.now()),
-        name: `angkorverses_db_${dateStr}_manual.sql`,
-        size: '149.2 MB',
-        date: `${dateStr} ${timeStr} ICT`,
-        type: 'Manual System Snapshot',
-        status: 'Completed'
-      };
+  const unavailable = () => showError(
+    t('settings.backupUnavailable', 'This maintenance action is not connected to the server yet.'),
+    t('settings.backupUnavailableTitle', 'Action unavailable')
+  );
 
-      setBackups([newBackup, ...backups]);
-      setCreatingBackup(false);
-      showSuccess(
-        t('settings.backupCreatedMsg', { name: newBackup.name, size: '149.2 MB' }, `Database snapshot "${newBackup.name}" (149.2 MB) generated and stored successfully.`),
-        t('settings.backupCreatedTitle', 'Backup Created')
-      );
-    }, 1800);
-  };
+  const handleCreateBackup = unavailable;
 
   const handleDeleteBackup = async (id) => {
     const target = backups.find((b) => b.id === id);
+    if (!target) return;
     const confirmed = await showConfirm({
       title: t('settings.deleteBackupConfirmTitle', 'Delete Backup Snapshot'),
       message: t('settings.deleteBackupConfirmMsg', { name: target?.name || 'this backup file' }, `Are you sure you want to permanently remove "${target?.name || 'this backup file'}"?`),
@@ -111,87 +69,22 @@ export default function BackupTab({ settings, setSettings }) {
     });
 
     if (confirmed) {
-      setBackups(backups.filter((b) => b.id !== id));
-      showSuccess(
-        t('settings.deleteSuccessMsg', 'Backup file has been removed from server storage.'),
-        t('settings.deleteSuccessTitle', 'Deleted')
-      );
+      unavailable();
     }
   };
 
-  const handleDownloadBackup = (backup) => {
-    const content = `-- AngkorVerses Relational Database Snapshot Dump
--- Archive: ${backup.name}
--- Timestamp: ${backup.date}
--- Architecture: AngkorVerses Smart Tourism Engine v1.0
--- Checksum Status: Verified
-
-SET FOREIGN_KEY_CHECKS=0;
--- Database: tourism_db
--- System settings, places, categories, events, reviews, and galleries preserved.
-`;
-    const blob = new Blob([content], { type: 'application/sql' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = backup.name;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    showSuccess(
-      t('settings.downloadSuccessMsg', { name: backup.name }, `Backup snapshot "${backup.name}" downloaded to your device.`),
-      t('settings.downloadSuccessTitle', 'Download Complete')
-    );
-  };
+  const handleDownloadBackup = unavailable;
 
   const handleRestoreSubmit = () => {
     if (!selectedFile) return;
-    setRestoring(true);
-    setTimeout(() => {
-      setRestoring(false);
-      setRestoreModalOpen(false);
-      const fileName = selectedFile.name;
-      setSelectedFile(null);
-      showSuccess(
-        t('settings.dbRestoredMsg', { name: fileName }, `Database state restored successfully from "${fileName}".`),
-        t('settings.dbRestoredTitle', 'Database Restored')
-      );
-    }, 2200);
+    unavailable();
   };
 
-  const handleClearCache = () => {
-    setClearingCache(true);
-    setTimeout(() => {
-      setClearingCache(false);
-      showSuccess(
-        t('settings.cacheClearedMsg', 'Application configuration, route cache, and compiled views have been purged.'),
-        t('settings.cacheClearedTitle', 'Cache Cleared')
-      );
-    }, 1200);
-  };
+  const handleClearCache = unavailable;
 
-  const handlePurgeTemp = () => {
-    setPurgingTemp(true);
-    setTimeout(() => {
-      setPurgingTemp(false);
-      showSuccess(
-        t('settings.storageCleanedMsg', 'Temporary upload artifacts and cached thumbnail fragments have been purged (2.4 GB reclaimed).'),
-        t('settings.storageCleanedTitle', 'Storage Cleaned')
-      );
-    }, 1400);
-  };
+  const handlePurgeTemp = unavailable;
 
-  const handleOptimizeDb = () => {
-    setOptimizingDb(true);
-    setTimeout(() => {
-      setOptimizingDb(false);
-      showSuccess(
-        t('settings.dbOptimizedMsg', 'All database tables, spatial indexes, and foreign key relations optimized.'),
-        t('settings.dbOptimizedTitle', 'Database Optimized')
-      );
-    }, 1600);
-  };
+  const handleOptimizeDb = unavailable;
 
   return (
     <div className="space-y-6 animate-in fade-in duration-200">

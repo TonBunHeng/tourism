@@ -106,7 +106,7 @@ export default function SecurityGrid({
                     {t('security.labelSourceIp', 'Source IP Address')}:
                   </span>
                   <span className="font-semibold text-slate-800 dark:text-zinc-200">
-                    {alert.ip_address || '127.0.0.1'}
+                    {alert.ip_address || 'N/A'}
                   </span>
                 </div>
 

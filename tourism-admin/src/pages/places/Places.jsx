@@ -50,7 +50,7 @@ export default function Places() {
     best_time: '',
     duration: '',
     price: '',
-    rating: 5.0,
+    rating: 0,
     status: 'Active',
     image_url: ''
   });
@@ -94,17 +94,17 @@ export default function Places() {
           category: p.category || p.category_detail?.name || 'Attraction',
           category_detail: p.category_detail,
           province_id: p.province_id,
-          province: p.province || p.province_detail?.name || 'Siem Reap',
+          province: p.province || p.province_detail?.name || '',
           province_detail: p.province_detail,
-          address: p.address || 'Cambodia',
-          coordinates: p.coordinates || '13.4125° N, 103.8670° E',
-          latitude: p.latitude || 13.4125,
-          longitude: p.longitude || 103.8670,
+          address: p.address || '',
+          coordinates: p.coordinates || '',
+          latitude: p.latitude ?? null,
+          longitude: p.longitude ?? null,
           description: p.description || '',
-          best_time: p.best_time || 'Morning',
-          duration: p.duration || '2-3 Hours',
+          best_time: p.best_time || '',
+          duration: p.duration || '',
           price: p.price || 'Free',
-          rating: Number(p.rating || 5.0),
+          rating: Number(p.rating ?? 0),
           reviews: Number(p.reviews_count || 0),
           visits: Number(p.visitors_count || 0),
           image_url: p.image_url || p.image || '',
@@ -240,7 +240,7 @@ export default function Places() {
       best_time: 'Morning',
       duration: '2-3 Hours',
       price: '$10 - $25',
-      rating: 5.0,
+      rating: 0,
       status: 'Active',
       image_url: ''
     });
@@ -258,14 +258,14 @@ export default function Places() {
     setEditingPlace(place);
     setFormData({
       name: place.name,
-      category_id: place.category_id || 1,
+      category_id: place.category_id || '',
       category: place.category || formCategories[0] || 'Temple',
       address: place.address || '',
       description: place.description || '',
-      best_time: place.best_time || 'Morning',
-      duration: place.duration || '2-3 Hours',
+      best_time: place.best_time || '',
+      duration: place.duration || '',
       price: place.price || '',
-      rating: place.rating || 5.0,
+      rating: place.rating ?? 0,
       status: place.status || 'Active',
       image_url: place.image_url || place.image || ''
     });
@@ -290,7 +290,7 @@ export default function Places() {
         best_time: formData.best_time || '',
         duration: formData.duration || '',
         price: formData.price || '',
-        rating: formData.rating || 5.0,
+        rating: Number(formData.rating ?? 0),
         status: formData.status || 'Active',
         image_url: formData.image_url || ''
       };
