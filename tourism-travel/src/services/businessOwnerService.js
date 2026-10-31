@@ -163,9 +163,17 @@ export const businessOwnerService = {
     return await businessApi.post(`/businesses/${businessId}/reviews/${reviewId}/reply`, { reply });
   },
 
-  // Business Statistics
+  // Business Statistics & Events
   async getStatistics(businessId) {
     return await businessApi.get(`/businesses/${businessId}/statistics`);
+  },
+
+  async getEvents(businessId) {
+    return await businessApi.get(`/businesses/${businessId}/events`);
+  },
+
+  async createEvent(businessId, data) {
+    return await businessApi.post(`/businesses/${businessId}/events`, data);
   },
 
   // Bookings Management

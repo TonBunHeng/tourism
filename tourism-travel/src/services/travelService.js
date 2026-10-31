@@ -66,6 +66,22 @@ export const travelService = {
     return await api.post(`/galleries/${id}/like`);
   },
 
+  async recordGalleryView(id) {
+    return await api.post(`/galleries/${id}/view`);
+  },
+
+  async getGalleryComments(id) {
+    return await api.get(`/galleries/${id}/comments`);
+  },
+
+  async postGalleryComment(id, data) {
+    return await api.post(`/galleries/${id}/comments`, data);
+  },
+
+  async deleteGalleryComment(commentId) {
+    return await api.delete(`/galleries/comments/${commentId}`);
+  },
+
   // Directory Businesses
   async getBusinesses(params = {}) {
     return await api.get('/businesses', { params });
@@ -81,6 +97,18 @@ export const travelService = {
 
   async getBusinessHours(id) {
     return await api.get(`/businesses/${id}/hours`);
+  },
+
+  async getBusinessGallery(id) {
+    return await api.get(`/businesses/${id}/gallery`);
+  },
+
+  async getBusinessPromotions(id) {
+    return await api.get(`/businesses/${id}/promotions`);
+  },
+
+  async getBusinessEvents(id) {
+    return await api.get(`/businesses/${id}/events`);
   },
 
   async getBusinessReviews(id) {
@@ -173,6 +201,31 @@ export const travelService = {
 
   async deleteTrip(id) {
     return await api.delete(`/trips/${id}`);
+  },
+
+  async duplicateTrip(id) {
+    return await api.post(`/trips/${id}/duplicate`);
+  },
+
+  async addTripItinerary(tripId, data) {
+    return await api.post(`/trips/${tripId}/itineraries`, data);
+  },
+
+  async deleteTripItinerary(tripId, itineraryId) {
+    return await api.delete(`/trips/${tripId}/itineraries/${itineraryId}`);
+  },
+
+  async reorderTripItineraries(tripId, items) {
+    return await api.post(`/trips/${tripId}/reorder`, { itineraries: items });
+  },
+
+  // Gamification & Badges
+  async getAchievements() {
+    return await api.get('/achievements');
+  },
+
+  async getMyAchievements() {
+    return await api.get('/achievements/my');
   },
 
   // App Settings & Emergency Contacts

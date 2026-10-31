@@ -1,23 +1,19 @@
 import { useState, useEffect } from 'react';
 import { 
-  Sparkles,
-  Search,
+  Search, 
   PhoneCall, 
   Mail, 
   HelpCircle, 
   Send, 
   ShieldCheck, 
-  AlertTriangle,
-  Loader2,
-  Clock,
-  MapPin,
-  Check,
-  Copy,
-  ChevronDown,
-  ChevronUp,
-  FileText,
-  Headphones,
-  ExternalLink
+  Loader2, 
+  Clock, 
+  MapPin, 
+  Check, 
+  Copy, 
+  ChevronDown, 
+  ChevronUp, 
+  Headphones
 } from 'lucide-react';
 import travelService from '../../services/travelService';
 import { useAlert } from '../../context/AlertContext';
@@ -72,7 +68,6 @@ export default function Support() {
 
   // Settings & Contacts from Database/API
   const [settings, setSettings] = useState(null);
-  const [isLoadingSettings, setIsLoadingSettings] = useState(true);
 
   // Filters
   const [search, setSearch] = useState('');
@@ -101,9 +96,6 @@ export default function Support() {
       })
       .catch((err) => {
         console.error('Failed to load system settings from backend:', err);
-      })
-      .finally(() => {
-        setIsLoadingSettings(false);
       });
   }, []);
 

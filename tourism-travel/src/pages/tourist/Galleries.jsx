@@ -4,7 +4,9 @@ import {
   Heart, 
   Eye, 
   MapPin, 
-  X
+  X,
+  MessageSquare,
+  Send
 } from 'lucide-react';
 import travelService from '../../services/travelService';
 import { useAlert } from '../../context/AlertContext';
@@ -18,6 +20,9 @@ export default function Galleries() {
   const { showSuccess, showError } = useAlert();
   const [galleries, setGalleries] = useState([]);
   const [activePhoto, setActivePhoto] = useState(null);
+  const [photoComments, setPhotoComments] = useState([]);
+  const [newComment, setNewComment] = useState('');
+  const [isSubmittingComment, setIsSubmittingComment] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [pagination, setPagination] = useState({ current_page: 1, last_page: 1, total: 0, per_page: 9 });
   const [isLoading, setIsLoading] = useState(true);
@@ -73,6 +78,47 @@ export default function Galleries() {
     }
   };
 
+  const handleOpenPhoto = (photo) => {
+    setActivePhoto(photo);
+    setPhotoComments([]);
+    setNewComment('');
+
+    // Register real view in database
+    travelService.recordGalleryView(photo.id).catch(() => {});
+
+    // Load comments
+    travelService.getGalleryComments(photo.id).then((res) => {
+      if (res?.success) {
+        const cList = res.data?.comments || res.data || [];
+        setPhotoComments(Array.isArray(cList) ? cList : []);
+      }
+    }).catch(() => {});
+  };
+
+  const handlePostComment = async (e) => {
+    e.preventDefault();
+    if (!newComment.trim() || !activePhoto) return;
+
+    setIsSubmittingComment(true);
+    try {
+      const res = await travelService.postGalleryComment(activePhoto.id, { comment: newComment.trim() });
+      if (res?.success) {
+        showSuccess('Comment posted!');
+        setNewComment('');
+        travelService.getGalleryComments(activePhoto.id).then((r) => {
+          if (r?.success) {
+            const list = r.data?.comments || r.data || [];
+            setPhotoComments(Array.isArray(list) ? list : []);
+          }
+        });
+      }
+    } catch {
+      showError('Please sign in to post comments.');
+    } finally {
+      setIsSubmittingComment(false);
+    }
+  };
+
   const totalPages = pagination.last_page;
   const paginatedGalleries = galleries;
 
@@ -110,7 +156,7 @@ export default function Galleries() {
               return (
                 <div
                   key={photo.id}
-                  onClick={() => setActivePhoto(photo)}
+                  onClick={() => handleOpenPhoto(photo)}
                   className="group relative h-80 rounded-3xl overflow-hidden bg-slate-100 dark:bg-zinc-800 border border-slate-200/80 dark:border-zinc-800 shadow-xs hover:shadow-2xl transition-all duration-300 cursor-pointer"
                 >
                   {photoUrl ? (
@@ -209,16 +255,66 @@ export default function Galleries() {
               />
             </div>
 
-            <div className="w-full md:w-80 p-6 flex flex-col justify-between text-white border-t md:border-t-0 md:border-l border-zinc-800 space-y-4">
-              <div className="space-y-3">
-                <h3 className="text-lg font-black leading-snug">
-                  {activePhoto.title}
-                </h3>
-                {activePhoto.description && (
-                  <p className="text-xs text-zinc-300 leading-relaxed">
-                    {activePhoto.description}
-                  </p>
-                )}
+            <div className="w-full md:w-96 p-6 flex flex-col justify-between text-white border-t md:border-t-0 md:border-l border-zinc-800 space-y-4 max-h-[80vh] overflow-y-auto">
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <h3 className="text-lg font-black leading-snug">
+                    {activePhoto.title}
+                  </h3>
+                  {activePhoto.place && (
+                    <div className="text-xs text-rose-400 flex items-center gap-1">
+                      <MapPin size={12} />
+                      <span>{activePhoto.place}</span>
+                    </div>
+                  )}
+                  {activePhoto.description && (
+                    <p className="text-xs text-zinc-300 leading-relaxed">
+                      {activePhoto.description}
+                    </p>
+                  )}
+                </div>
+
+                {/* Comments Section */}
+                <div className="pt-3 border-t border-zinc-800 space-y-3">
+                  <div className="flex items-center gap-1.5 text-xs font-bold text-zinc-300">
+                    <MessageSquare size={14} />
+                    <span>Traveler Comments ({photoComments.length})</span>
+                  </div>
+
+                  <div className="space-y-2 max-h-40 overflow-y-auto pr-1">
+                    {photoComments.length === 0 ? (
+                      <p className="text-[11px] text-zinc-500 italic">No comments yet. Share your thoughts!</p>
+                    ) : (
+                      photoComments.map((c, idx) => (
+                        <div key={c.id || idx} className="p-2.5 rounded-xl bg-zinc-900 border border-zinc-800 text-[11px] space-y-1">
+                          <div className="flex items-center justify-between text-zinc-400 font-bold">
+                            <span>{c.user?.name || c.user_name || 'Traveler'}</span>
+                            <span className="text-[10px]">{c.created_at ? new Date(c.created_at).toLocaleDateString() : ''}</span>
+                          </div>
+                          <p className="text-zinc-200">{c.comment || c.content}</p>
+                        </div>
+                      ))
+                    )}
+                  </div>
+
+                  {/* Comment Form */}
+                  <form onSubmit={handlePostComment} className="flex gap-2 pt-1">
+                    <input
+                      type="text"
+                      value={newComment}
+                      onChange={(e) => setNewComment(e.target.value)}
+                      placeholder="Add a comment..."
+                      className="flex-1 px-3 py-1.5 rounded-xl bg-zinc-900 border border-zinc-700 text-xs text-white placeholder-zinc-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    />
+                    <button
+                      type="submit"
+                      disabled={isSubmittingComment || !newComment.trim()}
+                      className="p-2 rounded-xl bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white transition cursor-pointer"
+                    >
+                      <Send size={14} />
+                    </button>
+                  </form>
+                </div>
               </div>
 
               <div className="pt-4 border-t border-zinc-800 flex items-center justify-between">

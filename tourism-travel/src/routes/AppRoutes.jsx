@@ -23,6 +23,7 @@ import TouristHome from '../pages/tourist/TouristHome';
 import Destinations from '../pages/tourist/Destinations';
 import DestinationDetails from '../pages/tourist/DestinationDetails';
 import Businesses from '../pages/tourist/Businesses';
+import BusinessDetails from '../pages/tourist/BusinessDetails';
 import TourPackages from '../pages/tourist/TourPackages';
 import TourGuides from '../pages/tourist/TourGuides';
 import Categories from '../pages/tourist/Categories';
@@ -35,6 +36,8 @@ import Favorites from '../pages/tourist/Favorites';
 import Notifications from '../pages/tourist/Notifications';
 import Profile from '../pages/tourist/Profile';
 import Support from '../pages/tourist/Support';
+import Trips from '../pages/tourist/Trips';
+import Achievements from '../pages/tourist/Achievements';
 
 // Business Owner Pages
 import BusinessDashboard from '../pages/business-owner/Dashboard';
@@ -87,16 +90,21 @@ export default function AppRoutes() {
 
               {/* Tours & Bookings Section */}
               <Route path="/businesses" element={<Businesses />} />
+              <Route path="/businesses/:id" element={<BusinessDetails />} />
               <Route path="/tours" element={<TourPackages />} />
               <Route path="/tour-packages" element={<Navigate to="/tours" replace />} />
               <Route path="/guides" element={<TourGuides />} />
               <Route path="/tour-guides" element={<Navigate to="/guides" replace />} />
+
+              {/* Achievements & Gamification */}
+              <Route path="/achievements" element={<Achievements />} />
 
               {/* General Tourist Pages */}
               <Route path="/support" element={<Support />} />
 
               {/* Protected Tourist Actions */}
               <Route element={<ProtectedRoute allowedRoles={['user', 'business_owner', 'admin', 'super_admin']} />}>
+                <Route path="/trips" element={<Trips />} />
                 <Route path="/bookings" element={<Bookings />} />
                 <Route path="/favorites" element={<Favorites />} />
                 <Route path="/notifications" element={<Notifications />} />

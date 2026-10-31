@@ -12,7 +12,9 @@ import {
   ChevronLeft, 
   ShieldCheck, 
   MessageSquare,
-  Sparkles
+  Sparkles,
+  Compass,
+  X
 } from 'lucide-react';
 import travelService from '../../services/travelService';
 import { useAuth } from '../../context/AuthContext';
@@ -45,6 +47,13 @@ export default function DestinationDetails() {
   const [reviewTitle, setReviewTitle] = useState('');
   const [reviewComment, setReviewComment] = useState('');
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
+
+  // Add to Trip State
+  const [isAddToTripModalOpen, setIsAddToTripModalOpen] = useState(false);
+  const [userTrips, setUserTrips] = useState([]);
+  const [selectedTripId, setSelectedTripId] = useState('');
+  const [tripDayNumber, setTripDayNumber] = useState(1);
+  const [isAddingToTrip, setIsAddingToTrip] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -103,6 +112,58 @@ export default function DestinationDetails() {
     if (navigator.clipboard) {
       navigator.clipboard.writeText(window.location.href);
       showSuccess('Destination link copied to clipboard!', 'Link Copied');
+    }
+  };
+
+  const handleOpenAddToTrip = async () => {
+    if (!isAuthenticated) {
+      showError('Please sign in to add destinations to your planned trips.');
+      return;
+    }
+
+    try {
+      const res = await travelService.getTrips();
+      if (res?.success) {
+        const list = res.data?.trips || res.data?.data || res.data || [];
+        setUserTrips(Array.isArray(list) ? list : []);
+        if (Array.isArray(list) && list.length > 0) {
+          setSelectedTripId(String(list[0].id));
+        }
+        setIsAddToTripModalOpen(true);
+      }
+    } catch {
+      showError('Unable to load your trips. Please try again.');
+    }
+  };
+
+  const handleAddToTripSubmit = async (e) => {
+    e.preventDefault();
+    if (!selectedTripId) {
+      showError('Please select or create a trip first.');
+      return;
+    }
+
+    setIsAddingToTrip(true);
+    try {
+      const payload = {
+        place_id: place.id,
+        day_number: parseInt(tripDayNumber, 10) || 1,
+        activity: `Explore ${place.name}`,
+        notes: `Visit ${place.name} in ${place.province?.name || 'Cambodia'}.`,
+        time_slot: 'Morning',
+      };
+
+      const res = await travelService.addTripItinerary(selectedTripId, payload);
+      if (res?.success) {
+        showSuccess(`Added ${place.name} to your trip plan!`, 'Added to Itinerary');
+        setIsAddToTripModalOpen(false);
+      } else {
+        showError(res?.message || 'Failed to add to trip.');
+      }
+    } catch (err) {
+      showError(err?.message || 'Unable to add destination to trip.');
+    } finally {
+      setIsAddingToTrip(false);
     }
   };
 
@@ -358,6 +419,15 @@ export default function DestinationDetails() {
               >
                 <Calendar size={16} />
                 <span>Book Guided Tour / Visit</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={handleOpenAddToTrip}
+                className="w-full py-3 px-4 rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-850 hover:bg-slate-50 dark:hover:bg-zinc-800 text-slate-800 dark:text-zinc-200 text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer shadow-xs"
+              >
+                <Compass size={15} className="text-[#002D62] dark:text-blue-400" />
+                <span>Add to Trip Itinerary</span>
               </button>
 
               <Link
@@ -639,6 +709,94 @@ export default function DestinationDetails() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Add to Trip Modal */}
+      {isAddToTripModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-alert-backdrop">
+          <div className="w-full max-w-md rounded-3xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 p-6 shadow-2xl animate-alert-popup space-y-5">
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-zinc-800 pb-3">
+              <div>
+                <span className="text-[11px] font-bold text-[#002D62] dark:text-blue-400 uppercase tracking-wider">
+                  Itinerary Planner
+                </span>
+                <h3 className="text-base font-black text-slate-900 dark:text-white">
+                  Add {place.name} to Trip
+                </h3>
+              </div>
+              <button onClick={() => setIsAddToTripModalOpen(false)}>
+                <X size={18} className="text-slate-400" />
+              </button>
+            </div>
+
+            {userTrips.length === 0 ? (
+              <div className="text-center py-4 space-y-3">
+                <p className="text-xs text-slate-500">You don't have any planned trips yet.</p>
+                <Link
+                  to="/trips"
+                  className="inline-block px-4 py-2 rounded-xl bg-[#002D62] text-white text-xs font-bold"
+                >
+                  Create a Trip First
+                </Link>
+              </div>
+            ) : (
+              <form onSubmit={handleAddToTripSubmit} className="space-y-4">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 dark:text-zinc-300 mb-1">
+                    Select Planned Trip <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    value={selectedTripId}
+                    onChange={(e) => setSelectedTripId(e.target.value)}
+                    required
+                    className="w-full px-3 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800 text-xs font-medium text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#002D62]"
+                  >
+                    {userTrips.map((t) => (
+                      <option key={t.id} value={t.id}>
+                        {t.title} ({t.destination || 'Cambodia'})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 dark:text-zinc-300 mb-1">
+                    Day Number <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="number"
+                    min="1"
+                    max="30"
+                    required
+                    value={tripDayNumber}
+                    onChange={(e) => setTripDayNumber(Math.max(1, parseInt(e.target.value, 10) || 1))}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#002D62]"
+                  />
+                  <span className="text-[10px] text-slate-400 mt-0.5 block">
+                    e.g. Day 1, Day 2 of your trip itinerary
+                  </span>
+                </div>
+
+                <div className="pt-2 flex items-center justify-end gap-2 border-t border-slate-100 dark:border-zinc-800">
+                  <button
+                    type="button"
+                    onClick={() => setIsAddToTripModalOpen(false)}
+                    className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 dark:text-zinc-400 hover:bg-slate-100 dark:hover:bg-zinc-800"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isAddingToTrip}
+                    className="px-5 py-2 rounded-xl bg-[#002D62] hover:bg-[#001f44] text-white text-xs font-bold transition shadow-sm disabled:opacity-50"
+                  >
+                    {isAddingToTrip ? 'Adding to Trip...' : 'Add to Day Itinerary'}
+                  </button>
+                </div>
+              </form>
+            )}
           </div>
         </div>
       )}

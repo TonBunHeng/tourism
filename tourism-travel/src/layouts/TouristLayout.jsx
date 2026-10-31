@@ -20,7 +20,10 @@ import {
   Globe,
   Images,
   CalendarDays,
-  ArrowRight
+  ArrowRight,
+  Compass,
+  Award,
+  Store
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { toggleTheme, isDarkTheme, getInitialTheme } from '../utils/Theme';
@@ -130,7 +133,7 @@ export default function TouristLayout() {
     (p) => location.pathname === p || (p !== '/' && location.pathname.startsWith(p))
   );
 
-  const isToursActive = ['/tours', '/tour-packages', '/guides', '/tour-guides', '/bookings', '/businesses', '/favorites'].some(
+  const isToursActive = ['/tours', '/tour-packages', '/guides', '/tour-guides', '/bookings', '/businesses', '/favorites', '/trips', '/achievements'].some(
     (p) => location.pathname === p || location.pathname.startsWith(p)
   );
 
@@ -196,6 +199,20 @@ export default function TouristLayout() {
       description: 'Accredited local guides',
       icon: UserCheck,
       iconClass: 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400',
+    },
+    {
+      to: '/trips',
+      title: 'Trip Planner',
+      description: 'Custom day-by-day itineraries',
+      icon: Compass,
+      iconClass: 'bg-blue-50 dark:bg-blue-950/60 text-[#002D62] dark:text-blue-400',
+    },
+    {
+      to: '/achievements',
+      title: 'Achievements',
+      description: 'Explorer badges & milestones',
+      icon: Award,
+      iconClass: 'bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400',
     },
     {
       to: '/bookings',
@@ -439,6 +456,30 @@ export default function TouristLayout() {
                           <span>My Bookings</span>
                         </Link>
                         <Link
+                          to="/trips"
+                          onClick={() => setIsProfileMenuOpen(false)}
+                          className={`flex items-center gap-2 px-4 py-2 text-xs font-medium transition ${
+                            location.pathname === '/trips'
+                              ? 'text-red-600 dark:text-red-400 font-bold bg-red-50 dark:bg-red-950/40'
+                              : 'text-slate-700 dark:text-zinc-300 hover:bg-slate-50 dark:hover:bg-zinc-800'
+                          }`}
+                        >
+                          <Compass size={14} className={location.pathname === '/trips' ? 'text-red-600 dark:text-red-400' : 'text-slate-400'} />
+                          <span>Trip Planner</span>
+                        </Link>
+                        <Link
+                          to="/achievements"
+                          onClick={() => setIsProfileMenuOpen(false)}
+                          className={`flex items-center gap-2 px-4 py-2 text-xs font-medium transition ${
+                            location.pathname === '/achievements'
+                              ? 'text-red-600 dark:text-red-400 font-bold bg-red-50 dark:bg-red-950/40'
+                              : 'text-slate-700 dark:text-zinc-300 hover:bg-slate-50 dark:hover:bg-zinc-800'
+                          }`}
+                        >
+                          <Award size={14} className={location.pathname === '/achievements' ? 'text-red-600 dark:text-red-400' : 'text-slate-400'} />
+                          <span>Achievements</span>
+                        </Link>
+                        <Link
                           to="/favorites"
                           onClick={() => setIsProfileMenuOpen(false)}
                           className={`flex items-center gap-2 px-4 py-2 text-xs font-medium transition ${
@@ -450,6 +491,16 @@ export default function TouristLayout() {
                           <Heart size={14} className={location.pathname === '/favorites' ? 'text-red-600 fill-red-600' : 'text-rose-500'} />
                           <span>Saved Wishlist</span>
                         </Link>
+                        {(user?.role === 'business_owner' || user?.role === 'admin' || user?.role === 'super_admin') && (
+                          <Link
+                            to="/business/dashboard"
+                            onClick={() => setIsProfileMenuOpen(false)}
+                            className="flex items-center gap-2 px-4 py-2 text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-50/60 dark:bg-blue-950/40 hover:bg-blue-100"
+                          >
+                            <Store size={14} />
+                            <span>Business Hub</span>
+                          </Link>
+                        )}
                       </div>
 
                       <div className="pt-1 border-t border-slate-100 dark:border-zinc-800">

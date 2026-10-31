@@ -10,7 +10,9 @@ import {
   LogOut,
   CheckCircle2,
   CalendarCheck,
-  Heart
+  Heart,
+  Compass,
+  Award
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useAlert } from '../../context/AlertContext';
@@ -247,17 +249,31 @@ export default function Profile() {
         </div>
 
         {/* Quick Travel Shortcuts */}
-        <div className="flex items-center gap-3 w-full md:w-auto justify-center">
+        <div className="flex flex-wrap items-center gap-2.5 w-full md:w-auto justify-center">
+          <Link
+            to="/trips"
+            className="px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-zinc-800 hover:bg-slate-200 dark:hover:bg-zinc-700 text-slate-700 dark:text-zinc-200 text-xs font-bold transition flex items-center gap-1.5"
+          >
+            <Compass size={14} className="text-[#002D62] dark:text-blue-400" />
+            <span>Trip Planner</span>
+          </Link>
           <Link
             to="/bookings"
-            className="px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-zinc-800 hover:bg-slate-200 dark:hover:bg-zinc-700 text-slate-700 dark:text-zinc-200 text-xs font-bold transition flex items-center gap-1.5"
+            className="px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-zinc-800 hover:bg-slate-200 dark:hover:bg-zinc-700 text-slate-700 dark:text-zinc-200 text-xs font-bold transition flex items-center gap-1.5"
           >
             <CalendarCheck size={14} className="text-[#002D62] dark:text-blue-400" />
             <span>My Bookings</span>
           </Link>
           <Link
+            to="/achievements"
+            className="px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-zinc-800 hover:bg-slate-200 dark:hover:bg-zinc-700 text-slate-700 dark:text-zinc-200 text-xs font-bold transition flex items-center gap-1.5"
+          >
+            <Award size={14} className="text-amber-500" />
+            <span>Badges</span>
+          </Link>
+          <Link
             to="/favorites"
-            className="px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-zinc-800 hover:bg-slate-200 dark:hover:bg-zinc-700 text-slate-700 dark:text-zinc-200 text-xs font-bold transition flex items-center gap-1.5"
+            className="px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-zinc-800 hover:bg-slate-200 dark:hover:bg-zinc-700 text-slate-700 dark:text-zinc-200 text-xs font-bold transition flex items-center gap-1.5"
           >
             <Heart size={14} className="text-rose-500" />
             <span>Saved Wishlist</span>

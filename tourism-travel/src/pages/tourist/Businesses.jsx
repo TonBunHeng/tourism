@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, Link } from 'react-router-dom';
 import { 
   Building2, 
   Search, 
@@ -279,7 +279,7 @@ export default function Businesses() {
                   >
                     <div>
                       {/* Photo & Badges */}
-                      <div className="relative h-52 w-full overflow-hidden bg-slate-100 dark:bg-zinc-800">
+                      <Link to={`/businesses/${b.id}`} className="block relative h-52 w-full overflow-hidden bg-slate-100 dark:bg-zinc-800">
                         {coverImage ? (
                           <img
                             src={coverImage}
@@ -310,13 +310,15 @@ export default function Businesses() {
                             {b.price_range}
                           </div>
                         )}
-                      </div>
+                      </Link>
 
                       {/* Content */}
                       <div className="p-6 space-y-3.5">
-                        <h3 className="font-extrabold text-base text-slate-900 dark:text-white group-hover:text-[#002D62] dark:group-hover:text-blue-400 transition-colors line-clamp-1">
-                          {b.name}
-                        </h3>
+                        <Link to={`/businesses/${b.id}`} className="block">
+                          <h3 className="font-extrabold text-base text-slate-900 dark:text-white group-hover:text-[#002D62] dark:group-hover:text-blue-400 transition-colors line-clamp-1">
+                            {b.name}
+                          </h3>
+                        </Link>
 
                         {/* Rating & Reviews */}
                         <div className="flex items-center gap-2 text-xs">
@@ -356,13 +358,12 @@ export default function Businesses() {
 
                     {/* Footer Buttons */}
                     <div className="px-6 py-4 border-t border-slate-100 dark:border-zinc-800/80 flex items-center justify-between gap-2 text-xs">
-                      <button
-                        type="button"
-                        onClick={() => setActiveBusinessDetails(b)}
+                      <Link
+                        to={`/businesses/${b.id}`}
                         className="px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-zinc-800 hover:bg-slate-200 dark:hover:bg-zinc-700 text-slate-800 dark:text-zinc-200 font-semibold transition cursor-pointer"
                       >
                         View Details
-                      </button>
+                      </Link>
 
                       <button
                         type="button"
