@@ -1,20 +1,24 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useOutletContext } from 'react-router-dom';
-import { 
-  Package, 
-  Plus, 
-  Edit, 
-  Trash2, 
-  Clock, 
-  Users, 
-  X, 
+import {
+  Package,
+  Plus,
+  Edit,
+  Trash2,
+  Clock,
+  Users,
+  X,
   Building2,
   Tag,
   PartyPopper,
-  Calendar
+  Calendar,
+  Sparkles,
+  CheckCircle2,
+  AlertCircle
 } from 'lucide-react';
 import businessOwnerService from '../../services/businessOwnerService';
 import { useAlert } from '../../context/AlertContext';
+import { useSearch } from '../../context/SearchContext';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import EmptyState from '../../components/common/EmptyState';
 import Badge from '../../components/common/Badge';
@@ -22,6 +26,7 @@ import Badge from '../../components/common/Badge';
 export default function Listings() {
   const { selectedBusiness } = useOutletContext();
   const { showSuccess, showError, showConfirm } = useAlert();
+  const { searchTerm } = useSearch();
 
   const [activeTab, setActiveTab] = useState('services'); // 'services' | 'promotions' | 'events'
   const [isLoading, setIsLoading] = useState(false);
@@ -161,33 +166,33 @@ export default function Listings() {
     }
   };
 
-  const handleDeleteService = async (svcId) => {
+  const handleDeleteService = async (id) => {
     const confirmed = await showConfirm({
-      title: 'Delete Service Listing',
-      message: 'Are you sure you want to delete this service listing? This action cannot be undone.',
-      confirmText: 'Delete',
+      title: 'Delete Service Offering',
+      message: 'Remove this service listing from your public profile? Active bookings will remain intact.',
+      confirmText: 'Delete Service',
       type: 'danger',
     });
     if (!confirmed) return;
 
     try {
-      const res = await businessOwnerService.deleteService(selectedBusiness.id, svcId);
+      const res = await businessOwnerService.deleteService(selectedBusiness.id, id);
       if (res?.success) {
-        showSuccess('Service deleted.');
-        setServices((prev) => prev.filter((s) => s.id !== svcId));
+        showSuccess('Service removed successfully.');
+        fetchCatalogData();
       }
     } catch (err) {
       showError(err.message || 'Failed to delete service.');
     }
   };
 
-  // PROMOTION HANDLERS
+  // PROMO HANDLERS
   const handleOpenCreatePromo = () => {
     setEditingPromo(null);
     setPromoTitle('');
-    setPromoCode('ANGKOR15');
+    setPromoCode('');
     setPromoDiscount('15');
-    setPromoStartDate(new Date().toISOString().split('T')[0]);
+    setPromoStartDate('');
     setPromoEndDate('');
     setPromoDescription('');
     setPromoIsActive(true);
@@ -199,8 +204,8 @@ export default function Listings() {
     setPromoTitle(promo.title || '');
     setPromoCode(promo.promo_code || '');
     setPromoDiscount(String(promo.discount_percentage || '15'));
-    setPromoStartDate(promo.start_date ? promo.start_date.split('T')[0] : '');
-    setPromoEndDate(promo.end_date ? promo.end_date.split('T')[0] : '');
+    setPromoStartDate(promo.start_date || '');
+    setPromoEndDate(promo.end_date || '');
     setPromoDescription(promo.description || '');
     setPromoIsActive(Boolean(promo.is_active));
     setIsPromoModalOpen(true);
@@ -217,7 +222,7 @@ export default function Listings() {
     const payload = {
       title: promoTitle.trim(),
       promo_code: promoCode.trim() || undefined,
-      discount_percentage: parseFloat(promoDiscount) || 0,
+      discount_percentage: parseFloat(promoDiscount) || 10,
       start_date: promoStartDate || undefined,
       end_date: promoEndDate || undefined,
       description: promoDescription.trim() || undefined,
@@ -228,14 +233,14 @@ export default function Listings() {
       if (editingPromo) {
         const res = await businessOwnerService.updatePromotion(selectedBusiness.id, editingPromo.id, payload);
         if (res?.success) {
-          showSuccess('Promotion updated successfully.');
+          showSuccess('Promotion deal updated successfully.');
           setIsPromoModalOpen(false);
           fetchCatalogData();
         }
       } else {
         const res = await businessOwnerService.createPromotion(selectedBusiness.id, payload);
         if (res?.success) {
-          showSuccess('Promotion discount published!', 'Promotion Created');
+          showSuccess('Special promotion created and activated!', 'Promotion Published');
           setIsPromoModalOpen(false);
           fetchCatalogData();
         }
@@ -247,20 +252,20 @@ export default function Listings() {
     }
   };
 
-  const handleDeletePromo = async (promoId) => {
+  const handleDeletePromo = async (id) => {
     const confirmed = await showConfirm({
       title: 'Delete Promotion',
-      message: 'Delete this promotional offer from your establishment?',
-      confirmText: 'Delete',
+      message: 'Deactivate and delete this promotional discount deal?',
+      confirmText: 'Delete Promo',
       type: 'danger',
     });
     if (!confirmed) return;
 
     try {
-      const res = await businessOwnerService.deletePromotion(selectedBusiness.id, promoId);
+      const res = await businessOwnerService.deletePromotion(selectedBusiness.id, id);
       if (res?.success) {
-        showSuccess('Promotion removed.');
-        setPromotions((prev) => prev.filter((p) => p.id !== promoId));
+        showSuccess('Promotion deleted successfully.');
+        fetchCatalogData();
       }
     } catch (err) {
       showError(err.message || 'Failed to delete promotion.');
@@ -271,8 +276,8 @@ export default function Listings() {
   const handleOpenCreateEvent = () => {
     setEventTitle('');
     setEventCategory('Cultural & Dining');
-    setEventLocation(selectedBusiness?.address || 'Siem Reap');
-    setEventStartDate(new Date().toISOString().split('T')[0]);
+    setEventLocation(selectedBusiness?.address || '');
+    setEventStartDate('');
     setEventEndDate('');
     setEventPrice('Free Admission');
     setEventDescription('');
@@ -289,7 +294,7 @@ export default function Listings() {
     setIsSubmitting(true);
     const payload = {
       title: eventTitle.trim(),
-      category: eventCategory.trim() || undefined,
+      category: eventCategory,
       location: eventLocation.trim() || undefined,
       start_date: eventStartDate || undefined,
       end_date: eventEndDate || undefined,
@@ -311,6 +316,37 @@ export default function Listings() {
     }
   };
 
+  // Filtered lists by header search
+  const filteredServices = useMemo(() => {
+    if (!searchTerm) return services;
+    const q = searchTerm.toLowerCase();
+    return services.filter(
+      (s) => s.name?.toLowerCase().includes(q) || s.description?.toLowerCase().includes(q)
+    );
+  }, [services, searchTerm]);
+
+  const filteredPromos = useMemo(() => {
+    if (!searchTerm) return promotions;
+    const q = searchTerm.toLowerCase();
+    return promotions.filter(
+      (p) =>
+        p.title?.toLowerCase().includes(q) ||
+        p.promo_code?.toLowerCase().includes(q) ||
+        p.description?.toLowerCase().includes(q)
+    );
+  }, [promotions, searchTerm]);
+
+  const filteredEvents = useMemo(() => {
+    if (!searchTerm) return events;
+    const q = searchTerm.toLowerCase();
+    return events.filter(
+      (e) =>
+        e.title?.toLowerCase().includes(q) ||
+        e.description?.toLowerCase().includes(q) ||
+        e.location?.toLowerCase().includes(q)
+    );
+  }, [events, searchTerm]);
+
   if (!selectedBusiness) {
     return (
       <EmptyState
@@ -321,64 +357,122 @@ export default function Listings() {
     );
   }
 
+  const catalogStats = [
+    {
+      title: 'Services & Offerings',
+      value: services.length,
+      subtext: `${services.filter((s) => s.status === 'active' || s.is_available).length} bookable active`,
+      icon: Package,
+      color: 'text-blue-600 dark:text-blue-400',
+      bg: 'bg-blue-50 dark:bg-blue-950/40',
+    },
+    {
+      title: 'Promotions Active',
+      value: promotions.length,
+      subtext: `${promotions.filter((p) => p.is_active).length} live discount deals`,
+      icon: Tag,
+      color: 'text-amber-600 dark:text-amber-400',
+      bg: 'bg-amber-50 dark:bg-amber-950/40',
+    },
+    {
+      title: 'Hosted Events',
+      value: events.length,
+      subtext: 'Cultural & community programs',
+      icon: PartyPopper,
+      color: 'text-purple-600 dark:text-purple-400',
+      bg: 'bg-purple-50 dark:bg-purple-950/40',
+    },
+  ];
+
   return (
-    <div className="space-y-8">
-      {/* Title & Action */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <div className="text-xs font-semibold text-[#002D62] dark:text-blue-400 uppercase tracking-wider mb-1">
-            Establishment Catalog ({selectedBusiness.name})
+    <div className="flex flex-col">
+      {/* Header Section (matching tourism-admin) */}
+      <div className="mb-6 md:mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white tracking-tight">
+              Listings & Services
+            </h1>
+            <p className="text-xs sm:text-sm text-gray-500 dark:text-zinc-400 mt-1">
+              Publish bookable experiences, configure seasonal discounts, and promote live events.
+            </p>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
-            Offerings, Deals & Events
-          </h1>
-          <p className="text-xs sm:text-sm text-slate-500 dark:text-zinc-400 mt-1">
-            Publish bookable experiences, configure seasonal discounts, and promote live events.
-          </p>
-        </div>
 
-        <div className="flex items-center gap-2 self-start sm:self-auto">
-          {activeTab === 'services' && (
-            <button
-              type="button"
-              onClick={handleOpenCreateService}
-              className="px-4 py-2.5 rounded-xl bg-[#002D62] hover:bg-[#001f44] text-white text-xs font-bold shadow-sm transition flex items-center gap-1.5 cursor-pointer"
-            >
-              <Plus size={15} />
-              <span>Add New Service</span>
-            </button>
-          )}
+          <div className="flex items-center gap-2.5 self-start sm:self-auto">
+            {activeTab === 'services' && (
+              <button
+                type="button"
+                onClick={handleOpenCreateService}
+                className="flex items-center gap-1.5 px-3.5 py-2 rounded-md bg-[#003E83] hover:bg-[#002e62] text-white text-xs sm:text-sm font-medium shadow-xs transition-colors cursor-pointer"
+              >
+                <Plus size={16} />
+                <span>Add Service</span>
+              </button>
+            )}
 
-          {activeTab === 'promotions' && (
-            <button
-              type="button"
-              onClick={handleOpenCreatePromo}
-              className="px-4 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold shadow-sm transition flex items-center gap-1.5 cursor-pointer"
-            >
-              <Plus size={15} />
-              <span>Create Promotion</span>
-            </button>
-          )}
+            {activeTab === 'promotions' && (
+              <button
+                type="button"
+                onClick={handleOpenCreatePromo}
+                className="flex items-center gap-1.5 px-3.5 py-2 rounded-md bg-amber-600 hover:bg-amber-700 text-white text-xs sm:text-sm font-medium shadow-xs transition-colors cursor-pointer"
+              >
+                <Plus size={16} />
+                <span>Create Promotion</span>
+              </button>
+            )}
 
-          {activeTab === 'events' && (
-            <button
-              type="button"
-              onClick={handleOpenCreateEvent}
-              className="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-sm transition flex items-center gap-1.5 cursor-pointer"
-            >
-              <Plus size={15} />
-              <span>Publish Event</span>
-            </button>
-          )}
+            {activeTab === 'events' && (
+              <button
+                type="button"
+                onClick={handleOpenCreateEvent}
+                className="flex items-center gap-1.5 px-3.5 py-2 rounded-md bg-purple-600 hover:bg-purple-700 text-white text-xs sm:text-sm font-medium shadow-xs transition-colors cursor-pointer"
+              >
+                <Plus size={16} />
+                <span>Publish Event</span>
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
-      {/* Tabs */}
-      <div className="border-b border-slate-200 dark:border-zinc-800 flex items-center gap-2 text-xs sm:text-sm font-bold">
+      {/* KPI Stats Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-6">
+        {catalogStats.map((stat, idx) => {
+          const Icon = stat.icon;
+          return (
+            <div
+              key={idx}
+              className="bg-white dark:bg-zinc-900 rounded-md p-4 shadow-xs border border-gray-200 dark:border-zinc-800 flex flex-col justify-between"
+            >
+              <div className="flex items-center justify-between gap-2">
+                <div className="min-w-0">
+                  <p className="text-xs text-gray-500 dark:text-zinc-400 font-medium truncate">
+                    {stat.title}
+                  </p>
+                  <p className="text-lg md:text-xl font-bold text-gray-900 dark:text-white mt-1 tracking-tight">
+                    {stat.value}
+                  </p>
+                </div>
+                <div className={`p-2 rounded-md shrink-0 ${stat.bg}`}>
+                  <Icon className={`w-4 h-4 md:w-5 md:h-5 ${stat.color}`} />
+                </div>
+              </div>
+              <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-100 dark:border-zinc-800">
+                <p className="text-[11px] text-gray-500 dark:text-zinc-400 truncate">
+                  {stat.subtext}
+                </p>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Segmented Tabs (matching tourism-admin tabs) */}
+      <div className="bg-gray-100 dark:bg-zinc-800/80 p-1 rounded-md inline-flex items-center gap-1 mb-6 border border-gray-200/50 dark:border-zinc-700/50 self-start">
         {[
-          { key: 'services', label: 'Services & Experiences', count: services.length, icon: Package },
-          { key: 'promotions', label: 'Promotions & Discounts', count: promotions.length, icon: Tag },
-          { key: 'events', label: 'Hosted Events', count: events.length, icon: PartyPopper },
+          { key: 'services', label: 'Services & Offerings', count: filteredServices.length, icon: Package },
+          { key: 'promotions', label: 'Promotions & Deals', count: filteredPromos.length, icon: Tag },
+          { key: 'events', label: 'Hosted Events', count: filteredEvents.length, icon: PartyPopper },
         ].map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.key;
@@ -386,19 +480,21 @@ export default function Listings() {
             <button
               key={tab.key}
               onClick={() => setActiveTab(tab.key)}
-              className={`px-4 py-3 border-b-2 transition flex items-center gap-2 cursor-pointer ${
+              className={`px-3 py-1.5 rounded-md text-xs sm:text-sm font-medium transition flex items-center gap-2 cursor-pointer ${
                 isActive
-                  ? 'border-[#002D62] text-[#002D62] dark:border-blue-400 dark:text-blue-400'
-                  : 'border-transparent text-slate-500 hover:text-slate-800 dark:text-zinc-400 dark:hover:text-zinc-200'
+                  ? 'bg-white dark:bg-zinc-900 text-[#003E83] dark:text-blue-400 font-semibold shadow-xs'
+                  : 'text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white'
               }`}
             >
-              <Icon size={16} />
+              <Icon size={15} />
               <span>{tab.label}</span>
-              <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                isActive 
-                  ? 'bg-[#002D62]/10 text-[#002D62] dark:bg-blue-400/20 dark:text-blue-400' 
-                  : 'bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-400'
-              }`}>
+              <span
+                className={`px-1.5 py-0.2 rounded text-[10px] font-bold ${
+                  isActive
+                    ? 'bg-blue-50 text-[#003E83] dark:bg-blue-950/60 dark:text-blue-400'
+                    : 'bg-gray-200 dark:bg-zinc-700 text-gray-700 dark:text-zinc-300'
+                }`}
+              >
                 {tab.count}
               </span>
             </button>
@@ -406,67 +502,71 @@ export default function Listings() {
         })}
       </div>
 
-      {/* TAB CONTENT */}
+      {/* Tab Content */}
       {isLoading ? (
-        <LoadingSpinner text="Retrieving catalog items from database..." />
+        <div className="py-16">
+          <LoadingSpinner text="Retrieving catalog items from database..." />
+        </div>
       ) : activeTab === 'services' ? (
         /* SERVICES GRID */
-        services.length === 0 ? (
-          <EmptyState
-            icon={Package}
-            title="No services created yet"
-            description="Create your first tourism service (e.g. Khmer Cooking Class, Deluxe Heritage Suite, or Guided Boat Excursion)."
-            action={
-              <button
-                type="button"
-                onClick={handleOpenCreateService}
-                className="px-4 py-2 rounded-xl bg-[#002D62] text-white text-xs font-bold shadow-sm"
-              >
-                Add First Service
-              </button>
-            }
-          />
+        filteredServices.length === 0 ? (
+          <div className="p-8 bg-white dark:bg-zinc-900 rounded-md border border-gray-200 dark:border-zinc-800">
+            <EmptyState
+              icon={Package}
+              title="No services created yet"
+              description="Create your first tourism service (e.g. Khmer Cooking Class, Deluxe Heritage Suite, or Guided Boat Excursion)."
+              action={
+                <button
+                  type="button"
+                  onClick={handleOpenCreateService}
+                  className="px-3.5 py-2 rounded-md bg-[#003E83] text-white text-xs font-medium shadow-xs"
+                >
+                  Add First Service
+                </button>
+              }
+            />
+          </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {services.map((svc) => (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {filteredServices.map((svc) => (
               <div
                 key={svc.id}
-                className="p-5 rounded-3xl bg-white dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800 shadow-xs hover:shadow-md transition-all flex flex-col justify-between"
+                className="p-4 rounded-md bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 shadow-xs hover:border-blue-400 dark:hover:border-blue-500 transition-all flex flex-col justify-between"
               >
                 <div>
                   <div className="flex items-center justify-between mb-2">
                     <Badge variant={svc.status === 'active' || svc.is_available ? 'success' : 'neutral'}>
                       {svc.status || 'Active'}
                     </Badge>
-                    <span className="text-base font-black text-slate-900 dark:text-white">
+                    <span className="text-base font-bold text-gray-900 dark:text-white">
                       ${Number(svc.price || 0).toFixed(2)}
                     </span>
                   </div>
 
-                  <h3 className="font-extrabold text-base text-slate-900 dark:text-white line-clamp-1 mb-1">
+                  <h3 className="font-bold text-sm text-gray-900 dark:text-white line-clamp-1 mb-1">
                     {svc.name}
                   </h3>
-                  <p className="text-xs text-slate-500 dark:text-zinc-400 line-clamp-2 leading-relaxed">
+                  <p className="text-xs text-gray-500 dark:text-zinc-400 line-clamp-2 leading-relaxed">
                     {svc.description || 'Verified tourism experience offered by business.'}
                   </p>
 
-                  <div className="mt-4 pt-3 border-t border-slate-100 dark:border-zinc-800 grid grid-cols-2 gap-2 text-xs text-slate-600 dark:text-zinc-400">
+                  <div className="mt-3.5 pt-2.5 border-t border-gray-100 dark:border-zinc-800 grid grid-cols-2 gap-2 text-xs text-gray-600 dark:text-zinc-400">
                     <div className="flex items-center gap-1.5">
-                      <Clock size={13} className="text-[#002D62] dark:text-blue-400 shrink-0" />
+                      <Clock size={13} className="text-[#003E83] dark:text-blue-400 shrink-0" />
                       <span>{svc.duration || 'Flexible'}</span>
                     </div>
                     <div className="flex items-center gap-1.5">
-                      <Users size={13} className="text-[#002D62] dark:text-blue-400 shrink-0" />
+                      <Users size={13} className="text-[#003E83] dark:text-blue-400 shrink-0" />
                       <span>Max: {svc.capacity || '10'} guests</span>
                     </div>
                   </div>
                 </div>
 
-                <div className="mt-5 pt-3 border-t border-slate-100 dark:border-zinc-800 flex items-center justify-end gap-2">
+                <div className="mt-4 pt-3 border-t border-gray-100 dark:border-zinc-800 flex items-center justify-end gap-2">
                   <button
                     type="button"
                     onClick={() => handleOpenEditService(svc)}
-                    className="p-2 rounded-xl border border-slate-200 dark:border-zinc-700 hover:bg-slate-50 dark:hover:bg-zinc-800 text-slate-700 dark:text-zinc-300 text-xs font-semibold flex items-center gap-1 transition cursor-pointer"
+                    className="px-2.5 py-1.5 rounded-md border border-gray-200 dark:border-zinc-700 hover:bg-gray-50 dark:hover:bg-zinc-800 text-gray-700 dark:text-zinc-300 text-xs font-medium flex items-center gap-1 transition cursor-pointer"
                   >
                     <Edit size={13} />
                     <span>Edit</span>
@@ -474,7 +574,7 @@ export default function Listings() {
                   <button
                     type="button"
                     onClick={() => handleDeleteService(svc.id)}
-                    className="p-2 rounded-xl border border-rose-200 dark:border-rose-900/60 text-rose-600 dark:text-rose-400 hover:bg-rose-50 text-xs font-semibold flex items-center gap-1 transition cursor-pointer"
+                    className="px-2.5 py-1.5 rounded-md border border-rose-200 dark:border-rose-900/60 text-rose-600 dark:text-rose-400 hover:bg-rose-50 text-xs font-medium flex items-center gap-1 transition cursor-pointer"
                   >
                     <Trash2 size={13} />
                     <span>Delete</span>
@@ -486,58 +586,63 @@ export default function Listings() {
         )
       ) : activeTab === 'promotions' ? (
         /* PROMOTIONS GRID */
-        promotions.length === 0 ? (
-          <EmptyState
-            icon={Tag}
-            title="No promotions active"
-            description="Create seasonal discount codes or percentage discounts to attract more travelers."
-            action={
-              <button
-                type="button"
-                onClick={handleOpenCreatePromo}
-                className="px-4 py-2 rounded-xl bg-amber-600 text-white text-xs font-bold shadow-sm"
-              >
-                Create First Promo
-              </button>
-            }
-          />
+        filteredPromos.length === 0 ? (
+          <div className="p-8 bg-white dark:bg-zinc-900 rounded-md border border-gray-200 dark:border-zinc-800">
+            <EmptyState
+              icon={Tag}
+              title="No promotions active"
+              description="Create seasonal discount codes or percentage discounts to attract more travelers."
+              action={
+                <button
+                  type="button"
+                  onClick={handleOpenCreatePromo}
+                  className="px-3.5 py-2 rounded-md bg-amber-600 text-white text-xs font-medium shadow-xs"
+                >
+                  Create First Promo
+                </button>
+              }
+            />
+          </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {promotions.map((p) => (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {filteredPromos.map((p) => (
               <div
                 key={p.id}
-                className="p-5 rounded-3xl bg-white dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800 shadow-xs hover:shadow-md transition-all flex flex-col justify-between"
+                className="p-4 rounded-md bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 shadow-xs hover:border-amber-400 dark:hover:border-amber-500 transition-all flex flex-col justify-between"
               >
-                <div className="space-y-3">
+                <div className="space-y-2.5">
                   <div className="flex items-center justify-between">
-                    <span className="px-2.5 py-1 rounded-full bg-amber-500 text-white text-[10px] font-black uppercase">
+                    <span className="px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-800/60 text-[11px] font-bold uppercase">
                       {p.discount_percentage ? `${p.discount_percentage}% OFF` : 'Special Offer'}
                     </span>
                     {p.promo_code && (
-                      <span className="font-mono text-xs font-bold px-2 py-0.5 rounded bg-slate-100 dark:bg-zinc-800 text-slate-800 dark:text-white border border-slate-200 dark:border-zinc-700">
+                      <span className="font-mono text-xs font-bold px-2 py-0.5 rounded-md bg-gray-100 dark:bg-zinc-800 text-gray-800 dark:text-white border border-gray-200 dark:border-zinc-700">
                         {p.promo_code}
                       </span>
                     )}
                   </div>
 
-                  <h3 className="font-extrabold text-base text-slate-900 dark:text-white line-clamp-1">
+                  <h3 className="font-bold text-sm text-gray-900 dark:text-white line-clamp-1">
                     {p.title}
                   </h3>
 
-                  <p className="text-xs text-slate-500 dark:text-zinc-400 line-clamp-2 leading-relaxed">
+                  <p className="text-xs text-gray-500 dark:text-zinc-400 line-clamp-2 leading-relaxed">
                     {p.description || 'Seasonal promotion available to travelers.'}
                   </p>
 
-                  <div className="pt-2 text-[11px] text-slate-400">
-                    Status: <strong className={p.is_active ? 'text-emerald-500' : 'text-slate-400'}>{p.is_active ? 'Active' : 'Inactive'}</strong>
+                  <div className="pt-1.5 text-[11px] text-gray-400 dark:text-zinc-500">
+                    Status:{' '}
+                    <strong className={p.is_active ? 'text-emerald-500 font-semibold' : 'text-gray-400'}>
+                      {p.is_active ? 'Active' : 'Inactive'}
+                    </strong>
                   </div>
                 </div>
 
-                <div className="mt-5 pt-3 border-t border-slate-100 dark:border-zinc-800 flex items-center justify-end gap-2">
+                <div className="mt-4 pt-3 border-t border-gray-100 dark:border-zinc-800 flex items-center justify-end gap-2">
                   <button
                     type="button"
                     onClick={() => handleOpenEditPromo(p)}
-                    className="p-2 rounded-xl border border-slate-200 dark:border-zinc-700 hover:bg-slate-50 dark:hover:bg-zinc-800 text-slate-700 dark:text-zinc-300 text-xs font-semibold flex items-center gap-1 transition cursor-pointer"
+                    className="px-2.5 py-1.5 rounded-md border border-gray-200 dark:border-zinc-700 hover:bg-gray-50 dark:hover:bg-zinc-800 text-gray-700 dark:text-zinc-300 text-xs font-medium flex items-center gap-1 transition cursor-pointer"
                   >
                     <Edit size={13} />
                     <span>Edit</span>
@@ -545,7 +650,7 @@ export default function Listings() {
                   <button
                     type="button"
                     onClick={() => handleDeletePromo(p.id)}
-                    className="p-2 rounded-xl border border-rose-200 dark:border-rose-900/60 text-rose-600 dark:text-rose-400 hover:bg-rose-50 text-xs font-semibold flex items-center gap-1 transition cursor-pointer"
+                    className="px-2.5 py-1.5 rounded-md border border-rose-200 dark:border-rose-900/60 text-rose-600 dark:text-rose-400 hover:bg-rose-50 text-xs font-medium flex items-center gap-1 transition cursor-pointer"
                   >
                     <Trash2 size={13} />
                     <span>Delete</span>
@@ -557,50 +662,52 @@ export default function Listings() {
         )
       ) : (
         /* EVENTS GRID */
-        events.length === 0 ? (
-          <EmptyState
-            icon={PartyPopper}
-            title="No events scheduled"
-            description="Publish cultural nights, live music, cooking classes, or tasting workshops to the community."
-            action={
-              <button
-                type="button"
-                onClick={handleOpenCreateEvent}
-                className="px-4 py-2 rounded-xl bg-indigo-600 text-white text-xs font-bold shadow-sm"
-              >
-                Publish First Event
-              </button>
-            }
-          />
+        filteredEvents.length === 0 ? (
+          <div className="p-8 bg-white dark:bg-zinc-900 rounded-md border border-gray-200 dark:border-zinc-800">
+            <EmptyState
+              icon={PartyPopper}
+              title="No events scheduled"
+              description="Publish cultural nights, live music, cooking classes, or tasting workshops to the community."
+              action={
+                <button
+                  type="button"
+                  onClick={handleOpenCreateEvent}
+                  className="px-3.5 py-2 rounded-md bg-purple-600 text-white text-xs font-medium shadow-xs"
+                >
+                  Publish First Event
+                </button>
+              }
+            />
+          </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {events.map((ev) => (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {filteredEvents.map((ev) => (
               <div
                 key={ev.id}
-                className="p-5 rounded-3xl bg-white dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800 shadow-xs hover:shadow-md transition-all space-y-3"
+                className="p-4 rounded-md bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 shadow-xs hover:border-purple-400 dark:hover:border-purple-500 transition-all space-y-2.5"
               >
                 <div className="flex items-center justify-between text-xs">
-                  <span className="font-bold text-indigo-600 dark:text-indigo-400 flex items-center gap-1">
+                  <span className="font-semibold text-purple-600 dark:text-purple-400 flex items-center gap-1">
                     <Calendar size={13} />
                     <span>{ev.start_date ? new Date(ev.start_date).toLocaleDateString() : 'Upcoming'}</span>
                   </span>
                   {ev.price && (
-                    <span className="font-semibold text-slate-500 dark:text-zinc-400">
+                    <span className="font-medium text-gray-500 dark:text-zinc-400 text-[11px]">
                       {ev.price}
                     </span>
                   )}
                 </div>
 
-                <h3 className="font-extrabold text-base text-slate-900 dark:text-white line-clamp-1">
+                <h3 className="font-bold text-sm text-gray-900 dark:text-white line-clamp-1">
                   {ev.title}
                 </h3>
 
-                <p className="text-xs text-slate-500 dark:text-zinc-400 line-clamp-3 leading-relaxed">
+                <p className="text-xs text-gray-500 dark:text-zinc-400 line-clamp-2 leading-relaxed">
                   {ev.description || 'Special event hosted at our establishment.'}
                 </p>
 
                 {ev.location && (
-                  <div className="pt-2 text-[11px] text-slate-400 truncate">
+                  <div className="pt-1.5 text-[11px] text-gray-400 dark:text-zinc-500 truncate">
                     📍 {ev.location}
                   </div>
                 )}
@@ -612,25 +719,29 @@ export default function Listings() {
 
       {/* SERVICE MODAL */}
       {isServiceModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-alert-backdrop">
-          <div className="w-full max-w-lg rounded-3xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 p-6 sm:p-8 shadow-2xl animate-alert-popup space-y-5">
-            <div className="flex items-center justify-between border-b border-slate-100 dark:border-zinc-800 pb-3">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-alert-backdrop">
+          <div className="w-full max-w-lg rounded-md bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 p-6 shadow-2xl animate-alert-popup space-y-4">
+            <div className="flex items-center justify-between border-b border-gray-200 dark:border-zinc-800 pb-3">
               <div>
-                <span className="text-[11px] font-bold text-[#002D62] dark:text-blue-400 uppercase tracking-wider">
-                  Service Listing
+                <span className="text-[11px] font-semibold text-[#003E83] dark:text-blue-400 uppercase tracking-wider">
+                  Service Offering
                 </span>
-                <h3 className="text-base font-black text-slate-900 dark:text-white">
+                <h3 className="text-base font-bold text-gray-900 dark:text-white">
                   {editingService ? 'Edit Experience / Service' : 'Add New Service Listing'}
                 </h3>
               </div>
-              <button onClick={() => setIsServiceModalOpen(false)}>
-                <X size={18} className="text-slate-400" />
+              <button
+                type="button"
+                onClick={() => setIsServiceModalOpen(false)}
+                className="p-1 rounded-md text-gray-400 hover:text-gray-600 dark:hover:text-zinc-200 hover:bg-gray-100 dark:hover:bg-zinc-800"
+              >
+                <X size={18} />
               </button>
             </div>
 
-            <form onSubmit={handleServiceSubmit} className="space-y-4">
+            <form onSubmit={handleServiceSubmit} className="space-y-3.5">
               <div>
-                <label className="block text-xs font-bold text-slate-700 dark:text-zinc-300 mb-1">
+                <label className="block text-xs font-semibold text-gray-700 dark:text-zinc-300 mb-1">
                   Service Title <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -639,13 +750,13 @@ export default function Listings() {
                   value={serviceName}
                   onChange={(e) => setServiceName(e.target.value)}
                   placeholder="e.g. Traditional Khmer Cooking Class"
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#002D62]"
+                  className="w-full px-3 py-1.5 rounded-md bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 text-xs sm:text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#003E83]"
                 />
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 dark:text-zinc-300 mb-1">
+                  <label className="block text-xs font-semibold text-gray-700 dark:text-zinc-300 mb-1">
                     Price ($ USD) <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -655,11 +766,11 @@ export default function Listings() {
                     required
                     value={servicePrice}
                     onChange={(e) => setServicePrice(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#002D62]"
+                    className="w-full px-3 py-1.5 rounded-md bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 text-xs sm:text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#003E83]"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 dark:text-zinc-300 mb-1">
+                  <label className="block text-xs font-semibold text-gray-700 dark:text-zinc-300 mb-1">
                     Duration
                   </label>
                   <input
@@ -667,11 +778,11 @@ export default function Listings() {
                     value={serviceDuration}
                     onChange={(e) => setServiceDuration(e.target.value)}
                     placeholder="2 hours, Full day"
-                    className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#002D62]"
+                    className="w-full px-3 py-1.5 rounded-md bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 text-xs sm:text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#003E83]"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 dark:text-zinc-300 mb-1">
+                  <label className="block text-xs font-semibold text-gray-700 dark:text-zinc-300 mb-1">
                     Max Capacity
                   </label>
                   <input
@@ -679,13 +790,13 @@ export default function Listings() {
                     min="1"
                     value={serviceCapacity}
                     onChange={(e) => setServiceCapacity(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#002D62]"
+                    className="w-full px-3 py-1.5 rounded-md bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 text-xs sm:text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#003E83]"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 dark:text-zinc-300 mb-1">
+                <label className="block text-xs font-semibold text-gray-700 dark:text-zinc-300 mb-1">
                   Detailed Description
                 </label>
                 <textarea
@@ -693,38 +804,38 @@ export default function Listings() {
                   value={serviceDescription}
                   onChange={(e) => setServiceDescription(e.target.value)}
                   placeholder="Outline what's included, timing, equipment, or pickup details..."
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#002D62]"
+                  className="w-full px-3 py-1.5 rounded-md bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 text-xs sm:text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#003E83]"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 dark:text-zinc-300 mb-1">
+                <label className="block text-xs font-semibold text-gray-700 dark:text-zinc-300 mb-1">
                   Availability Status
                 </label>
                 <select
                   value={serviceStatus}
                   onChange={(e) => setServiceStatus(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#002D62]"
+                  className="w-full px-3 py-1.5 rounded-md bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 text-xs sm:text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#003E83]"
                 >
                   <option value="active">Active & Bookable</option>
                   <option value="inactive">Inactive (Temporarily Hidden)</option>
                 </select>
               </div>
 
-              <div className="pt-2 flex items-center justify-end gap-2 border-t border-slate-100 dark:border-zinc-800">
+              <div className="pt-3 flex items-center justify-end gap-2 border-t border-gray-200 dark:border-zinc-800">
                 <button
                   type="button"
                   onClick={() => setIsServiceModalOpen(false)}
-                  className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 dark:text-zinc-400 hover:bg-slate-100 dark:hover:bg-zinc-800"
+                  className="px-3.5 py-1.5 rounded-md text-xs font-medium text-gray-700 dark:text-zinc-300 hover:bg-gray-100 dark:hover:bg-zinc-800 border border-gray-200 dark:border-zinc-700"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="px-5 py-2 rounded-xl bg-[#002D62] hover:bg-[#001f44] text-white text-xs font-bold transition shadow-sm disabled:opacity-50"
+                  className="px-4 py-1.5 rounded-md bg-[#003E83] hover:bg-[#002e62] text-white text-xs font-medium transition shadow-xs disabled:opacity-50"
                 >
-                  {isSubmitting ? 'Saving to DB...' : 'Save Service'}
+                  {isSubmitting ? 'Saving...' : 'Save Service'}
                 </button>
               </div>
             </form>
@@ -734,25 +845,29 @@ export default function Listings() {
 
       {/* PROMOTION MODAL */}
       {isPromoModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-alert-backdrop">
-          <div className="w-full max-w-lg rounded-3xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 p-6 sm:p-8 shadow-2xl animate-alert-popup space-y-5">
-            <div className="flex items-center justify-between border-b border-slate-100 dark:border-zinc-800 pb-3">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-alert-backdrop">
+          <div className="w-full max-w-lg rounded-md bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 p-6 shadow-2xl animate-alert-popup space-y-4">
+            <div className="flex items-center justify-between border-b border-gray-200 dark:border-zinc-800 pb-3">
               <div>
-                <span className="text-[11px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider">
+                <span className="text-[11px] font-semibold text-amber-600 dark:text-amber-400 uppercase tracking-wider">
                   Promotion Deal
                 </span>
-                <h3 className="text-base font-black text-slate-900 dark:text-white">
+                <h3 className="text-base font-bold text-gray-900 dark:text-white">
                   {editingPromo ? 'Edit Promotion Deal' : 'Create Special Promotion'}
                 </h3>
               </div>
-              <button onClick={() => setIsPromoModalOpen(false)}>
-                <X size={18} className="text-slate-400" />
+              <button
+                type="button"
+                onClick={() => setIsPromoModalOpen(false)}
+                className="p-1 rounded-md text-gray-400 hover:text-gray-600 dark:hover:text-zinc-200 hover:bg-gray-100 dark:hover:bg-zinc-800"
+              >
+                <X size={18} />
               </button>
             </div>
 
-            <form onSubmit={handlePromoSubmit} className="space-y-4">
+            <form onSubmit={handlePromoSubmit} className="space-y-3.5">
               <div>
-                <label className="block text-xs font-bold text-slate-700 dark:text-zinc-300 mb-1">
+                <label className="block text-xs font-semibold text-gray-700 dark:text-zinc-300 mb-1">
                   Promotion Title <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -761,13 +876,13 @@ export default function Listings() {
                   value={promoTitle}
                   onChange={(e) => setPromoTitle(e.target.value)}
                   placeholder="e.g. 15% Early Bird Sunrise Special"
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500"
+                  className="w-full px-3 py-1.5 rounded-md bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 text-xs sm:text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-amber-500"
                 />
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 dark:text-zinc-300 mb-1">
+                  <label className="block text-xs font-semibold text-gray-700 dark:text-zinc-300 mb-1">
                     Promo Code (Optional)
                   </label>
                   <input
@@ -775,11 +890,11 @@ export default function Listings() {
                     value={promoCode}
                     onChange={(e) => setPromoCode(e.target.value)}
                     placeholder="ANGKOR15"
-                    className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-xs text-slate-900 dark:text-white font-mono uppercase focus:outline-none focus:ring-2 focus:ring-amber-500"
+                    className="w-full px-3 py-1.5 rounded-md bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 text-xs sm:text-sm text-gray-900 dark:text-white font-mono uppercase focus:outline-none focus:ring-1 focus:ring-amber-500"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 dark:text-zinc-300 mb-1">
+                  <label className="block text-xs font-semibold text-gray-700 dark:text-zinc-300 mb-1">
                     Discount Percentage (%) <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -789,25 +904,25 @@ export default function Listings() {
                     required
                     value={promoDiscount}
                     onChange={(e) => setPromoDiscount(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500"
+                    className="w-full px-3 py-1.5 rounded-md bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 text-xs sm:text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-amber-500"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 dark:text-zinc-300 mb-1">
+                  <label className="block text-xs font-semibold text-gray-700 dark:text-zinc-300 mb-1">
                     Start Date
                   </label>
                   <input
                     type="date"
                     value={promoStartDate}
                     onChange={(e) => setPromoStartDate(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500"
+                    className="w-full px-3 py-1.5 rounded-md bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 text-xs sm:text-sm text-gray-700 dark:text-zinc-200"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 dark:text-zinc-300 mb-1">
+                  <label className="block text-xs font-semibold text-gray-700 dark:text-zinc-300 mb-1">
                     End Date
                   </label>
                   <input
@@ -815,13 +930,13 @@ export default function Listings() {
                     value={promoEndDate}
                     min={promoStartDate}
                     onChange={(e) => setPromoEndDate(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500"
+                    className="w-full px-3 py-1.5 rounded-md bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 text-xs sm:text-sm text-gray-700 dark:text-zinc-200"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 dark:text-zinc-300 mb-1">
+                <label className="block text-xs font-semibold text-gray-700 dark:text-zinc-300 mb-1">
                   Conditions & Description
                 </label>
                 <textarea
@@ -829,22 +944,22 @@ export default function Listings() {
                   value={promoDescription}
                   onChange={(e) => setPromoDescription(e.target.value)}
                   placeholder="Applies to bookings made 3 days in advance..."
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500"
+                  className="w-full px-3 py-1.5 rounded-md bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 text-xs sm:text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-amber-500"
                 />
               </div>
 
-              <div className="pt-2 flex items-center justify-end gap-2 border-t border-slate-100 dark:border-zinc-800">
+              <div className="pt-3 flex items-center justify-end gap-2 border-t border-gray-200 dark:border-zinc-800">
                 <button
                   type="button"
                   onClick={() => setIsPromoModalOpen(false)}
-                  className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 dark:text-zinc-400 hover:bg-slate-100 dark:hover:bg-zinc-800"
+                  className="px-3.5 py-1.5 rounded-md text-xs font-medium text-gray-700 dark:text-zinc-300 hover:bg-gray-100 dark:hover:bg-zinc-800 border border-gray-200 dark:border-zinc-700"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="px-5 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold transition shadow-sm disabled:opacity-50"
+                  className="px-4 py-1.5 rounded-md bg-amber-600 hover:bg-amber-700 text-white text-xs font-medium transition shadow-xs disabled:opacity-50"
                 >
                   {isSubmitting ? 'Saving...' : 'Publish Promotion'}
                 </button>
@@ -856,25 +971,29 @@ export default function Listings() {
 
       {/* EVENT MODAL */}
       {isEventModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-alert-backdrop">
-          <div className="w-full max-w-lg rounded-3xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 p-6 sm:p-8 shadow-2xl animate-alert-popup space-y-5">
-            <div className="flex items-center justify-between border-b border-slate-100 dark:border-zinc-800 pb-3">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-alert-backdrop">
+          <div className="w-full max-w-lg rounded-md bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 p-6 shadow-2xl animate-alert-popup space-y-4">
+            <div className="flex items-center justify-between border-b border-gray-200 dark:border-zinc-800 pb-3">
               <div>
-                <span className="text-[11px] font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">
+                <span className="text-[11px] font-semibold text-purple-600 dark:text-purple-400 uppercase tracking-wider">
                   Community Event
                 </span>
-                <h3 className="text-base font-black text-slate-900 dark:text-white">
+                <h3 className="text-base font-bold text-gray-900 dark:text-white">
                   Publish Business Event
                 </h3>
               </div>
-              <button onClick={() => setIsEventModalOpen(false)}>
-                <X size={18} className="text-slate-400" />
+              <button
+                type="button"
+                onClick={() => setIsEventModalOpen(false)}
+                className="p-1 rounded-md text-gray-400 hover:text-gray-600 dark:hover:text-zinc-200 hover:bg-gray-100 dark:hover:bg-zinc-800"
+              >
+                <X size={18} />
               </button>
             </div>
 
-            <form onSubmit={handleEventSubmit} className="space-y-4">
+            <form onSubmit={handleEventSubmit} className="space-y-3.5">
               <div>
-                <label className="block text-xs font-bold text-slate-700 dark:text-zinc-300 mb-1">
+                <label className="block text-xs font-semibold text-gray-700 dark:text-zinc-300 mb-1">
                   Event Title <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -883,13 +1002,13 @@ export default function Listings() {
                   value={eventTitle}
                   onChange={(e) => setEventTitle(e.target.value)}
                   placeholder="e.g. Khmer Traditional Music & Apsara Night"
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-3 py-1.5 rounded-md bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 text-xs sm:text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-purple-500"
                 />
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 dark:text-zinc-300 mb-1">
+                  <label className="block text-xs font-semibold text-gray-700 dark:text-zinc-300 mb-1">
                     Event Date <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -897,11 +1016,11 @@ export default function Listings() {
                     required
                     value={eventStartDate}
                     onChange={(e) => setEventStartDate(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-3 py-1.5 rounded-md bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 text-xs sm:text-sm text-gray-700 dark:text-zinc-200"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 dark:text-zinc-300 mb-1">
+                  <label className="block text-xs font-semibold text-gray-700 dark:text-zinc-300 mb-1">
                     Admission / Price
                   </label>
                   <input
@@ -909,25 +1028,25 @@ export default function Listings() {
                     value={eventPrice}
                     onChange={(e) => setEventPrice(e.target.value)}
                     placeholder="Free / $10 Admission"
-                    className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-3 py-1.5 rounded-md bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 text-xs sm:text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-purple-500"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 dark:text-zinc-300 mb-1">
+                <label className="block text-xs font-semibold text-gray-700 dark:text-zinc-300 mb-1">
                   Location / Venue
                 </label>
                 <input
                   type="text"
                   value={eventLocation}
                   onChange={(e) => setEventLocation(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-3 py-1.5 rounded-md bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 text-xs sm:text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-purple-500"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 dark:text-zinc-300 mb-1">
+                <label className="block text-xs font-semibold text-gray-700 dark:text-zinc-300 mb-1">
                   Event Description
                 </label>
                 <textarea
@@ -935,22 +1054,22 @@ export default function Listings() {
                   value={eventDescription}
                   onChange={(e) => setEventDescription(e.target.value)}
                   placeholder="Performers, schedules, seatings, dinner packages..."
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-3 py-1.5 rounded-md bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 text-xs sm:text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-purple-500"
                 />
               </div>
 
-              <div className="pt-2 flex items-center justify-end gap-2 border-t border-slate-100 dark:border-zinc-800">
+              <div className="pt-3 flex items-center justify-end gap-2 border-t border-gray-200 dark:border-zinc-800">
                 <button
                   type="button"
                   onClick={() => setIsEventModalOpen(false)}
-                  className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 dark:text-zinc-400 hover:bg-slate-100 dark:hover:bg-zinc-800"
+                  className="px-3.5 py-1.5 rounded-md text-xs font-medium text-gray-700 dark:text-zinc-300 hover:bg-gray-100 dark:hover:bg-zinc-800 border border-gray-200 dark:border-zinc-700"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition shadow-sm disabled:opacity-50"
+                  className="px-4 py-1.5 rounded-md bg-purple-600 hover:bg-purple-700 text-white text-xs font-medium transition shadow-xs disabled:opacity-50"
                 >
                   {isSubmitting ? 'Publishing...' : 'Publish Event'}
                 </button>

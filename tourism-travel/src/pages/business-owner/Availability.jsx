@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
-import { 
-  Save, 
+import {
+  Save,
   Loader2,
-  Building2 
+  Building2,
+  Clock,
+  CalendarCheck
 } from 'lucide-react';
 import businessOwnerService from '../../services/businessOwnerService';
 import { useAlert } from '../../context/AlertContext';
@@ -33,19 +35,22 @@ export default function Availability() {
     if (!selectedBusiness?.id) return;
     setIsLoading(true);
 
-    businessOwnerService.getHours(selectedBusiness.id)
+    businessOwnerService
+      .getHours(selectedBusiness.id)
       .then((res) => {
         if (res?.success && res.data?.hours && Array.isArray(res.data.hours) && res.data.hours.length > 0) {
           const apiHours = res.data.hours;
           setHours(
             DAYS_OF_WEEK.map((day) => {
               const found = apiHours.find((h) => (h.day || '').toLowerCase() === day.toLowerCase());
-              return found || {
-                day,
-                open_time: '08:00',
-                close_time: '21:00',
-                is_closed: false,
-              };
+              return (
+                found || {
+                  day,
+                  open_time: '08:00',
+                  close_time: '21:00',
+                  is_closed: false,
+                }
+              );
             })
           );
         }
@@ -67,7 +72,7 @@ export default function Availability() {
   };
 
   const handleSave = async (e) => {
-    e.preventDefault();
+    e?.preventDefault();
     if (!selectedBusiness?.id) return;
 
     setIsSaving(true);
@@ -94,70 +99,90 @@ export default function Availability() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8">
-      {/* Title */}
-      <div>
-        <div className="text-xs font-semibold text-[#002D62] dark:text-blue-400 uppercase tracking-wider mb-1">
-          Operating Schedule ({selectedBusiness.name})
+    <div className="flex flex-col">
+      {/* Header Section (matching tourism-admin) */}
+      <div className="mb-6 md:mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white tracking-tight">
+              Operating Hours & Weekly Availability
+            </h1>
+            <p className="text-xs sm:text-sm text-gray-500 dark:text-zinc-400 mt-1">
+              Configure standard opening hours, closed days, and visitor arrival schedules for {selectedBusiness.name}.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2.5 self-start sm:self-auto">
+            <button
+              type="button"
+              onClick={handleSave}
+              disabled={isSaving}
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-md bg-[#003E83] hover:bg-[#002e62] disabled:opacity-50 text-white text-xs sm:text-sm font-medium shadow-xs transition-colors cursor-pointer"
+            >
+              {isSaving ? <Loader2 size={15} className="animate-spin" /> : <Save size={15} />}
+              <span>Save Schedule</span>
+            </button>
+          </div>
         </div>
-        <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
-          Operating Hours & Weekly Availability
-        </h1>
-        <p className="text-xs sm:text-sm text-slate-500 dark:text-zinc-400 mt-1">
-          Configure standard business opening hours, closed days, and holiday service availability.
-        </p>
       </div>
 
       {isLoading ? (
-        <LoadingSpinner text="Loading schedule..." />
+        <div className="py-16">
+          <LoadingSpinner text="Loading schedule..." />
+        </div>
       ) : (
-        <form onSubmit={handleSave} className="p-6 sm:p-8 rounded-3xl bg-white dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800 shadow-sm space-y-6">
-          <div className="space-y-4">
+        <form onSubmit={handleSave} className="bg-white dark:bg-zinc-900 rounded-md border border-gray-200 dark:border-zinc-800 shadow-xs p-4 sm:p-6 space-y-5">
+          <div className="flex items-center gap-2 pb-3 border-b border-gray-100 dark:border-zinc-800 text-xs font-semibold text-gray-500 dark:text-zinc-400">
+            <Clock size={16} className="text-[#003E83] dark:text-blue-400" />
+            <span>Weekly Operating Schedule</span>
+          </div>
+
+          <div className="space-y-2.5">
             {hours.map((item, idx) => (
               <div
                 key={item.day}
-                className={`p-4 rounded-2xl border transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4 ${
+                className={`p-3 rounded-md border transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
                   item.is_closed
-                    ? 'bg-slate-50 dark:bg-zinc-800/40 border-slate-200/60 dark:border-zinc-800 opacity-60'
-                    : 'bg-white dark:bg-zinc-900 border-slate-200 dark:border-zinc-700/80 shadow-2xs'
+                    ? 'bg-gray-50 dark:bg-zinc-800/40 border-gray-200/60 dark:border-zinc-800 opacity-60'
+                    : 'bg-white dark:bg-zinc-900 border-gray-200 dark:border-zinc-700/80 shadow-2xs'
                 }`}
               >
-                <div className="w-32 font-bold text-xs sm:text-sm text-slate-900 dark:text-white">
+                <div className="w-28 font-semibold text-xs sm:text-sm text-gray-900 dark:text-white">
                   {item.day}
                 </div>
 
-                <div className="flex items-center gap-3 flex-1">
+                <div className="flex items-center gap-2.5 flex-1">
                   <div className="flex items-center gap-2">
-                    <span className="text-[11px] text-slate-500 dark:text-zinc-400">Open:</span>
+                    <span className="text-[11px] text-gray-400 dark:text-zinc-500 font-medium">Open:</span>
                     <input
                       type="time"
                       disabled={item.is_closed}
                       value={item.open_time || '08:00'}
                       onChange={(e) => handleHourChange(idx, 'open_time', e.target.value)}
-                      className="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800 text-xs text-slate-800 dark:text-white disabled:opacity-40"
+                      className="px-2.5 py-1.5 rounded-md border border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800 text-xs text-gray-800 dark:text-white disabled:opacity-40 focus:outline-none focus:ring-1 focus:ring-[#003E83]"
                     />
                   </div>
 
-                  <span className="text-slate-400">—</span>
+                  <span className="text-gray-400">—</span>
 
                   <div className="flex items-center gap-2">
-                    <span className="text-[11px] text-slate-500 dark:text-zinc-400">Close:</span>
+                    <span className="text-[11px] text-gray-400 dark:text-zinc-500 font-medium">Close:</span>
                     <input
                       type="time"
                       disabled={item.is_closed}
                       value={item.close_time || '21:00'}
                       onChange={(e) => handleHourChange(idx, 'close_time', e.target.value)}
-                      className="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800 text-xs text-slate-800 dark:text-white disabled:opacity-40"
+                      className="px-2.5 py-1.5 rounded-md border border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800 text-xs text-gray-800 dark:text-white disabled:opacity-40 focus:outline-none focus:ring-1 focus:ring-[#003E83]"
                     />
                   </div>
                 </div>
 
-                <label className="flex items-center gap-2 text-xs font-semibold text-slate-700 dark:text-zinc-300 cursor-pointer select-none">
+                <label className="flex items-center gap-2 text-xs font-medium text-gray-700 dark:text-zinc-300 cursor-pointer select-none">
                   <input
                     type="checkbox"
                     checked={Boolean(item.is_closed)}
                     onChange={(e) => handleHourChange(idx, 'is_closed', e.target.checked)}
-                    className="w-4 h-4 rounded text-[#002D62] focus:ring-[#002D62]"
+                    className="w-4 h-4 rounded text-[#003E83] focus:ring-[#003E83]"
                   />
                   <span>Closed</span>
                 </label>
@@ -165,13 +190,13 @@ export default function Availability() {
             ))}
           </div>
 
-          <div className="flex justify-end pt-4 border-t border-slate-100 dark:border-zinc-800">
+          <div className="flex justify-end pt-3 border-t border-gray-100 dark:border-zinc-800">
             <button
               type="submit"
               disabled={isSaving}
-              className="px-8 py-3 rounded-xl bg-[#002D62] hover:bg-[#001f44] disabled:opacity-50 text-white text-xs sm:text-sm font-bold shadow-md transition flex items-center gap-2 cursor-pointer"
+              className="px-4 py-2 rounded-md bg-[#003E83] hover:bg-[#002e62] disabled:opacity-50 text-white text-xs sm:text-sm font-medium shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer"
             >
-              {isSaving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
+              {isSaving ? <Loader2 size={15} className="animate-spin" /> : <Save size={15} />}
               <span>Save Operating Schedule</span>
             </button>
           </div>
