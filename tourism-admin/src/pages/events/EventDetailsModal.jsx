@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { X, Clock, Calendar, Star, Users, MapPin, Edit } from 'lucide-react';
 import { useLanguage } from '../../i18n';
 

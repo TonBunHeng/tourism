@@ -1,4 +1,3 @@
-import React from 'react';
 import { BarChart3 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../../i18n';

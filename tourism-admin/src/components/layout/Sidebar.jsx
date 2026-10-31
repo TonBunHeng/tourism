@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
+import { useState, useRef, useEffect, useMemo, useCallback, useSyncExternalStore } from 'react';
 import { createPortal } from 'react-dom';
 import { useLocation, Link } from 'react-router-dom';
 import tourism_app_icon from "../../assets/images/tourism_app_icon.png";
@@ -157,19 +157,16 @@ function useStoredUser() {
 }
 
 function useMediaQuery(query) {
-  const [matches, setMatches] = useState(
-    () => typeof window !== 'undefined' && window.matchMedia(query).matches
+  return useSyncExternalStore(
+    (onStoreChange) => {
+      if (typeof window === 'undefined') return () => {};
+      const mql = window.matchMedia(query);
+      mql.addEventListener('change', onStoreChange);
+      return () => mql.removeEventListener('change', onStoreChange);
+    },
+    () => (typeof window !== 'undefined' ? window.matchMedia(query).matches : false),
+    () => false
   );
-
-  useEffect(() => {
-    const mql = window.matchMedia(query);
-    const onChange = (e) => setMatches(e.matches);
-    setMatches(mql.matches);
-    mql.addEventListener('change', onChange);
-    return () => mql.removeEventListener('change', onChange);
-  }, [query]);
-
-  return matches;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -188,6 +185,12 @@ function Flyout({ enabled, interactive = false, panel, className = '', children 
   const isDesktop = useMediaQuery('(min-width: 768px)');
   const active = enabled && isDesktop;
 
+  const [prevPath, setPrevPath] = useState(pathname);
+  if (prevPath !== pathname) {
+    setPrevPath(pathname);
+    if (rect) setRect(null);
+  }
+
   const open = () => {
     if (!active) return;
     clearTimeout(timer.current);
@@ -196,11 +199,10 @@ function Flyout({ enabled, interactive = false, panel, className = '', children 
   };
   const close = () => {
     clearTimeout(timer.current);
-    timer.current = setTimeout(() => setRect(null), 80);
+    timer.current = setTimeout(() => setRect(null), 180);
   };
 
   useEffect(() => () => clearTimeout(timer.current), []);
-  useEffect(() => { setRect(null); }, [pathname, active]);
 
   // Keep position correct if the sidebar scrolls while a flyout is open.
   useEffect(() => {
@@ -246,6 +248,8 @@ function Flyout({ enabled, interactive = false, panel, className = '', children 
           <div
             {...{ [PORTAL_ATTR]: '' }}
             style={style}
+            onMouseEnter={open}
+            onMouseLeave={close}
             className={`z-50 ${interactive ? 'overflow-y-auto' : 'pointer-events-none'}`}
           >
             {panel}
@@ -309,28 +313,36 @@ function NavLeaf({ item, active, isExpanded }) {
   const Icon = item.icon;
   const label = item.key ? t(item.key, item.name) : item.name;
 
+  const content = (
+    <Link
+      to={item.path || '#'}
+      aria-label={label}
+      aria-current={active ? 'page' : undefined}
+      className={`flex items-center px-3 py-1.5 rounded-md cursor-pointer transition-colors duration-150 ${active
+        ? 'bg-blue-50 dark:bg-blue-600/15 text-[#003E83] dark:text-blue-400 font-semibold shadow-xs'
+        : 'text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-zinc-800/70'
+        }`}
+    >
+      <div className="flex items-center w-full min-w-0">
+        <div className="flex items-center justify-center w-5 h-5 shrink-0">
+          <Icon size={18} aria-hidden="true" />
+        </div>
+        <span className={labelClass(isExpanded)}>{label}</span>
+      </div>
+    </Link>
+  );
+
+  if (isExpanded) {
+    return <div className="my-0.5">{content}</div>;
+  }
+
   return (
     <Flyout
       enabled={!isExpanded}
       className="my-0.5"
       panel={<TooltipBubble>{label}</TooltipBubble>}
     >
-      <Link
-        to={item.path || '#'}
-        aria-label={label}
-        aria-current={active ? 'page' : undefined}
-        className={`flex items-center px-3 py-1.5 rounded-md cursor-pointer transition-colors duration-150 ${active
-          ? 'bg-blue-50 dark:bg-blue-600/15 text-[#003E83] dark:text-blue-400 font-semibold shadow-xs'
-          : 'text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-zinc-800/70'
-          }`}
-      >
-        <div className="flex items-center w-full min-w-0">
-          <div className="flex items-center justify-center w-5 h-5 shrink-0">
-            <Icon size={18} aria-hidden="true" />
-          </div>
-          <span className={labelClass(isExpanded)}>{label}</span>
-        </div>
-      </Link>
+      {content}
     </Flyout>
   );
 }
@@ -340,25 +352,33 @@ function LogoutButton({ item, isExpanded, onClick }) {
   const Icon = item.icon;
   const label = item.key ? t(item.key, item.name) : item.name;
 
+  const content = (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label={label}
+      className="flex items-center w-full px-3 py-1.5 rounded-md cursor-pointer transition-colors duration-150 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 hover:text-red-700 dark:hover:text-red-300"
+    >
+      <div className="flex items-center w-full min-w-0">
+        <div className="flex items-center justify-center w-5 h-5 shrink-0">
+          <Icon size={18} aria-hidden="true" />
+        </div>
+        <span className={`${labelClass(isExpanded)} font-medium`}>{label}</span>
+      </div>
+    </button>
+  );
+
+  if (isExpanded) {
+    return <div className="my-0.5">{content}</div>;
+  }
+
   return (
     <Flyout
       enabled={!isExpanded}
       className="my-0.5"
       panel={<TooltipBubble>{label}</TooltipBubble>}
     >
-      <button
-        type="button"
-        onClick={onClick}
-        aria-label={label}
-        className="flex items-center w-full px-3 py-1.5 rounded-md cursor-pointer transition-colors duration-150 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 hover:text-red-700 dark:hover:text-red-300"
-      >
-        <div className="flex items-center w-full min-w-0">
-          <div className="flex items-center justify-center w-5 h-5 shrink-0">
-            <Icon size={18} aria-hidden="true" />
-          </div>
-          <span className={`${labelClass(isExpanded)} font-medium`}>{label}</span>
-        </div>
-      </button>
+      {content}
     </Flyout>
   );
 }
@@ -369,24 +389,8 @@ function NavGroup({ item, pathname, isExpanded, isMenuOpen, onToggle, onExpandAn
   const label = item.key ? t(item.key, item.name) : item.name;
   const isChildActive = item.children.some((c) => isItemActive(c, pathname));
 
-  return (
-    <Flyout
-      enabled={!isExpanded}
-      interactive
-      className="flex flex-col my-0.5"
-      panel={
-        <div className="w-48 py-2 px-1.5 rounded-lg shadow-xl bg-white dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800 text-gray-800 dark:text-zinc-200">
-          <div className="px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider text-gray-400 dark:text-zinc-500 border-b border-gray-100 dark:border-zinc-800/80 mb-1">
-            {label}
-          </div>
-          <div className="flex flex-col space-y-0.5">
-            {item.children.map((child) => (
-              <SubLink key={child.name} child={child} active={isItemActive(child, pathname)} />
-            ))}
-          </div>
-        </div>
-      }
-    >
+  const content = (
+    <>
       <button
         type="button"
         onClick={() => (isExpanded ? onToggle(item.name) : onExpandAndOpen(item.name))}
@@ -435,6 +439,32 @@ function NavGroup({ item, pathname, isExpanded, isMenuOpen, onToggle, onExpandAn
           </div>
         </div>
       )}
+    </>
+  );
+
+  if (isExpanded) {
+    return <div className="flex flex-col my-0.5">{content}</div>;
+  }
+
+  return (
+    <Flyout
+      enabled={!isExpanded}
+      interactive
+      className="flex flex-col my-0.5"
+      panel={
+        <div className="w-48 py-2 px-1.5 rounded-lg shadow-xl bg-white dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800 text-gray-800 dark:text-zinc-200">
+          <div className="px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider text-gray-400 dark:text-zinc-500 border-b border-gray-100 dark:border-zinc-800/80 mb-1">
+            {label}
+          </div>
+          <div className="flex flex-col space-y-0.5">
+            {item.children.map((child) => (
+              <SubLink key={child.name} child={child} active={isItemActive(child, pathname)} />
+            ))}
+          </div>
+        </div>
+      }
+    >
+      {content}
     </Flyout>
   );
 }
@@ -602,15 +632,7 @@ export default function Sidebar({ isOpen, setIsOpen, isExpanded, setIsExpanded }
 
         {/* Profile Card */}
         <div className="h-14 px-2.5 shrink-0 flex items-center border-t border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 transition-colors">
-          <Flyout
-            enabled={!isExpanded}
-            className="w-full"
-            panel={
-              <TooltipBubble>
-                {userName} ({displayRole})
-              </TooltipBubble>
-            }
-          >
+          {isExpanded ? (
             <Link
               to="/profile"
               aria-label="User Profile"
@@ -623,15 +645,36 @@ export default function Sidebar({ isOpen, setIsOpen, isExpanded, setIsExpanded }
                   userName.charAt(0).toUpperCase()
                 )}
               </div>
-              <div
-                className={`flex flex-col min-w-0 transition-all duration-200 ${isExpanded ? 'opacity-100 max-w-[140px]' : 'opacity-100 md:opacity-0 md:max-w-0 md:overflow-hidden'
-                  }`}
-              >
+              <div className="flex flex-col min-w-0 transition-all duration-200 opacity-100 max-w-[140px]">
                 <span className="text-xs font-medium truncate text-gray-900 dark:text-zinc-100">{userName}</span>
                 <span className="text-[10px] truncate text-gray-500 dark:text-zinc-400">{displayRole}</span>
               </div>
             </Link>
-          </Flyout>
+          ) : (
+            <Flyout
+              enabled={!isExpanded}
+              className="w-full"
+              panel={
+                <TooltipBubble>
+                  {userName} ({displayRole})
+                </TooltipBubble>
+              }
+            >
+              <Link
+                to="/profile"
+                aria-label="User Profile"
+                className="w-full flex items-center gap-2 p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-zinc-800/60 transition-colors overflow-hidden"
+              >
+                <div className="w-7 h-7 rounded-md flex items-center justify-center font-bold text-xs shrink-0 overflow-hidden bg-blue-50 dark:bg-zinc-800 text-[#003E83] dark:text-blue-400 border border-blue-100 dark:border-zinc-700">
+                  {userAvatar ? (
+                    <img src={userAvatar} alt="" className="w-full h-full object-cover" />
+                  ) : (
+                    userName.charAt(0).toUpperCase()
+                  )}
+                </div>
+              </Link>
+            </Flyout>
+          )}
         </div>
       </aside>
 

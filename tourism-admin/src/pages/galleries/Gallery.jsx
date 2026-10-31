@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import SimplePagination from "../../components/common/SimplePagination";
 import GalleryHeader from "./GalleryHeader";
 import GalleryStats from "./GalleryStats";
@@ -13,19 +13,24 @@ import deletionRequestService from "../../services/deletionRequestService";
 import authService, { isSuperAdminRole } from "../../services/authService";
 import { useAlert } from "../../context/AlertContext";
 import { useSearch } from "../../context/SearchContext";
-import { getPageCache, setPageCache } from "../../utils/pageCache";
+import { getPageCache, setPageCache, clearPageCache } from "../../utils/pageCache";
 import { useLanguage } from "../../i18n";
 
 export default function Gallery() {
   const { t } = useLanguage();
   const { showConfirm, showSuccess, showError } = useAlert();
-  const { searchTerm, setSearchTerm } = useSearch();
+  const { searchTerm } = useSearch();
   const currentUser = authService.getCurrentUser();
   const isSuperAdmin = isSuperAdminRole(currentUser?.role);
 
-  const cachedGallery = getPageCache('gallery_data');
-  const [mediaItems, setMediaItems] = useState(() => cachedGallery?.mediaItems || []);
-  const [isLoading, setIsLoading] = useState(() => !cachedGallery);
+  const [mediaItems, setMediaItems] = useState(() => {
+    const cached = getPageCache('gallery_data');
+    return cached?.mediaItems || [];
+  });
+  const [isLoading, setIsLoading] = useState(() => {
+    const cached = getPageCache('gallery_data');
+    return !cached;
+  });
 
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [selectedType, setSelectedType] = useState("All");
@@ -36,14 +41,28 @@ export default function Gallery() {
   const [isEditOpen, setIsEditOpen] = useState(false);
 
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalRecords, setTotalRecords] = useState(() => cachedGallery?.totalRecords || 0);
-  const [totalPages, setTotalPages] = useState(() => cachedGallery?.totalPages || 1);
+  const [totalRecords, setTotalRecords] = useState(() => {
+    const cached = getPageCache('gallery_data');
+    return cached?.totalRecords || 0;
+  });
+  const [totalPages, setTotalPages] = useState(() => {
+    const cached = getPageCache('gallery_data');
+    return cached?.totalPages || 1;
+  });
   const itemsPerPage = 10;
+
+  // Render-time state adjustment when searchTerm changes
+  const [prevSearch, setPrevSearch] = useState(searchTerm);
+  if (prevSearch !== searchTerm) {
+    setPrevSearch(searchTerm);
+    setCurrentPage(1);
+  }
 
   const [categoriesList, setCategoriesList] = useState(["All", "Temple", "Nature", "Culture", "City", "Festival", "Food"]);
   const types = ["All", "Image", "Video"];
 
   const loadCategories = async () => {
+    await Promise.resolve();
     try {
       const res = await categoryService.getCategories({ per_page: 100 });
       if (res.success && res.data && res.data.length > 0) {
@@ -56,9 +75,7 @@ export default function Gallery() {
   };
 
   const loadMedia = useCallback(async () => {
-    if (!cachedGallery && mediaItems.length === 0) {
-      setIsLoading(true);
-    }
+    await Promise.resolve();
     try {
       const params = {
         page: currentPage,
@@ -102,21 +119,18 @@ export default function Gallery() {
     } finally {
       setIsLoading(false);
     }
-  }, [currentPage, searchTerm, selectedCategory, selectedType, itemsPerPage, cachedGallery, mediaItems.length]);
+  }, [currentPage, searchTerm, selectedCategory, selectedType, itemsPerPage]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     loadCategories();
   }, []);
 
   useEffect(() => {
-    setCurrentPage(1);
-  }, [searchTerm]);
-
-  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     loadMedia();
   }, [loadMedia]);
 
-  const handleSearchChange = (val) => { setSearchTerm(val); setCurrentPage(1); };
   const handleCategoryChange = (val) => { setSelectedCategory(val); setCurrentPage(1); };
   const handleTypeChange = (val) => { setSelectedType(val); setCurrentPage(1); };
 
@@ -139,6 +153,7 @@ export default function Gallery() {
 
       try {
         await galleryService.deleteMedia(id);
+        clearPageCache('gallery_data');
         showSuccess(
           t('gallery.deleteSuccessMsg', 'Media "{name}" has been permanently deleted.').replace('{name}', mediaTitle),
           t('gallery.deleteSuccessTitle', 'Media Deleted')
@@ -211,6 +226,7 @@ export default function Gallery() {
       });
       setIsEditOpen(false);
       setEditingMedia(null);
+      clearPageCache('gallery_data');
       showSuccess(
         t('gallery.mediaUpdatedSuccess', 'Media item "{name}" has been updated successfully.').replace('{name}', editingMedia.title),
         t('gallery.mediaUpdatedTitle', 'Media Updated')
@@ -236,6 +252,7 @@ export default function Gallery() {
         status: newMedia.status || "Published"
       });
       setIsUploadModalOpen(false);
+      clearPageCache('gallery_data');
       showSuccess(
         t('gallery.mediaUploadedSuccess', 'Media item "{name}" has been created and published successfully.').replace('{name}', newMedia.title),
         t('gallery.mediaUploadedTitle', 'Media Uploaded')

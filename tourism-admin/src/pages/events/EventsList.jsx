@@ -1,4 +1,3 @@
-import React from 'react';
 import { Eye, Edit, Trash2, MapPin, Users, Clock, Calendar } from 'lucide-react';
 import { getEventStatusColor as getStatusColor, getCategoryColor } from '../../utils/StatusUtils';
 import { useLanguage } from '../../i18n';
@@ -198,11 +197,11 @@ export default function EventsList({
                             {event.title}
                           </p>
                           <div className="flex items-center gap-1.5 mt-0.5">
-                            <span className={`text-[10px] font-semibold px-2 py-0.2 rounded-md border ${getCategoryColor(event.category)}`}>
+                            <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-md border ${getCategoryColor(event.category)}`}>
                               {getCategoryLabel(event.category)}
                             </span>
                             {event.featured && (
-                              <span className="text-[10px] font-semibold px-1.5 py-0.2 bg-[var(--color-warning-bg)] dark:bg-[var(--color-warning-dark-bg)] text-[var(--color-warning-text)] dark:text-[var(--color-warning-dark-text)] rounded-md border border-[var(--color-warning-border)] dark:border-[var(--color-warning-dark-border)]">
+                              <span className="text-[10px] font-semibold px-1.5 py-0.5 bg-[var(--color-warning-bg)] dark:bg-[var(--color-warning-dark-bg)] text-[var(--color-warning-text)] dark:text-[var(--color-warning-dark-text)] rounded-md border border-[var(--color-warning-border)] dark:border-[var(--color-warning-dark-border)]">
                                 {t('events.featuredBadge', 'Featured')}
                               </span>
                             )}

@@ -68,6 +68,12 @@ class EventController extends Controller
             }
         }
 
+        if ($category = $request->query('category')) {
+            if ($category !== 'All') {
+                $query->where('category', $category);
+            }
+        }
+
         if ($provinceId = $request->query('province_id')) {
             $query->where('province_id', $provinceId);
         }

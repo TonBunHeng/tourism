@@ -1,4 +1,3 @@
-import React from 'react';
 import { Calendar, Bell, Clock, Users } from 'lucide-react';
 import { useLanguage } from '../../i18n';
 

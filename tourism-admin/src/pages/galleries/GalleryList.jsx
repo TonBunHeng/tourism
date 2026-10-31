@@ -1,6 +1,5 @@
-import React from 'react';
 import { Eye, Edit, Trash2, Video, Image as ImageIcon, Eye as ViewsIcon } from 'lucide-react';
-import { getGalleryStatusColor as getStatusColor, getTypeIcon } from '../../utils/StatusUtils';
+import { getGalleryStatusColor as getStatusColor } from '../../utils/StatusUtils';
 import { useLanguage } from '../../i18n';
 
 export default function GalleryList({ media, mediaItems, onPreview, onEdit, onDelete, startIndex = 0 }) {
@@ -19,7 +18,6 @@ export default function GalleryList({ media, mediaItems, onPreview, onEdit, onDe
       <div className="sm:hidden divide-y divide-[var(--color-border-subtle-light)] dark:divide-[var(--color-border-dark)]">
         {items.length > 0 ? (
           items.map((item) => {
-            const TypeIcon = getTypeIcon(item.type);
             return (
               <div
                 key={item.id}
@@ -134,7 +132,6 @@ export default function GalleryList({ media, mediaItems, onPreview, onEdit, onDe
           <tbody className="bg-[var(--color-white)] dark:bg-[var(--color-bg-dark)] divide-y divide-[var(--color-border-light)] dark:divide-[var(--color-border-dark)]">
             {items.length > 0 ? (
               items.map((item, index) => {
-                const TypeIcon = getTypeIcon(item.type);
                 return (
                   <tr
                     key={item.id}

@@ -1,4 +1,3 @@
-import React from 'react';
 import { Eye, Edit, Trash2, Calendar, Clock, MapPin, Users, Star } from 'lucide-react';
 import { getEventStatusColor as getStatusColor, getCategoryColor } from '../../utils/StatusUtils';
 import { useLanguage } from '../../i18n';

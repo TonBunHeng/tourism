@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
   ChevronDown,
   Upload,
@@ -19,24 +19,8 @@ import {
 } from 'lucide-react';
 import uploadService from '../../services/uploadService';
 import { validateImageFile } from '../../utils/fileValidation';
+import { calculateAutoStatus } from '../../utils/StatusUtils';
 import { useLanguage } from '../../i18n';
-
-export const calculateAutoStatus = (startDate, endDate, manualStatus) => {
-  if (manualStatus === 'Cancelled') return 'Cancelled';
-  if (!startDate) return 'Upcoming';
-
-  const todayStr = new Date().toISOString().split('T')[0];
-  const start = String(startDate).slice(0, 10);
-  const end = endDate ? String(endDate).slice(0, 10) : start;
-
-  if (todayStr < start) {
-    return 'Upcoming';
-  } else if (todayStr > end) {
-    return 'Completed';
-  } else {
-    return 'Ongoing';
-  }
-};
 
 export default function EventModal({
   isOpen,

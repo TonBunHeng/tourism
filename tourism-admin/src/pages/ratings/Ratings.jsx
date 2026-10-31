@@ -18,7 +18,7 @@ import { getPageCache, setPageCache } from "../../utils/pageCache";
 export default function Ratings() {
   const { t } = useLanguage();
   const { showConfirm, showSuccess, showError } = useAlert();
-  const { searchTerm, setSearchTerm } = useSearch();
+  const { searchTerm } = useSearch();
 
   const [reviews, setReviews] = useState(() => getPageCache('ratings_data')?.reviews || []);
   const [places, setPlaces] = useState(() => getPageCache('ratings_data')?.places || ["All"]);
@@ -26,14 +26,12 @@ export default function Ratings() {
   const [analyticsData, setAnalyticsData] = useState(() => getPageCache('ratings_data')?.analyticsData || null);
 
   const [selectedStatus, setSelectedStatus] = useState("All");
-  const [selectedRating, setSelectedRating] = useState("All");
   const [selectedPlace, setSelectedPlace] = useState("All");
   const [selectedReview, setSelectedReview] = useState(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [isReplyModalOpen, setIsReplyModalOpen] = useState(false);
 
   const [replyText, setReplyText] = useState("");
-  const [sortBy, setSortBy] = useState("newest");
 
   const [currentPage, setCurrentPage] = useState(1);
   const [totalRecords, setTotalRecords] = useState(() => getPageCache('ratings_data')?.totalRecords || 0);
@@ -41,28 +39,39 @@ export default function Ratings() {
   const itemsPerPage = 10;
 
   const statuses = ["All", "Approved", "Pending", "Rejected"];
-  const ratings = ["All", "5", "4", "3", "2", "1"];
+
+  const [prevSearch, setPrevSearch] = useState(searchTerm);
+  if (prevSearch !== searchTerm) {
+    setPrevSearch(searchTerm);
+    setCurrentPage(1);
+  }
 
   useEffect(() => {
+    let isMounted = true;
     const fetchPlacesList = async () => {
+      if (places && places.length > 1) return;
       try {
         const res = await placeService.getPlaces({ per_page: 100 });
-        if (res.success && res.data) {
+        if (isMounted && res.success && res.data) {
           const names = ["All", ...res.data.map((p) => p.name)];
           setPlaces(names);
+          const current = getPageCache('ratings_data') || {};
+          setPageCache('ratings_data', { ...current, places: names });
         }
       } catch (e) {
         console.error("Failed to load places filter list from API", e);
       }
     };
     fetchPlacesList();
-  }, []);
+    return () => { isMounted = false; };
+  }, [places]);
 
   useEffect(() => {
+    let isMounted = true;
     const fetchAnalyticsOverview = async () => {
       try {
         const res = await reviewService.getAnalytics();
-        if (res && (res.success || res.data)) {
+        if (isMounted && res && (res.success || res.data)) {
           const data = res.data || res;
           setAnalyticsData(data);
           const current = getPageCache('ratings_data') || {};
@@ -73,9 +82,11 @@ export default function Ratings() {
       }
     };
     fetchAnalyticsOverview();
+    return () => { isMounted = false; };
   }, []);
 
   const loadReviews = useCallback(async () => {
+    await Promise.resolve();
     try {
       const params = {
         page: currentPage,
@@ -83,7 +94,6 @@ export default function Ratings() {
       };
       if (searchTerm) params.search = searchTerm;
       if (selectedStatus !== "All") params.status = selectedStatus;
-      if (selectedRating !== "All") params.rating = selectedRating;
 
       const res = await reviewService.getReviews(params);
       if (res.success && res.data) {
@@ -102,7 +112,7 @@ export default function Ratings() {
         setTotalRecords(total);
         setTotalPages(pages);
 
-        if (currentPage === 1 && !searchTerm && selectedStatus === "All" && selectedRating === "All") {
+        if (currentPage === 1 && !searchTerm && selectedStatus === "All") {
           const current = getPageCache('ratings_data') || {};
           setPageCache('ratings_data', { ...current, reviews: formatted, totalRecords: total, totalPages: pages });
         }
@@ -112,15 +122,12 @@ export default function Ratings() {
     } finally {
       setIsLoading(false);
     }
-  }, [currentPage, itemsPerPage, searchTerm, selectedRating, selectedStatus]);
+  }, [currentPage, itemsPerPage, searchTerm, selectedStatus]);
 
   useEffect(() => {
-    setCurrentPage(1);
-  }, [searchTerm]);
-
-  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     loadReviews();
-  }, [currentPage, searchTerm, selectedStatus, selectedRating, loadReviews]);
+  }, [loadReviews]);
 
   // Client side filtering for places & sorting
   const filteredReviews = reviews
@@ -130,9 +137,6 @@ export default function Ratings() {
       return matchesPlace;
     })
     .sort((a, b) => {
-      if (sortBy === "highest") return Number(b.rating) - Number(a.rating);
-      if (sortBy === "lowest") return Number(a.rating) - Number(b.rating);
-      if (sortBy === "most-replies") return (b.replies?.length || 0) - (a.replies?.length || 0);
       return new Date(b.created_at || b.date || 0) - new Date(a.created_at || a.date || 0);
     });
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { X, ChevronDown, Upload, Trash2, Loader2 } from 'lucide-react';
 import uploadService from '../../services/uploadService';
 import { useLanguage } from '../../i18n';

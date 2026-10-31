@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   Star,
   ThumbsUp,
@@ -6,8 +5,6 @@ import {
   Check,
   X,
   Eye,
-  Clock,
-  Calendar,
   Image as ImageIcon,
   MapPin,
   User,

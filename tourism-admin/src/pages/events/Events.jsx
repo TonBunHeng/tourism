@@ -5,14 +5,15 @@ import EventsHeader from './EventsHeader';
 import EventsStats from './EventsStats';
 import EventsToolbar from './EventsToolbar';
 import EventsList from './EventsList';
-import EventModal, { calculateAutoStatus } from './EventModal';
+import EventModal from './EventModal';
 import EventDetailsModal from './EventDetailsModal';
 import eventService from '../../services/eventService';
 import deletionRequestService from '../../services/deletionRequestService';
 import authService, { isSuperAdminRole } from '../../services/authService';
 import { useAlert } from '../../context/AlertContext';
 import { useSearch } from '../../context/SearchContext';
-import { getPageCache, setPageCache } from '../../utils/pageCache';
+import { getPageCache, setPageCache, clearPageCache } from '../../utils/pageCache';
+import { calculateAutoStatus } from '../../utils/StatusUtils';
 import { useLanguage } from '../../i18n';
 
 export default function Events() {
@@ -57,8 +58,15 @@ export default function Events() {
 
   const categoriesList = ['All', 'Cultural', 'Festival', 'Sports', 'Food', 'Music', 'Exhibition'];
 
+  const [prevSearchTerm, setPrevSearchTerm] = useState(searchTerm);
+  if (prevSearchTerm !== searchTerm) {
+    setPrevSearchTerm(searchTerm);
+    setCurrentPage(1);
+  }
+
   const loadEvents = useCallback(async () => {
-    if (!cachedEvents && events.length === 0) {
+    await Promise.resolve();
+    if (!getPageCache('events_data')) {
       setIsLoading(true);
     }
     try {
@@ -114,13 +122,10 @@ export default function Events() {
     } finally {
       setIsLoading(false);
     }
-  }, [currentPage, searchTerm, selectedCategory, selectedStatus, itemsPerPage, cachedEvents, events.length]);
+  }, [currentPage, searchTerm, selectedCategory, selectedStatus, itemsPerPage]);
 
   useEffect(() => {
-    setCurrentPage(1);
-  }, [searchTerm]);
-
-  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     loadEvents();
   }, [loadEvents]);
 
@@ -157,6 +162,7 @@ export default function Events() {
 
       try {
         await eventService.deleteEvent(eventId);
+        clearPageCache('events_data');
         showSuccess(
           t('events.deleteSuccessMsg', 'Event "{name}" has been permanently deleted.').replace('{name}', eventTitle),
           t('events.deleteSuccessTitle', 'Event Deleted')
@@ -225,8 +231,11 @@ export default function Events() {
 
   useEffect(() => {
     if (location.state?.openAdd) {
-      openAddModal();
       window.history.replaceState({}, document.title);
+      const timer = setTimeout(() => {
+        openAddModal();
+      }, 0);
+      return () => clearTimeout(timer);
     }
   }, [location.state]);
 
@@ -296,6 +305,7 @@ export default function Events() {
           t('events.eventCreatedTitle', 'Event Created')
         );
       }
+      clearPageCache('events_data');
       closeModal();
       loadEvents();
     } catch (e) {

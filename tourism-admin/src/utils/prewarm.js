@@ -10,6 +10,9 @@ import userService from '../services/userService';
 import notificationService from '../services/notificationService';
 import securityService from '../services/securityService';
 import userTrackingService from '../services/userTrackingService';
+import reviewService from '../services/reviewService';
+import favoriteService from '../services/favoriteService';
+import galleryService from '../services/galleryService';
 
 let prewarmed = false;
 
@@ -30,6 +33,9 @@ export function prewarmAdminCaches() {
     () => tourService.getTours({ per_page: 100 }),
     () => guideService.getGuides({ per_page: 100 }),
     () => notificationService.getNotifications({}),
+    () => reviewService.getReviews({ page: 1, per_page: 10 }),
+    () => favoriteService.getFavorites(),
+    () => galleryService.getMedia({ page: 1, per_page: 10 }),
     ...(isPrivileged ? [
       () => businessService.getAdminAll({}),
       () => userService.getUsers({ page: 1, per_page: 10 }),

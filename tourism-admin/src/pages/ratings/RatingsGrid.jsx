@@ -1,4 +1,4 @@
-import { Star, ThumbsUp, ThumbsDown, Check, X, Eye, Clock, Calendar, Image as ImageIcon, MapPin, User, Reply, Trash2 } from 'lucide-react';
+import { ThumbsUp, ThumbsDown, Check, X, Eye, Clock, Calendar, MapPin, User, Reply, Trash2 } from 'lucide-react';
 import { getStatusColor, renderStars } from '../../utils/StatusUtils';
 import { useLanguage } from '../../i18n';
 

@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { X, Check, Eye, User, Calendar, MapPin, ThumbsUp, ThumbsDown } from 'lucide-react';
+import { X, Check, User, Calendar, MapPin, ThumbsUp, ThumbsDown } from 'lucide-react';
 import { getStatusColor, renderStars } from '../../utils/StatusUtils';
 import { useLanguage } from '../../i18n';
 

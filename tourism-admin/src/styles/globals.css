@@ -210,17 +210,21 @@
 .route-loading-overlay {
   position: fixed;
   inset: 0;
-  z-index: 100;
+  z-index: 30;
   display: grid;
   place-items: center;
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(2px);
-  pointer-events: none;
-  animation: fadeIn 0.12s ease-out both;
+  background: rgba(255, 255, 255, 0.45);
+  pointer-events: none !important;
+  animation: fadeIn 0.1s ease-out both;
+}
+
+.route-loading-overlay,
+.route-loading-overlay * {
+  pointer-events: none !important;
 }
 
 .dark .route-loading-overlay {
-  background: rgba(9, 9, 11, 0.7);
+  background: rgba(9, 9, 11, 0.5);
 }
 
 .route-loading-content {

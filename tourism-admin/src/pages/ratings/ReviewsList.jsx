@@ -9,7 +9,6 @@ import {
   Eye,
   X,
   Reply,
-  FileText,
   User
 } from 'lucide-react';
 

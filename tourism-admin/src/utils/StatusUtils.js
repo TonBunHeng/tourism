@@ -15,6 +15,23 @@ export const getStatusColor = (status) => {
   return 'bg-[var(--color-neutral-badge-bg)] text-[var(--color-neutral-badge-text)] border-[var(--color-border-subtle-light)] dark:bg-[var(--color-neutral-badge-dark-bg)] dark:text-[var(--color-neutral-badge-dark-text)] dark:border-[var(--color-border-dark)]';
 };
 
+export const calculateAutoStatus = (startDate, endDate, manualStatus) => {
+  if (manualStatus === 'Cancelled') return 'Cancelled';
+  if (!startDate) return 'Upcoming';
+
+  const todayStr = new Date().toISOString().split('T')[0];
+  const start = String(startDate).slice(0, 10);
+  const end = endDate ? String(endDate).slice(0, 10) : start;
+
+  if (todayStr < start) {
+    return 'Upcoming';
+  } else if (todayStr > end) {
+    return 'Completed';
+  } else {
+    return 'Ongoing';
+  }
+};
+
 export const getEventStatusColor = (status) => {
   const colors = {
     'Upcoming': 'bg-[var(--color-info-bg)] text-[var(--color-info-text)] border-[var(--color-info-border)] dark:bg-[var(--color-info-dark-bg)] dark:text-[var(--color-info-dark-text)] dark:border-[var(--color-info-dark-border)]',
@@ -91,7 +108,7 @@ export const getUserStatusColor = (status, isOnline = false) => {
 
 export const formatRoleLabel = (role) => {
   if (!role) return 'User';
-  const norm = String(role).toLowerCase().trim().replace(/[\_\-\s]+/g, '_');
+  const norm = String(role).toLowerCase().trim().replace(/[_\-\s]+/g, '_');
   const roleMap = {
     'business_owner': 'Business Owner',
     'super_admin': 'Super Admin',
@@ -110,7 +127,7 @@ export const formatRoleLabel = (role) => {
 };
 
 export const getRoleColor = (role) => {
-  const norm = String(role || '').toLowerCase().trim().replace(/[\_\-\s]+/g, '_');
+  const norm = String(role || '').toLowerCase().trim().replace(/[_\-\s]+/g, '_');
 
   if (norm === 'admin') {
     return 'bg-[var(--color-purple-bg)] text-[var(--color-purple-text)] border-[var(--color-purple-border)] dark:bg-[var(--color-purple-dark-bg)] dark:text-[var(--color-purple-dark-text)] dark:border-[var(--color-purple-dark-border)]';

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Upload, Trash2, Video, Image as ImageIcon, AlertCircle, Type, Layers, ChevronDown } from 'lucide-react';
 import uploadService from '../../services/uploadService';
 import { validateImageFile, DANGEROUS_EXTENSIONS } from '../../utils/fileValidation';
@@ -16,6 +16,21 @@ export default function GalleryUploadModal({ isOpen, onClose, categories = [], o
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState(null);
   const fileInputRef = useRef(null);
+
+  // Render-time state reset when modal closes
+  const [prevOpen, setPrevOpen] = useState(isOpen);
+  if (prevOpen !== isOpen) {
+    setPrevOpen(isOpen);
+    if (!isOpen) {
+      setTitle('');
+      setFileUrl('');
+      setUploadedUrl('');
+      setUploadError(null);
+      setIsUploading(false);
+      setDimensions('');
+      setFileSize('');
+    }
+  }
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -218,7 +233,11 @@ export default function GalleryUploadModal({ isOpen, onClose, categories = [], o
                     </button>
                     <button
                       type="button"
-                      onClick={() => setFileUrl('')}
+                      onClick={() => {
+                        setFileUrl('');
+                        setUploadedUrl('');
+                        if (fileInputRef.current) fileInputRef.current.value = '';
+                      }}
                       className="p-1 bg-red-600 hover:bg-red-700 text-white rounded-md shadow-sm transition-colors cursor-pointer"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
@@ -253,7 +272,17 @@ export default function GalleryUploadModal({ isOpen, onClose, categories = [], o
                 <input
                   type="text"
                   value={fileUrl}
-                  onChange={(e) => setFileUrl(e.target.value)}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setFileUrl(val);
+                    setUploadedUrl(val);
+                    setUploadError(null);
+                    if (val.match(/\.(mp4|webm|ogg)$/i)) {
+                      setMediaType('video');
+                    } else if (val) {
+                      setMediaType('image');
+                    }
+                  }}
                   placeholder={t('gallery.enterImageUrlPlaceholder', 'Or enter image/video URL (https://...)')}
                   className="w-full pl-9 pr-4 py-2 bg-[var(--color-bg-light)] dark:bg-[var(--color-input-dark-bg)] border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]/70 rounded-md text-xs text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] placeholder-[var(--color-text-muted-light)] focus:outline-none focus:ring-2 focus:ring-[var(--color-input)] transition-all"
                 />

@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import tourismLogo from '../../assets/images/tourism_logo.png';
 
-const ROUTE_TRANSITION_MS = 600;
+const ROUTE_TRANSITION_MS = 120;
 
 export default function RouteLoadingOverlay() {
   const { pathname } = useLocation();

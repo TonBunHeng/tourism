@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   Landmark,
   Crown,
@@ -82,6 +82,12 @@ export default function Favorites() {
     fetchCategories();
   }, []);
 
+  const [prevSearch, setPrevSearch] = useState(searchTerm);
+  if (prevSearch !== searchTerm) {
+    setPrevSearch(searchTerm);
+    setCurrentPage(1);
+  }
+
   // Fetch all places for modal selector
   const loadAvailablePlaces = async () => {
     try {
@@ -95,11 +101,13 @@ export default function Favorites() {
   };
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     loadAvailablePlaces();
   }, []);
 
   // Load Favorites from API
-  const loadFavorites = async () => {
+  const loadFavorites = useCallback(async () => {
+    await Promise.resolve();
     if (favorites.length === 0) {
       setIsLoading(true);
     }
@@ -165,15 +173,12 @@ export default function Favorites() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [categories, favorites.length]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     loadFavorites();
-  }, []);
-
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchTerm]);
+  }, [loadFavorites]);
 
   // Handlers
   const handleCategoryChange = (val) => {
@@ -273,7 +278,7 @@ export default function Favorites() {
   const handleBulkMarkVisited = async () => {
     const favoritesToMark = favorites.filter((favorite) =>
       selectedFavorites.includes(favorite.id) &&
-      !Boolean(favorite.visited || favorite.status === 'Visited')
+      !(favorite.visited || favorite.status === 'Visited')
     );
     if (favoritesToMark.length === 0) {
       setSelectedFavorites([]);

@@ -1,4 +1,3 @@
-import React from 'react';
 import { Image, Video, Eye } from 'lucide-react';
 import { useLanguage } from '../../i18n';
 

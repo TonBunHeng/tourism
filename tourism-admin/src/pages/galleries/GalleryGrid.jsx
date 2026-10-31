@@ -1,4 +1,3 @@
-import React from 'react';
 import { Video, Eye, Edit, Trash2, HardDrive, Calendar } from 'lucide-react';
 import { useLanguage } from '../../i18n';
 

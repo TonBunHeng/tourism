@@ -143,22 +143,27 @@ class FavoriteController extends Controller
             $query->where('visited', false);
         }
 
-        $allFavorites = $query->orderBy('id', 'desc')->get();
-        $totalFavorites = $allFavorites->count();
-        $visitedCount = $allFavorites->where('visited', true)->count();
+        // Fast overview statistics via SQL Aggregation
+        $statsRow = (clone $query)->selectRaw('
+            COUNT(*) as total_favorites,
+            SUM(CASE WHEN visited = 1 THEN 1 ELSE 0 END) as visited_count,
+            COUNT(DISTINCT user_id) as unique_users
+        ')->first();
+
+        $totalFavorites = (int) ($statsRow->total_favorites ?? 0);
+        $visitedCount = (int) ($statsRow->visited_count ?? 0);
         $wishlistCount = $totalFavorites - $visitedCount;
         $conversionRate = $totalFavorites > 0 ? round(($visitedCount / $totalFavorites) * 100, 1) : 0.0;
+        $uniqueUsers = (int) ($statsRow->unique_users ?? 0);
 
-        $uniqueUsers = $allFavorites->pluck('user_id')->filter()->unique()->count();
+        // Calculate average rating of favorited places in 1 fast join query
+        $avgRatingRow = (clone $query)
+            ->join('places', 'favorites.place_id', '=', 'places.id')
+            ->selectRaw('COALESCE(AVG(places.rating), 0) as avg_rating')
+            ->first();
+        $avgRating = round((float) ($avgRatingRow->avg_rating ?? 0), 2);
 
-        // Calculate average rating of favorited places
-        $placesWithRating = $allFavorites->map(function ($fav) {
-            return $fav->place ? (float) $fav->place->rating : null;
-        })->filter();
-
-        $avgRating = $placesWithRating->count() > 0 ? round((float) $placesWithRating->avg(), 2) : 0.0;
-
-        // Categories breakdown
+        // Categories breakdown via 1 GROUP BY query
         $colors = ['bg-[#003E83]', 'bg-rose-500', 'bg-emerald-500', 'bg-amber-500', 'bg-purple-500', 'bg-cyan-500', 'bg-indigo-500'];
         $fillColors = ['#003E83', '#f43f5e', '#10b981', '#f59e0b', '#a855f7', '#06b6d4', '#6366f1'];
         $categories = Category::all();
@@ -166,23 +171,29 @@ class FavoriteController extends Controller
         $catScopeQuery = Favorite::query();
         if ($timeframe !== 'ALL' && is_numeric($timeframe)) {
             $catScopeQuery->where(function ($q) use ($targetYear) {
-                $q->whereYear('saved_date', $targetYear)
+                $q->whereYear('favorites.saved_date', $targetYear)
                   ->orWhere(function ($sq) use ($targetYear) {
-                      $sq->whereNull('saved_date')->whereYear('created_at', $targetYear);
+                      $sq->whereNull('favorites.saved_date')->whereYear('favorites.created_at', $targetYear);
                   });
             });
         }
         if ($statusUpper === 'VISITED') {
-            $catScopeQuery->where('visited', true);
+            $catScopeQuery->where('favorites.visited', true);
         } elseif ($statusUpper === 'PLANNED' || $statusUpper === 'WISHLIST' || $statusUpper === 'TO VISIT' || $statusUpper === 'TO_VISIT') {
-            $catScopeQuery->where('visited', false);
+            $catScopeQuery->where('favorites.visited', false);
         }
-        $catScopeTotal = (clone $catScopeQuery)->count();
+
+        $catCounts = (clone $catScopeQuery)
+            ->join('places', 'favorites.place_id', '=', 'places.id')
+            ->selectRaw('places.category_id, COUNT(*) as count')
+            ->groupBy('places.category_id')
+            ->pluck('count', 'places.category_id');
+
+        $catScopeTotal = $catCounts->sum();
 
         $categoryData = [];
         foreach ($categories as $i => $cat) {
-            $catPlaceIds = Place::where('category_id', $cat->id)->pluck('id');
-            $catFavCount = (clone $catScopeQuery)->whereIn('place_id', $catPlaceIds)->count();
+            $catFavCount = (int) ($catCounts->get($cat->id, 0));
             if ($catFavCount > 0 || $catScopeTotal === 0) {
                 $categoryData[] = [
                     'id' => $cat->id,
@@ -214,14 +225,22 @@ class FavoriteController extends Controller
             ]
         ];
 
-        // Top Favorited Places
-        $topPlaceCounts = $allFavorites->groupBy('place_id')->map->count()->sortDesc()->take(5);
+        // Top Favorited Places (1 fast GROUP BY query and eager-load places in bulk)
+        $topPlaceCounts = (clone $query)
+            ->selectRaw('place_id, COUNT(*) as count, SUM(CASE WHEN visited = 1 THEN 1 ELSE 0 END) as visited_count')
+            ->groupBy('place_id')
+            ->orderByDesc('count')
+            ->take(5)
+            ->get();
+
+        $placeIds = $topPlaceCounts->pluck('place_id');
+        $places = Place::with(['category', 'province'])->whereIn('id', $placeIds)->get()->keyBy('id');
+
         $topFavorites = [];
         $rank = 1;
-        foreach ($topPlaceCounts as $placeId => $count) {
-            $place = Place::with(['category', 'province'])->find($placeId);
+        foreach ($topPlaceCounts as $item) {
+            $place = $places->get($item->place_id);
             if ($place) {
-                $placeVisited = $allFavorites->where('place_id', $placeId)->where('visited', true)->count();
                 $topFavorites[] = [
                     'rank' => $rank++,
                     'id' => $place->id,
@@ -231,14 +250,14 @@ class FavoriteController extends Controller
                     'category' => $place->category ? $place->category->name : 'Destination',
                     'province' => $place->province ? $place->province->name : 'Cambodia',
                     'rating' => (float) $place->rating,
-                    'saves_count' => $count,
-                    'visited_count' => $placeVisited,
-                    'percentage' => $totalFavorites > 0 ? round(($count / $totalFavorites) * 100) : 100,
+                    'saves_count' => (int) $item->count,
+                    'visited_count' => (int) $item->visited_count,
+                    'percentage' => $totalFavorites > 0 ? round(((int) $item->count / $totalFavorites) * 100) : 100,
                 ];
             }
         }
 
-        // Monthly trends
+        // Monthly trends (1 fast query with GROUP BY month instead of 24 queries)
         $months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
         $monthlyData = [];
         $runningCumulative = 0;
@@ -258,26 +277,26 @@ class FavoriteController extends Controller
         } elseif ($statusUpper === 'PLANNED' || $statusUpper === 'WISHLIST' || $statusUpper === 'TO VISIT' || $statusUpper === 'TO_VISIT') {
             $monthBaseQuery->where('visited', false);
         }
+        if ($timeframe !== 'ALL' && is_numeric($timeframe)) {
+            $monthBaseQuery->where(function ($q) use ($targetYear) {
+                $q->whereYear('saved_date', $targetYear)
+                  ->orWhere(function ($sq) use ($targetYear) {
+                      $sq->whereNull('saved_date')->whereYear('created_at', $targetYear);
+                  });
+            });
+        }
+
+        $monthlyRows = (clone $monthBaseQuery)
+            ->selectRaw('MONTH(COALESCE(saved_date, created_at)) as m_num, COUNT(*) as count, SUM(CASE WHEN visited = 1 THEN 1 ELSE 0 END) as visited_count')
+            ->groupBy(DB::raw('MONTH(COALESCE(saved_date, created_at))'))
+            ->get()
+            ->keyBy('m_num');
 
         foreach ($months as $idx => $mName) {
             $mNum = $idx + 1;
-            $mQuery = (clone $monthBaseQuery)->where(function ($q) use ($mNum) {
-                $q->whereMonth('saved_date', $mNum)
-                  ->orWhere(function ($sq) use ($mNum) {
-                      $sq->whereNull('saved_date')->whereMonth('created_at', $mNum);
-                  });
-            });
-            if ($timeframe !== 'ALL' && is_numeric($timeframe)) {
-                $mQuery->where(function ($q) use ($targetYear) {
-                    $q->whereYear('saved_date', $targetYear)
-                      ->orWhere(function ($sq) use ($targetYear) {
-                          $sq->whereNull('saved_date')->whereYear('created_at', $targetYear);
-                      });
-                });
-            }
-
-            $realCount = $mQuery->count();
-            $realVisited = (clone $mQuery)->where('visited', true)->count();
+            $row = $monthlyRows->get($mNum);
+            $realCount = $row ? (int) $row->count : 0;
+            $realVisited = $row ? (int) $row->visited_count : 0;
             $runningCumulative += $realCount;
 
             $monthlyData[] = [
@@ -292,7 +311,7 @@ class FavoriteController extends Controller
             ];
         }
 
-        $recentFavorites = $allFavorites->take(50);
+        $recentFavorites = (clone $query)->with(['place.category', 'place.province', 'user'])->orderBy('id', 'desc')->take(20)->get();
 
         return $this->successResponse([
             'overview' => [

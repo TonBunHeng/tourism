@@ -66,8 +66,8 @@ class ReviewController extends Controller
         $selectedCategory = $request->query('category', 'ALL');
         $selectedRating = $request->query('rating', 'ALL');
 
-        // Base query with active filters
-        $baseQuery = Review::with(['user', 'place.category', 'images']);
+        // Base query with active filters (without eager loading for aggregate queries)
+        $baseQuery = Review::query();
 
         if ($timeframe !== 'ALL' && is_numeric($timeframe)) {
             $baseQuery->whereYear('created_at', $targetYear);
@@ -93,20 +93,25 @@ class ReviewController extends Controller
             }
         }
 
-        $filteredReviews = (clone $baseQuery)->orderBy('id', 'desc')->get();
-        $totalReviews = $filteredReviews->count();
-        $avgScore = $totalReviews > 0 ? $filteredReviews->avg('rating') : 0.0;
-        $avgRating = round((float) $avgScore, 2);
+        // Fast Overview Stats via SQL Aggregation (1 query instead of full table load)
+        $statsRow = (clone $baseQuery)->selectRaw('
+            COUNT(*) as total_count,
+            COALESCE(AVG(rating), 0) as avg_rating,
+            SUM(CASE WHEN rating >= 4 THEN 1 ELSE 0 END) as positive_count,
+            SUM(CASE WHEN rating <= 3 THEN 1 ELSE 0 END) as critical_count,
+            SUM(CASE WHEN status = "Approved" THEN 1 ELSE 0 END) as verified_count
+        ')->first();
 
-        $posCount = $filteredReviews->where('rating', '>=', 4)->count();
-        $criticalCount = $filteredReviews->where('rating', '<=', 3)->count();
+        $totalReviews = (int) ($statsRow->total_count ?? 0);
+        $avgRating = round((float) ($statsRow->avg_rating ?? 0), 2);
+        $posCount = (int) ($statsRow->positive_count ?? 0);
+        $criticalCount = (int) ($statsRow->critical_count ?? 0);
         $positiveSentimentPct = $totalReviews > 0 ? round(($posCount / $totalReviews) * 100, 1) : 0.0;
         $criticalSentimentPct = $totalReviews > 0 ? round(($criticalCount / $totalReviews) * 100, 1) : 0.0;
-
-        $verifiedCount = $filteredReviews->where('status', 'Approved')->count();
+        $verifiedCount = (int) ($statsRow->verified_count ?? 0);
         $verificationPct = $totalReviews > 0 ? round(($verifiedCount / $totalReviews) * 100, 1) : 0.0;
 
-        // Rating Stars breakdown scoped to category & timeframe
+        // Rating Stars breakdown scoped to category & timeframe (1 single GROUP BY query instead of 5)
         $ratingScopeQuery = Review::query();
         if ($timeframe !== 'ALL' && is_numeric($timeframe)) {
             $ratingScopeQuery->whereYear('created_at', $targetYear);
@@ -120,9 +125,14 @@ class ReviewController extends Controller
                 }
             });
         }
-        $ratingScopeTotal = (clone $ratingScopeQuery)->count();
 
-        $ratingDistribution = [];
+        $ratingCounts = (clone $ratingScopeQuery)
+            ->selectRaw('rating, COUNT(*) as count')
+            ->groupBy('rating')
+            ->pluck('count', 'rating');
+
+        $ratingScopeTotal = $ratingCounts->sum();
+
         $starColors = [
             5 => '#10b981',
             4 => '#3b82f6',
@@ -130,8 +140,9 @@ class ReviewController extends Controller
             2 => '#f97316',
             1 => '#ef4444',
         ];
+        $ratingDistribution = [];
         foreach ([5, 4, 3, 2, 1] as $star) {
-            $starCount = (clone $ratingScopeQuery)->where('rating', $star)->count();
+            $starCount = (int) ($ratingCounts->get($star, 0));
             $ratingDistribution[] = [
                 'stars' => $star,
                 'rating' => $star,
@@ -143,30 +154,35 @@ class ReviewController extends Controller
             ];
         }
 
-        // Categories breakdown
+        // Categories breakdown (1 fast grouped query instead of N category queries)
         $categories = Category::all();
         $categoryColors = ['bg-[#003E83]', 'bg-rose-500', 'bg-emerald-500', 'bg-amber-500', 'bg-purple-500', 'bg-cyan-500', 'bg-indigo-500'];
         $categoryFillColors = ['#003E83', '#f43f5e', '#10b981', '#f59e0b', '#a855f7', '#06b6d4', '#6366f1'];
 
         $catScopeQuery = Review::query();
         if ($timeframe !== 'ALL' && is_numeric($timeframe)) {
-            $catScopeQuery->whereYear('created_at', $targetYear);
+            $catScopeQuery->whereYear('reviews.created_at', $targetYear);
         }
         if ($selectedRating !== 'ALL' && !empty($selectedRating)) {
             if ($selectedRating === 'positive') {
-                $catScopeQuery->where('rating', '>=', 4);
+                $catScopeQuery->where('reviews.rating', '>=', 4);
             } elseif ($selectedRating === 'critical') {
-                $catScopeQuery->where('rating', '<=', 3);
+                $catScopeQuery->where('reviews.rating', '<=', 3);
             } elseif (is_numeric($selectedRating)) {
-                $catScopeQuery->where('rating', (int) $selectedRating);
+                $catScopeQuery->where('reviews.rating', (int) $selectedRating);
             }
         }
-        $catScopeTotal = (clone $catScopeQuery)->count();
 
+        $catCounts = (clone $catScopeQuery)
+            ->join('places', 'reviews.place_id', '=', 'places.id')
+            ->selectRaw('places.category_id, COUNT(*) as count')
+            ->groupBy('places.category_id')
+            ->pluck('count', 'places.category_id');
+
+        $catScopeTotal = $catCounts->sum();
         $categoryData = [];
         foreach ($categories as $i => $cat) {
-            $catPlaceIds = Place::where('category_id', $cat->id)->pluck('id');
-            $catReviewCount = (clone $catScopeQuery)->whereIn('place_id', $catPlaceIds)->count();
+            $catReviewCount = (int) ($catCounts->get($cat->id, 0));
             if ($catReviewCount > 0 || $catScopeTotal === 0) {
                 $categoryData[] = [
                     'id' => $cat->id,
@@ -180,7 +196,7 @@ class ReviewController extends Controller
         }
         usort($categoryData, fn($a, $b) => $b['count'] <=> $a['count']);
 
-        // Monthly trends
+        // Monthly trends (1 fast query with GROUP BY month instead of 36 queries)
         $months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
         $monthlyData = [];
         $runningTotal = 0;
@@ -206,17 +222,22 @@ class ReviewController extends Controller
                 $monthBaseQuery->where('rating', (int) $selectedRating);
             }
         }
+        if ($timeframe !== 'ALL' && is_numeric($timeframe)) {
+            $monthBaseQuery->whereYear('created_at', $targetYear);
+        }
+
+        $monthlyRows = (clone $monthBaseQuery)
+            ->selectRaw('MONTH(created_at) as m_num, COUNT(*) as count, COALESCE(SUM(rating), 0) as rating_sum, AVG(rating) as month_avg')
+            ->groupBy(DB::raw('MONTH(created_at)'))
+            ->get()
+            ->keyBy('m_num');
 
         foreach ($months as $idx => $mName) {
             $mNum = $idx + 1;
-            $mQuery = (clone $monthBaseQuery)->whereMonth('created_at', $mNum);
-            if ($timeframe !== 'ALL' && is_numeric($timeframe)) {
-                $mQuery->whereYear('created_at', $targetYear);
-            }
-
-            $realCount = $mQuery->count();
-            $monthSum = $realCount > 0 ? (float) $mQuery->sum('rating') : 0.0;
-            $monthAvg = $realCount > 0 ? round((float) $mQuery->avg('rating'), 2) : null;
+            $row = $monthlyRows->get($mNum);
+            $realCount = $row ? (int) $row->count : 0;
+            $monthSum = $row ? (float) $row->rating_sum : 0.0;
+            $monthAvg = $row && $realCount > 0 ? round((float) $row->month_avg, 2) : null;
 
             if ($realCount > 0) {
                 $runningRatingSum += $monthSum;
@@ -224,7 +245,6 @@ class ReviewController extends Controller
             }
             $runningTotal += $realCount;
 
-            // Score trajectory represents prevailing average rating
             $trajectoryScore = $runningRatingCount > 0 
                 ? round($runningRatingSum / $runningRatingCount, 2) 
                 : ($totalReviews > 0 ? $avgRating : 5.0);
@@ -241,8 +261,12 @@ class ReviewController extends Controller
             ];
         }
 
-        // Recent reviews matching active filters
-        $recentReviews = (clone $baseQuery)->orderBy('id', 'desc')->take(50)->get();
+        // Recent reviews matching active filters (only eager-load relationships for these 20 items!)
+        $recentReviews = (clone $baseQuery)
+            ->with(['user', 'place.category', 'images'])
+            ->orderBy('id', 'desc')
+            ->take(20)
+            ->get();
 
         return $this->successResponse([
             'overview' => [
