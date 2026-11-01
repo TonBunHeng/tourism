@@ -23,7 +23,7 @@ class UpdateBusinessRequest extends FormRequest
             'longitude' => ['nullable', 'numeric', 'between:-180,180'],
             'phone' => ['nullable', 'string', 'max:50'],
             'email' => ['nullable', 'email', 'max:150'],
-            'website' => ['nullable', 'url', 'max:255'],
+            'website' => ['nullable', 'string', 'max:255'],
             'price_range' => ['nullable', 'string', 'max:30'],
             'status' => ['sometimes', 'in:active,inactive'],
         ];

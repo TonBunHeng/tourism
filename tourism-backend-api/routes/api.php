@@ -362,9 +362,9 @@ Route::prefix('business')
 
         // Reports & Export Analytics
         Route::get('/reports', [BusinessReportController::class, 'index']);
-        Route::get('/reports/export', [BusinessReportController::class, 'export'])->middleware('throttle:10,1');
+        Route::get('/reports/export', [BusinessReportController::class, 'export'])->middleware('throttle:60,1');
         Route::get('/businesses/{id}/reports', [BusinessReportController::class, 'businessReport']);
-        Route::get('/businesses/{id}/reports/export', [BusinessReportController::class, 'exportBusiness'])->middleware('throttle:10,1');
+        Route::get('/businesses/{id}/reports/export', [BusinessReportController::class, 'exportBusiness'])->middleware('throttle:60,1');
     });
 
 /*

@@ -298,24 +298,28 @@ export default function BusinessHeader({
                         ))
                       )}
                       <div className="border-t border-gray-100 dark:border-zinc-800 pt-1.5 mt-1 px-2">
-                        <Link
-                          to="/business/profile"
-                          onClick={() => setShowBusinessDropdown(false)}
-                          className="flex items-center justify-center gap-1.5 w-full py-1.5 rounded-md text-xs font-semibold text-[#003E83] dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40 transition"
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setShowBusinessDropdown(false);
+                            window.dispatchEvent(new CustomEvent('open-manage-business-modal'));
+                          }}
+                          className="flex items-center justify-center gap-1.5 w-full py-1.5 rounded-md text-xs font-semibold text-[#003E83] dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40 transition cursor-pointer"
                         >
                           <span>+ Manage / Add Profile</span>
-                        </Link>
+                        </button>
                       </div>
                     </div>
                   )}
                 </div>
               ) : (
-                <Link
-                  to="/business/profile"
-                  className="h-10 px-3 rounded-md border border-dashed border-gray-300 dark:border-zinc-700 text-xs font-semibold text-[#003E83] dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-zinc-800 transition flex items-center gap-1.5"
+                <button
+                  type="button"
+                  onClick={() => window.dispatchEvent(new CustomEvent('open-manage-business-modal'))}
+                  className="h-10 px-3 rounded-md border border-dashed border-gray-300 dark:border-zinc-700 text-xs font-semibold text-[#003E83] dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-zinc-800 transition flex items-center gap-1.5 cursor-pointer"
                 >
                   <span>+ Register Business Profile</span>
-                </Link>
+                </button>
               )}
             </div>
           </div>

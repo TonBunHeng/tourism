@@ -9,20 +9,23 @@ import {
   Loader2,
   ChevronDown,
   BarChart3,
-  PieChart
+  PieChart,
+  FileSpreadsheet
 } from 'lucide-react';
 import businessOwnerService from '../../services/businessOwnerService';
 import { useAlert } from '../../context/AlertContext';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
+import SalesAnalyticsChart from '../../components/business/SalesAnalyticsChart';
+import { exportBusinessReportToExcel } from '../../utils/exportBusinessReport';
 
 export default function BusinessReports() {
-  const { selectedBusiness } = useOutletContext();
+  const { selectedBusiness, businesses = [], setSelectedBusiness } = useOutletContext();
   const { showSuccess, showError } = useAlert();
 
   const [timeframe, setTimeframe] = useState('this_month');
   const [reportData, setReportData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [isExporting, setIsExporting] = useState(false);
+  const [isExportingExcel, setIsExportingExcel] = useState(false);
 
   const fetchReports = useCallback(() => {
     setIsLoading(true);
@@ -42,23 +45,35 @@ export default function BusinessReports() {
       .finally(() => {
         setIsLoading(false);
       });
-  }, [timeframe, selectedBusiness]);
+  }, [timeframe, selectedBusiness?.id]);
 
   useEffect(() => {
     fetchReports();
   }, [fetchReports]);
 
-  const handleExportCsv = async () => {
-    setIsExporting(true);
+  // Handle Excel (.xlsx) Export
+  const handleExportExcel = async () => {
+    if (!reportData) {
+      showError('Report dataset is still loading. Please wait a moment.');
+      return;
+    }
+
+    setIsExportingExcel(true);
     try {
-      const params = { timeframe };
-      if (selectedBusiness?.id) params.business_id = selectedBusiness.id;
-      await businessOwnerService.exportReportsCsv(params);
-      showSuccess('CSV report statement downloaded successfully.', 'Export Complete');
+      exportBusinessReportToExcel({
+        reportData,
+        businessName: selectedBusiness?.name || 'AngkorVerses Business',
+        timeframe,
+      });
+      showSuccess(
+        'Excel workbook (.xlsx) downloaded successfully with complete financial statements.',
+        'Excel Export Complete'
+      );
     } catch (err) {
-      showError(err.message || 'Failed to export report.');
+      console.error('Excel Export Error:', err);
+      showError(err.message || 'Failed to generate Excel report file.');
     } finally {
-      setIsExporting(false);
+      setIsExportingExcel(false);
     }
   };
 
@@ -145,15 +160,20 @@ export default function BusinessReports() {
               <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
             </div>
 
-            {/* Export CSV Button */}
+            {/* Export Excel Button */}
             <button
               type="button"
-              onClick={handleExportCsv}
-              disabled={isExporting}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-md bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white text-xs sm:text-sm font-medium shadow-xs transition-colors cursor-pointer"
+              onClick={handleExportExcel}
+              disabled={isExportingExcel}
+              className="flex items-center gap-2 px-4 py-2 rounded-md bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white text-xs sm:text-sm font-semibold shadow-xs transition-colors cursor-pointer"
+              title="Download full multi-sheet Excel spreadsheet (.xlsx)"
             >
-              {isExporting ? <Loader2 size={15} className="animate-spin" /> : <Download size={15} />}
-              <span>Export CSV</span>
+              {isExportingExcel ? (
+                <Loader2 size={16} className="animate-spin" />
+              ) : (
+                <FileSpreadsheet size={16} />
+              )}
+              <span>Export Excel</span>
             </button>
           </div>
         </div>
@@ -196,6 +216,20 @@ export default function BusinessReports() {
               );
             })}
           </div>
+
+          {/* Interactive Balanced Analytics: Record Ingestion Velocity + System Health & Dataset Hub with Business Focus */}
+          <SalesAnalyticsChart
+            key={`${selectedBusiness?.id || 'all'}-${timeframe}`}
+            trends={reportData?.trends || []}
+            timeframe={timeframe}
+            summary={summary}
+            topServices={topServices}
+            statusBreakdown={statusBreakdown}
+            ratingsBreakdown={reportData?.ratings_breakdown || {}}
+            selectedBusiness={selectedBusiness}
+            businesses={businesses}
+            onSelectBusiness={setSelectedBusiness}
+          />
 
           {/* Breakdown & Popular Services Cards */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

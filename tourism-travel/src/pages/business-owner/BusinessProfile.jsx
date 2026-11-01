@@ -270,13 +270,13 @@ export default function BusinessProfile() {
 
           <div className="flex items-center gap-2.5 flex-wrap sm:flex-nowrap self-start sm:self-auto">
             {verificationStatus === 'approved' ? (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 shadow-xs">
-                <CheckCircle2 size={13} />
+              <span className="inline-flex items-center gap-1.5 px-4 py-2 rounded-md text-xs sm:text-sm font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 shadow-xs">
+                <CheckCircle2 size={14} />
                 <span>Verified Enterprise</span>
               </span>
             ) : (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-200 dark:border-amber-800 shadow-xs">
-                <Clock size={13} />
+              <span className="inline-flex items-center gap-1.5 px-4 py-2 rounded-md text-xs sm:text-sm font-semibold bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-200 dark:border-amber-800 shadow-xs">
+                <Clock size={14} />
                 <span>Status: {verificationStatus || 'Pending Review'}</span>
               </span>
             )}
@@ -472,14 +472,15 @@ export default function BusinessProfile() {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-gray-700 dark:text-zinc-300 mb-1">
-                      Official Website URL
+                    <label className="block text-xs font-semibold text-gray-700 dark:text-zinc-300 mb-1 flex items-center gap-1.5">
+                      <MapPin size={13} className="text-[#003E83] dark:text-blue-400" />
+                      <span>Location</span>
                     </label>
                     <input
-                      type="url"
+                      type="text"
                       value={website}
                       onChange={(e) => setWebsite(e.target.value)}
-                      placeholder="https://example.com"
+                      placeholder="e.g. Google Maps link, coordinates, or location link"
                       className="w-full px-3 py-2 rounded-md border border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800 text-xs sm:text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#003E83]"
                     />
                   </div>
@@ -582,18 +583,6 @@ export default function BusinessProfile() {
                 </div>
               </div>
             </div>
-          </div>
-
-          {/* Bottom Save Action */}
-          <div className="flex justify-end pt-6">
-            <button
-              type="submit"
-              disabled={isSaving}
-              className="px-6 py-2.5 rounded-md bg-[#003E83] hover:bg-[#002e62] disabled:opacity-50 text-white text-xs sm:text-sm font-medium shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer"
-            >
-              {isSaving ? <Loader2 size={15} className="animate-spin" /> : <Save size={15} />}
-              <span>Save Business Profile</span>
-            </button>
           </div>
         </form>
       )}

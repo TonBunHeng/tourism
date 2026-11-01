@@ -392,6 +392,17 @@ class BusinessReportController extends Controller
             ]);
 
             foreach ($bookings as $booking) {
+                $bDate = 'N/A';
+                if ($booking->booking_date instanceof \DateTimeInterface) {
+                    $bDate = $booking->booking_date->format('Y-m-d');
+                } elseif (is_string($booking->booking_date) && !empty($booking->booking_date)) {
+                    $bDate = $booking->booking_date;
+                }
+
+                $confAt = ($booking->confirmed_at instanceof \DateTimeInterface) ? $booking->confirmed_at->toIso8601String() : (string) ($booking->confirmed_at ?? '');
+                $compAt = ($booking->completed_at instanceof \DateTimeInterface) ? $booking->completed_at->toIso8601String() : (string) ($booking->completed_at ?? '');
+                $createdAt = ($booking->created_at instanceof \DateTimeInterface) ? $booking->created_at->toIso8601String() : (string) ($booking->created_at ?? '');
+
                 fputcsv($output, [
                     $booking->booking_reference,
                     $booking->business?->name ?? 'N/A',
@@ -399,16 +410,16 @@ class BusinessReportController extends Controller
                     $booking->customer_name,
                     $booking->customer_email,
                     $booking->customer_phone,
-                    $booking->booking_date ? $booking->booking_date->format('Y-m-d') : 'N/A',
+                    $bDate,
                     $booking->booking_time ?? 'N/A',
                     $booking->number_of_guests,
-                    number_format($booking->total_price, 2, '.', ''),
-                    ucfirst($booking->status),
-                    ucfirst($booking->payment_status),
-                    $booking->confirmed_at ? $booking->confirmed_at->toIso8601String() : '',
-                    $booking->completed_at ? $booking->completed_at->toIso8601String() : '',
+                    number_format((float) $booking->total_price, 2, '.', ''),
+                    ucfirst((string) $booking->status),
+                    ucfirst((string) $booking->payment_status),
+                    $confAt,
+                    $compAt,
                     $booking->special_requests ?? '',
-                    $booking->created_at ? $booking->created_at->toIso8601String() : '',
+                    $createdAt,
                 ]);
             }
 
@@ -530,15 +541,25 @@ class BusinessReportController extends Controller
                 $bCount = $dayItems->count();
                 $rCount = round((float) $rev, 2);
                 $gCount = (int) $dayItems->sum('number_of_guests');
+                $completedCount = $dayItems->where('status', Booking::STATUS_COMPLETED)->count();
+                $confirmedCount = $dayItems->where('status', Booking::STATUS_CONFIRMED)->count();
+                $activeCount = $completedCount + $confirmedCount;
+                $pendingCount = $dayItems->where('status', Booking::STATUS_PENDING)->count();
+                $cancelledCount = $dayItems->whereIn('status', [Booking::STATUS_CANCELLED, Booking::STATUS_REJECTED])->count();
+                $completedRev = $dayItems->where('status', Booking::STATUS_COMPLETED)->sum('total_price');
 
                 $trends[] = [
-                    'label' => $date->format('M d'),
+                    'label' => $date->format('M j'),
                     'date' => $dateStr,
                     'bookings' => $bCount,
                     'revenue' => $rCount,
                     'guests' => $gCount,
-                    'completed' => $dayItems->where('status', Booking::STATUS_COMPLETED)->count(),
-                    'cancelled' => $dayItems->whereIn('status', [Booking::STATUS_CANCELLED, Booking::STATUS_REJECTED])->count(),
+                    'active' => $activeCount,
+                    'confirmed' => $confirmedCount,
+                    'completed' => $completedCount,
+                    'pending' => $pendingCount,
+                    'cancelled' => $cancelledCount,
+                    'completed_revenue' => round((float) $completedRev, 2),
                     // Recharts & UI Compatibility Keys
                     'unitsSold' => $bCount,
                     'totalTransaction' => $rCount,
@@ -562,6 +583,12 @@ class BusinessReportController extends Controller
                 $bCount = $monthItems->count();
                 $rCount = round((float) $rev, 2);
                 $gCount = (int) $monthItems->sum('number_of_guests');
+                $completedCount = $monthItems->where('status', Booking::STATUS_COMPLETED)->count();
+                $confirmedCount = $monthItems->where('status', Booking::STATUS_CONFIRMED)->count();
+                $activeCount = $completedCount + $confirmedCount;
+                $pendingCount = $monthItems->where('status', Booking::STATUS_PENDING)->count();
+                $cancelledCount = $monthItems->whereIn('status', [Booking::STATUS_CANCELLED, Booking::STATUS_REJECTED])->count();
+                $completedRev = $monthItems->where('status', Booking::STATUS_COMPLETED)->sum('total_price');
 
                 $trends[] = [
                     'label' => $monthLabel,
@@ -570,8 +597,12 @@ class BusinessReportController extends Controller
                     'bookings' => $bCount,
                     'revenue' => $rCount,
                     'guests' => $gCount,
-                    'completed' => $monthItems->where('status', Booking::STATUS_COMPLETED)->count(),
-                    'cancelled' => $monthItems->whereIn('status', [Booking::STATUS_CANCELLED, Booking::STATUS_REJECTED])->count(),
+                    'active' => $activeCount,
+                    'confirmed' => $confirmedCount,
+                    'completed' => $completedCount,
+                    'pending' => $pendingCount,
+                    'cancelled' => $cancelledCount,
+                    'completed_revenue' => round((float) $completedRev, 2),
                     // Recharts & UI Compatibility Keys
                     'unitsSold' => $bCount,
                     'totalTransaction' => $rCount,

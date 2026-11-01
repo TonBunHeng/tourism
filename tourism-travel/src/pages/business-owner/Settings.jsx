@@ -344,7 +344,7 @@ export default function BusinessSettings() {
                   </div>
                 </div>
 
-                <div className="pt-2">
+                <div className="pt-3 flex justify-end">
                   <button
                     type="submit"
                     disabled={isUpdatingPassword}
@@ -506,7 +506,7 @@ export default function BusinessSettings() {
                   />
                 </label>
 
-                <div className="pt-3">
+                <div className="pt-3 flex justify-end">
                   <button
                     type="submit"
                     disabled={isSavingPreferences}

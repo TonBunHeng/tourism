@@ -95,6 +95,7 @@ export default function BusinessOwnerLayout() {
           selectedBusiness={selectedBusiness}
           businesses={businesses}
           onSelectBusiness={handleSelectBusiness}
+          refreshBusinesses={refreshBusinesses}
         />
 
         <div className="flex flex-col flex-1 min-h-0 overflow-hidden">

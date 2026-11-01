@@ -560,18 +560,18 @@ export default function BusinessModal({
                   </div>
                 </div>
 
-                {/* Website */}
+                {/* Location (Website/Maps link) */}
                 <div className="sm:col-span-2">
                   <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] mb-1.5">
-                    {t('businesses.website', 'Website URL')}
+                    {t('businesses.website', 'Location')}
                   </label>
                   <div className="relative">
-                    <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                    <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
                     <input
                       type="text"
                       value={formData.website}
                       onChange={(e) => handleChange('website', e.target.value)}
-                      placeholder="https://business.com"
+                      placeholder="e.g. Google Maps URL, coordinates, or location link"
                       className="w-full pl-9 pr-3 py-2 bg-[var(--color-bg-light)] dark:bg-[var(--color-input-dark-bg)] border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]/70 rounded-md text-xs sm:text-sm text-[var(--color-text-primary-light)] dark:text-[var(--color-white)] placeholder-[var(--color-text-muted-light)] focus:outline-none focus:ring-2 focus:ring-[var(--color-input)] transition-all"
                     />
                   </div>

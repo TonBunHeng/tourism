@@ -189,17 +189,6 @@ export default function Availability() {
               </div>
             ))}
           </div>
-
-          <div className="flex justify-end pt-3 border-t border-gray-100 dark:border-zinc-800">
-            <button
-              type="submit"
-              disabled={isSaving}
-              className="px-4 py-2 rounded-md bg-[#003E83] hover:bg-[#002e62] disabled:opacity-50 text-white text-xs sm:text-sm font-medium shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer"
-            >
-              {isSaving ? <Loader2 size={15} className="animate-spin" /> : <Save size={15} />}
-              <span>Save Operating Schedule</span>
-            </button>
-          </div>
         </form>
       )}
     </div>

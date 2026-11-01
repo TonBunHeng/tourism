@@ -497,7 +497,7 @@ export default function Businesses() {
               <div><strong>Rating:</strong> {activeBusinessDetails.rating || 0} / 5 ({activeBusinessDetails.review_count || 0} reviews)</div>
               {activeBusinessDetails.phone && <div><strong>Phone:</strong> {activeBusinessDetails.phone}</div>}
               {activeBusinessDetails.email && <div><strong>Email:</strong> {activeBusinessDetails.email}</div>}
-              {activeBusinessDetails.website && <div><strong>Website:</strong> {activeBusinessDetails.website}</div>}
+              {activeBusinessDetails.website && <div><strong>Location:</strong> {activeBusinessDetails.website}</div>}
             </div>
 
             <div>

@@ -49,6 +49,35 @@ businessApi.interceptors.response.use(
     }
 
     if (responseData) {
+      if (responseData instanceof Blob) {
+        return responseData.text().then((text) => {
+          let parsedMsg = null;
+          try {
+            const parsed = JSON.parse(text);
+            parsedMsg = parsed.message || parsed.error;
+          } catch {
+            parsedMsg = text || null;
+          }
+          if (status === 429) {
+            parsedMsg = 'Export request rate limit reached. Please wait a minute and try again.';
+          }
+          const sanitizedMessage = sanitizeErrorMessage(parsedMsg, status);
+          return Promise.reject({
+            success: false,
+            message: sanitizedMessage || 'Failed to download export file.',
+            status,
+            data: responseData,
+          });
+        }).catch(() => {
+          return Promise.reject({
+            success: false,
+            message: sanitizeErrorMessage(null, status),
+            status,
+            data: responseData,
+          });
+        });
+      }
+
       const sanitizedMessage = sanitizeErrorMessage(
         responseData.message || responseData.error || responseData.errors,
         status

@@ -106,7 +106,7 @@ const Businesses = {
   addressPlaceholder: "Street address, Village, Sangkat...",
   phone: "Phone",
   email: "Email",
-  website: "Website URL",
+  website: "Location",
   latitude: "Latitude (Optional)",
   longitude: "Longitude (Optional)",
 

@@ -18,9 +18,11 @@ import {
   Building2,
   CheckCircle2,
   AlertCircle,
-  ChevronDown
+  ChevronDown,
+  Plus
 } from 'lucide-react';
 import BusinessLogoutAlert from './BusinessLogoutAlert';
+import ManageBusinessModal from './ManageBusinessModal';
 import { useAuth } from '../../context/AuthContext';
 
 const NAV_SECTIONS = [
@@ -172,11 +174,20 @@ export default function BusinessSidebar({
   selectedBusiness,
   businesses = [],
   onSelectBusiness,
+  refreshBusinesses,
 }) {
   const { user } = useAuth();
   const { pathname } = useLocation();
   const sidebarRef = useRef(null);
   const [showLogoutAlert, setShowLogoutAlert] = useState(false);
+  const [showManageModal, setShowManageModal] = useState(false);
+
+  // Listen for global open-manage-business-modal events
+  useEffect(() => {
+    const handleOpen = () => setShowManageModal(true);
+    window.addEventListener('open-manage-business-modal', handleOpen);
+    return () => window.removeEventListener('open-manage-business-modal', handleOpen);
+  }, []);
 
   // Close on outside click on mobile
   useEffect(() => {
@@ -339,29 +350,31 @@ export default function BusinessSidebar({
           ))}
         </nav>
 
-        {/* Switch to Tourist View Shortcut */}
+        {/* Manage / Add Profile Button */}
         <div className="px-2 py-2 border-t border-gray-200 dark:border-zinc-800">
           {isExpanded ? (
-            <Link
-              to="/"
-              className="flex items-center gap-2.5 px-3 py-1.5 rounded-md text-xs font-medium text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-zinc-800/70 transition"
-              title="Switch to Tourist Client View"
+            <button
+              type="button"
+              onClick={() => setShowManageModal(true)}
+              className="w-full flex items-center gap-2 px-3 py-2 rounded-md text-xs font-semibold bg-blue-50 dark:bg-blue-950/40 text-[#003E83] dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/60 border border-blue-200/80 dark:border-blue-900/60 shadow-2xs transition-colors cursor-pointer"
+              title="Manage / Add Profile"
             >
-              <Globe size={16} className="text-blue-500 shrink-0" />
-              <span className="truncate">Tourist Client View</span>
-            </Link>
+              <Plus size={16} className="shrink-0 text-[#003E83] dark:text-blue-400" />
+              <span className="truncate">+ Manage / Add Profile</span>
+            </button>
           ) : (
             <Flyout
               enabled={!isExpanded}
-              panel={<TooltipBubble>Tourist Client View</TooltipBubble>}
+              panel={<TooltipBubble>+ Manage / Add Profile</TooltipBubble>}
             >
-              <Link
-                to="/"
-                className="flex items-center justify-center w-full py-1.5 rounded-md text-gray-600 dark:text-zinc-400 hover:bg-gray-100 dark:hover:bg-zinc-800"
-                aria-label="Tourist Client View"
+              <button
+                type="button"
+                onClick={() => setShowManageModal(true)}
+                className="flex items-center justify-center w-full py-2 rounded-md text-[#003E83] dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40 transition cursor-pointer"
+                aria-label="Manage / Add Profile"
               >
-                <Globe size={18} className="text-blue-500" />
-              </Link>
+                <Plus size={18} />
+              </button>
             </Flyout>
           )}
         </div>
@@ -422,6 +435,16 @@ export default function BusinessSidebar({
       <BusinessLogoutAlert
         isOpen={showLogoutAlert}
         onClose={() => setShowLogoutAlert(false)}
+      />
+
+      {/* Manage / Add Business Profile Modal */}
+      <ManageBusinessModal
+        isOpen={showManageModal}
+        onClose={() => setShowManageModal(false)}
+        selectedBusiness={selectedBusiness}
+        businesses={businesses}
+        onSelectBusiness={onSelectBusiness}
+        refreshBusinesses={refreshBusinesses}
       />
     </>
   );
