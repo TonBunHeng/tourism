@@ -1,14 +1,15 @@
+import CodeBlock from '../chat/CodeBlock';
+
 // Safely parse inline formatting: bold, italic, inline-code, and links
 function parseInline(text) {
   if (!text) return null;
 
-  // Regex to split on bold (**...**), inline code (`...`), links ([...](...)), and italics (*...*)
   const tokens = [];
   let remaining = text;
   let keyIndex = 0;
 
   while (remaining.length > 0) {
-    // 1. Bold: **text**
+    // 1. Bold: **text** or __text__
     const boldMatch = remaining.match(/^(\*\*|__)(.*?)\1/);
     if (boldMatch) {
       tokens.push(
@@ -82,7 +83,7 @@ function parseInline(text) {
   return tokens;
 }
 
-export default function MarkdownMessage({ content = '' }) {
+export default function MarkdownMessage({ content = '', isKhmer = false }) {
   if (!content) return null;
 
   const lines = content.split('\n');
@@ -93,6 +94,29 @@ export default function MarkdownMessage({ content = '' }) {
   while (i < lines.length) {
     const rawLine = lines[i];
     const trimmed = rawLine.trim();
+
+    // 0. Fenced Code Blocks (```lang ... ```)
+    if (trimmed.startsWith('```')) {
+      const lang = trimmed.slice(3).trim();
+      i++;
+      const codeLines = [];
+      while (i < lines.length && !lines[i].trim().startsWith('```')) {
+        codeLines.push(lines[i]);
+        i++;
+      }
+      if (i < lines.length && lines[i].trim().startsWith('```')) {
+        i++; // skip closing ```
+      }
+      elements.push(
+        <CodeBlock
+          key={blockKey++}
+          code={codeLines.join('\n')}
+          lang={lang}
+          isKhmer={isKhmer}
+        />
+      );
+      continue;
+    }
 
     // Empty line
     if (!trimmed) {
@@ -113,7 +137,7 @@ export default function MarkdownMessage({ content = '' }) {
 
     if (trimmed.startsWith('## ')) {
       elements.push(
-        <h3 key={blockKey++} className="text-xl font-bold text-zinc-900 dark:text-white mt-5 mb-2.5 tracking-tight">
+        <h3 key={blockKey++} className="text-lg sm:text-xl font-bold text-zinc-900 dark:text-white mt-5 mb-2.5 tracking-tight">
           {parseInline(trimmed.slice(3))}
         </h3>
       );
@@ -123,7 +147,7 @@ export default function MarkdownMessage({ content = '' }) {
 
     if (trimmed.startsWith('# ')) {
       elements.push(
-        <h2 key={blockKey++} className="text-2xl font-black text-zinc-900 dark:text-white mt-6 mb-3 tracking-tight">
+        <h2 key={blockKey++} className="text-xl sm:text-2xl font-black text-zinc-900 dark:text-white mt-6 mb-3 tracking-tight">
           {parseInline(trimmed.slice(2))}
         </h2>
       );

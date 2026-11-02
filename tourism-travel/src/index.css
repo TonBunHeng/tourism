@@ -2,6 +2,10 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
+  /* Fonts matching angkorvers.vercel.app */
+  --font-sans: 'Inter', 'Kantumruy Pro', system-ui, -apple-system, sans-serif;
+  --font-khmer: 'Kantumruy Pro', sans-serif;
+
   /* Primary Brand Colors */
   --color-primary: #002D62;
   --color-primary-hover: #001f44;
@@ -137,6 +141,24 @@
   background: #334155;
 }
 
-html {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+html, :host {
+  font-family: 'Inter', 'Kantumruy Pro', system-ui, -apple-system, sans-serif;
+  line-height: 1.5;
+}
+
+body {
+  font-family: 'Inter', 'Kantumruy Pro', system-ui, -apple-system, sans-serif;
+}
+
+.font-khmer {
+  font-family: 'Kantumruy Pro', sans-serif;
+}
+
+.font-sans {
+  font-family: 'Inter', 'Kantumruy Pro', sans-serif;
+}
+
+:lang(km), .font-khmer, [data-lang="km"] {
+  font-family: 'Kantumruy Pro', 'Inter', system-ui, -apple-system, sans-serif;
+  letter-spacing: 0.01em;
 }

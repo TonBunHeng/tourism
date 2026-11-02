@@ -1,164 +1,232 @@
 import { 
   Landmark, 
-  Coins,
   MapPin,
   Compass,
   Hotel, 
   Utensils, 
   Car, 
   Calendar, 
-  Sparkles, 
-  ShieldAlert, 
   DollarSign,
   Sun
 } from 'lucide-react';
 
-// Exact sets of 4 suggested topics from angkorvers.vercel.app
-export const SUGGESTED_TOPIC_SETS = [
-  // Set 0: Initial home view on angkorvers.vercel.app
-  [
-    {
-      icon: Sun,
-      text: 'Best time to visit Cambodia & seasons',
-      query: 'What is the best time of year to visit Cambodia in terms of weather, seasons, and festivals?',
-    },
-    {
-      icon: Calendar,
-      text: 'Plan a 3-day trip to Siem Reap',
-      query: 'Plan a 3-day trip to Siem Reap covering Angkor Wat, local culture, and food.',
-    },
-    {
-      icon: Compass,
-      text: 'Battambang Bamboo Train & bat caves',
-      query: 'Tell me about the Battambang Bamboo Train and the evening bat caves experience.',
-    },
-    {
-      icon: Landmark,
-      text: 'Explore Angkor Wat & sunrise spots',
-      query: 'What are the best sunrise spots at Angkor Wat and how can I avoid crowds?',
-    },
-  ],
-  // Set 1: Conversation suggested topics from angkorvers.vercel.app
-  [
-    {
-      icon: Landmark,
-      text: 'Phnom Penh Royal Palace & Silver Pagoda',
-      query: 'What should I know before visiting Phnom Penh Royal Palace and Silver Pagoda?',
-    },
-    {
-      icon: MapPin,
-      text: '25 Provinces of Cambodia overview',
-      query: 'Give me an overview of the 25 provinces of Cambodia and their tourism highlights.',
-    },
-    {
-      icon: Calendar,
-      text: '3-Day Siem Reap cultural itinerary',
-      query: 'Create a detailed 3-Day Siem Reap cultural itinerary.',
-    },
-    {
-      icon: MapPin,
-      text: 'Bokor National Park in Kampot',
-      query: 'What are the must-see attractions in Bokor National Park in Kampot?',
-    },
-  ],
-  // Set 2: Highlights & Budget
-  [
-    {
-      icon: Landmark,
-      text: 'Discover Phnom Penh highlights',
-      query: 'Discover Phnom Penh highlights including history, markets, and riverside dining.',
-    },
-    {
-      icon: Coins,
-      text: 'Cambodia travel budget & currency tips',
-      query: 'Cambodia travel budget and currency tips (USD vs KHR and local pricing).',
-    },
-    {
-      icon: MapPin,
-      text: 'Mondulkiri waterfalls & eco-tourism',
-      query: 'Tell me about Mondulkiri waterfalls and elephant eco-tourism sanctuaries.',
-    },
-    {
-      icon: Utensils,
-      text: 'What authentic Khmer dishes should I try?',
-      query: 'What authentic Khmer dishes and street food should I try in Cambodia?',
-    },
-  ],
-];
-
-export const TRIP_GENIE_SUGGESTIONS = [
+// Exact 12 Suggested Topics in English from angkorvers.vercel.app
+export const TOPICS_EN = [
   {
-    category: 'Temples & Culture',
-    color: 'text-blue-500',
-    badgeBg: 'bg-blue-50',
+    id: 'angkor_wat',
     icon: Landmark,
-    question: 'How can I visit Angkor Wat and avoid the crowds?',
+    title: 'Explore Angkor Wat & ancient temples',
+    text: 'Explore Angkor Wat & ancient temples',
+    prompt: 'Tell me about the history, architecture, and sunrise spots at Angkor Wat.',
+    query: 'Tell me about the history, architecture, and sunrise spots at Angkor Wat.',
   },
   {
-    category: 'Hotels & Accommodation',
-    color: 'text-sky-500',
-    badgeBg: 'bg-sky-50',
-    icon: Hotel,
-    question: 'Recommend comfortable hotels in Siem Reap.',
-  },
-  {
-    category: 'Food & Cuisine',
-    color: 'text-amber-500',
-    badgeBg: 'bg-amber-50',
-    icon: Utensils,
-    question: 'What authentic Khmer dishes should I try?',
-  },
-  {
-    category: 'Transportation',
-    color: 'text-emerald-500',
-    badgeBg: 'bg-emerald-50',
-    icon: Car,
-    question: 'How do I travel between Phnom Penh and Siem Reap?',
-  },
-  {
-    category: 'Itinerary Planning',
-    color: 'text-indigo-500',
-    badgeBg: 'bg-indigo-50',
+    id: 'itinerary',
     icon: Calendar,
-    question: 'Create a 3-day Cambodia travel itinerary.',
+    title: '3-Day Siem Reap cultural itinerary',
+    text: '3-Day Siem Reap cultural itinerary',
+    prompt: 'Create a 3-day Siem Reap cultural itinerary with top temples, costs, and tips.',
+    query: 'Create a 3-day Siem Reap cultural itinerary with top temples, costs, and tips.',
   },
   {
-    category: 'Local Experiences',
-    color: 'text-purple-500',
-    badgeBg: 'bg-purple-50',
-    icon: Sparkles,
-    question: 'What are the best local experiences in Cambodia?',
+    id: 'phnom_penh',
+    icon: Landmark,
+    title: 'Phnom Penh Royal Palace & riverfront',
+    text: 'Phnom Penh Royal Palace & riverfront',
+    prompt: 'What are the top attractions and riverside experiences to explore in Phnom Penh?',
+    query: 'What are the top attractions and riverside experiences to explore in Phnom Penh?',
   },
   {
-    category: 'Travel Tips',
-    color: 'text-rose-500',
-    badgeBg: 'bg-rose-50',
-    icon: ShieldAlert,
-    question: 'What should I know before visiting Cambodia?',
+    id: 'islands',
+    icon: Compass,
+    title: 'Koh Rong & tropical white-sand beaches',
+    text: 'Koh Rong & tropical white-sand beaches',
+    prompt: 'Tell me about speed ferries, resorts, and beaches on Koh Rong and Koh Rong Sanloem.',
+    query: 'Tell me about speed ferries, resorts, and beaches on Koh Rong and Koh Rong Sanloem.',
   },
   {
-    category: 'Budget Planning',
-    color: 'text-teal-500',
-    badgeBg: 'bg-teal-50',
+    id: 'crab',
+    icon: Utensils,
+    title: 'Fresh Kampot pepper crab in Kep',
+    text: 'Fresh Kampot pepper crab in Kep',
+    prompt: 'Tell me about fresh Kampot pepper crab in Kep and visiting Kep Crab Market.',
+    query: 'Tell me about fresh Kampot pepper crab in Kep and visiting Kep Crab Market.',
+  },
+  {
+    id: 'nature',
+    icon: MapPin,
+    title: 'Bokor National Park in Kampot',
+    text: 'Bokor National Park in Kampot',
+    prompt: 'What can I explore at Bokor National Park and the historic hill station in Kampot?',
+    query: 'What can I explore at Bokor National Park and the historic hill station in Kampot?',
+  },
+  {
+    id: 'battambang',
+    icon: Compass,
+    title: 'Battambang Bamboo Train & bat caves',
+    text: 'Battambang Bamboo Train & bat caves',
+    prompt: 'Tell me about the Bamboo Train, colonial architecture, and bat caves in Battambang.',
+    query: 'Tell me about the Bamboo Train, colonial architecture, and bat caves in Battambang.',
+  },
+  {
+    id: 'mondulkiri',
+    icon: MapPin,
+    title: 'Mondulkiri waterfalls & eco-tourism',
+    text: 'Mondulkiri waterfalls & eco-tourism',
+    prompt: 'What are the top eco-tourism spots, elephant sanctuaries, and waterfalls in Mondulkiri?',
+    query: 'What are the top eco-tourism spots, elephant sanctuaries, and waterfalls in Mondulkiri?',
+  },
+  {
+    id: 'food',
+    icon: Utensils,
+    title: 'Must-try authentic Khmer dishes & Amok',
+    text: 'Must-try authentic Khmer dishes & Amok',
+    prompt: 'What authentic Khmer dishes like Fish Amok, Lok Lak, and Nom Banh Chok are must-try?',
+    query: 'What authentic Khmer dishes like Fish Amok, Lok Lak, and Nom Banh Chok are must-try?',
+  },
+  {
+    id: 'currency',
     icon: DollarSign,
-    question: 'How much should I budget for a week in Cambodia?',
+    title: 'Cambodia travel budget & USD vs Riel',
+    text: 'Cambodia travel budget & USD vs Riel',
+    prompt: 'What should I know about Cambodian currency, exchange rates, and tipping culture?',
+    query: 'What should I know about Cambodian currency, exchange rates, and tipping culture?',
+  },
+  {
+    id: 'provinces',
+    icon: MapPin,
+    title: '25 Provinces of Cambodia overview',
+    text: '25 Provinces of Cambodia overview',
+    prompt: 'Give an overview of the 25 administrative divisions of Cambodia with their top travel spots.',
+    query: 'Give an overview of the 25 administrative divisions of Cambodia with their top travel spots.',
+  },
+  {
+    id: 'sunrise',
+    icon: Sun,
+    title: 'Best time for Angkor Wat sunrise & weather',
+    text: 'Best time for Angkor Wat sunrise & weather',
+    prompt: 'What is the best time and spot for Angkor Wat sunrise and best travel seasons?',
+    query: 'What is the best time and spot for Angkor Wat sunrise and best travel seasons?',
   },
 ];
 
-export function generateSessionId(prefix = 'genie') {
-  return `${prefix}_${Math.random().toString(36).slice(2, 9)}`;
-}
+// Exact 12 Suggested Topics in Khmer from angkorvers.vercel.app
+export const TOPICS_KM = [
+  {
+    id: 'angkor_wat',
+    icon: Landmark,
+    title: 'ស្វែងយល់ពីប្រាសាទអង្គរវត្ត និងប្រវត្តិសាស្ត្រ',
+    text: 'ស្វែងយល់ពីប្រាសាទអង្គរវត្ត និងប្រវត្តិសាស្ត្រ',
+    prompt: 'សូមរៀបរាប់អំពីប្រវត្តិសាស្ត្រ ស្ថាបត្យកម្ម និងកន្លែងមើលថ្ងៃរះស្អាតបំផុតនៅអង្គរវត្ត។',
+    query: 'សូមរៀបរាប់អំពីប្រវត្តិសាស្ត្រ ស្ថាបត្យកម្ម និងកន្លែងមើលថ្ងៃរះស្អាតបំផុតនៅអង្គរវត្ត។',
+  },
+  {
+    id: 'itinerary',
+    icon: Calendar,
+    title: 'គម្រោងដើរលេង ៣ ថ្ងៃនៅសៀមរាប',
+    text: 'គម្រោងដើរលេង ៣ ថ្ងៃនៅសៀមរាប',
+    prompt: 'រៀបចំគម្រោងដើរលេង ៣ ថ្ងៃនៅសៀមរាប រួមទាំងការស្នាក់នៅ ម្ហូបអាហារ និងកញ្ចប់ថវិកា។',
+    query: 'រៀបចំគម្រោងដើរលេង ៣ ថ្ងៃនៅសៀមរាប រួមទាំងការស្នាក់នៅ ម្ហូបអាហារ និងកញ្ចប់ថវិកា។',
+  },
+  {
+    id: 'phnom_penh',
+    icon: Landmark,
+    title: 'ដើរលេងរាជធានីភ្នំពេញ និងព្រះបរមរាជវាំង',
+    text: 'ដើរលេងរាជធានីភ្នំពេញ និងព្រះបរមរាជវាំង',
+    prompt: 'តើនៅភ្នំពេញមានកន្លែងកម្សាន្ត និងសារមន្ទីរប្រវត្តិសាស្ត្រណាខ្លះដែលគួរទៅទស្សនា?',
+    query: 'តើនៅភ្នំពេញមានកន្លែងកម្សាន្ត និងសារមន្ទីរប្រវត្តិសាស្ត្រណាខ្លះដែលគួរទៅទស្សនា?',
+  },
+  {
+    id: 'islands',
+    icon: Compass,
+    title: 'កោះរ៉ុង និងឆ្នេរខ្សាច់សកម្សាន្ត',
+    text: 'កោះរ៉ុង និងឆ្នេរខ្សាច់សកម្សាន្ត',
+    prompt: 'ស្វែងយល់ពីដំណើរកម្សាន្តទៅកាន់កោះរ៉ុង និងកោះរ៉ុងសន្លឹម រួមទាំងអូប័រល្បឿនលឿន។',
+    query: 'ស្វែងយល់ពីដំណើរកម្សាន្តទៅកាន់កោះរ៉ុង និងកោះរ៉ុងសន្លឹម រួមទាំងអូប័រល្បឿនលឿន។',
+  },
+  {
+    id: 'crab',
+    icon: Utensils,
+    title: 'ក្តាមឆាម្រេចខ្ចីនៅកែប',
+    text: 'ក្តាមឆាម្រេចខ្ចីនៅកែប',
+    prompt: 'តើក្តាមឆាម្រេចខ្ចីនៅកែប និងចម្ការម្រេចកំពតមានអ្វីពិសេស?',
+    query: 'តើក្តាមឆាម្រេចខ្ចីនៅកែប និងចម្ការម្រេចកំពតមានអ្វីពិសេស?',
+  },
+  {
+    id: 'nature',
+    icon: MapPin,
+    title: 'ឧទ្យានជាតិភ្នំបូកគោ ខេត្តកំពត',
+    text: 'ឧទ្យានជាតិភ្នំបូកគោ ខេត្តកំពត',
+    prompt: 'តើការឡើងកម្សាន្តលើភ្នំបូកគោមានតំបន់ទេសចរណ៍ និងសំណង់ប្រវត្តិសាស្ត្រណាខ្លះ?',
+    query: 'តើការឡើងកម្សាន្តលើភ្នំបូកគោមានតំបន់ទេសចរណ៍ និងសំណង់ប្រវត្តិសាស្ត្រណាខ្លះ?',
+  },
+  {
+    id: 'battambang',
+    icon: Compass,
+    title: 'ជិះឡូរីបាត់ដំបង និងទស្សនាល្អាងប្រចៀវ',
+    text: 'ជិះឡូរីបាត់ដំបង និងទស្សនាល្អាងប្រចៀវ',
+    prompt: 'សូមណែនាំដំណើរកម្សាន្តជិះឡូរី (Bamboo Train) និងមើលហ្វូងប្រចៀវនៅភ្នំសំពៅ បាត់ដំបង។',
+    query: 'សូមណែនាំដំណើរកម្សាន្តជិះឡូរី (Bamboo Train) និងមើលហ្វូងប្រចៀវនៅភ្នំសំពៅ បាត់ដំបង។',
+  },
+  {
+    id: 'mondulkiri',
+    icon: MapPin,
+    title: 'ទឹកធ្លាក់ប៊ូស្រា និងទេសចរណ៍មណ្ឌលគិរី',
+    text: 'ទឹកធ្លាក់ប៊ូស្រា និងទេសចរណ៍មណ្ឌលគិរី',
+    prompt: 'តើដំណើរកម្សាន្តទៅមណ្ឌលគិរី ទឹកធ្លាក់ប៊ូស្រា និងជម្រកដំរីមានអ្វីគួរចាប់អារម្មណ៍?',
+    query: 'តើដំណើរកម្សាន្តទៅមណ្ឌលគិរី ទឹកធ្លាក់ប៊ូស្រា និងជម្រកដំរីមានអ្វីគួរចាប់អារម្មណ៍?',
+  },
+  {
+    id: 'food',
+    icon: Utensils,
+    title: 'ម្ហូបខ្មែរប្រពៃណី និងអាមុកត្រីមិនគួររំលង',
+    text: 'ម្ហូបខ្មែរប្រពៃណី និងអាមុកត្រីមិនគួររំលង',
+    prompt: 'តើម្ហូបខ្មែរប្រពៃណីណាខ្លះដែលមិនគួររំលង ដូចជាអាមុក ឡុកឡាក់ និងនំបញ្ចុក?',
+    query: 'តើម្ហូបខ្មែរប្រពៃណីណាខ្លះដែលមិនគួររំលង ដូចជាអាមុក ឡុកឡាក់ និងនំបញ្ចុក?',
+  },
+  {
+    id: 'currency',
+    icon: DollarSign,
+    title: 'ការចាយលុយដុល្លារ និងប្រាក់រៀល',
+    text: 'ការចាយលុយដុល្លារ និងប្រាក់រៀល',
+    prompt: 'តើការចាយលុយដុល្លារ និងប្រាក់រៀលនៅកម្ពុជាត្រូវដឹងអ្វីខ្លះ?',
+    query: 'តើការចាយលុយដុល្លារ និងប្រាក់រៀលនៅកម្ពុជាត្រូវដឹងអ្វីខ្លះ?',
+  },
+  {
+    id: 'provinces',
+    icon: MapPin,
+    title: 'រាជធានី-ខេត្តទាំង ២៥ នៃកម្ពុជា',
+    text: 'រាជធានី-ខេត្តទាំង ២៥ នៃកម្ពុជា',
+    prompt: 'សូមរៀបរាប់សង្ខេបអំពីរាជធានី-ខេត្តទាំង ២៥ នៅកម្ពុជា រួមទាំងសក្តានុពលទេសចរណ៍។',
+    query: 'សូមរៀបរាប់សង្ខេបអំពីរាជធានី-ខេត្តទាំង ២៥ នៅកម្ពុជា រួមទាំងសក្តានុពលទេសចរណ៍។',
+  },
+  {
+    id: 'sunrise',
+    icon: Sun,
+    title: 'ពេលវេលាល្អបំផុតមើលថ្ងៃរះអង្គរវត្ត',
+    text: 'ពេលវេលាល្អបំផុតមើលថ្ងៃរះអង្គរវត្ត',
+    prompt: 'តើពេលវេលា និងទីតាំងណាដែលល្អបំផុតសម្រាប់ទស្សនាថ្ងៃរះនៅអង្គរវត្ត?',
+    query: 'តើពេលវេលា និងទីតាំងណាដែលល្អបំផុតសម្រាប់ទស្សនាថ្ងៃរះនៅអង្គរវត្ត?',
+  },
+];
 
-export function createChatMessage({ role, content, isError = false, suggestions = [], sources = [] }) {
-  return {
-    id: `${role}_${Math.random().toString(36).slice(2, 9)}`,
-    role,
-    content,
-    isError,
-    suggestions,
-    sources,
-    time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-  };
+/**
+ * Returns a slice of 4 suggested topics for the given language and page/rotation index.
+ */
+export function getTopicsForLanguage(lang = 'en', setIndex = 0) {
+  const pool = lang === 'km' ? TOPICS_KM : TOPICS_EN;
+  const total = pool.length;
+  const start = (setIndex * 4) % total;
+  const result = [];
+  for (let i = 0; i < 4; i++) {
+    const item = pool[(start + i) % total];
+    result.push({
+      ...item,
+      text: item.title,
+      query: item.prompt,
+    });
+  }
+  return result;
 }
 
 /**
@@ -189,9 +257,7 @@ export function getTopicIcon(text = '') {
     t.includes('resort') ||
     t.includes('stay') ||
     t.includes('accommodation') ||
-    t.includes('hostel') ||
-    t.includes('villa') ||
-    t.includes('lodge') ||
+    t.includes('room') ||
     t.includes('សណ្ឋាគារ') ||
     t.includes('ផ្ទះសំណាក់')
   ) {
@@ -202,69 +268,43 @@ export function getTopicIcon(text = '') {
     t.includes('food') ||
     t.includes('dish') ||
     t.includes('cuisine') ||
-    t.includes('eat') ||
-    t.includes('amok') ||
-    t.includes('lok lak') ||
-    t.includes('noodle') ||
     t.includes('restaurant') ||
+    t.includes('amok') ||
     t.includes('dining') ||
-    t.includes('breakfast') ||
+    t.includes('eat') ||
+    t.includes('lunch') ||
+    t.includes('dinner') ||
+    t.includes('crab') ||
     t.includes('ម្ហូប') ||
-    t.includes('ញ៉ាំ') ||
-    t.includes('អាហារ')
+    t.includes('អាហារ') ||
+    t.includes('អាមុក')
   ) {
     return Utensils;
   }
 
   if (
-    t.includes('train') ||
-    t.includes('car') ||
-    t.includes('tuk') ||
-    t.includes('passapp') ||
-    t.includes('grab') ||
-    t.includes('bus') ||
-    t.includes('flight') ||
-    t.includes('airport') ||
-    t.includes('transit') ||
     t.includes('transport') ||
-    t.includes('ferry') ||
-    t.includes('boat') ||
-    t.includes('ធ្វើដំណើរ') ||
+    t.includes('transit') ||
+    t.includes('flight') ||
+    t.includes('bus') ||
+    t.includes('car') ||
+    t.includes('taxi') ||
+    t.includes('passapp') ||
+    t.includes('tuk') ||
     t.includes('ឡាន') ||
+    t.includes('តាក់ស៊ី') ||
     t.includes('កង់បី')
   ) {
     return Car;
   }
 
   if (
-    t.includes('budget') ||
-    t.includes('cost') ||
-    t.includes('price') ||
-    t.includes('fee') ||
-    t.includes('pass') ||
-    t.includes('ticket') ||
-    t.includes('usd') ||
-    t.includes('riel') ||
-    t.includes('khr') ||
-    t.includes('currency') ||
-    t.includes('money') ||
-    t.includes('bakong') ||
-    t.includes('តម្លៃ') ||
-    t.includes('ថ្លៃ') ||
-    t.includes('លុយ')
-  ) {
-    return Coins;
-  }
-
-  if (
     t.includes('itinerary') ||
     t.includes('day') ||
-    t.includes('days') ||
-    t.includes('3-day') ||
-    t.includes('plan') ||
     t.includes('schedule') ||
-    t.includes('trip') ||
-    t.includes('tour') ||
+    t.includes('plan') ||
+    t.includes('calendar') ||
+    t.includes('3-day') ||
     t.includes('គម្រោង') ||
     t.includes('ដំណើរកម្សាន្ត')
   ) {
@@ -272,216 +312,167 @@ export function getTopicIcon(text = '') {
   }
 
   if (
-    t.includes('weather') ||
+    t.includes('beach') ||
+    t.includes('island') ||
+    t.includes('sea') ||
+    t.includes('ocean') ||
+    t.includes('koh rong') ||
+    t.includes('ferry') ||
+    t.includes('speed ferry') ||
+    t.includes('ឆ្នេរ') ||
+    t.includes('កោះ')
+  ) {
+    return Compass;
+  }
+
+  if (
+    t.includes('budget') ||
+    t.includes('cost') ||
+    t.includes('price') ||
+    t.includes('currency') ||
+    t.includes('dollar') ||
+    t.includes('riel') ||
+    t.includes('khr') ||
+    t.includes('usd') ||
+    t.includes('money') ||
+    t.includes('លុយ') ||
+    t.includes('ប្រាក់') ||
+    t.includes('តម្លៃ') ||
+    t.includes('ថវិកា')
+  ) {
+    return DollarSign;
+  }
+
+  if (
     t.includes('sun') ||
     t.includes('sunrise') ||
     t.includes('sunset') ||
+    t.includes('weather') ||
     t.includes('season') ||
     t.includes('climate') ||
-    t.includes('time to visit') ||
-    t.includes('best time') ||
     t.includes('ថ្ងៃរះ') ||
     t.includes('ថ្ងៃលិច') ||
-    t.includes('អាកាសធាតុ') ||
-    t.includes('រដូវ')
+    t.includes('អាកាសធាតុ')
   ) {
     return Sun;
   }
 
   if (
-    t.includes('beach') ||
-    t.includes('island') ||
-    t.includes('koh rong') ||
-    t.includes('sanloem') ||
-    t.includes('waterfall') ||
     t.includes('nature') ||
-    t.includes('lake') ||
-    t.includes('elephant') ||
-    t.includes('dolphin') ||
-    t.includes('bamboo') ||
     t.includes('park') ||
-    t.includes('sea') ||
-    t.includes('កោះ') ||
-    t.includes('ឆ្នេរ') ||
+    t.includes('waterfall') ||
+    t.includes('mountain') ||
+    t.includes('forest') ||
     t.includes('ទឹកធ្លាក់') ||
+    t.includes('ព្រៃ') ||
+    t.includes('ភ្នំ') ||
     t.includes('ធម្មជាតិ')
   ) {
-    return Compass;
+    return MapPin;
   }
 
-  return Sparkles;
+  return Compass;
 }
 
 /**
- * Standardize any suggestion string or object into a structured { text, query, icon } object.
+ * Format any incoming suggestion string or object into a normalized { id, icon, title, text, prompt, query } object.
  */
-export function formatSuggestedTopic(item) {
-  if (!item) return null;
-
-  if (typeof item === 'object' && item.text && item.icon) {
+export function formatSuggestedTopic(raw, lang = 'en') {
+  if (!raw) return null;
+  if (typeof raw === 'object' && (raw.title || raw.text)) {
+    const title = raw.title || raw.text;
+    const prompt = raw.prompt || raw.query || raw.title || raw.text;
     return {
-      text: item.text,
-      query: item.query || item.text,
-      icon: item.icon,
+      ...raw,
+      id: raw.id || `topic_${Math.random().toString(36).slice(2, 8)}`,
+      title,
+      text: title,
+      prompt,
+      query: prompt,
+      icon: raw.icon || getTopicIcon(title || prompt),
     };
   }
 
-  const rawText = typeof item === 'string' ? item : (item.text || item.query || item.question || '');
-  const cleanText = (rawText || '').trim();
-  if (!cleanText) return null;
+  const text = String(raw).trim();
+  const pool = lang === 'km' ? TOPICS_KM : TOPICS_EN;
+  const match = pool.find(
+    (item) => item.prompt === text || item.title === text || text.toLowerCase().includes((item.title || '').toLowerCase())
+  );
 
-  const rawQuery = (typeof item === 'object' && item.query) ? item.query : cleanText;
-  const icon = (typeof item === 'object' && item.icon) ? item.icon : getTopicIcon(cleanText);
+  if (match) {
+    return {
+      ...match,
+      text: match.title,
+      query: match.prompt,
+    };
+  }
 
   return {
-    text: cleanText,
-    query: rawQuery,
-    icon,
+    id: `topic_${Math.random().toString(36).slice(2, 8)}`,
+    icon: getTopicIcon(text),
+    title: text,
+    text: text,
+    prompt: text,
+    query: text,
   };
 }
 
 /**
- * Comprehensive fallback multi-category pool for offline or immediate dynamic generation.
+ * Generate a unique session ID.
  */
-export const DYNAMIC_TOPIC_POOLS = [
-  {
-    category: 'Temples & Heritage',
-    icon: Landmark,
-    items: [
-      { text: 'Explore Angkor Wat & sunrise spots', query: 'What are the best sunrise spots at Angkor Wat and how can I avoid crowds?' },
-      { text: 'Angkor Pass official pricing & validity', query: 'What is the ticket price for Angkor Pass and where can I buy it?' },
-      { text: 'Ancient temple sacred dress code', query: 'What is the dress code and etiquette for visiting ancient Cambodian temples?' },
-      { text: 'Bayon Temple 54 smiling stone faces', query: 'Tell me about the history and smiling stone faces of Bayon Temple.' },
-    ],
-  },
-  {
-    category: 'Siem Reap & Itineraries',
-    icon: Calendar,
-    items: [
-      { text: 'Plan a 3-day trip to Siem Reap', query: 'Plan a 3-day trip to Siem Reap covering Angkor Wat, local culture, and food.' },
-      { text: 'Tonle Sap floating village boat tour', query: 'Tell me about taking a boat tour of Tonle Sap floating village and Kampong Phluk.' },
-      { text: 'Phare Circus & night markets', query: 'What should I experience at Phare Cambodian Circus and night markets in Siem Reap?' },
-      { text: 'Sacred Kulen Mountain waterfalls', query: 'Tell me about Kulen Mountain waterfalls and the River of a Thousand Lingas.' },
-    ],
-  },
-  {
-    category: 'Phnom Penh & Mekong',
-    icon: Compass,
-    items: [
-      { text: 'Phnom Penh Royal Palace & Silver Pagoda', query: 'What should I know before visiting Phnom Penh Royal Palace and Silver Pagoda?' },
-      { text: 'Mekong River sunset boat cruise', query: 'How do I take a sunset cruise along the Mekong and Tonle Sap rivers in Phnom Penh?' },
-      { text: 'National Museum ancient Khmer art', query: 'What can I see at the National Museum of Cambodia in Phnom Penh?' },
-      { text: 'Riverside cafes & Sisowath Quay', query: 'Recommend the best cafes, rooftop bars, and sights along Sisowath Quay riverside.' },
-    ],
-  },
-  {
-    category: 'Islands & Coastal',
-    icon: Compass,
-    items: [
-      { text: 'Koh Rong & Sanloem island ferries', query: 'How do I travel to Koh Rong and Koh Rong Sanloem islands from Sihanoukville?' },
-      { text: 'Fresh Kep crab & Kampot green pepper', query: 'Tell me about Kep Crab Market and tasting fresh blue crab with Kampot green pepper.' },
-      { text: 'Bokor National Park historic hill station', query: 'What are the must-see attractions in Bokor National Park in Kampot?' },
-      { text: 'Organic Kampot pepper farm tours', query: 'How can I visit an organic Kampot pepper plantation and salt fields?' },
-    ],
-  },
-  {
-    category: 'Heritage & Eco-Tourism',
-    icon: MapPin,
-    items: [
-      { text: 'Battambang Bamboo Train & bat caves', query: 'Tell me about the Battambang Bamboo Train and the evening bat caves experience.' },
-      { text: 'Mondulkiri Bousra waterfalls & elephants', query: 'Tell me about Mondulkiri Bousra waterfall and ethical elephant eco-tourism sanctuaries.' },
-      { text: 'Volcanic Lake Yeak Laom in Ratanakiri', query: 'What is special about swimming in Lake Yeak Laom in Ratanakiri?' },
-      { text: 'Rare Irrawaddy river dolphins in Kratie', query: 'Where and how can I see the rare freshwater Irrawaddy dolphins in Kratie?' },
-    ],
-  },
-  {
-    category: 'Khmer Food & Cuisine',
-    icon: Utensils,
-    items: [
-      { text: 'What authentic Khmer dishes should I try?', query: 'What authentic Khmer dishes and street food should I try in Cambodia?' },
-      { text: 'Traditional Fish Amok & Beef Lok Lak', query: 'Where can I taste traditional Fish Amok and tender Beef Lok Lak?' },
-      { text: 'Nom Banh Chok Khmer breakfast noodles', query: 'What is Nom Banh Chok and where is the best place to try it in Siem Reap?' },
-      { text: 'Khmer cooking classes & market tours', query: 'Can you recommend an authentic Khmer cooking class with a local morning market tour?' },
-    ],
-  },
-  {
-    category: 'Budget & Practical Tips',
-    icon: Coins,
-    items: [
-      { text: 'Cambodia travel budget & currency tips', query: 'Cambodia travel budget and currency tips (USD vs KHR and local pricing).' },
-      { text: 'PassApp & tuk-tuk ride-hailing guide', query: 'How do PassApp and Grab work for booking tuk-tuks and taxis in Cambodia?' },
-      { text: 'Best time to visit Cambodia & seasons', query: 'What is the best time of year to visit Cambodia in terms of weather, seasons, and festivals?' },
-      { text: 'Bakong Tourist App for QR payments', query: 'How does the Bakong Tourist App work for digital payments in Cambodia?' },
-    ],
-  },
-];
+export function generateSessionId(prefix = 'session') {
+  return `${prefix}_${Math.random().toString(36).slice(2, 10)}`;
+}
 
 /**
- * Generate 4 local dynamic suggestions with rotation and exclusion.
+ * Create a new message data object.
  */
-export function getLocalDynamicSuggestions({ message = '', answer = '', refresh = false, currentSuggestions = [] } = {}) {
-  const combined = `${(message || '').toLowerCase()} ${(answer || '').toLowerCase()}`.trim();
-  const excludeSet = new Set((currentSuggestions || []).map((s) => (typeof s === 'string' ? s : s?.text || '')));
-
-  // Check if context specifically matches a category
-  let matchedPool = null;
-  if (combined.includes('temple') || combined.includes('angkor') || combined.includes('sunrise') || combined.includes('pass')) {
-    matchedPool = DYNAMIC_TOPIC_POOLS[0];
-  } else if (combined.includes('itinerary') || combined.includes('hotel') || combined.includes('stay') || combined.includes('tonle sap')) {
-    matchedPool = DYNAMIC_TOPIC_POOLS[1];
-  } else if (combined.includes('phnom penh') || combined.includes('palace') || combined.includes('museum') || combined.includes('mekong')) {
-    matchedPool = DYNAMIC_TOPIC_POOLS[2];
-  } else if (combined.includes('beach') || combined.includes('island') || combined.includes('koh rong') || combined.includes('kampot') || combined.includes('kep')) {
-    matchedPool = DYNAMIC_TOPIC_POOLS[3];
-  } else if (combined.includes('battambang') || combined.includes('waterfall') || combined.includes('elephant') || combined.includes('nature')) {
-    matchedPool = DYNAMIC_TOPIC_POOLS[4];
-  } else if (combined.includes('food') || combined.includes('dish') || combined.includes('amok') || combined.includes('eat') || combined.includes('cuisine')) {
-    matchedPool = DYNAMIC_TOPIC_POOLS[5];
-  } else if (combined.includes('budget') || combined.includes('currency') || combined.includes('cost') || combined.includes('transit') || combined.includes('tuk')) {
-    matchedPool = DYNAMIC_TOPIC_POOLS[6];
-  }
-
-  let candidates = [];
-  if (matchedPool) {
-    const unexcluded = matchedPool.items.filter((item) => !excludeSet.has(item.text));
-    candidates = unexcluded.length >= 4 ? unexcluded : matchedPool.items;
-  }
-
-  if (candidates.length < 4) {
-    // Pick 1 item from 4 different categories for maximum diversity
-    const shuffledPools = [...DYNAMIC_TOPIC_POOLS].sort(() => Math.random() - 0.5);
-    const multi = [];
-    for (const pool of shuffledPools) {
-      const available = pool.items.filter((item) => !excludeSet.has(item.text) && !multi.some((m) => m.text === item.text));
-      if (available.length > 0) {
-        multi.push(available[Math.floor(Math.random() * available.length)]);
-      }
-      if (multi.length === 4) break;
-    }
-
-    if (multi.length < 4) {
-      const all = DYNAMIC_TOPIC_POOLS.flatMap((p) => p.items);
-      for (const item of all) {
-        if (!multi.some((m) => m.text === item.text)) {
-          multi.push(item);
-        }
-        if (multi.length === 4) break;
-      }
-    }
-    candidates = multi;
-  }
-
-  if (refresh) {
-    candidates = [...candidates].sort(() => Math.random() - 0.5);
-  }
-
-  const finalItems = candidates.slice(0, 4).map(formatSuggestedTopic);
+export function createChatMessage({
+  role = 'user',
+  sender,
+  content = '',
+  message,
+  attachments = [],
+  sources = [],
+  suggestions = [],
+  weather = null,
+  currency = null,
+  itinerary = null,
+  recommendations = null,
+  topic = '',
+  isError = false,
+}) {
+  const finalRole = sender || role || 'user';
+  const finalText = message !== undefined ? message : content;
   return {
-    success: true,
-    topic: 'SUGGESTED TOPICS',
-    suggestions: finalItems,
+    id: `msg_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+    role: finalRole,
+    sender: finalRole,
+    content: finalText,
+    message: finalText,
+    attachments,
+    sources,
+    suggestions: (suggestions || []).map((s) => formatSuggestedTopic(s)),
+    weather,
+    currency,
+    itinerary,
+    recommendations,
+    topic,
+    isError,
+    timestamp: new Date().toISOString(),
+    time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
   };
 }
+
+/**
+ * Default traveler profile for AngkorVers AI
+ */
+export const DEFAULT_USER_PROFILE = {
+  name: 'Traveler',
+  email: '',
+  travelStyle: 'cultural',
+  preferredDestinations: ['siem_reap'],
+};
 
 /**
  * 25 Provinces of Cambodia and major tourist regions.
@@ -515,3 +506,20 @@ export const CAMBODIA_PROVINCES = [
   'Tboung Khmum',
 ];
 
+
+/**
+ * Backwards compatibility helper for getLocalDynamicSuggestions
+ */
+export function getLocalDynamicSuggestions({ _message = '', _answer = '', language = 'en', refresh = false } = {}) {
+  const pool = language === 'km' ? TOPICS_KM : TOPICS_EN;
+  const shuffled = refresh ? [...pool].sort(() => Math.random() - 0.5) : pool;
+  return {
+    success: true,
+    topic: language === 'km' ? 'ប្រធានបទណែនាំ' : 'SUGGESTED TOPICS',
+    suggestions: shuffled.slice(0, 4).map((item) => ({
+      ...item,
+      text: item.title,
+      query: item.prompt,
+    })),
+  };
+}

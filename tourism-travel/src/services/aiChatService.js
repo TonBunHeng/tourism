@@ -1,25 +1,60 @@
 import axios from 'axios';
 import api, { AI_CHAT_SERVICE_URL } from './api';
-import { formatSuggestedTopic, getLocalDynamicSuggestions } from '../utils/chatUtils';
+import { formatSuggestedTopic, TOPICS_EN, TOPICS_KM } from '../utils/chatUtils';
 
-// Direct axios client for the dedicated aichatbot microservice (Port 8001)
+// Primary live backend URL matching angkorvers.vercel.app
+const LIVE_VERCEL_API = 'https://angkorvers.vercel.app/api';
+
+// Direct axios client for the dedicated aichatbot microservice (Port 8001 / Vercel API)
 export const aiBotClient = axios.create({
-  baseURL: AI_CHAT_SERVICE_URL, // e.g. http://127.0.0.1:8001
+  baseURL: AI_CHAT_SERVICE_URL && AI_CHAT_SERVICE_URL !== 'http://127.0.0.1:8001'
+    ? AI_CHAT_SERVICE_URL 
+    : LIVE_VERCEL_API,
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
   },
-  timeout: 10000,
+  timeout: 25000,
 });
 
 /**
- * Intelligent local fallback knowledge when both aichatbot (8001) 
- * and Laravel backend (8000) are temporarily offline or starting up.
+ * Clean UTF-8 text decoder helper for incoming streaming chunks
  */
-function getLocalFallbackReply(message) {
-  const msg = (message || '').toLowerCase();
+function cleanUtf8(str) {
+  if (!str) return '';
+  if (/[\u00e0-\u00ef][\u0080-\u00bf]/.test(str)) {
+    try {
+      const bytes = new Uint8Array([...str].map((c) => c.charCodeAt(0) & 0xff));
+      const decoded = new TextDecoder('utf-8').decode(bytes);
+      if (decoded && !decoded.includes('\uFFFD')) {
+        return decoded;
+      }
+    } catch {
+      // ignore
+    }
+  }
+  return str;
+}
 
-  if (msg.includes('sunrise') || msg.includes('sunset') || msg.includes('dawn')) {
+/**
+ * Intelligent local fallback knowledge when both online service and local backend
+ * are temporarily offline or unreachable.
+ */
+function getLocalFallbackReply(message, lang = 'en') {
+  const msg = (message || '').toLowerCase();
+  const isKm = lang === 'km' || /[\u1780-\u17FF]/.test(msg);
+
+  if (msg.includes('sunrise') || msg.includes('sunset') || msg.includes('dawn') || msg.includes('ថ្ងៃរះ')) {
+    if (isKm) {
+      return {
+        reply: `**ការទស្សនាថ្ងៃរះ និងថ្ងៃលិចនៅអង្គរវត្ត**:\n\n* **ថ្ងៃរះ**: ទីតាំងល្អបំផុតគឺនៅមាត់ស្រះខាងជើង (ខាងឆ្វេងផ្លូវដើរចូល)។ គួរទៅដល់ចន្លោះម៉ោង **៥:០០ ដល់ ៥:១៥ ព្រឹក** ដើម្បីផ្តិតយករូបភាពស្រមោលប្រាសាទឆ្លុះលើផ្ទៃទឹកដ៏ស្រស់ស្អាត។\n* **ប័ណ្ណទស្សនា**: គួរបញ្ជាទិញប័ណ្ណអង្គរជាមុនតាមប្រព័ន្ធអនឡាញ ឬនៅរសៀលថ្ងៃមុន ដើម្បីជៀសវាងការតម្រង់ជួរនៅពេលព្រឹកព្រលឹម។\n* **ថ្ងៃលិច**: **ភ្នំបាក់ខែង** ជាទីតាំងពេញនិយមបំផុត (កំណត់ត្រឹម ៣០០ នាក់ គួរទៅដល់មុនម៉ោង ៤:០០ រសៀល)។ ទីតាំងជម្រើសផ្សេងទៀតមាន **ប្រែរូប** និង **ស្រះស្រង់**។`,
+        suggestions: [
+          'តើតម្លៃប័ណ្ណទស្សនាអង្គរមានប៉ុន្មានខ្លះ?',
+          'តើការស្លៀកពាក់ចូលប្រាសាទមានលក្ខខណ្ឌអ្វីខ្លះ?',
+          'សូមណែនាំគម្រោងដើរលេង ៣ ថ្ងៃនៅសៀមរាប'
+        ]
+      };
+    }
     return {
       reply: `**Angkor Wat Sunrise & Sunset Guide**:\n\n* **Sunrise**: The premier vantage point is by the **Northern Reflecting Pond** (left of the main causeway). Arrive between **5:00 AM – 5:15 AM** for the iconic reflection photo.\n* **Pass Requirement**: Buy your Angkor Pass online or the afternoon prior so you bypass ticket booths in the morning.\n* **Sunset**: **Phnom Bakheng** offers sunset views over the temple canopy (capped at 300 visitors; arrive by 4:00 PM). Excellent uncrowded alternatives are **Pre Rup** and **Srah Srang**.`,
       suggestions: [
@@ -30,20 +65,19 @@ function getLocalFallbackReply(message) {
     };
   }
 
-  if (msg.includes('dress') || msg.includes('wear') || msg.includes('etiquette') || msg.includes('clothes') || msg.includes('code')) {
+  if (msg.includes('ticket') || msg.includes('pass') || msg.includes('fee') || msg.includes('price') || msg.includes('cost') || msg.includes('តម្លៃ') || msg.includes('ប័ណ្ណ')) {
+    if (isKm) {
+      return {
+        reply: `**តម្លៃប័ណ្ណទស្សនារមណីយដ្ឋានអង្គរ (Angkor Pass)**:\n\n* **ប័ណ្ណ ១ ថ្ងៃ**: **$37 USD** (មានសុពលភាពនៅថ្ងៃចេញប័ណ្ណ)\n* **ប័ណ្ណ ៣ ថ្ងៃ**: **$62 USD** (អាចប្រើប្រាស់បាន ៣ ថ្ងៃក្នុងរយៈពេល ១០ ថ្ងៃ)\n* **ប័ណ្ណ ៧ ថ្ងៃ**: **$72 USD** (អាចប្រើប្រាស់បាន ៧ ថ្ងៃក្នុងរយៈពេល ១ ខែ)\n* **កុមារអាយុក្រោម ១២ ឆ្នាំ**: **ឥតគិតថ្លៃ** (សូមបង្ហាញលិខិតឆ្លងដែន)\n\n**កន្លែងលក់ប័ណ្ណ**: មជ្ឈមណ្ឌលលក់ប័ណ្ណអង្គរសហគ្រាស (Angkor Enterprise) ផ្លូវ ៦០ ម៉ែត្រ ឬទិញតាមអនឡាញ **angkorenterprise.gov.kh**។`,
+        suggestions: [
+          'តើការស្លៀកពាក់ចូលប្រាសាទមានលក្ខខណ្ឌអ្វីខ្លះ?',
+          'សូមណែនាំគម្រោងដើរលេង ៣ ថ្ងៃនៅសៀមរាប',
+          'តើម្ហូបខ្មែរប្រពៃណីណាខ្លះដែលគួរញ៉ាំ?'
+        ]
+      };
+    }
     return {
-      reply: `**Temple Dress Code & Sacred Etiquette**:\n\n* **Shoulders & Knees Covered**: Both men and women must wear clothing covering shoulders and extending below the knees.\n* **Restricted**: Sleeveless shirts, tank tops, and short shorts are strictly prohibited past checkpoints.\n* **Footwear**: Sturdy walking shoes or hiking sandals for ancient sandstone steps.\n* **Sanctuaries**: Hats and sunglasses must be removed inside inner tower sanctums.\n* **Monks**: Never touch a Buddhist monk, and never point your feet directly at Buddha images.`,
-      suggestions: [
-        'When is the best time for Angkor sunrise?',
-        'What are the best boutique hotels in Siem Reap?',
-        'How do PassApp and Tuk-Tuks work?'
-      ]
-    };
-  }
-
-  if (msg.includes('ticket') || msg.includes('pass') || msg.includes('fee') || msg.includes('price') || msg.includes('cost')) {
-    return {
-      reply: `**Official Angkor Pass Pricing (2026)**:\n\n* **1-Day Pass**: **$37 USD** (Valid on date of issue)\n* **3-Day Pass**: **$62 USD** (Valid any 3 days within a 10-day window)\n* **7-Day Pass**: **$72 USD** (Valid any 7 days within a 1-month window)\n* **Children under 12**: **Free** admission (present passport copy).\n\n**Where to purchase**: Buy at the official Angkor Enterprise ticket center on Apsara Road (4:30 AM – 5:30 PM) or online via **angkorenterprise.gov.kh**.`,
+      reply: `**Official Angkor Pass Pricing**:\n\n* **1-Day Pass**: **$37 USD** (Valid on date of issue)\n* **3-Day Pass**: **$62 USD** (Valid any 3 days within a 10-day window)\n* **7-Day Pass**: **$72 USD** (Valid any 7 days within a 1-month window)\n* **Children under 12**: **Free** admission (present passport copy).\n\n**Where to purchase**: Buy at the official Angkor Enterprise ticket center on Apsara Road (4:30 AM – 5:30 PM) or online via **angkorenterprise.gov.kh**.`,
       suggestions: [
         'Recommend a 3-day Siem Reap itinerary',
         'What traditional Khmer foods should I try?',
@@ -52,95 +86,200 @@ function getLocalFallbackReply(message) {
     };
   }
 
-  if (msg.includes('hotel') || msg.includes('resort') || msg.includes('stay') || msg.includes('accommodation')) {
+  if (isKm) {
     return {
-      reply: `**Recommended Accommodations in Siem Reap**:\n\n* **Heritage Luxury**: *Raffles Grand Hotel d'Angkor* (French colonial charm since 1932) and *Amansara* (former royal guest villa).\n* **Boutique Eco-Resorts**: *Phum Baitang* (wooden stilt pavilions nestled in green paddy fields) and *Shinta Mani Angkor* (designed by Bill Bensley).\n* **Chic Mid-Range**: *Treeline Urban Resort* (riverside art hotel in Wat Bo) and *Viroth's Hotel* (lush 1950s retro-modern sanctuary with saltwater pool).\n\n**Tip**: Staying around the **Wat Bo** or **French Quarter** gives walking access to riverside cafes while being just a 15-minute tuk-tuk ride from the Angkor temples.`,
+      reply: `**ជំរាបសួរ!** ខ្ញុំជា **AngkorVers AI Assistant** 🇰🇭 — ជំនួយការឆ្លាតវៃសម្រាប់ទេសចរណ៍ វប្បធម៌ បេតិកភណ្ឌប្រវត្តិសាស្ត្រ និងការធ្វើដំណើរទូទាំងប្រទេសកម្ពុជា។\n\nខ្ញុំអាចជួយលោកអ្នកអំពី៖\n- **មគ្គុទ្ទេសក៍ប្រាសាទអង្គរវត្ត និងបេតិកភណ្ឌប្រវត្តិសាស្ត្រ**\n- **ការរៀបចំគម្រោងធ្វើដំណើរ ៣ ថ្ងៃ ឬ ៧ ថ្ងៃ នៅកម្ពុជា**\n- **ព័ត៌មានអាកាសធាតុ ថវិកា និងអត្រាប្តូរប្រាក់ (USD ➔ KHR)**\n- **សណ្ឋាគារ រមណីយដ្ឋាន និងម្ហូបខ្មែរឆ្ងាញ់ៗ**\n\nតើខ្ញុំអាចជួយដោះស្រាយ ឬស្វែងយល់អ្វីជូនអ្នកនៅថ្ងៃនេះ?`,
       suggestions: [
-        'What authentic Khmer dishes should I try?',
-        'How do Tuk-Tuks and PassApp rides work?',
-        'How to spend a 3-day itinerary in Angkor?'
-      ]
-    };
-  }
-
-  if (msg.includes('itinerary') || msg.includes('3-day') || msg.includes('plan') || msg.includes('trip')) {
-    return {
-      reply: `**Recommended 3-Day Angkor & Siem Reap Itinerary**:\n\n* **Day 1 (Small Circuit Core)**: 5:00 AM Angkor Wat sunrise → Bayon & Angkor Thom smiling stone faces → Ta Keo → Ta Prohm ("Tomb Raider" jungle roots) → Evening Khmer dinner at Wat Bo.\n* **Day 2 (Grand Circuit & Culture)**: Preah Khan monastery → Neak Pean water island → East Mebon → Sunset over Pre Rup pyramid → Night market & Phare Cambodian Circus.\n* **Day 3 (Outer Jewels & Nature)**: Intricate pink sandstone carvings at Banteay Srei → Cambodia Landmine Museum → Afternoon boat cruise along Tonle Sap floating village (Kampong Phluk).`,
-      suggestions: [
-        'What is the ticket price for Angkor Pass?',
-        'What is the temple dress code?',
-        'What authentic Khmer foods should I not miss?'
-      ]
-    };
-  }
-
-  if (msg.includes('food') || msg.includes('eat') || msg.includes('dish') || msg.includes('cuisine') || msg.includes('restaurant')) {
-    return {
-      reply: `**Top Authentic Cambodian Dishes to Try**:\n\n* **Fish Amok (អាម៉ុកត្រី)**: Steamed freshwater fish soufflé infused with kroeung paste, coconut cream, and noni leaves, cooked in a banana-leaf basket.\n* **Beef Lok Lak (ឡុកឡាក់សាច់គោ)**: Sautéed tender beef cubes served with red onions, tomatoes, and the quintessential lime & Kampot black pepper dipping sauce.\n* **Nom Banh Chok (នំបញ្ចុក)**: Traditional Khmer breakfast rice noodles bathed in green fish lemongrass curry broth and heaped with wild river greens.\n* **Kuy Teav (គុយទាវ)**: Fragrant pork and seafood bone broth noodle soup garnished with fried garlic and cilantro.`,
-      suggestions: [
-        'Are there boutique resorts in Siem Reap?',
-        'What is the currency exchange between USD and KHR?',
-        'When is the best time for Angkor Wat sunrise?'
-      ]
-    };
-  }
-
-  if (msg.includes('transit') || msg.includes('flight') || msg.includes('airport') || msg.includes('tuk') || msg.includes('passapp') || msg.includes('grab')) {
-    return {
-      reply: `**Cambodia Transportation & Airport Transit Guide**:\n\n* **Ride-Hailing Apps**: Download **PassApp** or **Grab** on arrival. Both provide metered, upfront pricing without haggling.\n* **Siem Reap–Angkor Airport (SAI)**: Located 45 km from town. Official airport bus ($8 USD), shared van ($9 USD), or private taxi ($35 USD).\n* **Phnom Penh Airport (PNH)**: An auto-rickshaw/tuk-tuk to the city center costs around **$6 – $10 USD** via PassApp or Grab.\n* **City Tuk-Tuks**: Standard remorque rides within town typically range from **$1.50 to $3 USD** (6,000 to 12,000 KHR).`,
-      suggestions: [
-        'What are the dress code rules for temples?',
-        'What is the official Angkor Pass price?',
-        'Recommend a 3-day itinerary in Siem Reap'
+        'ស្វែងយល់ពីប្រាសាទអង្គរវត្ត និងប្រវត្តិសាស្ត្រ',
+        'គម្រោងដើរលេង ៣ ថ្ងៃនៅសៀមរាប',
+        'ម្ហូបខ្មែរប្រពៃណី និងអាមុកត្រីមិនគួររំលង',
+        'ការចាយលុយដុល្លារ និងប្រាក់រៀល'
       ]
     };
   }
 
   return {
-    reply: `**Choum Reap Sour!** Welcome to AngkorGenie, your dedicated Cambodian travel intelligence companion.\n\nI can assist you with:\n- **Angkor Wat & ancient temple guides** (sunrise spots, crowd timing)\n- **Dress code, photography rules & Angkor Pass permits**\n- **Day-by-day tailored itineraries** across Siem Reap, Phnom Penh, & islands\n- **Hotels, boutique eco-resorts & culinary hotspots**\n- **Transit fares, airport transfers & PassApp tuk-tuk pricing**\n\nHow can I help you plan your journey in Cambodia today?`,
+    reply: `Hello! 👋 I am **AngkorVers AI Assistant** 🇰🇭. I am your dedicated Cambodian travel intelligence companion, specializing in cultural heritage, temple exploration, custom itineraries, and local insights across all 25 provinces.\n\nHow can I help you plan your journey in Cambodia today?`,
     suggestions: [
-      'When is the best time for sunrise at Angkor Wat?',
-      'How do I make the most of a 3-day itinerary in Angkor?',
-      'What authentic Khmer dishes should I try?'
+      'Tell me about the history and sunrise spots at Angkor Wat.',
+      'Create a 3-day Siem Reap cultural itinerary with top temples, costs, and tips.',
+      'What should I know about Cambodian currency, exchange rates, and tipping culture?',
+      'Give an overview of the 25 administrative divisions of Cambodia with their top travel spots.'
     ]
   };
 }
 
 export const aiChatService = {
   /**
-   * Send a chat message to the Angkor Verse AI Assistant.
-   * Priority:
-   * 1. Direct call to dedicated aichatbot microservice (Port 8001 / VITE_AI_CHAT_URL)
-   * 2. Fallback to Laravel Backend proxy (/api/travel/ai/chat on Port 8000)
-   * 3. Fallback to built-in local Cambodia intelligence engine
+   * SSE Streaming message sender matching angkorvers.vercel.app
+   */
+  async streamMessage(
+    payload,
+    { onChunk, onSuggestions, onDone, onError, signal } = {}
+  ) {
+    const message = typeof payload === 'object' ? payload.message : payload;
+    const sessionId = typeof payload === 'object' ? payload.session_id || payload.sessionId : null;
+    const language = (typeof payload === 'object' ? payload.language : 'en') || 'en';
+    const attachments = typeof payload === 'object' ? payload.attachments || [] : [];
+    const history = typeof payload === 'object' ? payload.history || [] : [];
+
+    // Base endpoints to attempt streaming
+    const streamEndpoints = [
+      'https://angkorvers.vercel.app/api/chat/stream',
+      'http://127.0.0.1:8001/api/chat/stream',
+      '/api/chat/stream',
+    ];
+
+    let streamSucceeded = false;
+
+    for (const endpoint of streamEndpoints) {
+      if (streamSucceeded) break;
+      try {
+        const response = await fetch(endpoint, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'text/event-stream',
+          },
+          body: JSON.stringify({
+            message,
+            session_id: sessionId,
+            language,
+            attachments,
+            history,
+          }),
+          signal,
+        });
+
+        if (!response.ok) {
+          continue;
+        }
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder('utf-8');
+        let buffer = '';
+
+        while (true) {
+          const { value, done } = await reader.read();
+          if (done) break;
+
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split('\n');
+          buffer = lines.pop() || '';
+
+          for (const line of lines) {
+            const trimmed = line.trim();
+            if (!trimmed.startsWith('data:')) continue;
+            const dataStr = trimmed.slice(5).trim();
+
+            if (dataStr === '[DONE]') {
+              streamSucceeded = true;
+              if (onDone) onDone();
+              return;
+            }
+
+            try {
+              const parsed = JSON.parse(dataStr);
+              if (parsed.token && onChunk) {
+                onChunk(cleanUtf8(parsed.token));
+              }
+              if (parsed.suggestions && onSuggestions) {
+                onSuggestions(parsed.suggestions, parsed.topic);
+              }
+            } catch {
+              // Non-JSON chunk, send raw token
+              if (dataStr && onChunk) {
+                onChunk(cleanUtf8(dataStr));
+              }
+            }
+          }
+        }
+
+        streamSucceeded = true;
+        if (onDone) onDone();
+        return;
+      } catch {
+        if (signal?.aborted) {
+          if (onDone) onDone();
+          return;
+        }
+        // Try next endpoint
+      }
+    }
+
+    // If streaming endpoints were unavailable, fallback seamlessly to standard sendMessage
+    try {
+      const result = await this.sendMessage({
+        message,
+        sessionId,
+        language,
+        attachments,
+        history,
+      });
+
+      const fullReply = result.reply || result.message || '';
+      
+      // Emit tokens smoothly
+      if (onChunk && fullReply) {
+        onChunk(fullReply);
+      }
+      if (onSuggestions && result.suggestions) {
+        onSuggestions(result.suggestions, result.topic || 'SUGGESTED TOPICS');
+      }
+      if (onDone) onDone(result);
+    } catch (err) {
+      if (signal?.aborted) {
+        if (onDone) onDone();
+        return;
+      }
+      if (onError) onError(err);
+      else throw err;
+    }
+  },
+
+  /**
+   * Send a chat message to the AngkorVers AI Assistant.
    */
   async sendMessage({ 
     message, 
     sessionId = null, 
     history = [], 
     province = null, 
-    category = null, 
-    language = 'en' 
+    category = null,
+    language = 'en',
+    attachments = []
   }) {
-    const cleanMsg = (message || '').trim();
-    if (!cleanMsg) {
+    const trimmedMessage = (message || '').trim();
+    if (!trimmedMessage && (!attachments || attachments.length === 0)) {
       throw new Error('Message content cannot be empty.');
     }
 
-    // 1. Attempt direct connection to aichatbot service (FastAPI on Port 8001)
-    try {
-      const res = await aiBotClient.post('/api/chat', {
-        message: cleanMsg,
-        session_id: sessionId,
-        language,
-        history: history.length > 0 ? history : undefined,
-      });
+    const payload = {
+      message: trimmedMessage,
+      session_id: sessionId,
+      language,
+      attachments,
+      province,
+      category,
+      history: history && history.length > 0 ? history : undefined,
+    };
 
+    // 1. Attempt Live AngkorVers Online AI Microservice (https://angkorvers.vercel.app/api/chat)
+    try {
+      const res = await aiBotClient.post('/chat', payload);
       if (res.data) {
-        const d = res.data;
-        const inner = d.data && typeof d.data === 'object' ? d.data : {};
-        const replyText = inner.response || inner.reply || inner.message || inner.answer || inner.content ||
-          d.response || d.reply || d.message || d.answer || (typeof d.data === 'string' ? d.data : '');
+        const root = res.data;
+        const inner = root.data && typeof root.data === 'object' ? root.data : {};
+        const replyText = 
+          inner.answer || 
+          inner.reply || 
+          inner.message || 
+          inner.response || 
+          root.answer || 
+          root.reply || 
+          root.message || 
+          root.response ||
+          (typeof root.data === 'string' ? root.data : '');
 
         if (replyText) {
           return {
@@ -148,34 +287,37 @@ export const aiChatService = {
             reply: replyText,
             message: replyText,
             response: replyText,
-            sessionId: d.session_id || inner.session_id || sessionId,
-            suggestions: inner.suggestions || d.suggestions || [],
-            sources: inner.sources || d.sources || [],
-            relatedPlaces: inner.related_places || d.related_places || [],
-            weather: inner.weather || d.weather || null,
-            currency: inner.currency || d.currency || null,
+            sessionId: root.session_id || inner.session_id || sessionId,
+            suggestions: inner.suggestions || root.suggestions || [],
+            topic: inner.topic || root.topic || 'Suggested Topics',
+            sources: inner.sources || root.sources || [],
+            weather: inner.weather || root.weather || null,
+            currency: inner.currency || root.currency || null,
+            itinerary: inner.itinerary || root.itinerary || null,
+            recommendations: inner.recommendations || root.recommendations || null,
             data: inner,
           };
         }
       }
     } catch {
-      // aichatbot service not directly reachable, try backend proxy next
+      // Fall through to next tier
     }
 
-    // 2. Fallback to Laravel Backend API proxy (/api/travel/ai/chat on Port 8000)
+    // 2. Attempt Laravel Backend proxy (/api/travel/ai/chat)
     try {
-      const res = await api.post('/ai/chat', {
-        message: cleanMsg,
-        session_id: sessionId,
-        province,
-        category,
-        language,
-      });
-
+      const res = await api.post('/ai/chat', payload);
       if (res.data) {
-        const payload = res.data;
-        const nestedData = (typeof payload.data === 'object' && payload.data !== null) ? payload.data : {};
-        const replyText = payload.response || payload.reply || payload.answer || payload.message || nestedData.response || nestedData.reply || nestedData.message || (typeof payload.data === 'string' ? payload.data : '');
+        const root = res.data;
+        const inner = typeof root.data === 'object' && root.data !== null ? root.data : {};
+        const replyText = 
+          root.response || 
+          root.reply || 
+          root.answer || 
+          root.message || 
+          inner.response || 
+          inner.reply || 
+          inner.message ||
+          (typeof root.data === 'string' ? root.data : '');
 
         if (replyText) {
           return {
@@ -183,20 +325,24 @@ export const aiChatService = {
             reply: replyText,
             message: replyText,
             response: replyText,
-            sessionId: payload.session_id || nestedData.session_id || sessionId,
-            suggestions: nestedData.suggestions || payload.suggestions || [],
-            sources: nestedData.sources || payload.sources || [],
-            relatedPlaces: nestedData.related_places || payload.related_places || [],
-            data: payload,
+            sessionId: root.session_id || inner.session_id || sessionId,
+            suggestions: inner.suggestions || root.suggestions || [],
+            topic: inner.topic || root.topic || 'Suggested Topics',
+            sources: inner.sources || root.sources || [],
+            weather: inner.weather || root.weather || null,
+            currency: inner.currency || root.currency || null,
+            itinerary: inner.itinerary || root.itinerary || null,
+            recommendations: inner.recommendations || root.recommendations || null,
+            data: root,
           };
         }
       }
     } catch {
-      // Laravel proxy also unreachable, proceed to local intelligence engine
+      // Fall through to local intelligence
     }
 
-    // 3. Fallback to built-in local Cambodian travel intelligence
-    const fallback = getLocalFallbackReply(cleanMsg);
+    // 3. Robust Local Cambodia Intelligence Engine
+    const fallback = getLocalFallbackReply(trimmedMessage, language);
     return {
       success: true,
       reply: fallback.reply,
@@ -204,193 +350,334 @@ export const aiChatService = {
       response: fallback.reply,
       sessionId: sessionId || 'sess_local',
       suggestions: fallback.suggestions,
+      topic: language === 'km' ? 'ប្រធានបទណែនាំ' : 'Suggested Topics',
       sources: [
-        { title: 'Ministry of Tourism Cambodia (Official Data)', url: 'https://tourismcambodia.org' }
+        {
+          title: 'Ministry of Tourism Cambodia (Official Data)',
+          name: 'Ministry of Tourism Cambodia',
+          url: 'https://tourismcambodia.org',
+          category: 'Official Government Portal',
+          location: 'Phnom Penh & Siem Reap'
+        }
       ],
-      relatedPlaces: [],
+      weather: null,
+      currency: null,
+      itinerary: null,
+      recommendations: null,
       data: null,
     };
   },
 
-  // Conversation history from Laravel backend
-  async getConversations() {
+  /**
+   * Session Management: Loads chat sessions list (synced with localStorage)
+   */
+  async getChatSessions() {
     try {
-      return await api.get('/ai/conversations');
+      const stored = localStorage.getItem('aichat_sessions');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed;
+        }
+      }
     } catch {
-      return { success: true, data: [] };
+      // ignore
+    }
+
+    try {
+      const res = await aiBotClient.get('/chat/sessions');
+      const sessions = res.data?.data || res.data;
+      if (Array.isArray(sessions) && sessions.length > 0) {
+        localStorage.setItem('aichat_sessions', JSON.stringify(sessions));
+        return sessions;
+      }
+    } catch {
+      // ignore
+    }
+
+    return [];
+  },
+
+  /**
+   * Save or update a session in the list
+   */
+  saveSessionMetadata({ sessionId, title, firstMessage = '' }) {
+    if (!sessionId) return;
+    try {
+      const stored = localStorage.getItem('aichat_sessions');
+      let sessions = stored ? JSON.parse(stored) : [];
+      if (!Array.isArray(sessions)) sessions = [];
+
+      const cleanTitle = (title || firstMessage || 'New Chat').slice(0, 48);
+      const existingIdx = sessions.findIndex((s) => s.session_id === sessionId);
+
+      if (existingIdx >= 0) {
+        sessions[existingIdx] = {
+          ...sessions[existingIdx],
+          title: cleanTitle,
+          updated_at: new Date().toISOString(),
+        };
+      } else {
+        sessions.unshift({
+          session_id: sessionId,
+          title: cleanTitle,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          messages_count: 1,
+        });
+      }
+
+      localStorage.setItem('aichat_sessions', JSON.stringify(sessions.slice(0, 50)));
+    } catch {
+      // ignore
     }
   },
 
-  async getConversationMessages(sessionId) {
+  /**
+   * Rename a chat session
+   */
+  async renameChatSession(sessionId, newTitle) {
+    if (!sessionId || !newTitle) return;
     try {
-      return await api.get(`/ai/conversations/${sessionId}/messages`);
+      const stored = localStorage.getItem('aichat_sessions');
+      if (stored) {
+        let sessions = JSON.parse(stored);
+        if (Array.isArray(sessions)) {
+          sessions = sessions.map((s) => 
+            s.session_id === sessionId ? { ...s, title: newTitle.trim() } : s
+          );
+          localStorage.setItem('aichat_sessions', JSON.stringify(sessions));
+        }
+      }
     } catch {
-      return { success: true, data: [] };
+      // ignore
+    }
+
+    try {
+      await aiBotClient.patch(`/chat/sessions/${sessionId}`, { title: newTitle.trim() });
+    } catch {
+      // ignore
     }
   },
 
-  async deleteConversation(sessionId) {
+  /**
+   * Delete a chat session
+   */
+  async deleteChatSession(sessionId) {
+    if (!sessionId) return;
     try {
-      return await api.delete(`/ai/conversations/${sessionId}`);
+      const stored = localStorage.getItem('aichat_sessions');
+      if (stored) {
+        let sessions = JSON.parse(stored);
+        if (Array.isArray(sessions)) {
+          sessions = sessions.filter((s) => s.session_id !== sessionId);
+          localStorage.setItem('aichat_sessions', JSON.stringify(sessions));
+        }
+      }
+      localStorage.removeItem(`aichat_messages_${sessionId}`);
     } catch {
-      return { success: true };
+      // ignore
+    }
+
+    try {
+      await aiBotClient.delete(`/chat/sessions/${sessionId}`);
+    } catch {
+      // ignore
     }
   },
 
-  // Smart Recommendations (queries aichatbot with fallback to backend)
-  async getRecommendations(params) {
+  /**
+   * Load stored messages for a specific session
+   */
+  getChatMessages(sessionId) {
+    if (!sessionId) return [];
     try {
-      const res = await aiBotClient.post('/api/recommendations', params);
+      const stored = localStorage.getItem(`aichat_messages_${sessionId}`);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed)) return parsed;
+      }
+    } catch {
+      // ignore
+    }
+    return [];
+  },
+
+  /**
+   * Persist messages for a specific session
+   */
+  saveChatMessages(sessionId, messages = []) {
+    if (!sessionId || !Array.isArray(messages)) return;
+    try {
+      localStorage.setItem(`aichat_messages_${sessionId}`, JSON.stringify(messages));
+      localStorage.setItem('aichat_last_active_session_id', sessionId);
+    } catch {
+      // ignore
+    }
+  },
+
+  /**
+   * Fetch recommendations
+   */
+  async getRecommendations(params = {}) {
+    try {
+      const res = await aiBotClient.post('/recommendations', params);
+      if (res.data?.data) return res.data.data;
       if (res.data) return res.data;
     } catch {
-      // fallback to backend
+      // ignore
     }
-    return await api.post('/ai/recommendations', params);
+    try {
+      const res = await api.post('/ai/recommendations', params);
+      return res.data?.data || res.data;
+    } catch {
+      // ignore
+    }
+    return [];
   },
 
-  // Day-by-Day Itineraries (queries aichatbot with fallback to backend)
-  async generateItinerary(params) {
+  /**
+   * Generate Itinerary
+   */
+  async generateItinerary(params = {}) {
     try {
-      const res = await aiBotClient.post('/api/itineraries', params);
+      const res = await aiBotClient.post('/itineraries', params);
+      if (res.data?.data) return res.data.data;
       if (res.data) return res.data;
     } catch {
-      // fallback to backend
+      // ignore
     }
-    return await api.post('/ai/itineraries', params);
+    try {
+      const res = await api.post('/ai/itineraries', params);
+      return res.data?.data || res.data;
+    } catch {
+      // ignore
+    }
+    return null;
   },
 
-  // Real-time Weather (queries aichatbot with fallback to backend)
+  /**
+   * Fetch Weather
+   */
   async getWeather(province = 'Siem Reap', days = 3) {
     try {
-      const res = await aiBotClient.get('/api/weather', { params: { province, days } });
+      const res = await aiBotClient.get('/weather', { params: { province, days } });
+      if (res.data?.data) return res.data.data;
       if (res.data) return res.data;
     } catch {
-      // fallback to backend
+      // ignore
     }
-    return await api.get('/ai/weather', { params: { province, days } });
+    try {
+      const res = await api.get('/ai/weather', { params: { province, days } });
+      return res.data?.data || res.data;
+    } catch {
+      // ignore
+    }
+    return null;
   },
 
-  // Currency Exchange Rate
+  /**
+   * Fetch Currency
+   */
   async getCurrencyRate() {
     try {
-      const res = await aiBotClient.get('/api/currency');
+      const res = await aiBotClient.get('/currency');
+      if (res.data?.data) return res.data.data;
       if (res.data) return res.data;
     } catch {
-      // fallback to backend
+      // ignore
     }
-    return await api.get('/ai/currency');
+    try {
+      const res = await api.get('/ai/currency');
+      return res.data?.data || res.data;
+    } catch {
+      // ignore
+    }
+    return null;
   },
 
+  /**
+   * Convert Currency
+   */
   async convertCurrency(amount, from = 'USD', to = 'KHR') {
     try {
-      const res = await aiBotClient.post('/api/currency/convert', {
-        amount,
-        from_currency: from,
-        to_currency: to,
-      });
+      const res = await aiBotClient.post('/currency/convert', { amount, from_currency: from, to_currency: to });
       if (res.data) return res.data;
     } catch {
-      // fallback to backend
+      // ignore
     }
-    return await api.post('/ai/currency/convert', {
-      amount,
-      from_currency: from,
-      to_currency: to,
-    });
-  },
-
-  // Transport estimator
-  async getTransportEstimate(origin, destination, travelers = 1) {
     try {
-      const res = await aiBotClient.get('/api/transport', {
-        params: { origin, destination, travelers },
-      });
-      if (res.data) return res.data;
+      const res = await api.post('/ai/currency/convert', { amount, from_currency: from, to_currency: to });
+      return res.data;
     } catch {
-      // fallback to backend
+      // ignore
     }
-    return await api.get('/ai/transport', {
-      params: { origin, destination, travelers },
-    });
+    return { amount, from_currency: from, to_currency: to, result: from === 'USD' ? amount * 4100 : amount / 4100 };
   },
 
-  // Dynamic context-aware suggested topics (from aichatbot, Laravel proxy, or local dynamic engine)
-  async getSuggestions({
-    message = '',
-    answer = '',
-    sessionId = null,
-    history = [],
-    language = 'en',
-    refresh = false,
-    currentSuggestions = []
+  /**
+   * Fetch Suggestions
+   */
+  async getSuggestions({ 
+    message = '', 
+    answer = '', 
+    sessionId = null, 
+    language = 'en', 
+    refresh = false, 
+    currentSuggestions = [] 
   } = {}) {
-    const cleanMsg = (message || '').trim();
-    const cleanAns = (answer || '').trim();
-
-    // 1. Try dedicated aichatbot microservice (Port 8001 / VITE_AI_CHAT_URL)
     try {
-      const res = await aiBotClient.post('/api/chat/suggestions', {
-        message: cleanMsg,
-        answer: cleanAns,
+      const res = await aiBotClient.post('/chat/suggestions', {
+        message: (message || '').trim(),
+        answer: (answer || '').trim(),
         session_id: sessionId,
-        history,
         language,
-        refresh: Boolean(refresh),
+        refresh: !!refresh,
         current_suggestions: currentSuggestions,
       });
 
       if (res.data?.success && Array.isArray(res.data?.suggestions) && res.data.suggestions.length > 0) {
         return {
           success: true,
-          topic: res.data.topic || 'SUGGESTED TOPICS',
-          suggestions: res.data.suggestions.map(formatSuggestedTopic).filter(Boolean),
+          topic: res.data.topic || (language === 'km' ? 'ប្រធានបទណែនាំ' : 'Suggested Topics'),
+          suggestions: res.data.suggestions.map((s) => formatSuggestedTopic(s, language)).filter(Boolean),
         };
       }
     } catch {
-      // microservice offline, try backend proxy next
+      // ignore
     }
 
-    // 2. Fallback to Laravel Backend API proxy (/api/travel/ai/chat/suggestions on Port 8000)
-    try {
-      const res = await api.post('/ai/chat/suggestions', {
-        message: cleanMsg,
-        answer: cleanAns,
-        session_id: sessionId,
-        language,
-        refresh: Boolean(refresh),
-        current_suggestions: currentSuggestions,
-      });
-
-      const payload = res.data?.data || res.data;
-      if (payload && Array.isArray(payload.suggestions) && payload.suggestions.length > 0) {
-        return {
-          success: true,
-          topic: payload.topic || 'SUGGESTED TOPICS',
-          suggestions: payload.suggestions.map(formatSuggestedTopic).filter(Boolean),
-        };
-      }
-    } catch {
-      // Laravel proxy offline, fallback to local dynamic engine
-    }
-
-    // 3. Built-in local dynamic Cambodian tourism suggestion engine
-    return getLocalDynamicSuggestions({
-      message: cleanMsg,
-      answer: cleanAns,
-      refresh,
-      currentSuggestions,
-    });
+    // Fallback to pool
+    const pool = language === 'km' ? TOPICS_KM : TOPICS_EN;
+    const shuffled = [...pool]
+      .sort(() => Math.random() - 0.5)
+      .slice(0, 4)
+      .map((item) => formatSuggestedTopic(item, language))
+      .filter(Boolean);
+    return {
+      success: true,
+      topic: language === 'km' ? 'ប្រធានបទណែនាំ' : 'Suggested Topics',
+      suggestions: shuffled,
+    };
   },
 
-  // Health check for AngkorGenie / aichatbot
+  /**
+   * Health check for AngkorVers / aichatbot
+   */
   async getStatus() {
     try {
-      const res = await aiBotClient.get('/api/health');
-      if (res.data) return { success: true, service: 'aichatbot', ...res.data };
+      const res = await aiBotClient.get('/health', { timeout: 4000 });
+      if (res.data) return { success: true, service: 'online_ai', ...res.data };
     } catch {
-      // fallback
+      // ignore
     }
-    return await api.get('/ai/status');
+    try {
+      const res = await api.get('/ai/status', { timeout: 4000 });
+      return res.data;
+    } catch {
+      // ignore
+    }
+    return { success: false, status: 'offline' };
   },
 };
 

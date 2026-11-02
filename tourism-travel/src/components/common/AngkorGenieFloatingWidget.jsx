@@ -21,8 +21,13 @@ import {
   Search,
   MapPin
 } from 'lucide-react';
-import GenieAvatar from './GenieAvatar';
+import logoImg from '../../assets/images/tourism_logo.png';
 import MarkdownMessage from './MarkdownMessage';
+import WeatherCard from '../chat/WeatherCard';
+import ItineraryCard from '../chat/ItineraryCard';
+import RecommendationsCard from '../chat/RecommendationsCard';
+import CurrencyCard from '../chat/CurrencyCard';
+import SourcesCard from '../chat/SourcesCard';
 import aiChatService from '../../services/aiChatService';
 import { useAuth } from '../../context/AuthContext';
 import { useAlert } from '../../context/AlertContext';
@@ -48,7 +53,10 @@ export default function AngkorGenieFloatingWidget() {
   const [copiedIndex, setCopiedIndex] = useState(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showToolsModal, setShowToolsModal] = useState(false);
-  const [initialSuggestions, setInitialSuggestions] = useState(() => getLocalDynamicSuggestions().suggestions);
+  const [initialSuggestions, setInitialSuggestions] = useState(() => {
+    const raw = getLocalDynamicSuggestions().suggestions || [];
+    return raw.map((s) => formatSuggestedTopic(s, 'en')).filter(Boolean);
+  });
   const [isRefreshingInitial, setIsRefreshingInitial] = useState(false);
   const [refreshingMsgIndex, setRefreshingMsgIndex] = useState(null);
   const [feedbackMap, setFeedbackMap] = useState({});
@@ -110,14 +118,14 @@ export default function AngkorGenieFloatingWidget() {
   const fetchInitialSuggestions = async (refresh = false) => {
     setIsRefreshingInitial(true);
     try {
-      const currentTexts = initialSuggestions.map((s) => s.text);
+      const currentTexts = initialSuggestions.map((s) => s.title || s.text || '');
       const res = await aiChatService.getSuggestions({
         refresh,
         currentSuggestions: currentTexts,
         language: 'en',
       });
       if (res?.suggestions?.length > 0) {
-        setInitialSuggestions(res.suggestions.map(formatSuggestedTopic).filter(Boolean));
+        setInitialSuggestions(res.suggestions.map((s) => formatSuggestedTopic(s, 'en')).filter(Boolean));
       }
     } catch {
       // Fallback already provided by getLocalDynamicSuggestions
@@ -331,19 +339,21 @@ export default function AngkorGenieFloatingWidget() {
           <button
             type="button"
             onClick={() => setIsOpen(true)}
-            aria-label="Open AngkorGenie AI Assistant"
+            aria-label="Open AngkorVers AI Assistant"
             className="group relative flex items-center justify-center cursor-pointer transition-transform duration-300 hover:scale-105 active:scale-95 focus:outline-none"
           >
             {/* Glowing pulse halo */}
             <span className="absolute -inset-1.5 rounded-full bg-blue-500/30 animate-pulse blur-xs" />
             <span className="absolute -inset-3 rounded-full bg-blue-600/15 animate-ping pointer-events-none" />
 
-            {/* Genie circular avatar with GENIE badge */}
-            <GenieAvatar size={66} showBadge={true} className="drop-shadow-[0_12px_24px_rgba(29,78,216,0.45)]" />
+            {/* Circular avatar with tourism logo */}
+            <div className="w-14 h-14 rounded-full bg-white dark:bg-zinc-900 border-2 border-zinc-200 dark:border-zinc-700 flex items-center justify-center shadow-[0_12px_24px_rgba(0,0,0,0.25)] overflow-hidden">
+              <img src={logoImg} alt="AngkorVers AI" className="w-8 h-8 object-contain" />
+            </div>
 
             {/* Hover Tooltip */}
             <span className="absolute right-full mr-3 px-3 py-1.5 rounded-xl bg-slate-900/90 text-white text-xs font-semibold whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-lg backdrop-blur-xs">
-              Chat with AngkorGenie
+              Chat with AngkorVers AI
             </span>
           </button>
         </div>
@@ -357,14 +367,26 @@ export default function AngkorGenieFloatingWidget() {
           {/* Header */}
           <div className="px-5 py-3.5 border-b border-slate-200/80 dark:border-zinc-800 flex items-center justify-between bg-white dark:bg-zinc-900 shrink-0">
             <div className="flex items-center gap-2.5">
-              <GenieAvatar size={34} showBadge={false} />
+              <div className="w-8 h-8 rounded-lg bg-zinc-100 dark:bg-zinc-800 border border-zinc-200/80 dark:border-zinc-700/80 flex items-center justify-center shrink-0 overflow-hidden shadow-2xs">
+                <img
+                  src={logoImg}
+                  alt="AngkorVers Logo"
+                  className="w-5 h-5 object-contain"
+                  onError={(e) => {
+                    e.target.style.display = 'none';
+                  }}
+                />
+              </div>
               <div>
                 <div className="font-extrabold text-base text-slate-900 dark:text-white tracking-tight flex items-center gap-1.5 leading-none">
-                  <span>AngkorGenie</span>
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block animate-pulse" />
+                  <span>AngkorVers AI</span>
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+                  </span>
                 </div>
                 <div className="text-[10px] uppercase font-bold tracking-wider text-blue-600 dark:text-blue-400 mt-0.5">
-                  Travel Assistant
+                  Cambodia AI Travel Assistant
                 </div>
               </div>
             </div>
@@ -461,7 +483,7 @@ export default function AngkorGenieFloatingWidget() {
 
                 {/* 3. Subtitle Description */}
                 <p className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 font-normal max-w-sm mx-auto">
-                  General intelligence, programming, math, translation, and deep Cambodia expertise.
+                  Dedicated travel planning, cultural heritage, historic temples, and local insights across Cambodia.
                 </p>
 
                 {/* 4. Center Input Composer Box */}
@@ -535,18 +557,20 @@ export default function AngkorGenieFloatingWidget() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-left">
                     {initialSuggestions.map((item, idx) => {
                       const IconComponent = item.icon || Sparkles;
+                      const titleText = item.title || item.text || item.prompt || '';
+                      const actionQuery = item.prompt || item.query || item.title || item.text || '';
                       return (
                         <button
-                          key={idx}
+                          key={item.id || idx}
                           type="button"
-                          onClick={() => handleSendMessage(item.query || item.text)}
+                          onClick={() => handleSendMessage(actionQuery)}
                           className="w-full p-3 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:border-zinc-300 dark:hover:border-zinc-700 hover:shadow-xs flex items-center gap-2.5 transition-all cursor-pointer group"
                         >
                           <div className="w-8 h-8 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-500 group-hover:text-zinc-800 dark:group-hover:text-white transition shrink-0">
                             <IconComponent size={15} />
                           </div>
-                          <span className="text-xs font-semibold text-zinc-800 dark:text-zinc-200 group-hover:text-zinc-900 dark:group-hover:text-white transition line-clamp-1">
-                            {item.text}
+                          <span className="text-xs font-semibold text-zinc-800 dark:text-zinc-200 group-hover:text-zinc-900 dark:group-hover:text-white transition line-clamp-2 leading-snug">
+                            {titleText}
                           </span>
                         </button>
                       );
@@ -608,8 +632,28 @@ export default function AngkorGenieFloatingWidget() {
                         </div>
                       ) : (
                         <div className="space-y-3">
+                          {/* Assistant Persona Header */}
+                          <div className="flex items-center gap-2 mb-1.5 text-xs text-zinc-500 dark:text-zinc-400">
+                            <div className="w-5 h-5 rounded-md bg-zinc-100 dark:bg-zinc-800 border border-zinc-200/80 dark:border-zinc-700/80 flex items-center justify-center overflow-hidden shrink-0">
+                              <img src={logoImg} alt="" className="w-3.5 h-3.5 object-contain" />
+                            </div>
+                            <span className="font-semibold text-zinc-800 dark:text-zinc-200 text-xs">AngkorVers AI</span>
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                          </div>
+
                           {/* Rich Markdown Response */}
                           <MarkdownMessage content={msg.content} />
+
+                          {/* Rich Interactive Cards */}
+                          {msg.weather && <WeatherCard weather={msg.weather} />}
+                          {msg.itinerary && <ItineraryCard itinerary={msg.itinerary} />}
+                          {!msg.itinerary && msg.recommendations && msg.recommendations.length > 0 && (
+                            <RecommendationsCard recommendations={msg.recommendations} />
+                          )}
+                          {msg.currency && <CurrencyCard currency={msg.currency} />}
+                          {msg.sources && msg.sources.length > 0 && (
+                            <SourcesCard sources={msg.sources} />
+                          )}
 
                           {/* Embedded Suggested Topics Card Container */}
                           {(() => {
@@ -641,18 +685,20 @@ export default function AngkorGenieFloatingWidget() {
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                                   {messageTopics.map((item, tIdx) => {
                                     const IconComponent = item.icon || Sparkles;
+                                    const titleText = item.title || item.text || item.prompt || '';
+                                    const actionQuery = item.prompt || item.query || item.title || item.text || '';
                                     return (
                                       <button
-                                        key={tIdx}
+                                        key={item.id || tIdx}
                                         type="button"
-                                        onClick={() => handleSendMessage(item.query || item.text)}
+                                        onClick={() => handleSendMessage(actionQuery)}
                                         className="p-2.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:border-zinc-300 dark:hover:border-zinc-700 hover:shadow-xs flex items-center gap-2 transition-all cursor-pointer text-left group"
                                       >
                                         <div className="w-7 h-7 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-500 group-hover:text-zinc-800 dark:group-hover:text-white transition shrink-0">
                                           <IconComponent size={14} />
                                         </div>
-                                        <span className="text-xs font-semibold text-zinc-800 dark:text-zinc-200 group-hover:text-zinc-900 dark:group-hover:text-white transition line-clamp-1">
-                                          {item.text}
+                                        <span className="text-xs font-semibold text-zinc-800 dark:text-zinc-200 group-hover:text-zinc-900 dark:group-hover:text-white transition line-clamp-2 leading-snug">
+                                          {titleText}
                                         </span>
                                       </button>
                                     );

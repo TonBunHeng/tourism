@@ -324,12 +324,12 @@ class RAGService:
         elif intent == "greeting":
             answer = (
                 "សួស្តី! 🖐️ ខ្ញុំជា **AngkorVers AI Assistant** 🇰🇭។ "
-                "ខ្ញុំអាចជួយឆ្លើយសំណួរស្ទើរតែគ្រប់ប្រធានបទ ចាប់ពីការសរសេរកូដ គណិតវិទ្យា វិទ្យាសាស្ត្រ និងធុរកិច្ច រហូតដល់ចំណេះដឹងស៊ីជម្រៅលើប្រទេសកម្ពុជា (រាជធានី-ខេត្តទាំង២៥ ប្រវត្តិសាស្ត្រ វប្បធម៌ និងដំណើរកម្សាន្ត)។ "
+                "ខ្ញុំជាជំនួយការឆ្លាតវៃទេសចរណ៍ និងវប្បធម៌កម្ពុជា ឯកទេសរៀបចំគម្រោងធ្វើដំណើរ មគ្គុទ្ទេសក៍ប្រាសាទបុរាណ សណ្ឋាគារ ម្ហូបអាហារ និងតំបន់ទេសចរណ៍ក្នុងរាជធានី-ខេត្តទាំង២៥។ "
                 "តើមានអ្វីដែលខ្ញុំអាចជួយអ្នកថ្ងៃនេះ?"
                 if is_km
                 else "Hello! 👋 I am **AngkorVers AI Assistant** 🇰🇭. "
-                     "I can assist you across almost any domain—from programming, mathematics, science, and business to deep expertise in Cambodia (its 25 administrative divisions, cultural heritage, history, and travel). "
-                     "How can I help you today?"
+                     "I am your dedicated Cambodian travel and cultural intelligence assistant, specializing in trip planning, temple guides, local cuisine, and destination insights across all 25 provinces. "
+                     "How can I help you explore Cambodia today?"
             )
             ai_meta = {
                 "mode": "online",
