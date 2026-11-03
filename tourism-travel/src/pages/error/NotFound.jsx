@@ -1,7 +1,12 @@
+import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Compass, Home } from 'lucide-react';
+import { setPageTitle } from '../../utils/PagesTitle';
 
 export default function NotFound() {
+  useEffect(() => {
+    setPageTitle('Page Not Found');
+  }, []);
   return (
     <div className="min-h-screen flex items-center justify-center p-6 bg-slate-50 dark:bg-zinc-950 text-slate-800 dark:text-zinc-100">
       <div className="w-full max-w-md p-8 rounded-3xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 shadow-xl text-center">

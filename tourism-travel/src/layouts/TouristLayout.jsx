@@ -30,6 +30,7 @@ import { toggleTheme, isDarkTheme, getInitialTheme } from '../utils/Theme';
 import notificationService from '../services/notificationService';
 import logoImg from '../assets/images/tourism_logo.png';
 import AngkorGenieFloatingWidget from '../components/common/AngkorGenieFloatingWidget';
+import { setPageTitle } from '../utils/PagesTitle';
 
 export default function TouristLayout() {
   const { user, isAuthenticated, logout } = useAuth();
@@ -88,6 +89,41 @@ export default function TouristLayout() {
     if (dropdownTimeoutRef.current) {
       clearTimeout(dropdownTimeoutRef.current);
       dropdownTimeoutRef.current = null;
+    }
+  }, [location.pathname]);
+
+  // Dynamic Browser Tab Title
+  useEffect(() => {
+    const pageTitles = {
+      '/': 'Home',
+      '/destinations': 'Destinations',
+      '/places': 'Destinations',
+      '/categories': 'Categories',
+      '/provinces': '25 Provinces',
+      '/galleries': 'Photo Galleries',
+      '/events': 'Events & Festivals',
+      '/businesses': 'Businesses',
+      '/tours': 'Tour Packages',
+      '/tour-packages': 'Tour Packages',
+      '/guides': 'Tour Guides',
+      '/tour-guides': 'Tour Guides',
+      '/achievements': 'Achievements',
+      '/support': 'Research & Support',
+      '/trips': 'Trip Planner',
+      '/bookings': 'My Bookings',
+      '/favorites': 'Saved Wishlist',
+      '/notifications': 'Notifications',
+      '/profile': 'My Profile',
+    };
+
+    if (pageTitles[location.pathname]) {
+      setPageTitle(pageTitles[location.pathname]);
+    } else if (location.pathname.startsWith('/destinations/')) {
+      setPageTitle('Destination Details');
+    } else if (location.pathname.startsWith('/businesses/')) {
+      setPageTitle('Business Details');
+    } else {
+      setPageTitle('AngkorVerses');
     }
   }, [location.pathname]);
 

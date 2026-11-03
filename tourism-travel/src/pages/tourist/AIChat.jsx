@@ -14,6 +14,7 @@ import {
   getTopicsForLanguage,
   DEFAULT_USER_PROFILE 
 } from '../../utils/chatUtils';
+import { setPageTitle } from '../../utils/PagesTitle';
 
 export default function AIChat() {
   const [searchParams] = useSearchParams();
@@ -32,6 +33,10 @@ export default function AIChat() {
     return document.documentElement.classList.contains('dark') || 
       window.matchMedia('(prefers-color-scheme: dark)').matches;
   });
+
+  useEffect(() => {
+    setPageTitle(language === 'km' ? 'AngkorGenie AI ជំនួយការទេសចរណ៍' : 'AngkorGenie AI Assistant');
+  }, [language]);
 
   // User Profile
   const [userProfile, setUserProfile] = useState(() => {

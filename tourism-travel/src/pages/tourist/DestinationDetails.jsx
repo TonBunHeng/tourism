@@ -21,6 +21,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useAlert } from '../../context/AlertContext';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import Badge from '../../components/common/Badge';
+import { setPageTitle } from '../../utils/PagesTitle';
 
 export default function DestinationDetails() {
   const { id } = useParams();
@@ -54,6 +55,15 @@ export default function DestinationDetails() {
   const [selectedTripId, setSelectedTripId] = useState('');
   const [tripDayNumber, setTripDayNumber] = useState(1);
   const [isAddingToTrip, setIsAddingToTrip] = useState(false);
+
+  // Dynamic Browser Tab Title
+  useEffect(() => {
+    if (place?.name) {
+      setPageTitle(place.name);
+    } else {
+      setPageTitle('Destination Details');
+    }
+  }, [place?.name]);
 
   useEffect(() => {
     let isMounted = true;

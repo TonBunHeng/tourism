@@ -1,9 +1,15 @@
+import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ShieldAlert, Home, Briefcase, ExternalLink } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { setPageTitle } from '../../utils/PagesTitle';
 
 export default function Forbidden() {
   const { user, isBusinessOwner, isAdmin } = useAuth();
+
+  useEffect(() => {
+    setPageTitle('Access Forbidden');
+  }, []);
   const localHost = ['localhost', '127.0.0.1'].includes(window.location.hostname);
   const defaultAdminUrl = localHost
     ? `${window.location.protocol}//${window.location.hostname}:5174`

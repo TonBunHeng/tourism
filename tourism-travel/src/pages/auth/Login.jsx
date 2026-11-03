@@ -10,6 +10,7 @@ import {
 import { useAuth } from '../../context/AuthContext';
 import { normalizeRole } from '../../services/authService';
 import GoogleButton from '../../components/common/GoogleButton';
+import { setPageTitle } from '../../utils/PagesTitle';
 
 export default function Login() {
   const { login } = useAuth();
@@ -22,6 +23,10 @@ export default function Login() {
   const [errorMessage, setErrorMessage] = useState('');
 
   const from = location.state?.from;
+
+  useEffect(() => {
+    setPageTitle('Sign In');
+  }, []);
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);

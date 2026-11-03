@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
   User, 
@@ -16,6 +16,7 @@ import {
 import { useAuth } from '../../context/AuthContext';
 import { normalizeRole } from '../../services/authService';
 import GoogleButton from '../../components/common/GoogleButton';
+import { setPageTitle } from '../../utils/PagesTitle';
 
 export default function Register() {
   const { register } = useAuth();
@@ -32,6 +33,10 @@ export default function Register() {
 
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+
+  useEffect(() => {
+    setPageTitle('Register');
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

@@ -5,6 +5,7 @@ import BusinessHeader from '../components/layout/BusinessHeader';
 import BusinessFooter from '../components/layout/BusinessFooter';
 import { SearchProvider } from '../context/SearchContext';
 import businessOwnerService from '../services/businessOwnerService';
+import { setPageTitle } from '../utils/PagesTitle';
 
 export default function BusinessOwnerLayout() {
   const location = useLocation();
@@ -81,7 +82,7 @@ export default function BusinessOwnerLayout() {
     };
 
     const title = pageTitles[location.pathname] || 'Business Hub';
-    document.title = `${title} | AngkorVerses Business Hub`;
+    setPageTitle(title, 'AngkorVerses Business Hub');
   }, [location.pathname]);
 
   return (

@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
 // Providers
@@ -50,6 +51,7 @@ import BusinessReports from '../pages/business-owner/Reports';
 import BusinessNotifications from '../pages/business-owner/Notifications';
 import BusinessSettings from '../pages/business-owner/Settings';
 import OAuthCallbackHandler from '../components/common/OAuthCallbackHandler';
+import { setPageTitle } from '../utils/PagesTitle';
 
 export default function AppRoutes() {
   return (
@@ -138,6 +140,10 @@ export default function AppRoutes() {
 }
 
 function OAuthCallbackPending() {
+  useEffect(() => {
+    setPageTitle('Completing Sign In');
+  }, []);
+
   return (
     <main className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-zinc-950 text-sm text-slate-600 dark:text-zinc-300">
       Completing sign in…

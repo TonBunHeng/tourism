@@ -24,6 +24,7 @@ import travelService from '../../services/travelService';
 import { useAuth } from '../../context/AuthContext';
 import { useAlert } from '../../context/AlertContext';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
+import { setPageTitle } from '../../utils/PagesTitle';
 
 export default function BusinessDetails() {
   const { id } = useParams();
@@ -61,6 +62,15 @@ export default function BusinessDetails() {
 
   // Gallery Lightbox
   const [activePhoto, setActivePhoto] = useState(null);
+
+  // Dynamic Browser Tab Title
+  useEffect(() => {
+    if (business?.name) {
+      setPageTitle(business.name);
+    } else {
+      setPageTitle('Business Details');
+    }
+  }, [business?.name]);
 
   useEffect(() => {
     if (user) {
