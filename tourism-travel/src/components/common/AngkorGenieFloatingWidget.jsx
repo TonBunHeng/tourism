@@ -35,7 +35,7 @@ import {
   generateSessionId, 
   createChatMessage,
   formatSuggestedTopic,
-  getLocalDynamicSuggestions,
+  getTopicsForLanguage,
   CAMBODIA_PROVINCES
 } from '../../utils/chatUtils';
 
@@ -53,11 +53,40 @@ export default function AngkorGenieFloatingWidget() {
   const [copiedIndex, setCopiedIndex] = useState(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showToolsModal, setShowToolsModal] = useState(false);
-  const [initialSuggestions, setInitialSuggestions] = useState(() => {
-    const raw = getLocalDynamicSuggestions().suggestions || [];
-    return raw.map((s) => formatSuggestedTopic(s, 'en')).filter(Boolean);
+  
+  // Align language & suggested topics with AIChat (Picture 2)
+  const [language, setLanguage] = useState(() => {
+    return localStorage.getItem('aichat_language') || localStorage.getItem('i18nextLng') || 'en';
   });
-  const [isRefreshingInitial, setIsRefreshingInitial] = useState(false);
+  const isKm = language === 'km';
+
+  useEffect(() => {
+    const syncLang = () => {
+      const stored = localStorage.getItem('aichat_language') || localStorage.getItem('i18nextLng') || 'en';
+      if (stored && stored !== language) {
+        setLanguage(stored);
+      }
+    };
+    if (isOpen) {
+      syncLang();
+    }
+    window.addEventListener('storage', syncLang);
+    return () => window.removeEventListener('storage', syncLang);
+  }, [isOpen, language]);
+
+  const [topicsRotationIndex, setTopicsRotationIndex] = useState(0);
+  const [isRefreshingTopics, setIsRefreshingTopics] = useState(false);
+  const currentSuggestedTopics = getTopicsForLanguage(language, topicsRotationIndex);
+
+  const handleRefreshTopics = (e) => {
+    e?.stopPropagation();
+    setIsRefreshingTopics(true);
+    setTopicsRotationIndex((prev) => prev + 1);
+    setTimeout(() => {
+      setIsRefreshingTopics(false);
+    }, 400);
+  };
+
   const [refreshingMsgIndex, setRefreshingMsgIndex] = useState(null);
   const [feedbackMap, setFeedbackMap] = useState({});
   const [lastUserPrompt, setLastUserPrompt] = useState('');
@@ -114,36 +143,6 @@ export default function AngkorGenieFloatingWidget() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isMenuOpen]);
 
-  // Fetch dynamic initial suggested topics
-  const fetchInitialSuggestions = async (refresh = false) => {
-    setIsRefreshingInitial(true);
-    try {
-      const currentTexts = initialSuggestions.map((s) => s.title || s.text || '');
-      const res = await aiChatService.getSuggestions({
-        refresh,
-        currentSuggestions: currentTexts,
-        language: 'en',
-      });
-      if (res?.suggestions?.length > 0) {
-        setInitialSuggestions(res.suggestions.map((s) => formatSuggestedTopic(s, 'en')).filter(Boolean));
-      }
-    } catch {
-      // Fallback already provided by getLocalDynamicSuggestions
-    } finally {
-      setIsRefreshingInitial(false);
-    }
-  };
-
-  useEffect(() => {
-    if (isOpen) {
-      fetchInitialSuggestions(false);
-    }
-  }, [isOpen]);
-
-  const handleRefreshInitialTopics = () => {
-    fetchInitialSuggestions(true);
-  };
-
   // Refresh dynamic suggestions for a specific assistant message
   const handleRefreshMessageSuggestions = async (msgIndex, msg) => {
     if (refreshingMsgIndex !== null) return;
@@ -199,46 +198,137 @@ export default function AngkorGenieFloatingWidget() {
       content: prompt,
     });
 
-    setMessages((prev) => [...prev, userMsg]);
+    const isFirstMessage = messages.length === 0;
+    const updatedMessages = [...messages, userMsg];
+    setMessages(updatedMessages);
     if (!textToSend) setInputValue('');
+
+    const assistantMsgId = `msg_${Date.now()}_assistant`;
+    const initialAssistantMsg = createChatMessage({
+      role: 'assistant',
+      content: '',
+      weather: null,
+      itinerary: null,
+      recommendations: null,
+      currency: null,
+      sources: [],
+      suggestions: [],
+    });
+    initialAssistantMsg.id = assistantMsgId;
+
+    setMessages([...updatedMessages, initialAssistantMsg]);
     setIsLoading(true);
 
     const controller = new AbortController();
     abortControllerRef.current = controller;
+    let accumulatedTokens = '';
 
     try {
-      const res = await aiChatService.sendMessage({
-        message: prompt,
-        sessionId,
-        language: 'en',
-      });
-
-      const replyContent = res?.reply || res?.response || res?.message || res?.data?.response || res?.data?.message || 'Thank you for asking! Cambodia offers breathtaking heritage, especially in Siem Reap and Phnom Penh.';
-
-      // Format dynamic suggestions from AI chatbot response, or derive contextual dynamic suggestions
-      const rawSuggestions = res?.suggestions || [];
-      const formattedSuggestions = rawSuggestions.length > 0
-        ? rawSuggestions.map(formatSuggestedTopic).filter(Boolean)
-        : getLocalDynamicSuggestions({ message: prompt, answer: replyContent }).suggestions;
-
-      const botMsg = createChatMessage({
-        role: 'assistant',
-        content: replyContent,
-        suggestions: formattedSuggestions,
-        sources: res?.sources || [],
-      });
-
-      setMessages((prev) => [...prev, botMsg]);
+      const isBiz = user?.role === 'business_owner';
+      await aiChatService.streamMessage(
+        {
+          message: prompt,
+          session_id: sessionId,
+          language,
+          user_name: user?.name,
+          user_role: isBiz ? 'business_owner' : (user ? 'tourist' : 'guest'),
+          business_name: isBiz ? (user?.business?.name) : null,
+          business_category: isBiz ? (user?.business?.category) : null,
+          history: updatedMessages.map((m) => ({
+            role: m.role || m.sender,
+            content: m.content || m.message,
+          })),
+        },
+        {
+          signal: controller.signal,
+          onChunk: (chunk) => {
+            accumulatedTokens += chunk;
+            setMessages((prev) => {
+              const last = prev[prev.length - 1];
+              if (last && last.id === assistantMsgId) {
+                return [
+                  ...prev.slice(0, -1),
+                  {
+                    ...last,
+                    content: accumulatedTokens,
+                    message: accumulatedTokens,
+                  },
+                ];
+              }
+              return prev;
+            });
+          },
+          onSuggestions: (suggestions) => {
+            setMessages((prev) => {
+              const last = prev[prev.length - 1];
+              if (last && last.id === assistantMsgId) {
+                return [
+                  ...prev.slice(0, -1),
+                  {
+                    ...last,
+                    suggestions: (suggestions || []).map((s) => formatSuggestedTopic(s, language)).filter(Boolean),
+                  },
+                ];
+              }
+              return prev;
+            });
+          },
+          onDone: (result) => {
+            setIsLoading(false);
+            if (result) {
+              setMessages((prev) => {
+                const last = prev[prev.length - 1];
+                if (last && last.id === assistantMsgId) {
+                  return [
+                    ...prev.slice(0, -1),
+                    {
+                      ...last,
+                      content: accumulatedTokens || result.reply || result.message || last.content,
+                      message: accumulatedTokens || result.reply || result.message || last.content,
+                      weather: result.weather || last.weather,
+                      itinerary: result.itinerary || last.itinerary,
+                      recommendations: result.recommendations || last.recommendations,
+                      currency: result.currency || last.currency,
+                      sources: result.sources || last.sources,
+                      suggestions: (result.suggestions || []).map((s) => formatSuggestedTopic(s, language)).filter(Boolean),
+                    },
+                  ];
+                }
+                return prev;
+              });
+            }
+            if (user) {
+              aiChatService.saveSessionMetadata({
+                sessionId,
+                title: prompt.slice(0, 48),
+                firstMessage: prompt,
+              }, user);
+            }
+          },
+          onError: (err) => {
+            setIsLoading(false);
+            setMessages((prev) => {
+              const last = prev[prev.length - 1];
+              if (last && last.id === assistantMsgId) {
+                return [
+                  ...prev.slice(0, -1),
+                  {
+                    ...last,
+                    content: err.message || 'I am currently unable to reach the travel intelligence service. Please check your connection or retry in a moment.',
+                    isError: true,
+                  },
+                ];
+              }
+              return prev;
+            });
+          },
+        }
+      );
     } catch (err) {
-      if (err.name === 'AbortError') return;
-      const errorMsg = createChatMessage({
-        role: 'assistant',
-        isError: true,
-        content: err.message || 'I am currently unable to reach the travel intelligence service. Please check your connection or retry in a moment.',
-      });
-      setMessages((prev) => [...prev, errorMsg]);
+      if (!controller.signal.aborted) {
+        setIsLoading(false);
+      }
     } finally {
-      setIsLoading(false);
       abortControllerRef.current = null;
     }
   };
@@ -248,7 +338,7 @@ export default function AngkorGenieFloatingWidget() {
     setMessages([]);
     setIsMenuOpen(false);
     setFeedbackMap({});
-    fetchInitialSuggestions(true);
+    setTopicsRotationIndex(0);
   };
 
   const handleOpenFullScreen = () => {
@@ -545,39 +635,43 @@ export default function AngkorGenieFloatingWidget() {
                 {/* 5. Suggested Topics Section Header */}
                 <div className="space-y-2.5 pt-1">
                   <div className="flex items-center justify-between text-xs px-1">
-                    <div className="flex items-center gap-1.5 font-bold tracking-wider text-amber-500 uppercase text-[10px]">
-                      <Sparkles size={13} className="fill-amber-500" />
-                      <span>SUGGESTED TOPICS</span>
-                    </div>
+                    <span className="inline-flex items-center gap-1.5 text-xs font-bold text-zinc-600 dark:text-zinc-300">
+                      <Sparkles size={12} className="text-amber-500" />
+                      <span>{isKm ? 'ប្រធានបទណែនាំ' : 'Suggested Topics'}</span>
+                    </span>
+
                     <button
                       type="button"
-                      onClick={handleRefreshInitialTopics}
-                      disabled={isRefreshingInitial}
-                      className="flex items-center gap-1.5 font-medium text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 transition cursor-pointer text-xs"
+                      onClick={handleRefreshTopics}
+                      className="inline-flex items-center gap-1.5 text-[11px] font-medium text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white px-2 py-0.5 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all cursor-pointer group active:scale-95"
+                      title={isKm ? 'ប្តូរសំណួរថ្មី' : 'Refresh topics'}
                     >
-                      <RefreshCw size={11} className={isRefreshingInitial ? 'animate-spin' : ''} />
-                      <span>Refresh</span>
+                      <RefreshCw
+                        size={11}
+                        className={`transition-transform duration-500 ${
+                          isRefreshingTopics ? '-rotate-180 text-zinc-900 dark:text-white' : 'group-hover:-rotate-90'
+                        }`}
+                      />
+                      <span>{isKm ? 'ប្តូរសំណួរ' : 'Refresh'}</span>
                     </button>
                   </div>
 
-                  {/* 6. Suggestion Cards 2x2 Grid */}
+                  {/* 6. Suggestion Cards 2x2 Grid matching AIChat */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-left">
-                    {initialSuggestions.map((item, idx) => {
+                    {currentSuggestedTopics.map((item, idx) => {
                       const IconComponent = item.icon || Sparkles;
-                      const titleText = item.title || item.text || item.prompt || '';
-                      const actionQuery = item.prompt || item.query || item.title || item.text || '';
                       return (
                         <button
                           key={item.id || idx}
                           type="button"
-                          onClick={() => handleSendMessage(actionQuery)}
-                          className="w-full p-3 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:border-zinc-300 dark:hover:border-zinc-700 hover:shadow-xs flex items-center gap-2.5 transition-all cursor-pointer group"
+                          onClick={() => handleSendMessage(item.prompt || item.query || item.title)}
+                          className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl bg-white dark:bg-[#212121] border border-zinc-200/90 dark:border-zinc-800 text-xs sm:text-[13px] text-zinc-700 dark:text-zinc-300 hover:border-zinc-400 dark:hover:border-zinc-600 hover:text-zinc-900 dark:hover:text-white shadow-2xs hover:shadow-xs transition-all duration-200 active:scale-95 cursor-pointer text-left group"
                         >
-                          <div className="w-8 h-8 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-500 group-hover:text-zinc-800 dark:group-hover:text-white transition shrink-0">
-                            <IconComponent size={15} />
+                          <div className="w-7 h-7 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center shrink-0 text-zinc-600 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-white transition-colors">
+                            <IconComponent size={14} className="group-hover:scale-110 transition-transform duration-200" />
                           </div>
-                          <span className="text-xs font-semibold text-zinc-800 dark:text-zinc-200 group-hover:text-zinc-900 dark:group-hover:text-white transition line-clamp-2 leading-snug">
-                            {titleText}
+                          <span className="font-medium line-clamp-2 leading-snug">
+                            {item.title}
                           </span>
                         </button>
                       );
@@ -666,7 +760,7 @@ export default function AngkorGenieFloatingWidget() {
                           {(() => {
                             const messageTopics = (msg.suggestions && msg.suggestions.length > 0)
                               ? msg.suggestions.map(formatSuggestedTopic).filter(Boolean)
-                              : initialSuggestions;
+                              : currentSuggestedTopics;
 
                             if (!messageTopics || messageTopics.length === 0) return null;
                             const isThisRefreshing = refreshingMsgIndex === idx;
@@ -760,8 +854,8 @@ export default function AngkorGenieFloatingWidget() {
                   );
                 })}
 
-                {/* Thinking / Generating State Pill */}
-                {isLoading && (
+                {/* Thinking / Generating State Pill (Only shown while waiting for first token) */}
+                {isLoading && (!messages[messages.length - 1] || !messages[messages.length - 1]?.content) && (
                   <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-2xs text-[11px] font-medium text-zinc-600 dark:text-zinc-300">
                     <span>AngkorVers AI is thinking...</span>
                     <span className="flex items-center gap-0.5">

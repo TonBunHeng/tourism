@@ -50,7 +50,7 @@ export default function AIChat() {
   });
 
   useEffect(() => {
-    setPageTitle(language === 'km' ? 'AngkorGenie AI ជំនួយការទេសចរណ៍' : 'AngkorGenie AI Assistant');
+    setPageTitle(language === 'km' ? 'AI ជំនួយការទេសចរណ៍' : 'AI Assistant');
   }, [language]);
 
   // User Profile: dynamically bound to the authenticated user and their business (if business owner)
@@ -64,8 +64,24 @@ export default function AIChat() {
     }
   }, [user]);
 
-  // Sidebar & Layout state
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  // Sidebar & Layout state (true: 280px expanded, false: 80px collapsed on desktop)
+  const [sidebarOpen, setSidebarOpen] = useState(() => {
+    try {
+      const saved = localStorage.getItem('aichat_sidebar_expanded');
+      return saved !== null ? JSON.parse(saved) : true;
+    } catch {
+      return true;
+    }
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('aichat_sidebar_expanded', JSON.stringify(sidebarOpen));
+    } catch {
+      // ignore
+    }
+  }, [sidebarOpen]);
+
   const [isMobile, setIsMobile] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isOnline, setIsOnline] = useState(true);
@@ -158,8 +174,6 @@ export default function AIChat() {
       setIsMobile(mobile);
       if (mobile) {
         setSidebarOpen(false);
-      } else {
-        setSidebarOpen(true);
       }
     };
 
