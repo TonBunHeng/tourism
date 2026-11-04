@@ -10,7 +10,10 @@ import {
   Moon, 
   Check, 
   ShieldCheck, 
-  Database 
+  Database,
+  Building2,
+  Trash2,
+  Shield
 } from 'lucide-react';
 
 const DESTINATIONS_LIST = [
@@ -40,6 +43,7 @@ export default function SettingsModal({
   userProfile = {
     name: 'Traveler',
     email: '',
+    role: 'user',
     travelStyle: 'cultural',
     preferredDestinations: ['siem_reap'],
   },
@@ -48,19 +52,33 @@ export default function SettingsModal({
   onUpdateLanguage,
   onUpdateProfile,
   onToggleTheme,
+  onClearHistory,
 }) {
   const [activeTab, setActiveTab] = useState('general');
   const [searchQuery, setSearchQuery] = useState('');
   const isKm = language === 'km';
+  const isBiz = userProfile?.isBusinessOwner || userProfile?.role === 'business_owner';
 
   const destinationsList = DESTINATIONS_LIST;
   const travelStylesList = TRAVEL_STYLES_LIST;
 
+  const tabsList = useMemo(() => [
+    { id: 'general', labelEn: 'General', labelKm: 'ទូទៅ', icon: SettingsIcon },
+    { 
+      id: 'profile', 
+      labelEn: isBiz ? 'Business & Account' : 'Account', 
+      labelKm: isBiz ? 'គណនី និងអាជីវកម្ម' : 'គណនី', 
+      icon: isBiz ? Building2 : User 
+    },
+    { id: 'travel', labelEn: 'Personalization', labelKm: 'ចំណូលចិត្តផ្ទាល់ខ្លួន', icon: Sparkles },
+    { id: 'about', labelEn: 'About', labelKm: 'អំពីប្រព័ន្ធ', icon: Info },
+  ], [isBiz]);
+
   const filteredTabs = useMemo(() => {
-    if (!searchQuery.trim()) return SETTINGS_TABS;
+    if (!searchQuery.trim()) return tabsList;
     const q = searchQuery.toLowerCase();
-    return SETTINGS_TABS.filter((t) => t.labelEn.toLowerCase().includes(q) || t.labelKm.includes(q));
-  }, [searchQuery]);
+    return tabsList.filter((t) => t.labelEn.toLowerCase().includes(q) || t.labelKm.includes(q));
+  }, [searchQuery, tabsList]);
 
   const handleUpdate = (field, val) => {
     if (onUpdateProfile) {
@@ -239,20 +257,39 @@ export default function SettingsModal({
             </div>
           )}
 
-          {/* 2. PROFILE TAB */}
+          {/* 2. PROFILE & ACCOUNT TAB */}
           {activeTab === 'profile' && (
             <div className="space-y-4">
-              <h3 className="font-bold text-sm sm:text-base mb-1">
-                {isKm ? 'ព័ត៌មានគណនី' : 'Account Details'}
-              </h3>
-              <p className="text-xs text-slate-500 mb-4">
-                {isKm ? 'ព័ត៌មាននេះជួយឱ្យ AI ស្គាល់អ្នកកាន់តែច្បាស់' : 'Information used to personalize responses'}
-              </p>
+              <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-zinc-800">
+                <div>
+                  <h3 className="font-bold text-sm sm:text-base mb-0.5">
+                    {isBiz 
+                      ? (isKm ? 'ព័ត៌មានគណនី និងអាជីវកម្ម' : 'Account & Business Details') 
+                      : (isKm ? 'ព័ត៌មានគណនី' : 'Account Details')}
+                  </h3>
+                  <p className="text-xs text-slate-500">
+                    {isKm ? 'ព័ត៌មាននេះជួយឱ្យ AI ស្គាល់អ្នក និងមិនច្រឡំជាមួយអ្នកដទៃ' : 'AI personalizes assistance strictly for this account'}
+                  </p>
+                </div>
 
-              <div className="space-y-3 max-w-sm">
+                <span className={`px-2.5 py-1 rounded-full text-[11px] font-semibold border ${
+                  isBiz
+                    ? 'bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800'
+                    : 'bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-800'
+                }`}>
+                  {isBiz
+                    ? (isKm ? '🏢 ម្ចាស់អាជីវកម្ម' : '🏢 Business Owner')
+                    : (isKm ? '✈️ ភ្ញៀវទេសចរ' : '✈️ Tourist Account')}
+                </span>
+              </div>
+
+              {/* User Account Info */}
+              <div className="space-y-3 max-w-md">
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                    {isKm ? 'ឈ្មោះអ្នកដំណើរ' : 'Traveler Name'}
+                    {isBiz 
+                      ? (isKm ? 'ឈ្មោះតំណាងម្ចាស់អាជីវកម្ម' : 'Owner / Representative Name') 
+                      : (isKm ? 'ឈ្មោះអ្នកដំណើរ' : 'Traveler Name')}
                   </label>
                   <input
                     type="text"
@@ -271,9 +308,89 @@ export default function SettingsModal({
                     type="email"
                     value={userProfile.email || ''}
                     onChange={(e) => handleUpdate('email', e.target.value)}
-                    placeholder="traveler@example.com"
+                    placeholder="user@example.com"
                     className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-blue-500"
                   />
+                </div>
+
+                {/* Own Business Details Section */}
+                {isBiz && (
+                  <div className="p-3.5 rounded-xl bg-amber-50/50 dark:bg-amber-950/20 border border-amber-200/80 dark:border-amber-800/60 space-y-3">
+                    <div className="flex items-center gap-2 text-xs font-bold text-amber-900 dark:text-amber-300">
+                      <Building2 size={15} />
+                      <span>{isKm ? 'ព័ត៌មានអាជីវកម្មផ្ទាល់ខ្លួន' : 'Own Business Details'}</span>
+                    </div>
+
+                    <div>
+                      <label className="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                        {isKm ? 'ឈ្មោះអាជីវកម្ម' : 'Business Name'}
+                      </label>
+                      <input
+                        type="text"
+                        value={userProfile.businessName || ''}
+                        onChange={(e) => handleUpdate('businessName', e.target.value)}
+                        placeholder="e.g. Angkor Boutique Hotel"
+                        className="w-full px-3 py-1.5 rounded-lg bg-white dark:bg-zinc-900 border border-amber-200 dark:border-amber-800/80 text-xs text-slate-900 dark:text-white focus:outline-none"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2">
+                      <div>
+                        <label className="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                          {isKm ? 'ប្រភេទអាជីវកម្ម' : 'Category'}
+                        </label>
+                        <input
+                          type="text"
+                          value={userProfile.businessCategory || ''}
+                          onChange={(e) => handleUpdate('businessCategory', e.target.value)}
+                          placeholder="e.g. Hotel / Restaurant"
+                          className="w-full px-3 py-1.5 rounded-lg bg-white dark:bg-zinc-900 border border-amber-200 dark:border-amber-800/80 text-xs text-slate-900 dark:text-white focus:outline-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                          {isKm ? 'ខេត្ត/ក្រុង' : 'Province / Location'}
+                        </label>
+                        <input
+                          type="text"
+                          value={userProfile.businessProvince || ''}
+                          onChange={(e) => handleUpdate('businessProvince', e.target.value)}
+                          placeholder="e.g. Siem Reap"
+                          className="w-full px-3 py-1.5 rounded-lg bg-white dark:bg-zinc-900 border border-amber-200 dark:border-amber-800/80 text-xs text-slate-900 dark:text-white focus:outline-none"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* History & Privacy Protection Box */}
+                <div className="pt-2 border-t border-slate-100 dark:border-zinc-800">
+                  <div className="p-3 rounded-xl bg-slate-50 dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800 space-y-2">
+                    <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-800 dark:text-slate-200">
+                      <Shield size={14} className="text-emerald-500" />
+                      <span>{isKm ? 'ភាពឯកជន និងការបំបែកប្រវត្តិជជែក' : 'Isolated Chat History & Privacy'}</span>
+                    </div>
+                    <p className="text-[11px] text-slate-500 leading-normal">
+                      {isKm
+                        ? 'ប្រវត្តិសន្ទនារបស់អ្នកត្រូវបានការពារ និងបំបែកដាច់ដោយឡែក មិនត្រូវបានចែករំលែកជាមួយអ្នកប្រើប្រាស់ផ្សេង ឬអាជីវកម្មដទៃឡើយ។'
+                        : 'Your chat history and settings are strictly isolated to your own account and never accessible to other visitors or businesses.'}
+                    </p>
+
+                    {onClearHistory && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (window.confirm(isKm ? 'តើអ្នកប្រាកដជាចង់លុបប្រវត្តិជជែកទាំងអស់នៃគណនីរបស់អ្នកមែនទេ?' : 'Clear all chat history for your account? This action cannot be undone.')) {
+                            onClearHistory();
+                          }
+                        }}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 border border-rose-200 dark:border-rose-900/50 transition-colors cursor-pointer mt-1"
+                      >
+                        <Trash2 size={13} />
+                        <span>{isKm ? 'លុបប្រវត្តិជជែកគណនីនេះ' : 'Clear My Account History'}</span>
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>

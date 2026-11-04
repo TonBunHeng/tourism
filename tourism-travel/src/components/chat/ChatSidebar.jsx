@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
 import { 
   Plus, 
-  PanelLeftClose, 
   Search, 
   X, 
   MessageSquare, 
@@ -92,34 +91,23 @@ export default function ChatSidebar({
           isOpen ? 'translate-x-0 md:w-[280px] md:border-r' : '-translate-x-full pointer-events-none md:w-0 md:border-r-0 md:overflow-hidden'
         }`}
       >
-        {/* Top Actions: New Chat & Close Sidebar */}
+        {/* Top Actions: New Chat */}
         <div className="p-3 border-b border-zinc-200/80 dark:border-zinc-800/80 space-y-2">
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => {
-                onNewChat && onNewChat();
-                if (isMobile) onClose && onClose();
-              }}
-              className="flex-1 flex items-center justify-between px-3 h-9 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 text-zinc-800 dark:text-zinc-200 text-xs sm:text-[13px] font-semibold transition-all duration-150 shadow-2xs hover:shadow-xs active:scale-98 cursor-pointer group"
-              title={isKm ? 'កិច្ចសន្ទនាថ្មី' : 'New Chat'}
-            >
-              <div className="flex items-center gap-2">
-                <Plus size={15} className="text-zinc-600 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-white" />
-                <span>{isKm ? 'កិច្ចសន្ទនាថ្មី' : 'New Chat'}</span>
-              </div>
-              <span className="text-[10px] text-zinc-400 font-mono hidden sm:inline">⌘N</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={onToggle}
-              className="w-9 h-9 flex items-center justify-center rounded-xl text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer shrink-0"
-              title={isKm ? 'បិទរបារចំហៀង' : 'Close Sidebar'}
-            >
-              <PanelLeftClose size={16} />
-            </button>
-          </div>
+          <button
+            type="button"
+            onClick={() => {
+              onNewChat && onNewChat();
+              if (isMobile) onClose && onClose();
+            }}
+            className="w-full flex items-center justify-between px-3 h-9 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 text-zinc-800 dark:text-zinc-200 text-xs sm:text-[13px] font-semibold transition-all duration-150 shadow-2xs hover:shadow-xs active:scale-98 cursor-pointer group"
+            title={isKm ? 'កិច្ចសន្ទនាថ្មី' : 'New Chat'}
+          >
+            <div className="flex items-center gap-2">
+              <Plus size={15} className="text-zinc-600 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-white" />
+              <span>{isKm ? 'កិច្ចសន្ទនាថ្មី' : 'New Chat'}</span>
+            </div>
+            <span className="text-[10px] text-zinc-400 font-mono hidden sm:inline">⌘N</span>
+          </button>
 
           {/* Search Conversations Input */}
           <div className="relative flex items-center">
@@ -249,15 +237,33 @@ export default function ChatSidebar({
         <div className="p-3 border-t border-zinc-200/80 dark:border-zinc-800/80 bg-white/50 dark:bg-zinc-900/40">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2.5 min-w-0">
-              <div className="w-8 h-8 rounded-full bg-[#002D62] text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-2xs">
-                {initialLetter}
-              </div>
+              {userProfile?.avatar ? (
+                <img
+                  src={userProfile.avatar}
+                  alt={travelerName}
+                  className="w-8 h-8 rounded-full object-cover shrink-0 ring-1 ring-zinc-200 dark:ring-zinc-700"
+                />
+              ) : (
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs shrink-0 shadow-2xs text-white ${
+                  userProfile?.isBusinessOwner || userProfile?.role === 'business_owner'
+                    ? 'bg-gradient-to-tr from-amber-600 to-indigo-600'
+                    : 'bg-[#002D62]'
+                }`}>
+                  {initialLetter}
+                </div>
+              )}
               <div className="truncate">
                 <span className="font-semibold text-xs text-zinc-800 dark:text-zinc-200 block truncate leading-tight">
                   {travelerName}
                 </span>
-                <span className="text-[10px] text-zinc-400 dark:text-zinc-500 block truncate">
-                  AngkorVers AI Assistant
+                <span className={`text-[10px] block truncate font-medium ${
+                  userProfile?.isBusinessOwner || userProfile?.role === 'business_owner'
+                    ? 'text-amber-600 dark:text-amber-400'
+                    : 'text-zinc-400 dark:text-zinc-500'
+                }`}>
+                  {userProfile?.isBusinessOwner || userProfile?.role === 'business_owner'
+                    ? (userProfile?.businessName || (isKm ? 'ម្ចាស់អាជីវកម្ម' : 'Business Owner'))
+                    : (isKm ? 'គណនីទេសចរណ៍' : 'Tourist Account')}
                 </span>
               </div>
             </div>

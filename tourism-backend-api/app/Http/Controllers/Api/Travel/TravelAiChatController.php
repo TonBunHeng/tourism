@@ -50,21 +50,27 @@ class TravelAiChatController extends Controller
             $context['language'] = $validated['language'];
         }
 
-        // Find or create AI Conversation (optional history persistence)
+        // Find or create AI Conversation (isolated by user so sessions never cross accounts)
         $conversation = null;
         try {
-            $conversation = AiConversation::firstOrCreate(
-                ['session_id' => $sessionId],
-                [
+            $conversation = AiConversation::where('session_id', $sessionId)->first();
+
+            // If session already belongs to another user, isolate by assigning a new session ID
+            if ($conversation && $conversation->user_id && (!$user || (int)$conversation->user_id !== (int)$user->id)) {
+                $sessionId = $user ? ('user_' . $user->id . '_' . Str::random(12)) : ('guest_' . Str::random(16));
+                $conversation = null;
+            }
+
+            if (!$conversation) {
+                $conversation = AiConversation::create([
+                    'session_id' => $sessionId,
                     'user_id' => $user?->id,
                     'title' => Str::limit($validated['message'], 40),
                     'province' => $validated['province'] ?? null,
                     'category' => $validated['category'] ?? null,
                     'language' => $validated['language'] ?? 'en',
-                ]
-            );
-
-            if ($user && !$conversation->user_id) {
+                ]);
+            } else if ($user && !$conversation->user_id) {
                 $conversation->update(['user_id' => $user->id]);
             }
 
@@ -165,6 +171,35 @@ class TravelAiChatController extends Controller
             $conversation->messages,
             'Messages retrieved successfully.'
         );
+    }
+
+    /**
+     * Rename a conversation session.
+     * PATCH /api/travel/ai/conversations/{sessionId}
+     */
+    public function renameConversation(Request $request, string $sessionId): JsonResponse
+    {
+        $validated = $request->validate([
+            'title' => 'required|string|max:150',
+        ]);
+
+        $user = $request->user();
+        $conversation = AiConversation::where('session_id', $sessionId)->first();
+
+        if (!$conversation) {
+            return $this->errorResponse('Conversation not found.', 404);
+        }
+
+        if ($conversation->user_id && (!$user || (int)$conversation->user_id !== (int)$user->id)) {
+            return $this->errorResponse('Access denied.', 403);
+        }
+
+        $conversation->update(['title' => $validated['title']]);
+
+        return $this->successResponse([
+            'session_id' => $conversation->session_id,
+            'title' => $conversation->title,
+        ], 'Conversation renamed successfully.');
     }
 
     /**

@@ -1,9 +1,6 @@
 import { 
   PanelLeft, 
   PanelLeftClose, 
-  Sun, 
-  Moon, 
-  Settings, 
   X, 
   WifiOff 
 } from 'lucide-react';
@@ -13,11 +10,7 @@ export default function ChatHeader({
   sidebarOpen = true,
   language = 'en',
   isOnline = true,
-  isDarkMode = false,
   onToggleSidebar,
-  onToggleLanguage,
-  onToggleTheme,
-  onOpenSettings,
   onExit,
 }) {
   const isKm = language === 'km';
@@ -96,40 +89,6 @@ export default function ChatHeader({
             <WifiOff size={13} className="text-amber-500 dark:text-amber-400" />
           )}
         </div>
-
-        {/* Language Toggle Button */}
-        <button
-          type="button"
-          onClick={onToggleLanguage}
-          className="h-8 px-2.5 rounded-lg bg-zinc-100 hover:bg-zinc-200/80 dark:bg-zinc-800 dark:hover:bg-zinc-700 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 text-xs font-semibold transition-colors cursor-pointer flex items-center space-x-1 shrink-0"
-          title={isKm ? 'ប្តូរទៅភាសាអង់គ្លេស' : 'Switch to Khmer'}
-        >
-          <span>{isKm ? 'English' : 'ភាសាខ្មែរ'}</span>
-        </button>
-
-        {/* Dark/Light Mode Theme Toggle */}
-        <button
-          type="button"
-          onClick={onToggleTheme}
-          className="w-8 h-8 rounded-lg flex items-center justify-center bg-zinc-100 hover:bg-zinc-200/80 dark:bg-zinc-800 dark:hover:bg-zinc-700 border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-300 transition-colors cursor-pointer shrink-0"
-          title={isDarkMode ? 'Light Mode' : 'Dark Mode'}
-        >
-          {isDarkMode ? (
-            <Sun size={15} className="text-amber-400" />
-          ) : (
-            <Moon size={15} />
-          )}
-        </button>
-
-        {/* Settings Button */}
-        <button
-          type="button"
-          onClick={onOpenSettings}
-          className="w-8 h-8 rounded-lg flex items-center justify-center bg-zinc-100 hover:bg-zinc-200/80 dark:bg-zinc-800 dark:hover:bg-zinc-700 border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-300 transition-colors cursor-pointer shrink-0"
-          title={isKm ? 'ការកំណត់' : 'Settings'}
-        >
-          <Settings size={15} />
-        </button>
 
         {/* Exit / Return to Portal */}
         {onExit && (

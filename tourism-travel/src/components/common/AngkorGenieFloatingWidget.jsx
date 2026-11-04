@@ -40,8 +40,8 @@ import {
 } from '../../utils/chatUtils';
 
 export default function AngkorGenieFloatingWidget() {
-  useAuth();
-  const { showSuccess } = useAlert();
+  const { user, token } = useAuth();
+  const { showSuccess, showWarning } = useAlert();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -251,6 +251,19 @@ export default function AngkorGenieFloatingWidget() {
     fetchInitialSuggestions(true);
   };
 
+  const handleOpenFullScreen = () => {
+    setIsMenuOpen(false);
+    if (!token || !user) {
+      if (showWarning) {
+        showWarning('Please sign in or register to access the full-screen AI chat.');
+      }
+      navigate('/login', { state: { from: { pathname: '/ai-chat' } } });
+      return;
+    }
+    setIsOpen(false);
+    navigate('/ai-chat', { state: { sessionId, messages } });
+  };
+
   const handleCopyText = (text, index) => {
     if (navigator.clipboard) {
       navigator.clipboard.writeText(text);
@@ -395,10 +408,7 @@ export default function AngkorGenieFloatingWidget() {
               {/* Expand to Full Page */}
               <button
                 type="button"
-                onClick={() => {
-                  setIsOpen(false);
-                  navigate('/ai-chat', { state: { sessionId, messages } });
-                }}
+                onClick={handleOpenFullScreen}
                 className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-zinc-200 hover:bg-slate-100 dark:hover:bg-zinc-800 transition cursor-pointer"
                 title="Full Screen"
               >
@@ -440,10 +450,7 @@ export default function AngkorGenieFloatingWidget() {
                     </button>
                     <button
                       type="button"
-                      onClick={() => {
-                        setIsOpen(false);
-                        navigate('/ai-chat', { state: { sessionId, messages } });
-                      }}
+                      onClick={handleOpenFullScreen}
                       className="w-full text-left px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-zinc-700/60 flex items-center gap-2 text-blue-600 dark:text-blue-400 font-semibold cursor-pointer"
                     >
                       <Maximize2 size={14} />

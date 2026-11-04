@@ -8,6 +8,9 @@ import ChatMessageItem from '../../components/chat/ChatMessageItem';
 import TypingIndicator from '../../components/chat/TypingIndicator';
 import SettingsModal from '../../components/chat/SettingsModal';
 import aiChatService from '../../services/aiChatService';
+import { useAuth } from '../../context/AuthContext';
+import { useAlert } from '../../context/AlertContext';
+import { normalizeRole } from '../../services/authService';
 import { 
   generateSessionId, 
   createChatMessage, 
@@ -17,9 +20,21 @@ import {
 import { setPageTitle } from '../../utils/PagesTitle';
 
 export default function AIChat() {
+  const { user, token } = useAuth();
+  const { showSuccess, showWarning } = useAlert();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const location = useLocation();
+
+  // Authentication guard: Guests cannot use full-screen AI chat (Picture 2)
+  useEffect(() => {
+    if (!token && !user) {
+      if (showWarning) {
+        showWarning('Please sign in or register to access AngkorVers AI Assistant.');
+      }
+      navigate('/login', { state: { from: location }, replace: true });
+    }
+  }, [user, token, navigate, location, showWarning]);
 
   // Language state: 'en' | 'km'
   const [language, setLanguage] = useState(() => {
@@ -38,14 +53,16 @@ export default function AIChat() {
     setPageTitle(language === 'km' ? 'AngkorGenie AI ជំនួយការទេសចរណ៍' : 'AngkorGenie AI Assistant');
   }, [language]);
 
-  // User Profile
+  // User Profile: dynamically bound to the authenticated user and their business (if business owner)
   const [userProfile, setUserProfile] = useState(() => {
-    try {
-      const saved = localStorage.getItem('aichat_user_profile');
-      if (saved) return JSON.parse(saved);
-    } catch {}
-    return DEFAULT_USER_PROFILE;
+    return aiChatService.getUserProfile(user);
   });
+
+  useEffect(() => {
+    if (user) {
+      setUserProfile(aiChatService.getUserProfile(user));
+    }
+  }, [user]);
 
   // Sidebar & Layout state
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -53,26 +70,26 @@ export default function AIChat() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isOnline, setIsOnline] = useState(true);
 
-  // Sessions state
+  // Sessions state: strictly isolated per user and role
   const [sessions, setSessions] = useState([]);
   const [currentSessionId, setCurrentSessionId] = useState(() => {
     return (
       location.state?.sessionId ||
-      localStorage.getItem('aichat_last_active_session_id') ||
+      aiChatService.getLastActiveSessionId(user) ||
       generateSessionId()
     );
   });
 
-  // Active messages
+  // Active messages: isolated per user and session
   const [messages, setMessages] = useState(() => {
     if (location.state?.messages && location.state.messages.length > 0) {
       return location.state.messages;
     }
     const initialSession =
       location.state?.sessionId ||
-      localStorage.getItem('aichat_last_active_session_id');
+      aiChatService.getLastActiveSessionId(user);
     if (initialSession) {
-      const stored = aiChatService.getChatMessages(initialSession);
+      const stored = aiChatService.getChatMessages(initialSession, user);
       if (stored && stored.length > 0) return stored;
     }
     return [];
@@ -121,14 +138,18 @@ export default function AIChat() {
 
   const handleUpdateProfile = (newProfile) => {
     setUserProfile(newProfile);
-    localStorage.setItem('aichat_user_profile', JSON.stringify(newProfile));
+    aiChatService.saveUserProfile(newProfile, user);
+    if (showSuccess) {
+      showSuccess('AI preferences updated successfully.');
+    }
   };
 
-  // Load Sessions List
+  // Load Sessions List for the authenticated user
   const loadSessions = useCallback(async () => {
-    const list = await aiChatService.getChatSessions();
+    if (!user && !token) return;
+    const list = await aiChatService.getChatSessions(user);
     setSessions(list);
-  }, []);
+  }, [user, token]);
 
   // Initialize responsive layout & session loading
   useEffect(() => {
@@ -156,21 +177,23 @@ export default function AIChat() {
     };
   }, [loadSessions]);
 
-  // Persist messages whenever they change
+  // Persist messages whenever they change (scoped to user)
   useEffect(() => {
     if (currentSessionId && messages.length > 0) {
-      aiChatService.saveChatMessages(currentSessionId, messages);
+      aiChatService.saveChatMessages(currentSessionId, messages, user);
     }
-  }, [currentSessionId, messages]);
+  }, [currentSessionId, messages, user]);
 
   // Switch to an existing session
-  const handleSelectSession = (sessionId) => {
+  const handleSelectSession = async (sessionId) => {
     if (isLoading && abortControllerRef.current) {
       abortControllerRef.current.abort();
     }
     setCurrentSessionId(sessionId);
-    localStorage.setItem('aichat_last_active_session_id', sessionId);
-    const stored = aiChatService.getChatMessages(sessionId);
+    let stored = aiChatService.getChatMessages(sessionId, user);
+    if (!stored || stored.length === 0) {
+      stored = await aiChatService.fetchChatMessagesFromApi(sessionId, user);
+    }
     setMessages(stored || []);
     setErrorWarning(null);
     scrollToBottom('auto');
@@ -185,19 +208,18 @@ export default function AIChat() {
     setCurrentSessionId(newId);
     setMessages([]);
     setErrorWarning(null);
-    localStorage.setItem('aichat_last_active_session_id', newId);
     if (isMobile) setSidebarOpen(false);
   };
 
   // Rename a session
   const handleRenameSession = async ({ sessionId, newTitle }) => {
-    await aiChatService.renameChatSession(sessionId, newTitle);
+    await aiChatService.renameChatSession(sessionId, newTitle, user);
     await loadSessions();
   };
 
   // Delete a session
   const handleDeleteSession = async (sessionId) => {
-    await aiChatService.deleteChatSession(sessionId);
+    await aiChatService.deleteChatSession(sessionId, user);
     await loadSessions();
     if (currentSessionId === sessionId) {
       handleNewChat();
@@ -264,12 +286,17 @@ export default function AIChat() {
     let accumulatedTokens = '';
 
     try {
+      const isBiz = userProfile?.isBusinessOwner || normalizeRole(user?.role) === 'business_owner';
       await aiChatService.streamMessage(
         {
           message: trimmed,
           session_id: currentSessionId,
           language,
           attachments,
+          user_name: userProfile?.name || user?.name,
+          user_role: isBiz ? 'business_owner' : 'tourist',
+          business_name: isBiz ? (userProfile?.businessName || user?.business?.name) : null,
+          business_category: isBiz ? (userProfile?.businessCategory || user?.business?.category) : null,
           history: updatedMessages.map((m) => ({
             role: m.role || m.sender,
             content: m.content || m.message,
@@ -342,7 +369,7 @@ export default function AIChat() {
                 sessionId: currentSessionId,
                 title: trimmed.slice(0, 48),
                 firstMessage: trimmed,
-              });
+              }, user);
               loadSessions();
             }
             scrollToBottom();
@@ -420,11 +447,7 @@ export default function AIChat() {
         sidebarOpen={sidebarOpen}
         language={language}
         isOnline={isOnline}
-        isDarkMode={isDarkMode}
         onToggleSidebar={() => setSidebarOpen((prev) => !prev)}
-        onToggleLanguage={handleToggleLanguage}
-        onToggleTheme={handleToggleTheme}
-        onOpenSettings={() => setIsSettingsOpen(true)}
         onExit={() => navigate('/')}
       />
 
@@ -599,6 +622,14 @@ export default function AIChat() {
         onUpdateLanguage={handleUpdateLanguage}
         onUpdateProfile={handleUpdateProfile}
         onToggleTheme={handleToggleTheme}
+        onClearHistory={async () => {
+          await aiChatService.clearAllUserChatHistory(user);
+          handleNewChat();
+          await loadSessions();
+          if (showSuccess) {
+            showSuccess('Chat history cleared for your account.');
+          }
+        }}
       />
     </div>
   );

@@ -274,6 +274,8 @@ Route::prefix('travel')->group(function () use ($travelReadThrottle, $travelAuth
 
         // Tourist AI Chat History (Constrained sessionId to alphanumeric/UUID/dash)
         Route::get('/ai/conversations', [TravelAiChatController::class, 'conversations']);
+        Route::patch('/ai/conversations/{sessionId}', [TravelAiChatController::class, 'renameConversation'])
+            ->where('sessionId', '[a-zA-Z0-9\-_]+');
         Route::get('/ai/conversations/{sessionId}/messages', [TravelAiChatController::class, 'getMessages'])
             ->where('sessionId', '[a-zA-Z0-9\-_]+');
         Route::delete('/ai/conversations/{sessionId}', [TravelAiChatController::class, 'clearConversation'])

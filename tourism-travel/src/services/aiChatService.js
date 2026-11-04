@@ -1,6 +1,22 @@
 import axios from 'axios';
 import api, { AI_CHAT_SERVICE_URL } from './api';
-import { formatSuggestedTopic, TOPICS_EN, TOPICS_KM } from '../utils/chatUtils';
+import { formatSuggestedTopic, TOPICS_EN, TOPICS_KM, DEFAULT_USER_PROFILE } from '../utils/chatUtils';
+import authService, { normalizeRole } from './authService';
+
+/**
+ * Derives unique isolation scope key for the active user:
+ * - Registered Tourist (e.g. user ID 3): 'user_3'
+ * - Business Owner (e.g. user ID 7): 'business_owner_7'
+ * - Guest (not logged in): 'guest'
+ */
+export function getChatStorageScope(customUser = null) {
+  const activeUser = customUser || authService.getCurrentUser();
+  if (activeUser?.id) {
+    const role = normalizeRole(activeUser.role || 'user');
+    return `${role}_${activeUser.id}`;
+  }
+  return 'guest';
+}
 
 // Primary live backend URL matching angkorvers.vercel.app
 const LIVE_VERCEL_API = 'https://angkorvers.vercel.app/api';
@@ -369,42 +385,66 @@ export const aiChatService = {
   },
 
   /**
-   * Session Management: Loads chat sessions list (synced with localStorage)
+   * Session Management: Loads chat sessions list scoped to the current user/business
    */
-  async getChatSessions() {
+  async getChatSessions(customUser = null) {
+    const scope = getChatStorageScope(customUser);
+    const storageKey = `aichat_sessions_${scope}`;
+    let cachedSessions = [];
+
     try {
-      const stored = localStorage.getItem('aichat_sessions');
+      const stored = localStorage.getItem(storageKey);
       if (stored) {
         const parsed = JSON.parse(stored);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          return parsed;
+        if (Array.isArray(parsed)) {
+          cachedSessions = parsed;
         }
       }
     } catch {
       // ignore
     }
 
-    try {
-      const res = await aiBotClient.get('/chat/sessions');
-      const sessions = res.data?.data || res.data;
-      if (Array.isArray(sessions) && sessions.length > 0) {
-        localStorage.setItem('aichat_sessions', JSON.stringify(sessions));
-        return sessions;
+    // If authenticated user, fetch DB conversations for this specific user
+    const activeUser = customUser || authService.getCurrentUser();
+    if (activeUser?.id && authService.getToken()) {
+      try {
+        const res = await api.get('/ai/conversations');
+        const dbList = res.data?.data || res.data || [];
+        if (Array.isArray(dbList) && dbList.length > 0) {
+          const mapped = dbList.map((c) => ({
+            session_id: c.session_id,
+            title: c.title || 'New Chat',
+            created_at: c.created_at,
+            updated_at: c.last_message_at || c.updated_at || c.created_at,
+            messages_count: c.messages_count || 1,
+          }));
+
+          // Merge: use mapped DB sessions, preserving any local newly added sessions
+          const dbIds = new Set(mapped.map((s) => s.session_id));
+          const localOnly = cachedSessions.filter((s) => !dbIds.has(s.session_id));
+          const combined = [...localOnly, ...mapped].slice(0, 50);
+
+          localStorage.setItem(storageKey, JSON.stringify(combined));
+          return combined;
+        }
+      } catch {
+        // network or backend failure: fallback to cached
       }
-    } catch {
-      // ignore
     }
 
-    return [];
+    return cachedSessions;
   },
 
   /**
-   * Save or update a session in the list
+   * Save or update a session in the list scoped to the user
    */
-  saveSessionMetadata({ sessionId, title, firstMessage = '' }) {
+  saveSessionMetadata({ sessionId, title, firstMessage = '' }, customUser = null) {
     if (!sessionId) return;
+    const scope = getChatStorageScope(customUser);
+    const storageKey = `aichat_sessions_${scope}`;
+
     try {
-      const stored = localStorage.getItem('aichat_sessions');
+      const stored = localStorage.getItem(storageKey);
       let sessions = stored ? JSON.parse(stored) : [];
       if (!Array.isArray(sessions)) sessions = [];
 
@@ -427,72 +467,87 @@ export const aiChatService = {
         });
       }
 
-      localStorage.setItem('aichat_sessions', JSON.stringify(sessions.slice(0, 50)));
+      localStorage.setItem(storageKey, JSON.stringify(sessions.slice(0, 50)));
     } catch {
       // ignore
     }
   },
 
   /**
-   * Rename a chat session
+   * Rename a chat session (updates user storage and DB)
    */
-  async renameChatSession(sessionId, newTitle) {
+  async renameChatSession(sessionId, newTitle, customUser = null) {
     if (!sessionId || !newTitle) return;
+    const scope = getChatStorageScope(customUser);
+    const storageKey = `aichat_sessions_${scope}`;
+
     try {
-      const stored = localStorage.getItem('aichat_sessions');
+      const stored = localStorage.getItem(storageKey);
       if (stored) {
         let sessions = JSON.parse(stored);
         if (Array.isArray(sessions)) {
           sessions = sessions.map((s) => 
             s.session_id === sessionId ? { ...s, title: newTitle.trim() } : s
           );
-          localStorage.setItem('aichat_sessions', JSON.stringify(sessions));
+          localStorage.setItem(storageKey, JSON.stringify(sessions));
         }
       }
     } catch {
       // ignore
     }
 
-    try {
-      await aiBotClient.patch(`/chat/sessions/${sessionId}`, { title: newTitle.trim() });
-    } catch {
-      // ignore
+    const activeUser = customUser || authService.getCurrentUser();
+    if (activeUser?.id && authService.getToken()) {
+      try {
+        await api.patch(`/ai/conversations/${sessionId}`, { title: newTitle.trim() });
+      } catch {
+        // ignore
+      }
     }
   },
 
   /**
-   * Delete a chat session
+   * Delete a chat session (updates user storage and DB)
    */
-  async deleteChatSession(sessionId) {
+  async deleteChatSession(sessionId, customUser = null) {
     if (!sessionId) return;
+    const scope = getChatStorageScope(customUser);
+    const storageKey = `aichat_sessions_${scope}`;
+
     try {
-      const stored = localStorage.getItem('aichat_sessions');
+      const stored = localStorage.getItem(storageKey);
       if (stored) {
         let sessions = JSON.parse(stored);
         if (Array.isArray(sessions)) {
           sessions = sessions.filter((s) => s.session_id !== sessionId);
-          localStorage.setItem('aichat_sessions', JSON.stringify(sessions));
+          localStorage.setItem(storageKey, JSON.stringify(sessions));
         }
       }
-      localStorage.removeItem(`aichat_messages_${sessionId}`);
+      localStorage.removeItem(`aichat_messages_${scope}_${sessionId}`);
     } catch {
       // ignore
     }
 
-    try {
-      await aiBotClient.delete(`/chat/sessions/${sessionId}`);
-    } catch {
-      // ignore
+    const activeUser = customUser || authService.getCurrentUser();
+    if (activeUser?.id && authService.getToken()) {
+      try {
+        await api.delete(`/ai/conversations/${sessionId}`);
+      } catch {
+        // ignore
+      }
     }
   },
 
   /**
-   * Load stored messages for a specific session
+   * Load stored messages for a specific session scoped to user
    */
-  getChatMessages(sessionId) {
+  getChatMessages(sessionId, customUser = null) {
     if (!sessionId) return [];
+    const scope = getChatStorageScope(customUser);
+    const storageKey = `aichat_messages_${scope}_${sessionId}`;
+
     try {
-      const stored = localStorage.getItem(`aichat_messages_${sessionId}`);
+      const stored = localStorage.getItem(storageKey);
       if (stored) {
         const parsed = JSON.parse(stored);
         if (Array.isArray(parsed)) return parsed;
@@ -504,15 +559,157 @@ export const aiChatService = {
   },
 
   /**
-   * Persist messages for a specific session
+   * Fetch chat messages from DB if not available in localStorage
    */
-  saveChatMessages(sessionId, messages = []) {
+  async fetchChatMessagesFromApi(sessionId, customUser = null) {
+    if (!sessionId) return [];
+    const scope = getChatStorageScope(customUser);
+    const storageKey = `aichat_messages_${scope}_${sessionId}`;
+
+    const activeUser = customUser || authService.getCurrentUser();
+    if (activeUser?.id && authService.getToken()) {
+      try {
+        const res = await api.get(`/ai/conversations/${sessionId}/messages`);
+        const list = res.data?.data || res.data || [];
+        if (Array.isArray(list) && list.length > 0) {
+          const mapped = list.map((m) => ({
+            id: `msg_${m.id || Date.now()}`,
+            role: m.role || 'user',
+            sender: m.role || 'user',
+            content: m.content,
+            message: m.content,
+            timestamp: m.created_at || new Date().toISOString(),
+            weather: m.metadata?.weather || null,
+            itinerary: m.metadata?.itinerary || null,
+            recommendations: m.metadata?.recommendations || null,
+            currency: m.metadata?.currency || null,
+            sources: m.metadata?.sources || [],
+            suggestions: m.metadata?.suggestions || [],
+          }));
+
+          localStorage.setItem(storageKey, JSON.stringify(mapped));
+          return mapped;
+        }
+      } catch {
+        // ignore
+      }
+    }
+    return this.getChatMessages(sessionId, customUser);
+  },
+
+  /**
+   * Persist messages for a specific session scoped to user
+   */
+  saveChatMessages(sessionId, messages = [], customUser = null) {
     if (!sessionId || !Array.isArray(messages)) return;
+    const scope = getChatStorageScope(customUser);
+    const storageKey = `aichat_messages_${scope}_${sessionId}`;
+
     try {
-      localStorage.setItem(`aichat_messages_${sessionId}`, JSON.stringify(messages));
-      localStorage.setItem('aichat_last_active_session_id', sessionId);
+      localStorage.setItem(storageKey, JSON.stringify(messages));
+      localStorage.setItem(`aichat_last_active_${scope}`, sessionId);
     } catch {
       // ignore
+    }
+  },
+
+  /**
+   * Get last active session ID for user
+   */
+  getLastActiveSessionId(customUser = null) {
+    const scope = getChatStorageScope(customUser);
+    return localStorage.getItem(`aichat_last_active_${scope}`) || null;
+  },
+
+  /**
+   * Get user AI profile & personalization scoped to user
+   */
+  getUserProfile(customUser = null) {
+    const activeUser = customUser || authService.getCurrentUser();
+    const scope = getChatStorageScope(activeUser);
+    const storageKey = `aichat_profile_${scope}`;
+
+    let saved = null;
+    try {
+      const raw = localStorage.getItem(storageKey);
+      if (raw) saved = JSON.parse(raw);
+    } catch {
+      // ignore
+    }
+
+    if (!activeUser) {
+      return saved || DEFAULT_USER_PROFILE;
+    }
+
+    const isBiz = normalizeRole(activeUser.role) === 'business_owner';
+    const biz = activeUser.business || {};
+
+    return {
+      name: activeUser.name || saved?.name || 'Traveler',
+      email: activeUser.email || saved?.email || '',
+      role: activeUser.role || 'user',
+      avatar: activeUser.avatar || null,
+      isBusinessOwner: isBiz,
+      businessName: biz.name || saved?.businessName || (isBiz ? `${activeUser.name}'s Business` : ''),
+      businessCategory: biz.category || saved?.businessCategory || '',
+      businessProvince: biz.province || saved?.businessProvince || '',
+      travelStyle: saved?.travelStyle || (isBiz ? 'business' : 'cultural'),
+      preferredDestinations: saved?.preferredDestinations || ['siem_reap'],
+      businessBio: biz.description || saved?.businessBio || '',
+    };
+  },
+
+  /**
+   * Save user AI profile & personalization scoped to user
+   */
+  saveUserProfile(profile, customUser = null) {
+    if (!profile) return;
+    const scope = getChatStorageScope(customUser);
+    const storageKey = `aichat_profile_${scope}`;
+
+    try {
+      localStorage.setItem(storageKey, JSON.stringify(profile));
+    } catch {
+      // ignore
+    }
+  },
+
+  /**
+   * Clear all AI chat history for the current user/scope only
+   */
+  async clearAllUserChatHistory(customUser = null) {
+    const scope = getChatStorageScope(customUser);
+    const storageKey = `aichat_sessions_${scope}`;
+
+    try {
+      const stored = localStorage.getItem(storageKey);
+      const sessions = stored ? JSON.parse(stored) : [];
+      if (Array.isArray(sessions)) {
+        for (const s of sessions) {
+          if (s.session_id) {
+            localStorage.removeItem(`aichat_messages_${scope}_${s.session_id}`);
+          }
+        }
+      }
+      localStorage.removeItem(storageKey);
+      localStorage.removeItem(`aichat_last_active_${scope}`);
+    } catch {
+      // ignore
+    }
+
+    const activeUser = customUser || authService.getCurrentUser();
+    if (activeUser?.id && authService.getToken()) {
+      try {
+        const res = await api.get('/ai/conversations');
+        const dbList = res.data?.data || res.data || [];
+        for (const c of dbList) {
+          if (c.session_id) {
+            await api.delete(`/ai/conversations/${c.session_id}`).catch(() => {});
+          }
+        }
+      } catch {
+        // ignore
+      }
     }
   },
 

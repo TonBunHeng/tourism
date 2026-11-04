@@ -74,8 +74,10 @@ export default function AppRoutes() {
             {/* Error Pages */}
             <Route path="/forbidden" element={<Forbidden />} />
 
-            {/* Standalone Full-Screen AI Chat (No Header, No Footer) */}
-            <Route path="/ai-chat" element={<AIChat />} />
+            {/* Standalone Full-Screen AI Chat (Requires Authentication: Tourists & Business Owners) */}
+            <Route element={<ProtectedRoute allowedRoles={['user', 'business_owner', 'admin', 'super_admin']} />}>
+              <Route path="/ai-chat" element={<AIChat />} />
+            </Route>
 
             {/* 1. Tourist Portal (Public & Authenticated Routes under TouristLayout) */}
             <Route element={<TouristLayout />}>

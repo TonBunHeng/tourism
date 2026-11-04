@@ -29,6 +29,11 @@ class TravelUserResource extends JsonResource
             'last_active_at' => $this->last_active_at ? $this->last_active_at->toIso8601String() : null,
             'created_at' => $this->created_at ? $this->created_at->toIso8601String() : null,
             'updated_at' => $this->updated_at ? $this->updated_at->toIso8601String() : null,
+            'business' => $this->when($this->isBusinessOwner(), function () {
+                return $this->businesses()->select([
+                    'id', 'owner_id', 'name', 'category', 'province', 'address', 'status', 'verification_status'
+                ])->first();
+            }),
         ];
     }
 }
