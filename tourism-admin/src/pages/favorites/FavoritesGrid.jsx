@@ -8,7 +8,6 @@ import {
   Clock,
   Heart,
   Landmark,
-  Check,
   DollarSign,
   Compass,
   User,
@@ -28,11 +27,6 @@ export default function FavoritesGrid({
   onView
 }) {
   const { t } = useLanguage();
-
-  const handleToggleVisit = (id) => {
-    if (onToggleVisited) onToggleVisited(id);
-    else if (onToggleStatus) onToggleStatus(id);
-  };
 
   const handleView = (favorite) => {
     if (onView) onView(favorite);
@@ -202,39 +196,24 @@ export default function FavoritesGrid({
               </div>
 
               {/* Card Footer Actions */}
-              <div className="flex items-center justify-between gap-2 mt-4 pt-3 border-t border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]">
+              <div className="flex items-center justify-end gap-1 mt-4 pt-3 border-t border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]">
                 <button
                   type="button"
-                  onClick={() => handleToggleVisit(favorite.id)}
-                  className={`flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded-md border transition-colors cursor-pointer ${isVisited
-                    ? 'bg-[var(--color-success-bg)] dark:bg-[var(--color-success-dark-bg)] text-[var(--color-success-text)] dark:text-[var(--color-success-dark-text)] border-[var(--color-success-border)] dark:border-[var(--color-success-dark-border)] hover:opacity-85'
-                    : 'bg-[var(--color-neutral-badge-bg)] dark:bg-[var(--color-neutral-badge-dark-bg)] text-[var(--color-text-secondary-light)] dark:text-[var(--color-text-secondary-dark)] border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] hover:text-[var(--color-primary)]'
-                    }`}
-                  title={isVisited ? t('favorites.tooltipMarkToVisit') : t('favorites.tooltipMarkVisited')}
+                  onClick={() => handleView(favorite)}
+                  className="p-1.5 text-[var(--color-purple-badge-text)] dark:text-[var(--color-purple-badge-dark-text)] hover:bg-[var(--color-purple-badge-bg)] dark:hover:bg-[var(--color-purple-badge-dark-bg)] rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
+                  title={t('favorites.tooltipViewDetails')}
                 >
-                  <Check className="w-3.5 h-3.5" />
-                  <span>{isVisited ? t('favorites.statusVisited') : t('favorites.tooltipMarkVisited')}</span>
+                  <Eye className="w-4 h-4" />
                 </button>
 
-                <div className="flex items-center gap-1">
-                  <button
-                    type="button"
-                    onClick={() => handleView(favorite)}
-                    className="p-1.5 text-[var(--color-purple-badge-text)] dark:text-[var(--color-purple-badge-dark-text)] hover:bg-[var(--color-purple-badge-bg)] dark:hover:bg-[var(--color-purple-badge-dark-bg)] rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
-                    title={t('favorites.tooltipViewDetails')}
-                  >
-                    <Eye className="w-4 h-4" />
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => handleDelete(favorite.id || favorite.place_id)}
-                    className="p-1.5 text-[var(--color-danger-text)] dark:text-[var(--color-danger-dark-text)] hover:bg-[var(--color-danger-bg)] dark:hover:bg-[var(--color-danger-dark-bg)] rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
-                    title={t('favorites.tooltipDelete')}
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </div>
+                <button
+                  type="button"
+                  onClick={() => handleDelete(favorite.id || favorite.place_id)}
+                  className="p-1.5 text-[var(--color-danger-text)] dark:text-[var(--color-danger-dark-text)] hover:bg-[var(--color-danger-bg)] dark:hover:bg-[var(--color-danger-dark-bg)] rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
+                  title={t('favorites.tooltipDelete')}
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
               </div>
             </div>
           </div>

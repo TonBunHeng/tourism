@@ -7,7 +7,6 @@ import {
   CheckCircle2,
   Clock,
   Landmark,
-  Check,
   User
 } from 'lucide-react';
 import { useLanguage } from '../../i18n';
@@ -27,11 +26,6 @@ export default function FavoritesList({
   startIndex = 0
 }) {
   const { t } = useLanguage();
-
-  const handleToggleVisit = (id) => {
-    if (onToggleVisited) onToggleVisited(id);
-    else if (onToggleStatus) onToggleStatus(id);
-  };
 
   const handleView = (favorite) => {
     if (onView) onView(favorite);
@@ -118,14 +112,6 @@ export default function FavoritesList({
                       className="flex items-center justify-end gap-2 mt-3 pt-2 border-t border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)]"
                       onClick={(e) => e.stopPropagation()}
                     >
-                      <button
-                        type="button"
-                        onClick={() => handleToggleVisit(favorite.id)}
-                        className="p-1.5 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/30 rounded-md transition-colors cursor-pointer"
-                        title={isVisited ? t('favorites.tooltipMarkToVisit') : t('favorites.tooltipMarkVisited')}
-                      >
-                        <Check className="w-4 h-4" />
-                      </button>
                       <button
                         type="button"
                         onClick={() => handleView(favorite)}
@@ -304,14 +290,6 @@ export default function FavoritesList({
 
                     <td className="pl-3 pr-4 py-3.5 whitespace-nowrap text-right text-xs">
                       <div className="flex items-center justify-end gap-1">
-                        <button
-                          type="button"
-                          onClick={() => handleToggleVisit(favorite.id)}
-                          className="p-1.5 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/30 rounded-md transition-colors cursor-pointer"
-                          title={isVisited ? t('favorites.tooltipMarkToVisit') : t('favorites.tooltipMarkVisited')}
-                        >
-                          <Check className="w-4 h-4" />
-                        </button>
                         <button
                           type="button"
                           onClick={() => handleView(favorite)}

@@ -10,6 +10,8 @@ import ReviewReplyModal from "./ReviewReplyModal";
 
 import reviewService from "../../services/reviewService";
 import placeService from "../../services/placeService";
+import deletionRequestService from "../../services/deletionRequestService";
+import authService, { isSuperAdminRole } from "../../services/authService";
 import { useAlert } from "../../context/AlertContext";
 import { useSearch } from "../../context/SearchContext";
 import { useLanguage } from "../../i18n";
@@ -19,6 +21,9 @@ export default function Ratings() {
   const { t } = useLanguage();
   const { showConfirm, showSuccess, showError } = useAlert();
   const { searchTerm } = useSearch();
+
+  const currentUser = authService.getCurrentUser();
+  const isSuperAdmin = isSuperAdminRole(currentUser?.role);
 
   const [reviews, setReviews] = useState(() => getPageCache('ratings_data')?.reviews || []);
   const [places, setPlaces] = useState(() => getPageCache('ratings_data')?.places || ["All"]);
@@ -157,25 +162,62 @@ export default function Ratings() {
   };
 
   const handleDelete = async (id) => {
+    const review = reviews.find(r => r.id === id);
+    const reviewTitle = review ? (review.place_name ? `Review for ${review.place_name}` : `Review #${id}`) : `Review #${id}`;
+
+    if (isSuperAdmin) {
+      const confirmed = await showConfirm({
+        title: t('ratings.deleteConfirmTitle', 'Delete Review'),
+        message: t('ratings.deleteConfirmMsg', 'Are you sure you want to delete this tourist review permanently?'),
+        confirmText: t('ratings.deleteConfirmBtn', 'Delete Review'),
+        type: "danger"
+      });
+      if (!confirmed) return;
+
+      try {
+        await reviewService.deleteReview(id);
+        showSuccess(
+          t('ratings.deleteSuccess', 'Review has been deleted successfully.'),
+          t('ratings.deleteSuccessTitle', 'Review Deleted')
+        );
+        loadReviews();
+      } catch (e) {
+        showError(
+          e.message || t('ratings.deleteFailed', 'Failed to delete review'),
+          t('ratings.deleteFailedTitle', 'Delete Failed')
+        );
+      }
+      return;
+    }
+
     const confirmed = await showConfirm({
-      title: t('ratings.deleteConfirmTitle', 'Delete Review'),
-      message: t('ratings.deleteConfirmMsg', 'Are you sure you want to delete this tourist review permanently?'),
-      confirmText: t('ratings.deleteConfirmBtn', 'Delete Review'),
+      title: t('ratings.deletionRequestTitle', 'Submit Deletion Request'),
+      message: t('ratings.deletionRequestMessage', 'Are you sure you want to submit a deletion request for this review?\n\nThis will be submitted to the Super Administrator for review and approval.'),
+      confirmText: t('ratings.submitDeletionBtn', 'Submit Deletion'),
       type: "danger"
     });
     if (!confirmed) return;
 
     try {
-      await reviewService.deleteReview(id);
+      await deletionRequestService.createRequest({
+        request_type: 'item',
+        reason: t('ratings.deletionRequestReason', 'Request to delete review #{id}').replace('{id}', id),
+        urgency: 'medium',
+        items: [{
+          item_type: 'review',
+          item_id: id,
+          item_name: reviewTitle,
+          category: 'Review'
+        }]
+      });
       showSuccess(
-        t('ratings.deleteSuccess', 'Review has been deleted successfully.'),
-        t('ratings.deleteSuccessTitle', 'Review Deleted')
+        t('ratings.deletionRequestSuccess', 'Deletion request for this review has been submitted to Super Admin for approval.'),
+        t('ratings.requestSubmittedTitle', 'Request Submitted')
       );
-      loadReviews();
     } catch (e) {
       showError(
-        e.message || t('ratings.deleteFailed', 'Failed to delete review'),
-        t('ratings.deleteFailedTitle', 'Delete Failed')
+        e.message || t('ratings.submissionFailed', 'Failed to submit deletion request.'),
+        t('ratings.submissionFailedTitle', 'Submission Failed')
       );
     }
   };

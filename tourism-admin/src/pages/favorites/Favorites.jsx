@@ -18,6 +18,8 @@ import FavoriteDetailsModal from "./FavoriteDetailsModal";
 import favoriteService from "../../services/favoriteService";
 import placeService from "../../services/placeService";
 import categoryService from "../../services/categoryService";
+import deletionRequestService from "../../services/deletionRequestService";
+import authService, { isSuperAdminRole } from "../../services/authService";
 import { useAlert } from "../../context/AlertContext";
 import { useSearch } from "../../context/SearchContext";
 import { useLanguage } from "../../i18n";
@@ -27,6 +29,9 @@ export default function Favorites() {
   const { t } = useLanguage();
   const { showConfirm, showSuccess, showError } = useAlert();
   const { searchTerm, setSearchTerm } = useSearch();
+
+  const currentUser = authService.getCurrentUser();
+  const isSuperAdmin = isSuperAdminRole(currentUser?.role);
 
   const [favorites, setFavorites] = useState(() => getPageCache('favorites_data')?.favorites || []);
   const [categories, setCategories] = useState(() => getPageCache('favorites_data')?.categories || ["All"]);
@@ -229,49 +234,119 @@ export default function Favorites() {
   const handleDeleteFavorite = async (favId) => {
     const fav = favorites.find(f => f.id === favId || f.place_id === favId);
     const placeName = fav?.name || 'this destination';
+
+    if (isSuperAdmin) {
+      const confirmed = await showConfirm({
+        title: t('favorites.deleteConfirmTitle'),
+        message: t('favorites.deleteConfirmMsg', { name: placeName }),
+        confirmText: t('favorites.deleteConfirmBtn'),
+        type: 'danger'
+      });
+      if (!confirmed) return;
+
+      try {
+        await favoriteService.deleteFavorite(favId);
+        setFavorites((prev) => prev.filter((f) => f.id !== favId && f.place_id !== favId));
+        setSelectedFavorites((prev) => prev.filter((id) => id !== favId));
+        showSuccess(t('favorites.deleteSuccess'), t('favorites.deleteSuccessTitle'));
+      } catch (e) {
+        showError(e.message || t('favorites.deleteFailed'), t('favorites.deleteConfirmTitle'));
+      }
+      return;
+    }
+
     const confirmed = await showConfirm({
-      title: t('favorites.deleteConfirmTitle'),
-      message: t('favorites.deleteConfirmMsg', { name: placeName }),
-      confirmText: t('favorites.deleteConfirmBtn'),
+      title: t('favorites.deletionRequestTitle', 'Submit Deletion Request'),
+      message: t('favorites.deletionRequestMessage', 'Are you sure you want to submit a deletion request for "{name}"?\n\nThis will be submitted to the Super Administrator for review and approval.').replace('{name}', placeName),
+      confirmText: t('favorites.submitDeletionBtn', 'Submit Deletion'),
       type: 'danger'
     });
     if (!confirmed) return;
 
     try {
-      await favoriteService.deleteFavorite(favId);
-      setFavorites((prev) => prev.filter((f) => f.id !== favId && f.place_id !== favId));
-      setSelectedFavorites((prev) => prev.filter((id) => id !== favId));
-      showSuccess(t('favorites.deleteSuccess'), t('favorites.deleteSuccessTitle'));
+      await deletionRequestService.createRequest({
+        request_type: 'item',
+        reason: t('favorites.deletionRequestReason', 'Request to delete favorite: {name}').replace('{name}', placeName),
+        urgency: 'medium',
+        items: [{
+          item_type: 'favorite',
+          item_id: fav?.id || favId,
+          item_name: placeName,
+          category: fav?.category || 'Favorite'
+        }]
+      });
+      showSuccess(
+        t('favorites.deletionRequestSuccess', 'Deletion request for "{name}" has been submitted to Super Admin for approval.').replace('{name}', placeName),
+        t('favorites.requestSubmittedTitle', 'Request Submitted')
+      );
     } catch (e) {
-      showError(e.message || t('favorites.deleteFailed'), t('favorites.deleteConfirmTitle'));
+      showError(e.message || t('favorites.submissionFailed', 'Failed to submit deletion request.'), t('favorites.submissionFailedTitle', 'Submission Failed'));
     }
   };
 
   const handleBulkDelete = async () => {
     if (selectedFavorites.length === 0) return;
+
+    if (isSuperAdmin) {
+      const confirmed = await showConfirm({
+        title: t('favorites.bulkDeleteConfirmTitle'),
+        message: t('favorites.bulkDeleteConfirmMsg', { count: selectedFavorites.length }),
+        confirmText: t('favorites.deleteConfirmBtn'),
+        type: 'danger'
+      });
+      if (!confirmed) return;
+
+      const results = await Promise.allSettled(
+        selectedFavorites.map((id) => favoriteService.deleteFavorite(id))
+      );
+      const deletedIds = selectedFavorites.filter((_, index) => results[index].status === 'fulfilled');
+      const failedCount = results.length - deletedIds.length;
+      if (deletedIds.length > 0) {
+        setFavorites((prev) => prev.filter((f) => !deletedIds.includes(f.id)));
+        setSelectedFavorites((prev) => prev.filter((id) => !deletedIds.includes(id)));
+        showSuccess(t('favorites.bulkDeleteSuccess', { count: deletedIds.length }), t('favorites.deleteSuccessTitle'));
+      }
+      if (failedCount > 0) {
+        showError(
+          t('favorites.bulkDeletePartialFailure', '{count} favorite(s) could not be deleted.').replace('{count}', failedCount),
+          t('favorites.bulkDeleteConfirmTitle')
+        );
+      }
+      return;
+    }
+
     const confirmed = await showConfirm({
-      title: t('favorites.bulkDeleteConfirmTitle'),
-      message: t('favorites.bulkDeleteConfirmMsg', { count: selectedFavorites.length }),
-      confirmText: t('favorites.deleteConfirmBtn'),
+      title: t('favorites.bulkDeletionRequestTitle', 'Submit Bulk Deletion Request'),
+      message: t('favorites.bulkDeletionRequestMessage', 'Are you sure you want to submit a deletion request for {count} favorite destinations?\n\nThis will be submitted to the Super Administrator for review and approval.').replace('{count}', selectedFavorites.length),
+      confirmText: t('favorites.submitDeletionBtn', 'Submit Deletion'),
       type: 'danger'
     });
     if (!confirmed) return;
 
-    const results = await Promise.allSettled(
-      selectedFavorites.map((id) => favoriteService.deleteFavorite(id))
-    );
-    const deletedIds = selectedFavorites.filter((_, index) => results[index].status === 'fulfilled');
-    const failedCount = results.length - deletedIds.length;
-    if (deletedIds.length > 0) {
-      setFavorites((prev) => prev.filter((f) => !deletedIds.includes(f.id)));
-      setSelectedFavorites((prev) => prev.filter((id) => !deletedIds.includes(id)));
-      showSuccess(t('favorites.bulkDeleteSuccess', { count: deletedIds.length }), t('favorites.deleteSuccessTitle'));
-    }
-    if (failedCount > 0) {
-      showError(
-        t('favorites.bulkDeletePartialFailure', '{count} favorite(s) could not be deleted.').replace('{count}', failedCount),
-        t('favorites.bulkDeleteConfirmTitle')
+    const items = selectedFavorites.map(id => {
+      const f = favorites.find(item => item.id === id);
+      return {
+        item_type: 'favorite',
+        item_id: id,
+        item_name: f?.name || `Favorite #${id}`,
+        category: f?.category || 'Favorite'
+      };
+    });
+
+    try {
+      await deletionRequestService.createRequest({
+        request_type: 'item',
+        reason: `Bulk deletion request for ${selectedFavorites.length} favorite destinations`,
+        urgency: 'medium',
+        items: items
+      });
+      setSelectedFavorites([]);
+      showSuccess(
+        t('favorites.bulkDeletionRequestSuccess', 'Bulk deletion request for {count} favorites has been submitted to Super Admin.').replace('{count}', items.length),
+        t('favorites.requestSubmittedTitle', 'Request Submitted')
       );
+    } catch (e) {
+      showError(e.message || t('favorites.submissionFailed', 'Failed to submit deletion request.'), t('favorites.submissionFailedTitle', 'Submission Failed'));
     }
   };
 

@@ -1,5 +1,4 @@
 import {
-  Check,
   Star,
   MapPin,
   ThumbsUp,
@@ -7,8 +6,7 @@ import {
   MessageSquare,
   Bot,
   Eye,
-  X,
-  Reply,
+  Trash2,
   User
 } from 'lucide-react';
 
@@ -42,7 +40,8 @@ export default function ReviewsList({
   reviews,
   onViewDetails,
   onStatusChange,
-  onOpenReplyModal
+  onOpenReplyModal,
+  onDelete
 }) {
   return (
     <div className="divide-y divide-[var(--color-border-subtle-light)] dark:divide-[var(--color-border-dark)]">
@@ -167,31 +166,15 @@ export default function ReviewsList({
                   >
                     <Eye className="w-4 h-4 text-[var(--color-purple-badge-text)] dark:text-[var(--color-purple-badge-dark-text)]" />
                   </button>
-                  {review.status === 'Pending' && (
-                    <>
-                      <button
-                        onClick={() => onStatusChange(review.id, 'Approved')}
-                        className="p-1.5 hover:bg-[var(--color-success-bg)] dark:hover:bg-[var(--color-success-dark-bg)] rounded-md transition-colors cursor-pointer"
-                        title="Approve"
-                      >
-                        <Check className="w-4 h-4 text-[var(--color-success-text)] dark:text-[var(--color-success-dark-text)]" />
-                      </button>
-                      <button
-                        onClick={() => onStatusChange(review.id, 'Rejected')}
-                        className="p-1.5 hover:bg-[var(--color-danger-bg)] dark:hover:bg-[var(--color-danger-dark-bg)] rounded-md transition-colors cursor-pointer"
-                        title="Reject"
-                      >
-                        <X className="w-4 h-4 text-[var(--color-danger-text)] dark:text-[var(--color-danger-dark-text)]" />
-                      </button>
-                    </>
+                  {onDelete && (
+                    <button
+                      onClick={() => onDelete(review.id)}
+                      className="p-1.5 hover:bg-[var(--color-danger-bg)] dark:hover:bg-[var(--color-danger-dark-bg)] rounded-md transition-colors cursor-pointer"
+                      title="Delete Review"
+                    >
+                      <Trash2 className="w-4 h-4 text-[var(--color-danger-text)] dark:text-[var(--color-danger-dark-text)]" />
+                    </button>
                   )}
-                  <button
-                    onClick={() => onOpenReplyModal(review)}
-                    className="p-1.5 hover:bg-[var(--color-info-bg)] dark:hover:bg-[var(--color-info-dark-bg)] rounded-md transition-colors cursor-pointer"
-                    title="Reply as Admin"
-                  >
-                    <Reply className="w-4 h-4 text-[var(--color-info-text)] dark:text-[var(--color-info-dark-text)]" />
-                  </button>
                 </div>
               </div>
             </div>

@@ -1,4 +1,4 @@
-import { ThumbsUp, ThumbsDown, Check, X, Eye, Clock, Calendar, MapPin, User, Reply, Trash2 } from 'lucide-react';
+import { ThumbsUp, ThumbsDown, Eye, Clock, Calendar, MapPin, User, Trash2 } from 'lucide-react';
 import { getStatusColor, renderStars } from '../../utils/StatusUtils';
 import { useLanguage } from '../../i18n';
 
@@ -153,36 +153,6 @@ export default function RatingsGrid({
               </div>
 
               <div className="flex items-center gap-1">
-                {review.status === 'Pending' && onStatusChange && (
-                  <>
-                    <button
-                      type="button"
-                      onClick={() => onStatusChange(review.id, 'Approved')}
-                      className="p-1.5 text-[var(--color-success-text)] dark:text-[var(--color-success-dark-text)] hover:bg-[var(--color-success-bg)] dark:hover:bg-[var(--color-success-dark-bg)] rounded-md transition-colors cursor-pointer"
-                      title={t('ratings.tooltipApprove', 'Approve Review')}
-                    >
-                      <Check className="w-4 h-4" />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => onStatusChange(review.id, 'Rejected')}
-                      className="p-1.5 text-[var(--color-danger-text)] dark:text-[var(--color-danger-dark-text)] hover:bg-[var(--color-danger-bg)] dark:hover:bg-[var(--color-danger-dark-bg)] rounded-md transition-colors cursor-pointer"
-                      title={t('ratings.tooltipReject', 'Reject Review')}
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
-                  </>
-                )}
-                {onReply && (
-                  <button
-                    type="button"
-                    onClick={() => onReply(review)}
-                    className="p-1.5 text-[var(--color-info-text)] dark:text-[var(--color-info-dark-text)] hover:bg-[var(--color-info-bg)] dark:hover:bg-[var(--color-info-dark-bg)] rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
-                    title={t('ratings.tooltipReply', 'Reply')}
-                  >
-                    <Reply className="w-4 h-4" />
-                  </button>
-                )}
                 <button
                   type="button"
                   onClick={() => handleView(review)}
@@ -195,7 +165,7 @@ export default function RatingsGrid({
                   <button
                     type="button"
                     onClick={() => onDelete(review.id)}
-                    className="p-1.5 text-[var(--color-danger-text)] dark:text-[var(--color-danger-dark-text)] hover:bg-[var(--color-danger-bg)] dark:hover:bg-[var(--color-danger-dark-bg)] rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
+                    className="p-1.5 text-[var(--color-danger-text)] dark:text-[var(--color-danger-dark-text)] hover:bg-[var(--color-danger-bg)] dark:hover:bg-[var(--color-danger-bg)] rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
                     title={t('ratings.tooltipDelete', 'Delete Review')}
                   >
                     <Trash2 className="w-4 h-4" />

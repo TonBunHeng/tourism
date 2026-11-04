@@ -4,6 +4,8 @@ import {
   Plus, RefreshCw, Star, MapPin, Clock, Users, DollarSign, ChevronDown
 } from 'lucide-react';
 import tourService from '../../services/tourService';
+import deletionRequestService from '../../services/deletionRequestService';
+import authService, { isSuperAdminRole } from '../../services/authService';
 import SimplePagination from '../../components/common/SimplePagination';
 import TourModal from './TourModal';
 import TourDetailsModal from './TourDetailsModal';
@@ -17,6 +19,9 @@ export default function Tours() {
   const { t } = useLanguage();
   const { showConfirm, showSuccess, showError } = useAlert();
   const { searchTerm: search } = useSearch();
+
+  const currentUser = authService.getCurrentUser();
+  const isSuperAdmin = isSuperAdminRole(currentUser?.role);
 
   const [tours, setTours] = useState(() => getPageCache('tours_data') || []);
   const [loading, setLoading] = useState(() => !getPageCache('tours_data'));
@@ -186,36 +191,71 @@ export default function Tours() {
 
   // Delete Tour
   const handleDeleteTour = useCallback(async (tour) => {
+    if (isSuperAdmin) {
+      const confirmed = await showConfirm({
+        title: t('tours.deleteTitle', 'Delete Tour Package'),
+        message: t('tours.deleteMessage', 'Are you sure you want to permanently delete "{title}"?\n\nThis will remove all associated itinerary links and reservations.').replace('{title}', tour.title),
+        confirmText: t('tours.deleteConfirmBtn', 'Delete Package'),
+        type: 'danger'
+      });
+
+      if (!confirmed) return;
+
+      try {
+        await tourService.deleteTour(tour.id);
+        setTours(prev => {
+          const updated = prev.filter(item => item.id !== tour.id);
+          setPageCache('tours_data', updated);
+          return updated;
+        });
+        if (viewingTour && viewingTour.id === tour.id) {
+          setViewingTour(null);
+        }
+        showSuccess(
+          t('tours.packageDeletedSuccess', 'Tour package "{title}" has been deleted.').replace('{title}', tour.title),
+          t('tours.packageDeletedTitle', 'Package Removed')
+        );
+      } catch (err) {
+        showError(
+          err.message || t('tours.deleteFailed', 'Failed to delete tour package.'),
+          t('tours.errorSavingTitle', 'Delete Failed')
+        );
+      }
+      return;
+    }
+
     const confirmed = await showConfirm({
-      title: t('tours.deleteTitle', 'Delete Tour Package'),
-      message: t('tours.deleteMessage', 'Are you sure you want to permanently delete "{title}"?\n\nThis will remove all associated itinerary links and reservations.').replace('{title}', tour.title),
-      confirmText: t('tours.deleteConfirmBtn', 'Delete Package'),
+      title: t('tours.deletionRequestTitle', 'Submit Deletion Request'),
+      message: t('tours.deletionRequestMessage', 'Are you sure you want to submit a deletion request for "{title}"?\n\nThis will be submitted to the Super Administrator for review and approval.').replace('{title}', tour.title),
+      confirmText: t('tours.submitDeletionBtn', 'Submit Deletion'),
       type: 'danger'
     });
 
     if (!confirmed) return;
 
     try {
-      await tourService.deleteTour(tour.id);
-      setTours(prev => {
-        const updated = prev.filter(item => item.id !== tour.id);
-        setPageCache('tours_data', updated);
-        return updated;
+      await deletionRequestService.createRequest({
+        request_type: 'item',
+        reason: t('tours.deletionRequestReason', 'Request to delete tour package: {title}').replace('{title}', tour.title),
+        urgency: 'medium',
+        items: [{
+          item_type: 'tour',
+          item_id: tour.id,
+          item_name: tour.title,
+          category: tour.category || 'Tour'
+        }]
       });
-      if (viewingTour && viewingTour.id === tour.id) {
-        setViewingTour(null);
-      }
       showSuccess(
-        t('tours.packageDeletedSuccess', 'Tour package "{title}" has been deleted.').replace('{title}', tour.title),
-        t('tours.packageDeletedTitle', 'Package Removed')
+        t('tours.deletionRequestSuccess', 'Deletion request for "{title}" has been submitted to Super Admin for approval.').replace('{title}', tour.title),
+        t('tours.requestSubmittedTitle', 'Request Submitted')
       );
     } catch (err) {
       showError(
-        err.message || t('tours.deleteFailed', 'Failed to delete tour package.'),
-        t('tours.errorSavingTitle', 'Delete Failed')
+        err.message || t('tours.submissionFailed', 'Failed to submit deletion request.'),
+        t('tours.submissionFailedTitle', 'Submission Failed')
       );
     }
-  }, [viewingTour, showConfirm, showSuccess, showError, t]);
+  }, [viewingTour, isSuperAdmin, showConfirm, showSuccess, showError, t]);
 
   // Modal Callbacks
   const handleCloseViewing = useCallback(() => setViewingTour(null), []);

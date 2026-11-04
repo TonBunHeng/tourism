@@ -5,6 +5,8 @@ import {
   ExternalLink
 } from 'lucide-react';
 import businessService from '../../services/businessService';
+import deletionRequestService from '../../services/deletionRequestService';
+import authService, { isSuperAdminRole } from '../../services/authService';
 import SimplePagination from '../../components/common/SimplePagination';
 import BusinessDetailsModal from './BusinessDetailsModal';
 import BusinessModal from './BusinessModal';
@@ -18,6 +20,8 @@ import { useLanguage } from '../../i18n';
 export default function Businesses() {
   const { t } = useLanguage();
   const { showConfirm, showSuccess, showError } = useAlert();
+  const currentUser = authService.getCurrentUser();
+  const isSuperAdmin = isSuperAdminRole(currentUser?.role);
   const cachedData = getPageCache('businesses_data');
   const [businesses, setBusinesses] = useState(() => cachedData?.businesses || []);
   const [stats, setStats] = useState(() => cachedData?.stats || { pending: 0, approved: 0, suspended: 0, rejected: 0, total: 0 });
@@ -218,30 +222,62 @@ export default function Businesses() {
 
   // Handle Delete Action
   const handleDelete = async (business) => {
+    if (isSuperAdmin) {
+      const confirmed = await showConfirm({
+        title: t('businesses.deleteTitle', 'Delete Business Profile'),
+        message: t('businesses.deleteMessage', 'Are you sure you want to permanently delete "{name}"?\n\nThis will remove all associated ratings, media, and owner profile links.').replace('{name}', business.name),
+        confirmText: t('businesses.deleteConfirmBtn', 'Delete Profile'),
+        type: 'danger'
+      });
+
+      if (!confirmed) return;
+
+      setActionLoading(business.id);
+      try {
+        await businessService.delete(business.id);
+        setBusinesses(prev => prev.filter(b => b.id !== business.id));
+        if (viewingBusiness && viewingBusiness.id === business.id) {
+          setViewingBusiness(null);
+        }
+        showSuccess(
+          t('businesses.deletedSuccess', 'Business profile "{name}" has been removed.').replace('{name}', business.name),
+          t('businesses.deletedTitle', 'Profile Deleted')
+        );
+      } catch (err) {
+        showError(err.message || t('businesses.deleteFailed', 'Failed to delete business profile.'), t('businesses.errorTitle', 'Action Failed'));
+      } finally {
+        setActionLoading(null);
+      }
+      return;
+    }
+
     const confirmed = await showConfirm({
-      title: t('businesses.deleteTitle', 'Delete Business Profile'),
-      message: t('businesses.deleteMessage', 'Are you sure you want to permanently delete "{name}"?\n\nThis will remove all associated ratings, media, and owner profile links.').replace('{name}', business.name),
-      confirmText: t('businesses.deleteConfirmBtn', 'Delete Profile'),
+      title: t('businesses.deletionRequestTitle', 'Submit Deletion Request'),
+      message: t('businesses.deletionRequestMessage', 'Are you sure you want to submit a deletion request for "{name}"?\n\nThis will be submitted to the Super Administrator for review and approval.').replace('{name}', business.name),
+      confirmText: t('businesses.submitDeletionBtn', 'Submit Deletion'),
       type: 'danger'
     });
 
     if (!confirmed) return;
 
-    setActionLoading(business.id);
     try {
-      await businessService.delete(business.id);
-      setBusinesses(prev => prev.filter(b => b.id !== business.id));
-      if (viewingBusiness && viewingBusiness.id === business.id) {
-        setViewingBusiness(null);
-      }
+      await deletionRequestService.createRequest({
+        request_type: 'item',
+        reason: t('businesses.deletionRequestReason', 'Request to delete business profile: {name}').replace('{name}', business.name),
+        urgency: 'medium',
+        items: [{
+          item_type: 'business',
+          item_id: business.id,
+          item_name: business.name,
+          category: business.category_name || business.category?.name || 'Business'
+        }]
+      });
       showSuccess(
-        t('businesses.deletedSuccess', 'Business profile "{name}" has been removed.').replace('{name}', business.name),
-        t('businesses.deletedTitle', 'Profile Deleted')
+        t('businesses.deletionRequestSuccess', 'Deletion request for "{name}" has been submitted to Super Admin for approval.').replace('{name}', business.name),
+        t('businesses.requestSubmittedTitle', 'Request Submitted')
       );
     } catch (err) {
-      showError(err.message || t('businesses.deleteFailed', 'Failed to delete business profile.'), t('businesses.errorTitle', 'Action Failed'));
-    } finally {
-      setActionLoading(null);
+      showError(err.message || t('businesses.submissionFailed', 'Failed to submit deletion request.'), t('businesses.errorTitle', 'Submission Failed'));
     }
   };
 

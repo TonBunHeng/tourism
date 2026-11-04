@@ -2,13 +2,10 @@ import {
   Star,
   ThumbsUp,
   ThumbsDown,
-  Check,
-  X,
   Eye,
   Image as ImageIcon,
   MapPin,
   User,
-  Reply,
   Trash2,
   MessageSquare
 } from 'lucide-react';
@@ -135,36 +132,6 @@ export default function RatingsTable({
                       </div>
 
                       <div className="flex items-center gap-1">
-                        {review.status === 'Pending' && onStatusChange && (
-                          <>
-                            <button
-                              type="button"
-                              onClick={() => onStatusChange(review.id, 'Approved')}
-                              className="p-1.5 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 rounded-md transition-colors cursor-pointer"
-                              title={t('ratings.tooltipApprove', 'Approve Review')}
-                            >
-                              <Check className="w-4 h-4" />
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => onStatusChange(review.id, 'Rejected')}
-                              className="p-1.5 text-[var(--color-danger-text)] dark:text-[var(--color-danger-dark-text)] hover:bg-[var(--color-danger-bg)] dark:hover:bg-[var(--color-danger-dark-bg)] rounded-md transition-colors cursor-pointer"
-                              title={t('ratings.tooltipReject', 'Reject Review')}
-                            >
-                              <X className="w-4 h-4" />
-                            </button>
-                          </>
-                        )}
-                        {onReply && (
-                          <button
-                            type="button"
-                            onClick={() => onReply(review)}
-                            className="p-1.5 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/30 rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
-                            title={t('ratings.tooltipReply', 'Reply')}
-                          >
-                            <Reply className="w-4 h-4" />
-                          </button>
-                        )}
                         <button
                           type="button"
                           onClick={() => handleView(review)}
@@ -327,36 +294,6 @@ export default function RatingsTable({
                         >
                           <Eye className="w-4 h-4" />
                         </button>
-                        {onReply && (
-                          <button
-                            type="button"
-                            onClick={() => onReply(review)}
-                            className="p-1.5 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/30 rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
-                            title={t('ratings.tooltipReply', 'Reply')}
-                          >
-                            <Reply className="w-4 h-4" />
-                          </button>
-                        )}
-                        {review.status === 'Pending' && onStatusChange && (
-                          <>
-                            <button
-                              type="button"
-                              onClick={() => onStatusChange(review.id, 'Approved')}
-                              className="p-1.5 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 rounded-md transition-colors cursor-pointer"
-                              title={t('ratings.tooltipApprove', 'Approve Review')}
-                            >
-                              <Check className="w-4 h-4" />
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => onStatusChange(review.id, 'Rejected')}
-                              className="p-1.5 text-[var(--color-danger-text)] dark:text-[var(--color-danger-dark-text)] hover:bg-[var(--color-danger-bg)] dark:hover:bg-[var(--color-danger-dark-bg)] rounded-md transition-colors cursor-pointer"
-                              title={t('ratings.tooltipReject', 'Reject Review')}
-                            >
-                              <X className="w-4 h-4" />
-                            </button>
-                          </>
-                        )}
                         {onDelete && (
                           <button
                             type="button"

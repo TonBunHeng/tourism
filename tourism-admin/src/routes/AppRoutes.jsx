@@ -76,9 +76,7 @@ const AppRoutes = () => {
             <Route path="/events" element={<Events />} />
             <Route path="/reviews" element={<Ratings />} />
             <Route path="/ratings" element={<Ratings />} />
-            <Route path="/ratings/analytics" element={<RatingsAnalytics />} />
             <Route path="/favorites" element={<Favorites />} />
-            <Route path="/favorites/analytics" element={<FavoritesAnalytics />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/notifications" element={<Notifications />} />
 
@@ -98,6 +96,8 @@ const AppRoutes = () => {
             {/* Restricted Pages: Super Admin Only */}
             <Route element={<ProtectedRoute allowedRoles={SUPER_ADMIN_ONLY_ROLES} />}>
               <Route path="/deletion-requests" element={<DeletionRequests />} />
+              <Route path="/ratings/analytics" element={<RatingsAnalytics />} />
+              <Route path="/favorites/analytics" element={<FavoritesAnalytics />} />
             </Route>
           </Route>
         </Route>

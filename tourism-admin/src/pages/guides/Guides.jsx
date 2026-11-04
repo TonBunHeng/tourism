@@ -4,6 +4,8 @@ import {
   AlertCircle, Eye, Edit, Trash2, Plus, RefreshCw, ChevronDown
 } from 'lucide-react';
 import guideService from '../../services/guideService';
+import deletionRequestService from '../../services/deletionRequestService';
+import authService, { isSuperAdminRole } from '../../services/authService';
 import SimplePagination from '../../components/common/SimplePagination';
 import GuideModal from './GuideModal';
 import GuideDetailsModal from './GuideDetailsModal';
@@ -45,6 +47,9 @@ export default function Guides() {
   const { t } = useLanguage();
   const { showConfirm, showSuccess, showError } = useAlert();
   const { searchTerm: search } = useSearch();
+
+  const currentUser = authService.getCurrentUser();
+  const isSuperAdmin = isSuperAdminRole(currentUser?.role);
 
   const [guides, setGuides] = useState(() => getPageCache('guides_data') || []);
   const [loading, setLoading] = useState(() => !getPageCache('guides_data'));
@@ -244,32 +249,64 @@ export default function Guides() {
 
   // Delete Guide
   const handleDeleteGuide = async (guide) => {
+    if (isSuperAdmin) {
+      const confirmed = await showConfirm({
+        title: t('guides.deleteConfirmTitle', 'Delete Tour Guide'),
+        message: t('guides.deleteConfirmMessage', 'Are you sure you want to permanently remove "{name}" from the accredited directory?').replace('{name}', guide.name),
+        confirmText: t('guides.confirmDeleteBtn', 'Delete Guide'),
+        type: 'danger'
+      });
+
+      if (!confirmed) return;
+
+      try {
+        await guideService.deleteGuide(guide.id);
+      } catch {
+        // optimistic update
+      } finally {
+        setGuides(prev => {
+          const next = prev.filter(g => g.id !== guide.id);
+          setPageCache('guides_data', next);
+          return next;
+        });
+        if (viewingGuide && viewingGuide.id === guide.id) {
+          setViewingGuide(null);
+        }
+        showSuccess(
+          t('guides.guideDeletedSuccess', 'Tour guide "{name}" has been deleted.').replace('{name}', guide.name),
+          t('guides.guideRemovedTitle', 'Guide Removed')
+        );
+      }
+      return;
+    }
+
     const confirmed = await showConfirm({
-      title: t('guides.deleteConfirmTitle', 'Delete Tour Guide'),
-      message: t('guides.deleteConfirmMessage', 'Are you sure you want to permanently remove "{name}" from the accredited directory?').replace('{name}', guide.name),
-      confirmText: t('guides.confirmDeleteBtn', 'Delete Guide'),
+      title: t('guides.deletionRequestTitle', 'Submit Deletion Request'),
+      message: t('guides.deletionRequestMessage', 'Are you sure you want to submit a deletion request for "{name}"?\n\nThis will be submitted to the Super Administrator for review and approval.').replace('{name}', guide.name),
+      confirmText: t('guides.submitDeletionBtn', 'Submit Deletion'),
       type: 'danger'
     });
 
     if (!confirmed) return;
 
     try {
-      await guideService.deleteGuide(guide.id);
-    } catch {
-      // optimistic update
-    } finally {
-      setGuides(prev => {
-        const next = prev.filter(g => g.id !== guide.id);
-        setPageCache('guides_data', next);
-        return next;
+      await deletionRequestService.createRequest({
+        request_type: 'item',
+        reason: t('guides.deletionRequestReason', 'Request to remove tour guide: {name}').replace('{name}', guide.name),
+        urgency: 'medium',
+        items: [{
+          item_type: 'guide',
+          item_id: guide.id,
+          item_name: guide.name,
+          category: 'Guide'
+        }]
       });
-      if (viewingGuide && viewingGuide.id === guide.id) {
-        setViewingGuide(null);
-      }
       showSuccess(
-        t('guides.guideDeletedSuccess', 'Tour guide "{name}" has been deleted.').replace('{name}', guide.name),
-        t('guides.guideRemovedTitle', 'Guide Removed')
+        t('guides.deletionRequestSuccess', 'Deletion request for "{name}" has been submitted to Super Admin for approval.').replace('{name}', guide.name),
+        t('guides.requestSubmittedTitle', 'Request Submitted')
       );
+    } catch (e) {
+      showError(e.message || t('guides.submissionFailed', 'Failed to submit deletion request.'), t('guides.submissionFailedTitle', 'Submission Failed'));
     }
   };
 

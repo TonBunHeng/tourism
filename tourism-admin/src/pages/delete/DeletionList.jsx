@@ -125,26 +125,6 @@ export default function DeletionList({
                       >
                         <Eye className="w-4 h-4" />
                       </button>
-                      {request.status === 'pending' && (
-                        <>
-                          <button
-                            type="button"
-                            onClick={() => onApprove(request)}
-                            className="p-1.5 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
-                            title={t('deletion.tooltipApprove', 'Approve')}
-                          >
-                            <Check className="w-4 h-4" />
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => onReject(request)}
-                            className="p-1.5 text-[var(--color-danger-text)] dark:text-[var(--color-danger-dark-text)] hover:bg-[var(--color-danger-bg)] dark:hover:bg-[var(--color-danger-dark-bg)] rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
-                            title={t('deletion.tooltipReject', 'Reject')}
-                          >
-                            <X className="w-4 h-4" />
-                          </button>
-                        </>
-                      )}
                     </div>
                   </div>
                 </div>
@@ -261,26 +241,6 @@ export default function DeletionList({
                         >
                           <Eye className="w-4 h-4" />
                         </button>
-                        {request.status === 'pending' && (
-                          <>
-                            <button
-                              type="button"
-                              onClick={() => onApprove(request)}
-                              className="p-1.5 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
-                              title={t('deletion.tooltipApprove', 'Approve')}
-                            >
-                              <Check className="w-4 h-4" />
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => onReject(request)}
-                              className="p-1.5 text-[var(--color-danger-text)] dark:text-[var(--color-danger-dark-text)] hover:bg-[var(--color-danger-bg)] dark:hover:bg-[var(--color-danger-dark-bg)] rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer"
-                              title={t('deletion.tooltipReject', 'Reject')}
-                            >
-                              <X className="w-4 h-4" />
-                            </button>
-                          </>
-                        )}
                       </div>
                     </td>
                   </tr>

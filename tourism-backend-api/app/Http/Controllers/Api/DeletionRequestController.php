@@ -8,10 +8,13 @@ use App\Models\Category;
 use App\Models\DeletionRequest;
 use App\Models\DeletionRequestItem;
 use App\Models\Event;
+use App\Models\Favorite;
 use App\Models\GalleryMedia;
 use App\Models\Place;
 use App\Models\Province;
 use App\Models\Review;
+use App\Models\Tour;
+use App\Models\Business;
 use App\Models\User;
 use App\Traits\ApiResponse;
 use Carbon\Carbon;
@@ -261,11 +264,22 @@ class DeletionRequestController extends Controller
                                 Province::find($itemId)?->delete();
                                 break;
                             case 'review':
+                            case 'rating':
                                 Review::find($itemId)?->delete();
                                 break;
+                            case 'favorite':
+                                Favorite::find($itemId)?->delete();
+                                break;
+                            case 'tour':
+                                Tour::find($itemId)?->delete();
+                                break;
+                            case 'guide':
                             case 'user':
                             case 'account':
                                 User::find($itemId)?->delete();
+                                break;
+                            case 'business':
+                                Business::find($itemId)?->delete();
                                 break;
                         }
                     }
