@@ -70,5 +70,49 @@
     "source": "outside_search_discovery",
     "verified": true,
     "learned_at": "2026-11-02T16:22:01Z"
+  },
+  {
+    "id": "dynamic_balut__food__f4e48b",
+    "name": "Balut (food)",
+    "name_km": "",
+    "category": "Discovered Attraction",
+    "province": "Siem Reap",
+    "province_km": "",
+    "description": "Balut ( bə-LOOT,  BAH-loot; also spelled as balot) is a fertilized developing egg embryo that is boiled or steamed and eaten from the shell. It is commonly sold as street food in Southeast Asia, most notably in the Philippines, Cambodia (Khmer: ពងទាកូន, romanized: paung tea kaun), and Vietnam (Vietnamese: trứng vịt lộn, hột vịt lộn), and also occasionally in Thailand (Thai: ไข่ข้าว, romanized: khai khao). Balut is often seasoned with salt and vinegar.\nThe length of incubation before the egg is cooked is a matter of local preference, but generally ranges from two to three weeks. Balut can cause vomiting if not cooked correctly.\n\nthe shell. It is commonly sold as street food in Southeast Asia, most notably in the Philippines, Cambodia (Khmer: ពងទាកូន, romanized: paung tea kaun)\n\n1975 to 1979, under the general secretaryship of Pol Pot and the Communist Party of Kampuchea (CPK), commonly known as the Khmer Rouge. The Khmer Rouge&#039;s",
+    "description_km": "",
+    "website_links": [
+      {
+        "title": "Balut (food) - Wikipedia",
+        "url": "https://en.wikipedia.org/wiki/Balut_(food)"
+      },
+      {
+        "title": "Balut (food)",
+        "url": "https://en.wikipedia.org/wiki/Balut_%28food%29"
+      },
+      {
+        "title": "Democratic Kampuchea",
+        "url": "https://en.wikipedia.org/wiki/Democratic_Kampuchea"
+      },
+      {
+        "title": "Banana fritter",
+        "url": "https://en.wikipedia.org/wiki/Banana_fritter"
+      }
+    ],
+    "picture_links": [
+      {
+        "caption": "Picture of Balut (food)",
+        "image_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a5/The_Balut.jpg/960px-The_Balut.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
+      }
+    ],
+    "tags": [
+      "khmer",
+      "food",
+      "street",
+      "top",
+      "try"
+    ],
+    "source": "outside_search_discovery",
+    "verified": true,
+    "learned_at": "2026-11-08T12:42:05Z"
   }
 ]
