@@ -739,3 +739,7 @@ Administrators (`admin`) and Super Administrators (`super_admin`) operating via 
 * **Pending Requests Tracking**: Track pending business registrations (`verification_status = pending`) from Business Owners and pending place uploads (`status = Pending`) from Guides with direct approval (`/approve`) and rejection (`/reject`) triggers.
 
 ---
+
+## AngkorVerses API
+### All api with sawgger documentation
+[View API Documentation](http://127.0.0.1:8000/api/documentation)
