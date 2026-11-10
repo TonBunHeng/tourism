@@ -9,7 +9,7 @@ Route::get('/', function () {
         'status' => 'active',
         'version' => '1.0.0',
         'endpoints' => [
-            'api_documentation' => '/api/travel/settings',
+            'api_documentation' => '/api/documentation',
             'health_check' => '/api/health',
             'google_oauth_redirect' => '/auth/google/redirect',
         ],
