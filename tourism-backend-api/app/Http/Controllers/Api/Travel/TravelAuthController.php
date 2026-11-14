@@ -12,6 +12,7 @@ use App\Http\Requests\Travel\TravelRegisterRequest;
 use App\Http\Resources\Travel\TravelUserResource;
 use App\Models\BlockedIp;
 use App\Models\LoginAttempt;
+use App\Models\Notification;
 use App\Models\User;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
@@ -27,6 +28,28 @@ use Laravel\Socialite\Facades\Socialite;
 class TravelAuthController extends Controller
 {
     use ApiResponse;
+
+    /**
+     * Helper to safely remove locally stored avatars to avoid orphaned files.
+     */
+    private function deleteLocalAvatarFile(?string $avatarUrl): void
+    {
+        if (!$avatarUrl) {
+            return;
+        }
+
+        if (str_contains($avatarUrl, '/storage/avatars/')) {
+            $parsedPath = parse_url($avatarUrl, PHP_URL_PATH);
+            $filename = basename(is_string($parsedPath) ? $parsedPath : '');
+
+            /** @var \Illuminate\Filesystem\FilesystemAdapter $disk */
+            $disk = Storage::disk('public');
+
+            if ($filename && $disk->exists('avatars/' . $filename)) {
+                $disk->delete('avatars/' . $filename);
+            }
+        }
+    }
 
     public function register(TravelRegisterRequest $request): JsonResponse
     {
@@ -51,10 +74,11 @@ class TravelAuthController extends Controller
 
         $user = User::create([
             'name' => $validated['name'],
-            'email' => $validated['email'],
+            'email' => strtolower(trim($validated['email'])),
             'password_hash' => Hash::make($validated['password']),
             'phone' => $validated['phone'] ?? null,
-            'location' => $validated['location'] ?? null,
+            'location' => $validated['location'] ?? $validated['address'] ?? null,
+            'avatar' => $validated['avatar'] ?? null,
             'bio' => $validated['bio'] ?? null,
             'role' => $assignedRole,
             'status' => 'Active',
@@ -67,7 +91,7 @@ class TravelAuthController extends Controller
 
         $roleLabel = $user->role === User::ROLE_BUSINESS_OWNER ? 'Business Owner' : 'User';
 
-        \App\Models\Notification::createNotification([
+        Notification::createNotification([
             'type' => 'user',
             'category' => 'Users',
             'title' => "New {$roleLabel} Registered: {$user->name}",
@@ -249,11 +273,17 @@ class TravelAuthController extends Controller
             return $this->errorResponse('Invalid avatar file provided.', 422);
         }
 
+        // Safely remove previous local avatar to prevent disk leaks
+        $this->deleteLocalAvatarFile($user->avatar);
+
         $extension = $file->getClientOriginalExtension() ?: 'jpg';
         $filename = 'avatar_' . $user->id . '_' . time() . '_' . Str::random(6) . '.' . $extension;
 
         $path = $file->storeAs('avatars', $filename, 'public');
-        $url = Storage::disk('public')->url($path);
+
+        /** @var \Illuminate\Filesystem\FilesystemAdapter $disk */
+        $disk = Storage::disk('public');
+        $url = $disk->url($path);
         $fullUrl = url($url);
 
         $user->update(['avatar' => $fullUrl]);
@@ -268,6 +298,10 @@ class TravelAuthController extends Controller
     public function deleteAvatar(Request $request): JsonResponse
     {
         $user = $request->user();
+
+        // Safely remove previous local avatar to prevent disk leaks
+        $this->deleteLocalAvatarFile($user->avatar);
+
         $user->update(['avatar' => null]);
 
         return $this->successResponse([
@@ -359,7 +393,7 @@ class TravelAuthController extends Controller
                 'name' => $name ?: 'Google Traveler',
                 'email' => $email ?: (($googleId ?: ('google_' . time())) . '@google.oauth'),
                 'avatar' => $avatar ?: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
-                'role' => 'User',
+                'role' => User::ROLE_USER,
                 'status' => 'Active',
                 'verified' => true,
                 'provider' => 'google',
@@ -368,10 +402,32 @@ class TravelAuthController extends Controller
                 'email_verified_at' => now(),
                 'last_active_at' => now(),
             ]);
+
+            Notification::createNotification([
+                'type' => 'user',
+                'category' => 'Users',
+                'title' => "New User Joined via Google: {$user->name}",
+                'description' => "{$user->name} ({$user->email}) authenticated with Google.",
+                'link' => '/users',
+                'read' => false,
+                'data' => [
+                    'user_id' => $user->id,
+                    'email' => $user->email,
+                    'role' => $user->role,
+                    'provider' => 'google',
+                ]
+            ]);
         } else {
             if ($user->status !== 'Active') {
                 return $this->errorResponse('Account is ' . strtolower($user->status) . '. Please contact support.', 403);
             }
+
+            // Enforce administrative role protection
+            $normalizedRole = User::normalizeRole($user->role);
+            if (in_array($normalizedRole, [User::ROLE_SUPER_ADMIN, User::ROLE_ADMIN, User::ROLE_GUIDE_EDITOR], true)) {
+                return $this->errorResponse('Access restricted. Administrative accounts (Super Admin, Admin, Tourism Content Editor) must sign in via the Admin Portal.', 403);
+            }
+
             $user->update([
                 'last_active_at' => now(),
                 'avatar' => $avatar ?: $user->avatar,
@@ -408,7 +464,9 @@ class TravelAuthController extends Controller
                 return redirect($frontendUrl . '/login?error=' . urlencode('Google OAuth requires GOOGLE_CLIENT_SECRET. Please add your Client Secret in tourism-backend-api/.env (GOOGLE_CLIENT_SECRET=...).'));
             }
 
-            return Socialite::driver('google')->stateless()->redirect();
+            /** @var \Laravel\Socialite\Two\AbstractProvider $driver */
+            $driver = Socialite::driver('google');
+            return $driver->stateless()->redirect();
         } catch (\Throwable $e) {
             $frontendUrl = env('FRONTEND_URL', 'http://localhost:5175');
             return redirect($frontendUrl . '/login?error=' . urlencode('Google connection error: ' . $e->getMessage()));
@@ -423,7 +481,9 @@ class TravelAuthController extends Controller
             : env('FRONTEND_URL', 'http://localhost:5175');
 
         try {
-            $googleUser = Socialite::driver('google')->stateless()->user();
+            /** @var \Laravel\Socialite\Two\AbstractProvider $driver */
+            $driver = Socialite::driver('google');
+            $googleUser = $driver->stateless()->user();
         } catch (\Throwable $e) {
             return redirect($frontendUrl . '/login?error=' . urlencode('Google authentication failed: ' . $e->getMessage()));
         }
@@ -463,10 +523,32 @@ class TravelAuthController extends Controller
                 'email_verified_at' => now(),
                 'last_active_at' => now(),
             ]);
+
+            Notification::createNotification([
+                'type' => 'user',
+                'category' => 'Users',
+                'title' => "New User Joined via Google: {$user->name}",
+                'description' => "{$user->name} ({$user->email}) authenticated with Google.",
+                'link' => '/users',
+                'read' => false,
+                'data' => [
+                    'user_id' => $user->id,
+                    'email' => $user->email,
+                    'role' => $user->role,
+                    'provider' => 'google',
+                ]
+            ]);
         } else {
             if ($user->status !== 'Active') {
                 return redirect($frontendUrl . '/login?error=' . urlencode('Account is ' . strtolower($user->status)));
             }
+
+            // Enforce administrative role protection
+            $normalizedRole = User::normalizeRole($user->role);
+            if (in_array($normalizedRole, [User::ROLE_SUPER_ADMIN, User::ROLE_ADMIN, User::ROLE_GUIDE_EDITOR], true)) {
+                return redirect($frontendUrl . '/login?error=' . urlencode('Access restricted. Administrative accounts (Super Admin, Admin, Tourism Content Editor) must sign in via the Admin Portal.'));
+            }
+
             $user->update([
                 'last_active_at' => now(),
                 'avatar' => $avatar ?: $user->avatar,
