@@ -451,10 +451,18 @@ class TravelAuthController extends Controller
             $clientSecret = config('services.google.client_secret');
 
             // Capture the originating frontend URL (e.g. http://10.10.4.150:5175 or http://localhost:5175)
+            $frontendUrl = env('FRONTEND_URL', 'http://localhost:5175');
             $referer = $request->header('Referer');
-            $frontendUrl = $referer 
-                ? preg_replace('#/(login|register).*$#', '', $referer)
-                : env('FRONTEND_URL', 'http://localhost:5175');
+            if ($referer && !str_contains($referer, 'google.com') && !str_contains($referer, 'accounts.google')) {
+                $cleanReferer = preg_replace('#/(login|register).*$#', '', $referer);
+                if (filter_var($cleanReferer, FILTER_VALIDATE_URL)) {
+                    $frontendUrl = rtrim($cleanReferer, '/');
+                }
+            }
+
+            if ($request->filled('frontend_url') && filter_var($request->query('frontend_url'), FILTER_VALIDATE_URL)) {
+                $frontendUrl = rtrim($request->query('frontend_url'), '/');
+            }
 
             if (empty($clientId) || $clientId === 'your_google_client_id_here') {
                 return redirect($frontendUrl . '/login?error=' . urlencode('Google OAuth is not configured yet. Please set GOOGLE_CLIENT_ID in backend .env.'));
@@ -466,7 +474,11 @@ class TravelAuthController extends Controller
 
             /** @var \Laravel\Socialite\Two\AbstractProvider $driver */
             $driver = Socialite::driver('google');
-            return $driver->stateless()->redirect();
+
+            // Encode originating frontend URL into state so callback knows where to redirect
+            $statePayload = base64_encode(json_encode(['frontend_url' => $frontendUrl]));
+
+            return $driver->stateless()->with(['state' => $statePayload])->redirect();
         } catch (\Throwable $e) {
             $frontendUrl = env('FRONTEND_URL', 'http://localhost:5175');
             return redirect($frontendUrl . '/login?error=' . urlencode('Google connection error: ' . $e->getMessage()));
@@ -475,10 +487,29 @@ class TravelAuthController extends Controller
 
     public function handleGoogleCallback(Request $request)
     {
-        $referer = $request->header('Referer');
-        $frontendUrl = $referer 
-            ? preg_replace('#/(login|register).*$#', '', $referer)
-            : env('FRONTEND_URL', 'http://localhost:5175');
+        // Default frontend URL
+        $frontendUrl = env('FRONTEND_URL', 'http://localhost:5175');
+
+        // Extract originating frontend URL from state parameter if present
+        $state = $request->query('state');
+        if ($state) {
+            try {
+                $decoded = json_decode(base64_decode($state), true);
+                if (!empty($decoded['frontend_url']) && filter_var($decoded['frontend_url'], FILTER_VALIDATE_URL)) {
+                    $candidateUrl = rtrim($decoded['frontend_url'], '/');
+                    if (!str_contains($candidateUrl, 'google.com') && !str_contains($candidateUrl, 'accounts.google')) {
+                        $frontendUrl = $candidateUrl;
+                    }
+                }
+            } catch (\Throwable $e) {
+                // fallback to FRONTEND_URL
+            }
+        }
+
+        // Safety guarantee: Ensure frontendUrl never points to google.com
+        if (str_contains($frontendUrl, 'google.com') || str_contains($frontendUrl, 'accounts.google')) {
+            $frontendUrl = env('FRONTEND_URL', 'http://localhost:5175');
+        }
 
         try {
             /** @var \Laravel\Socialite\Two\AbstractProvider $driver */

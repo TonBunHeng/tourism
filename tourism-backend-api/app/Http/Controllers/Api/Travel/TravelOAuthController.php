@@ -82,7 +82,7 @@ class TravelOAuthController extends Controller
         $token = $user->createToken('travel_google_auth_token')->plainTextToken;
 
         // Redirect back to frontend with token and user details in query or fragment
-        return redirect($frontendUrl . '/?token=' . urlencode($token) . '&user=' . urlencode(json_encode([
+        return redirect($frontendUrl . '/auth/callback?token=' . urlencode($token) . '&user=' . urlencode(json_encode([
             'id' => $user->id,
             'name' => $user->name,
             'email' => $user->email,

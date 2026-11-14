@@ -36,13 +36,12 @@ class GeminiOnlineService:
     def _get_models_priority(self) -> List[str]:
         models = [
             settings.effective_online_model,
-            "gemini-2.5-flash",
             "gemini-2.0-flash",
             "gemini-1.5-flash",
-            "gemini-3.6-flash",
-            "gemini-3.5-flash",
+            "gemini-1.5-flash-8b",
+            "gemini-1.5-pro",
+            "gemini-2.5-flash",
             "gemini-flash-latest",
-            "gemini-flash-lite-latest",
         ]
         seen = set()
         return [m for m in models if m and not (m in seen or seen.add(m))]

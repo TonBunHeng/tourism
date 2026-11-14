@@ -16,11 +16,11 @@ class Settings(BaseSettings):
     
     # Online AI Provider Configuration (Google Gemini)
     ONLINE_AI_PROVIDER: str = "gemini"
-    ONLINE_AI_MODEL: str = "gemini-3.6-flash"
+    ONLINE_AI_MODEL: str = "gemini-2.0-flash"
     GEMINI_API_KEY: str = ""
-    GEMINI_MODEL: str = "gemini-3.6-flash"
+    GEMINI_MODEL: str = "gemini-2.0-flash"
     ONLINE_API_KEY: str = ""
-    ONLINE_MODEL: str = "gemini-3.6-flash"
+    ONLINE_MODEL: str = "gemini-2.0-flash"
     GEMINI_TIMEOUT_SECONDS: int = 15
     
     # Offline AI Provider Configuration (Ollama)
@@ -131,12 +131,42 @@ class Settings(BaseSettings):
 
     @property
     def effective_gemini_api_key(self) -> str:
-        return (
-            self.GEMINI_API_KEY or 
-            self.ONLINE_API_KEY or 
-            os.environ.get("GEMINI_API_KEY", "") or 
-            os.environ.get("GOOGLE_API_KEY", "")
-        ).strip()
+        candidates = [
+            self.GEMINI_API_KEY,
+            self.ONLINE_API_KEY,
+            os.environ.get("GEMINI_API_KEY", ""),
+            os.environ.get("GOOGLE_API_KEY", ""),
+        ]
+
+        # Check aichatbot/.env directly in case container environment had empty string injected
+        for candidate_path in [
+            os.path.join(self.BACKEND_DIR, ".env"),
+            os.path.join(os.path.dirname(self.BACKEND_DIR), ".env"),
+            os.path.abspath(".env")
+        ]:
+            if os.path.isfile(candidate_path):
+                try:
+                    with open(candidate_path, "r", encoding="utf-8") as f:
+                        for line in f:
+                            line = line.strip()
+                            if line.startswith("GEMINI_API_KEY="):
+                                val = line.split("=", 1)[1].strip().strip("'\"")
+                                if val:
+                                    candidates.append(val)
+                            elif line.startswith("ONLINE_API_KEY="):
+                                val = line.split("=", 1)[1].strip().strip("'\"")
+                                if val:
+                                    candidates.append(val)
+                except Exception:
+                    pass
+
+        for k in candidates:
+            if not k:
+                continue
+            k = k.strip().strip("'\"")
+            if k and k not in ("your_gemini_api_key_here", "AIzaSyD_Gemini20FlashAngkorVersesTourismKey"):
+                return k
+        return ""
 
     @property
     def effective_online_model(self) -> str:
