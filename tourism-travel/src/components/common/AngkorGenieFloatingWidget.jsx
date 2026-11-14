@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { 
   X, 
@@ -76,14 +76,37 @@ export default function AngkorGenieFloatingWidget() {
     return () => window.removeEventListener('storage', syncLang);
   }, [isOpen, language]);
 
-  const [topicsRotationIndex, setTopicsRotationIndex] = useState(0);
   const [isRefreshingTopics, setIsRefreshingTopics] = useState(false);
-  const currentSuggestedTopics = getTopicsForLanguage(language, topicsRotationIndex);
+
+  const getRotatedTopics = useCallback((excludeIds = [], currentLang = language) => {
+    const pool = currentLang === 'km' ? TOPICS_KM : TOPICS_EN;
+    const available = pool.filter((item) => !excludeIds.includes(item.id));
+    const candidates = available.length >= 4 ? available : pool;
+    return [...candidates]
+      .sort(() => 0.5 - Math.random())
+      .slice(0, 4)
+      .map((item) => ({
+        ...item,
+        text: item.title,
+        query: item.prompt || item.query,
+      }));
+  }, [language]);
+
+  const [suggestedTopics, setSuggestedTopics] = useState(() => {
+    return getRotatedTopics([], language);
+  });
+
+  useEffect(() => {
+    setSuggestedTopics(getRotatedTopics([], language));
+  }, [language, getRotatedTopics]);
 
   const handleRefreshTopics = (e) => {
-    e?.stopPropagation();
+    e?.stopPropagation?.();
+    e?.preventDefault?.();
     setIsRefreshingTopics(true);
-    setTopicsRotationIndex((prev) => prev + 1);
+    const currentIds = (suggestedTopics || []).map((t) => t.id);
+    const freshTopics = getRotatedTopics(currentIds, language);
+    setSuggestedTopics(freshTopics);
     setTimeout(() => {
       setIsRefreshingTopics(false);
     }, 400);
@@ -183,8 +206,15 @@ export default function AngkorGenieFloatingWidget() {
           prev.map((m, idx) => (idx === msgIndex ? { ...m, suggestions: formatted } : m))
         );
       }
-    } catch {
-      // ignore
+    } catch (err) {
+      console.warn('Network issue refreshing widget suggestions, rotating from pool:', err);
+      const isMsgKm = isKm || /[\u1780-\u17FF]/.test(msg?.content || '');
+      const pool = isMsgKm ? TOPICS_KM : TOPICS_EN;
+      const shuffled = [...pool].sort(() => Math.random() - 0.5).slice(0, 4);
+      const formatted = shuffled.map((s) => formatSuggestedTopic(s, isMsgKm ? 'km' : language)).filter(Boolean);
+      setMessages((prev) =>
+        prev.map((m, idx) => (idx === msgIndex ? { ...m, suggestions: formatted } : m))
+      );
     } finally {
       setRefreshingMsgIndex(null);
     }
@@ -668,7 +698,7 @@ export default function AngkorGenieFloatingWidget() {
 
                   {/* 6. Suggestion Cards 2x2 Grid matching AIChat */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-left">
-                    {currentSuggestedTopics.map((item, idx) => {
+                    {suggestedTopics.map((item, idx) => {
                       const IconComponent = item.icon || Sparkles;
                       return (
                         <button
@@ -770,7 +800,7 @@ export default function AngkorGenieFloatingWidget() {
                           {(() => {
                             const messageTopics = (msg.suggestions && msg.suggestions.length > 0)
                               ? msg.suggestions.map(formatSuggestedTopic).filter(Boolean)
-                              : currentSuggestedTopics;
+                              : suggestedTopics;
 
                             if (!messageTopics || messageTopics.length === 0) return null;
                             const isThisRefreshing = refreshingMsgIndex === idx;

@@ -74,10 +74,8 @@ export default function AppRoutes() {
             {/* Error Pages */}
             <Route path="/forbidden" element={<Forbidden />} />
 
-            {/* Standalone Full-Screen AI Chat (Requires Authentication: Tourists & Business Owners) */}
-            <Route element={<ProtectedRoute allowedRoles={['user', 'business_owner', 'admin', 'super_admin']} />}>
-              <Route path="/ai-chat" element={<AIChat />} />
-            </Route>
+            {/* Standalone Full-Screen AI Chat (Open to all visitors like angkorvers.vercel.app) */}
+            <Route path="/ai-chat" element={<AIChat />} />
 
             {/* 1. Tourist Portal (Public & Authenticated Routes under TouristLayout) */}
             <Route element={<TouristLayout />}>

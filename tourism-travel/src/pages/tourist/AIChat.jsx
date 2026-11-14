@@ -29,15 +29,8 @@ export default function AIChat() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Authentication guard: Guests cannot use full-screen AI chat (Picture 2)
-  useEffect(() => {
-    if (!token && !user) {
-      if (showWarning) {
-        showWarning('Please sign in or register to access AngkorVers AI Assistant.');
-      }
-      navigate('/login', { state: { from: location }, replace: true });
-    }
-  }, [user, token, navigate, location, showWarning]);
+  // Guests and authenticated users can both access AngkorVers AI freely (matching angkorvers.vercel.app)
+  // No forced login redirect; guest sessions persist locally
 
   // Language state: 'en' | 'km'
   const [language, setLanguage] = useState(() => {
@@ -117,16 +110,36 @@ export default function AIChat() {
   const [isLoading, setIsLoading] = useState(false);
   const [errorWarning, setErrorWarning] = useState(null);
 
-  // Suggested topics rotation index for welcome screen
-  const [topicsRotationIndex, setTopicsRotationIndex] = useState(0);
+  // Suggested topics for welcome screen (matching angkorvers.vercel.app random rotation)
+  const isKm = language === 'km';
   const [isRefreshingTopics, setIsRefreshingTopics] = useState(false);
+
+  const getRotatedTopics = useCallback((excludeIds = [], currentLang = language) => {
+    const pool = currentLang === 'km' ? TOPICS_KM : TOPICS_EN;
+    const available = pool.filter((item) => !excludeIds.includes(item.id));
+    const candidates = available.length >= 4 ? available : pool;
+    return [...candidates]
+      .sort(() => 0.5 - Math.random())
+      .slice(0, 4)
+      .map((item) => ({
+        ...item,
+        text: item.title,
+        query: item.prompt,
+      }));
+  }, [language]);
+
+  const [suggestedTopics, setSuggestedTopics] = useState(() => {
+    return getRotatedTopics([], language);
+  });
+
+  // Keep suggested topics in sync when language switches
+  useEffect(() => {
+    setSuggestedTopics(getRotatedTopics([], language));
+  }, [language, getRotatedTopics]);
 
   const abortControllerRef = useRef(null);
   const messagesEndRef = useRef(null);
   const chatContainerRef = useRef(null);
-
-  const isKm = language === 'km';
-  const currentSuggestedTopics = getTopicsForLanguage(language, topicsRotationIndex);
 
   // Auto-scroll to bottom of messages
   const scrollToBottom = (behavior = 'smooth') => {
@@ -163,12 +176,11 @@ export default function AIChat() {
     }
   };
 
-  // Load Sessions List for the authenticated user
+  // Load Sessions List (for guest locally or authenticated user via server/local)
   const loadSessions = useCallback(async () => {
-    if (!user && !token) return;
     const list = await aiChatService.getChatSessions(user);
-    setSessions(list);
-  }, [user, token]);
+    setSessions(list || []);
+  }, [user]);
 
   // Initialize responsive layout & session loading
   useEffect(() => {
@@ -251,11 +263,14 @@ export default function AIChat() {
     }
   };
 
-  // Refresh suggested topics on welcome screen
+  // Refresh suggested topics on welcome screen (matching angkorvers.vercel.app)
   const handleRefreshTopics = (e) => {
-    e.stopPropagation();
+    e?.stopPropagation?.();
+    e?.preventDefault?.();
     setIsRefreshingTopics(true);
-    setTopicsRotationIndex((prev) => prev + 1);
+    const currentIds = (suggestedTopics || []).map((t) => t.id);
+    const freshTopics = getRotatedTopics(currentIds, language);
+    setSuggestedTopics(freshTopics);
     setTimeout(() => {
       setIsRefreshingTopics(false);
     }, 400);
@@ -263,15 +278,15 @@ export default function AIChat() {
 
   // Refresh dynamic suggestions for a specific assistant message
   const handleRefreshMessageSuggestions = async (messageId, msg) => {
+    const isMsgKm = isKm || /[\u1780-\u17FF]/.test(msg?.content || msg?.message || '');
     try {
-      const msgText = msg?.content || '';
-      const isMsgKm = isKm || /[\u1780-\u17FF]/.test(msgText);
+      const msgText = msg?.content || msg?.message || '';
       const currentTexts = (msg?.suggestions || []).map((s) => (typeof s === 'string' ? s : s.title || s.text || s.query || ''));
 
       const res = await aiChatService.getSuggestions({
         message: msgText,
         answer: msgText,
-        sessionId,
+        sessionId: currentSessionId,
         language: isMsgKm ? 'km' : language,
         refresh: true,
         currentSuggestions: currentTexts,
@@ -283,18 +298,29 @@ export default function AIChat() {
             m.id === messageId ? { ...m, suggestions: res.suggestions, topic: res.topic || m.topic } : m
           )
         );
+        return res.suggestions;
       } else {
         const pool = isMsgKm ? TOPICS_KM : TOPICS_EN;
         const shuffled = [...pool].sort(() => Math.random() - 0.5).slice(0, 4);
-        const formatted = shuffled.map((item) => formatSuggestedTopic(item, isMsgKm ? 'km' : language));
+        const formatted = shuffled.map((item) => formatSuggestedTopic(item, isMsgKm ? 'km' : language)).filter(Boolean);
         setMessages((prev) =>
           prev.map((m) =>
             m.id === messageId ? { ...m, suggestions: formatted } : m
           )
         );
+        return formatted;
       }
     } catch (err) {
-      console.error('Error refreshing message suggestions:', err);
+      console.warn('Network issue refreshing suggestions, rotating from local pool:', err);
+      const pool = isMsgKm ? TOPICS_KM : TOPICS_EN;
+      const shuffled = [...pool].sort(() => Math.random() - 0.5).slice(0, 4);
+      const formatted = shuffled.map((item) => formatSuggestedTopic(item, isMsgKm ? 'km' : language)).filter(Boolean);
+      setMessages((prev) =>
+        prev.map((m) =>
+          m.id === messageId ? { ...m, suggestions: formatted } : m
+        )
+      );
+      return formatted;
     }
   };
 
@@ -548,8 +574,8 @@ export default function AIChat() {
                 {/* Subtitle */}
                 <p className="text-xs sm:text-sm md:text-base text-zinc-500 dark:text-zinc-400 max-w-xl mx-auto font-normal leading-relaxed">
                   {isKm
-                    ? 'ជំនួយការទេសចរណ៍ វប្បធម៌ បេតិកភណ្ឌប្រវត្តិសាស្ត្រ និងការរៀបចំគម្រោងធ្វើដំណើរទូទាំងប្រទេសកម្ពុជា'
-                    : 'Dedicated travel planning, cultural heritage, historic temples, and local insights across Cambodia.'}
+                    ? 'ឆ្លើយតបសំណួរទូទៅ សរសេរកូដ គណិតវិទ្យា ការបកប្រែ និងឯកទេសពេញលេញអំពីកម្ពុជា'
+                    : 'General intelligence, programming, math, translation, and deep Cambodia expertise.'}
                 </p>
 
                 {/* Centered Composer Box */}
@@ -589,7 +615,7 @@ export default function AIChat() {
 
                   {/* 4 Topic Cards Grid */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                    {currentSuggestedTopics.map((item, idx) => {
+                    {suggestedTopics.map((item, idx) => {
                       const IconComponent = item.icon;
                       return (
                         <button

@@ -111,7 +111,10 @@ export default function ChatMessageItem({
 
     try {
       if (onRefreshSuggestions) {
-        await onRefreshSuggestions(message.id, message);
+        const fresh = await onRefreshSuggestions(message.id, message);
+        if (fresh && Array.isArray(fresh) && fresh.length > 0) {
+          setLocalSuggestions(fresh);
+        }
       } else {
         const nextRotation = rotationIndex + 1;
         setRotationIndex(nextRotation);
