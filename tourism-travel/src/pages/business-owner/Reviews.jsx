@@ -14,6 +14,8 @@ import { useAlert } from '../../context/AlertContext';
 import { useSearch } from '../../context/SearchContext';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import EmptyState from '../../components/common/EmptyState';
+import useRealtimeSync from '../../hooks/useRealtimeSync';
+import realtimeHub from '../../utils/realtimeHub';
 
 export default function BusinessReviews() {
   const { selectedBusiness } = useOutletContext();
@@ -29,9 +31,9 @@ export default function BusinessReviews() {
   const [replyText, setReplyText] = useState('');
   const [isSubmittingReply, setIsSubmittingReply] = useState(false);
 
-  const fetchReviews = useCallback(() => {
+  const fetchReviews = useCallback((isSilent = false) => {
     if (!selectedBusiness?.id) return;
-    setIsLoading(true);
+    if (!isSilent) setIsLoading(true);
 
     businessOwnerService
       .getReviews(selectedBusiness.id)
@@ -45,13 +47,20 @@ export default function BusinessReviews() {
         console.warn('Failed to load reviews:', err);
       })
       .finally(() => {
-        setIsLoading(false);
+        if (!isSilent) setIsLoading(false);
       });
   }, [selectedBusiness]);
 
   useEffect(() => {
     fetchReviews();
   }, [fetchReviews]);
+
+  // Real-Time Background Synchronization
+  useRealtimeSync(
+    () => fetchReviews(true),
+    6000,
+    ['review_updated', 'notification_received']
+  );
 
   const handleOpenReply = (rev) => {
     setReplyingReview(rev);

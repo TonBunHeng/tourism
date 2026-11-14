@@ -23,6 +23,8 @@ import {
 import travelService from '../../services/travelService';
 import { useAuth } from '../../context/AuthContext';
 import { useAlert } from '../../context/AlertContext';
+import useRealtimeSync from '../../hooks/useRealtimeSync';
+import realtimeHub from '../../utils/realtimeHub';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import { setPageTitle } from '../../utils/PagesTitle';
 
@@ -80,8 +82,8 @@ export default function BusinessDetails() {
     }
   }, [user]);
 
-  const loadData = useCallback(() => {
-    setIsLoading(true);
+  const loadData = useCallback((isSilent = false) => {
+    if (!isSilent) setIsLoading(true);
 
     Promise.allSettled([
       travelService.getBusiness(id),
@@ -136,13 +138,20 @@ export default function BusinessDetails() {
         console.warn('Failed to load business details:', err);
       })
       .finally(() => {
-        setIsLoading(false);
+        if (!isSilent) setIsLoading(false);
       });
   }, [id]);
 
   useEffect(() => {
     loadData();
   }, [loadData]);
+
+  // Real-Time Background Synchronization
+  useRealtimeSync(
+    () => loadData(true),
+    6000,
+    ['review_updated', 'business_updated']
+  );
 
   const handleOpenBooking = (service = null) => {
     setSelectedService(service || services[0] || null);
@@ -184,6 +193,7 @@ export default function BusinessDetails() {
           `Your reservation has been placed successfully! Reference: ${res.data?.booking?.booking_reference || 'Confirmed'}.`,
           'Booking Confirmed'
         );
+        realtimeHub.emit('booking_updated', { bookingId: res.data?.booking?.id, businessId: id });
         setIsBookingModalOpen(false);
         setSpecialRequests('');
         if (isAuthenticated) {
@@ -215,10 +225,11 @@ export default function BusinessDetails() {
 
       if (res?.success) {
         showSuccess('Your review has been submitted to the database.', 'Review Posted');
+        realtimeHub.emit('review_updated', { businessId: id });
         setIsReviewModalOpen(false);
         setReviewComment('');
         setReviewRating(5);
-        loadData();
+        loadData(true);
       } else {
         showError(res?.message || 'Failed to submit review.');
       }

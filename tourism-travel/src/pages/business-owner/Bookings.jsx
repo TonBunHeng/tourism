@@ -22,6 +22,8 @@ import LoadingSpinner from '../../components/common/LoadingSpinner';
 import EmptyState from '../../components/common/EmptyState';
 import Badge from '../../components/common/Badge';
 import Pagination from '../../components/common/Pagination';
+import useRealtimeSync from '../../hooks/useRealtimeSync';
+import realtimeHub from '../../utils/realtimeHub';
 
 export default function BusinessBookings() {
   const { selectedBusiness } = useOutletContext();
@@ -46,9 +48,9 @@ export default function BusinessBookings() {
 
   const activeSearch = globalSearch || localSearch;
 
-  const fetchBookings = useCallback((targetPage, isManual = false) => {
+  const fetchBookings = useCallback((targetPage, isManual = false, isSilent = false) => {
     if (isManual) setIsRefreshing(true);
-    else setIsLoading(true);
+    else if (!isSilent) setIsLoading(true);
 
     const params = {
       page: targetPage,
@@ -83,7 +85,7 @@ export default function BusinessBookings() {
         console.warn('Failed to fetch business bookings:', err);
       })
       .finally(() => {
-        setIsLoading(false);
+        if (!isSilent) setIsLoading(false);
         setIsRefreshing(false);
       });
   }, [activeSearch, statusFilter, paymentStatusFilter, dateFrom, dateTo, selectedBusiness?.id]);
@@ -92,12 +94,20 @@ export default function BusinessBookings() {
     fetchBookings(page);
   }, [fetchBookings, page]);
 
+  // Real-Time Background Synchronization
+  useRealtimeSync(
+    () => fetchBookings(page, false, true),
+    5000,
+    ['booking_updated', 'notification_received']
+  );
+
   const handleConfirm = async (id) => {
     try {
       const res = await businessOwnerService.confirmBooking(id);
       if (res?.success) {
         showSuccess('Booking confirmed! Traveler has been notified.');
-        fetchBookings(page);
+        fetchBookings(page, false, true);
+        realtimeHub.emit('booking_updated', { bookingId: id, status: 'confirmed' });
         if (activeBooking?.id === id) setActiveBooking(null);
       }
     } catch (err) {
@@ -110,7 +120,8 @@ export default function BusinessBookings() {
       const res = await businessOwnerService.completeBooking(id);
       if (res?.success) {
         showSuccess('Booking marked as completed! Payment recorded.');
-        fetchBookings(page);
+        fetchBookings(page, false, true);
+        realtimeHub.emit('booking_updated', { bookingId: id, status: 'completed' });
         if (activeBooking?.id === id) setActiveBooking(null);
       }
     } catch (err) {
@@ -131,7 +142,8 @@ export default function BusinessBookings() {
       const res = await businessOwnerService.rejectBooking(id, 'Capacity reached');
       if (res?.success) {
         showSuccess('Booking reservation declined.');
-        fetchBookings(page);
+        fetchBookings(page, false, true);
+        realtimeHub.emit('booking_updated', { bookingId: id, status: 'rejected' });
         if (activeBooking?.id === id) setActiveBooking(null);
       }
     } catch (err) {

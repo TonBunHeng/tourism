@@ -17,6 +17,7 @@ import dashboardService from '../../services/dashboardService';
 import { getPageCache, setPageCache } from '../../utils/pageCache';
 import { useLanguage } from '../../i18n';
 import authService, { isFullAdminRole, isSuperAdminRole } from '../../services/authService';
+import useRealtimeSync from '../../hooks/useRealtimeSync';
 
 export default function Dashboard() {
   const { t } = useLanguage();
@@ -53,6 +54,13 @@ export default function Dashboard() {
   useEffect(() => {
     fetchStats(timeRange);
   }, [timeRange]);
+
+  // Real-Time Background Synchronization
+  useRealtimeSync(
+    () => fetchStats(timeRange),
+    6000,
+    ['booking_updated', 'review_updated', 'business_updated', 'notification_received']
+  );
 
   const pendingVerifications = dashboardData?.stats?.pending_verifications || 0;
   const pendingBookings = dashboardData?.stats?.pending_bookings || 0;

@@ -16,6 +16,7 @@ import { useSearch } from '../../context/SearchContext';
 import { getBusinessVerificationStatusColor } from '../../utils/StatusUtils';
 import { getPageCache, setPageCache } from '../../utils/pageCache';
 import { useLanguage } from '../../i18n';
+import { getTravelPortalBaseUrl } from '../../services/api';
 
 export default function Businesses() {
   const { t } = useLanguage();
@@ -395,11 +396,7 @@ export default function Businesses() {
           </div>
           <div className="flex items-center gap-2.5 shrink-0 w-full sm:w-auto">
             <a
-              href={(() => {
-                const isLocal = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
-                const travelBase = isLocal ? 'http://localhost:5175' : '';
-                return `${travelBase}/businesses`;
-              })()}
+              href={`${getTravelPortalBaseUrl()}/businesses`}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center justify-center gap-1.5 md:gap-2 px-3.5 py-2 text-xs md:text-sm font-medium rounded-md border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] hover:bg-[var(--color-surface-hover-light)] dark:hover:bg-[var(--color-surface-hover-dark)] text-[#003E83] dark:text-blue-400 transition-colors cursor-pointer"
@@ -604,11 +601,7 @@ export default function Businesses() {
                           </button>
 
                           <a
-                            href={(() => {
-                              const isLocal = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
-                              const travelBase = isLocal ? 'http://localhost:5175' : '';
-                              return `${travelBase}/businesses/${b.id || ''}`;
-                            })()}
+                            href={`${getTravelPortalBaseUrl()}/businesses/${b.id || ''}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="p-1.5 text-[#003E83] dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40 rounded-md transition-all active:scale-90 hover:scale-105 cursor-pointer inline-flex items-center justify-center"

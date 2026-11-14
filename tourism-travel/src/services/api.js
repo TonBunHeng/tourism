@@ -1,16 +1,50 @@
 import axios from 'axios';
 
+/**
+ * Dynamically resolves localhost/127.0.0.1 to the current browser hostname
+ * when accessed over a local LAN Wi-Fi network (e.g. 10.x.x.x, 192.168.x.x).
+ */
+export function resolveBackendHost(url, defaultPort = '8000') {
+  if (!url || typeof url !== 'string') return url;
+
+  if (typeof window === 'undefined' || !window.location?.hostname) {
+    return url;
+  }
+
+  const currentHost = window.location.hostname;
+
+  // When accessing from another device on the local network (LAN IP, mDNS, etc.)
+  // and the configured backend URL points to localhost or 127.0.0.1:
+  if (currentHost && currentHost !== 'localhost' && currentHost !== '127.0.0.1') {
+    return url.replace(
+      /^(https?:\/\/)?(localhost|127\.0\.0\.1)(:\d+)?/i,
+      (match, protocol, host, port) => {
+        const proto = protocol || `${window.location.protocol}//`;
+        const resolvedPort = port || (defaultPort ? `:${defaultPort}` : '');
+        return `${proto}${currentHost}${resolvedPort}`;
+      }
+    );
+  }
+
+  return url;
+}
+
 // Base API URL configuration
-const RAW_API_URL = (import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000/api/travel')
+const RAW_CONFIGURED_URL = (import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000/api/travel')
   .trim()
   .replace(/\/+$/, '');
-export const ROOT_API_URL = RAW_API_URL.replace(/\/travel$/i, ''); // e.g. http://127.0.0.1:8000/api
+
+const RAW_API_URL = resolveBackendHost(RAW_CONFIGURED_URL, '8000');
+export const ROOT_API_URL = RAW_API_URL.replace(/\/travel$/i, ''); // e.g. http://10.10.4.150:8000/api
 export const TRAVEL_API_URL = `${ROOT_API_URL}/travel`;
 export const BUSINESS_API_URL = `${ROOT_API_URL}/business`;
-export const AI_CHAT_SERVICE_URL = import.meta.env.VITE_AI_CHAT_URL || 'http://127.0.0.1:8001';
+export const AI_CHAT_SERVICE_URL = resolveBackendHost(
+  import.meta.env.VITE_AI_CHAT_URL || 'http://127.0.0.1:8001',
+  '8001'
+);
 export const GOOGLE_AUTH_URL = `${TRAVEL_API_URL}/auth/google`;
 export const GOOGLE_REDIRECT_URL = `${TRAVEL_API_URL}/auth/google/redirect`;
-export const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || '992178086409-a9j45bl7piu53vlfbihe1c9sgpv0itsb.apps.googleusercontent.com';
+export const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
 
 const api = axios.create({
   baseURL: TRAVEL_API_URL,

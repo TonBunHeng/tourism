@@ -19,6 +19,7 @@ use App\Http\Controllers\Api\ProvinceController;
 use App\Http\Controllers\Api\ReportController;
 use App\Http\Controllers\Api\ReviewController;
 use App\Http\Controllers\Api\SecurityAlertController;
+use App\Http\Controllers\Api\SyncController;
 use App\Http\Controllers\Api\SystemSettingController;
 use App\Http\Controllers\Api\AdminGuideController;
 use App\Http\Controllers\Api\AdminTourController;
@@ -82,6 +83,9 @@ Route::get('/health', function () {
     ]);
 });
 
+// Real-Time Sync Pulse (Low-overhead status check for live multi-device synchronization)
+Route::get('/sync/pulse', [SyncController::class, 'pulse']);
+
 $aiThrottle = app()->environment('local') ? 'throttle:120,1' : 'throttle:30,1';
 
 // Root AI aliases
@@ -120,6 +124,8 @@ Route::prefix('travel')->group(function () use ($travelReadThrottle, $travelAuth
 
     // 1.2 Public Read-Only Directory & Content (Standard API Throttling)
     Route::middleware($travelReadThrottle)->group(function () {
+        Route::get('/sync/pulse', [SyncController::class, 'pulse']);
+
         // Destinations / Places
         Route::get('/places', [TravelPlaceController::class, 'index']);
         Route::get('/places/{id}', [TravelPlaceController::class, 'show']);
@@ -311,6 +317,7 @@ Route::prefix('travel')->group(function () use ($travelReadThrottle, $travelAuth
 Route::prefix('business')
     ->middleware(['auth:sanctum', 'role:business_owner,admin,super_admin', $travelAuthThrottle])
     ->group(function () {
+        Route::get('/sync/pulse', [SyncController::class, 'pulse']);
         Route::get('/profile', [BusinessOwnerController::class, 'profile']);
         Route::get('/businesses', [BusinessOwnerController::class, 'index']);
         Route::post('/businesses', [BusinessOwnerController::class, 'store']);

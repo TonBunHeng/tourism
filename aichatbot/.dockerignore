@@ -1,0 +1,13 @@
+__pycache__
+*.py[cod]
+*$py.class
+.venv
+venv
+.env
+.git
+.gitignore
+storage/conversations/*.db
+storage/conversations/*.db-shm
+storage/conversations/*.db-wal
+storage/conversations/chat_history.json
+storage/vector_db/

@@ -10,8 +10,12 @@ export default function Forbidden() {
   useEffect(() => {
     setPageTitle('Access Forbidden');
   }, []);
-  const localHost = ['localhost', '127.0.0.1'].includes(window.location.hostname);
-  const defaultAdminUrl = localHost
+  const isLocalOrLan = typeof window !== 'undefined' && (
+    ['localhost', '127.0.0.1'].includes(window.location.hostname) ||
+    /^(\d{1,3}\.){3}\d{1,3}$/.test(window.location.hostname) ||
+    window.location.hostname.endsWith('.local')
+  );
+  const defaultAdminUrl = isLocalOrLan
     ? `${window.location.protocol}//${window.location.hostname}:5174`
     : `${window.location.origin}/admin`;
   const adminPortalUrl = import.meta.env.VITE_ADMIN_URL || defaultAdminUrl;

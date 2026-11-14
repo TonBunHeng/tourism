@@ -14,7 +14,9 @@ services:
       MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
       MYSQL_ROOT_HOST: "%"
     ports:
-      - "3306:3306"
+      # Keep MySQL on its standard port inside Docker, while avoiding the
+      # common host-side collision with a locally installed MySQL server.
+      - "${MYSQL_HOST_PORT:-3307}:3306"
     volumes:
       - tourism-mysql-data:/var/lib/mysql
     networks:
@@ -27,7 +29,7 @@ services:
       start_period: 10s
 
   # ---------------------------------------------------------------------------
-  # Laravel Backend (PHP-FPM 8.3)
+  # Laravel Backend (PHP-FPM 8.4)
   # ---------------------------------------------------------------------------
   backend:
     build:
@@ -41,6 +43,7 @@ services:
     environment:
       - APP_NAME=AngkorVerses
       - APP_ENV=local
+      - APP_KEY=base64:VLgeeAbgG0VthB7ck/wZdJzfp2ECER3sLubfB/T9/2Y=
       - APP_DEBUG=true
       - APP_URL=http://localhost:8000
       - FRONTEND_URL=http://localhost:5175
@@ -51,8 +54,12 @@ services:
       - DB_USERNAME=root
       - DB_PASSWORD=
       - AI_CHAT_API_URL=http://aichatbot:8001
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID:-}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET:-}
+      - GOOGLE_REDIRECT_URI=http://localhost:8000/api/travel/auth/google/callback
     volumes:
       - ../tourism-backend-api:/var/www
+      - /var/www/vendor
     networks:
       - tourism-network
 
@@ -89,6 +96,7 @@ services:
       - /app/node_modules
     environment:
       - VITE_API_URL=http://localhost:8000/api
+      - VITE_TRAVEL_URL=http://localhost:5175
     networks:
       - tourism-network
     depends_on:
@@ -111,7 +119,8 @@ services:
     environment:
       - VITE_API_URL=http://localhost:8000/api/travel
       - VITE_AI_CHAT_URL=http://localhost:8001
-      - VITE_GOOGLE_CLIENT_ID=992178086409-a9j45bl7piu53vlfbihe1c9sgpv0itsb.apps.googleusercontent.com
+      - VITE_ADMIN_URL=http://localhost:5174
+      - VITE_GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID:-}
     networks:
       - tourism-network
     depends_on:
@@ -135,6 +144,7 @@ services:
       - HOST=0.0.0.0
       - PORT=8001
       - DEBUG=True
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
     networks:
       - tourism-network
 

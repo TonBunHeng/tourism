@@ -1,7 +1,50 @@
 import axios from 'axios';
 import { clearPageCache } from '../utils/pageCache';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+/**
+ * Dynamically resolves localhost/127.0.0.1 to the current browser hostname
+ * when accessed over a local LAN Wi-Fi network (e.g. 10.x.x.x, 192.168.x.x).
+ */
+export function resolveBackendHost(url, defaultPort = '8000') {
+  if (!url || typeof url !== 'string') return url;
+
+  if (typeof window === 'undefined' || !window.location?.hostname) {
+    return url;
+  }
+
+  const currentHost = window.location.hostname;
+
+  if (currentHost && currentHost !== 'localhost' && currentHost !== '127.0.0.1') {
+    return url.replace(
+      /^(https?:\/\/)?(localhost|127\.0\.0\.1)(:\d+)?/i,
+      (match, protocol, host, port) => {
+        const proto = protocol || `${window.location.protocol}//`;
+        const resolvedPort = port || (defaultPort ? `:${defaultPort}` : '');
+        return `${proto}${currentHost}${resolvedPort}`;
+      }
+    );
+  }
+
+  return url;
+}
+
+/**
+ * Resolve the base URL for the tourist / public portal (Port 5175).
+ */
+export function getTravelPortalBaseUrl() {
+  if (typeof window === 'undefined') return 'http://localhost:5175';
+  if (import.meta.env.VITE_TRAVEL_URL) {
+    return resolveBackendHost(import.meta.env.VITE_TRAVEL_URL, '5175');
+  }
+  const { protocol, hostname } = window.location;
+  const isLanOrLocal = ['localhost', '127.0.0.1'].includes(hostname) ||
+    /^(\d{1,3}\.){3}\d{1,3}$/.test(hostname) ||
+    hostname.endsWith('.local');
+  return isLanOrLocal ? `${protocol}//${hostname}:5175` : '';
+}
+
+const RAW_API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+const API_BASE_URL = resolveBackendHost(RAW_API_URL, '8000');
 
 const api = axios.create({
   baseURL: API_BASE_URL,

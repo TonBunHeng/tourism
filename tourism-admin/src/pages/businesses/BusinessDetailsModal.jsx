@@ -6,6 +6,7 @@ import {
   Edit, RefreshCw, AlertTriangle, ExternalLink
 } from 'lucide-react';
 import { useLanguage } from '../../i18n';
+import { getTravelPortalBaseUrl } from '../../services/api';
 
 export default function BusinessDetailsModal({
   business,
@@ -334,11 +335,7 @@ export default function BusinessDetailsModal({
               <Edit size={14} /> {t('businesses.editProfile', 'Edit Profile')}
             </button>
             <a
-              href={(() => {
-                const isLocal = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
-                const travelBase = isLocal ? 'http://localhost:5175' : '';
-                return `${travelBase}/businesses/${business.id || ''}`;
-              })()}
+              href={`${getTravelPortalBaseUrl()}/businesses/${business.id || ''}`}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-md text-xs sm:text-sm font-medium border border-[var(--color-border-subtle-light)] dark:border-[var(--color-border-dark)] hover:bg-[var(--color-surface-hover-light)] dark:hover:bg-[var(--color-surface-hover-dark)] text-[#003E83] dark:text-blue-400 transition-colors cursor-pointer"

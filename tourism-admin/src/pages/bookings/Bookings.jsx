@@ -11,8 +11,11 @@ import BookingCancelModal from './BookingCancelModal';
 import { useAlert } from '../../context/AlertContext';
 import { useSearch } from '../../context/SearchContext';
 import { useLanguage } from '../../i18n';
+import { getTravelPortalBaseUrl } from '../../services/api';
 import { getStatusColor } from '../../utils/StatusUtils';
 import { getPageCache, setPageCache } from '../../utils/pageCache';
+import useRealtimeSync from '../../hooks/useRealtimeSync';
+import realtimeHub from '../../utils/realtimeHub';
 
 export default function Bookings() {
   const { t } = useLanguage();
@@ -46,9 +49,9 @@ export default function Bookings() {
     }
   }, [t]);
 
-  const fetchBookings = useCallback(async (isManualRefresh = false) => {
+  const fetchBookings = useCallback(async (isManualRefresh = false, isSilent = false) => {
     if (isManualRefresh) setIsRefreshing(true);
-    else if (!getPageCache('bookings_data')) setLoading(true);
+    else if (!isSilent && !getPageCache('bookings_data')) setLoading(true);
 
     try {
       const res = await bookingService.getBookings();
@@ -68,9 +71,9 @@ export default function Bookings() {
       }
     } catch (err) {
       console.warn('Backend bookings fetch notice:', err.message);
-      setBookings([]);
+      if (!isSilent) setBookings([]);
     } finally {
-      setLoading(false);
+      if (!isSilent) setLoading(false);
       setIsRefreshing(false);
     }
   }, [t]);
@@ -78,6 +81,13 @@ export default function Bookings() {
   useEffect(() => {
     fetchBookings();
   }, [fetchBookings]);
+
+  // Real-Time Background Synchronization
+  useRealtimeSync(
+    () => fetchBookings(false, true),
+    5000,
+    ['booking_updated', 'notification_received']
+  );
 
   // Copy code helper
   const handleCopyCode = (code) => {
@@ -88,8 +98,7 @@ export default function Bookings() {
 
   // Helper to resolve public page URL
   const getVisitUrl = (booking) => {
-    const isLocal = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
-    const travelBase = isLocal ? 'http://localhost:5175' : '';
+    const travelBase = getTravelPortalBaseUrl();
     if (booking?.business_id) {
       return `${travelBase}/businesses/${booking.business_id}`;
     }

@@ -21,6 +21,8 @@ import { useSearch } from '../../context/SearchContext';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import EmptyState from '../../components/common/EmptyState';
 import NotificationDetailsModal from './NotificationDetailsModal';
+import useRealtimeSync from '../../hooks/useRealtimeSync';
+import realtimeHub from '../../utils/realtimeHub';
 
 const NOTIFICATION_CATEGORIES = ['All', 'Bookings', 'Reviews', 'System', 'Alerts'];
 
@@ -75,6 +77,13 @@ export default function BusinessNotifications() {
     window.addEventListener('notifications-updated', handleSync);
     return () => window.removeEventListener('notifications-updated', handleSync);
   }, []);
+
+  // Real-Time Background Synchronization
+  useRealtimeSync(
+    () => fetchNotifications(false),
+    5000,
+    ['notification_received', 'booking_updated']
+  );
 
   const handleOpenDetails = (notification, e) => {
     if (e) e.stopPropagation();

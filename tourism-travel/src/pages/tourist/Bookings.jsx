@@ -13,6 +13,8 @@ import LoadingSpinner from '../../components/common/LoadingSpinner';
 import EmptyState from '../../components/common/EmptyState';
 import Badge from '../../components/common/Badge';
 import Pagination from '../../components/common/Pagination';
+import useRealtimeSync from '../../hooks/useRealtimeSync';
+import realtimeHub from '../../utils/realtimeHub';
 
 const ITEMS_PER_PAGE = 9;
 
@@ -33,8 +35,8 @@ export default function Bookings() {
   const [reviewComment, setReviewComment] = useState('');
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
 
-  const fetchBookings = useCallback(() => {
-    setIsLoading(true);
+  const fetchBookings = useCallback((isSilent = false) => {
+    if (!isSilent) setIsLoading(true);
     travelService.getBookings({
       page: currentPage,
       per_page: ITEMS_PER_PAGE,
@@ -55,13 +57,20 @@ export default function Bookings() {
         setBookings([]);
       })
       .finally(() => {
-        setIsLoading(false);
+        if (!isSilent) setIsLoading(false);
       });
   }, [currentPage, selectedFilter]);
 
   useEffect(() => {
     fetchBookings();
   }, [fetchBookings]);
+
+  // Real-Time Background Synchronization
+  useRealtimeSync(
+    () => fetchBookings(true),
+    5000,
+    ['booking_updated', 'notification_received']
+  );
 
   const handleCancelBooking = async (bookingId) => {
     const confirmed = await showConfirm({
@@ -77,7 +86,8 @@ export default function Bookings() {
       const res = await travelService.cancelBooking(bookingId, 'Cancelled by tourist user');
       if (res?.success) {
         showSuccess('Your booking has been cancelled in the database.');
-        fetchBookings();
+        fetchBookings(true);
+        realtimeHub.emit('booking_updated', { bookingId, status: 'cancelled' });
         if (activeBookingDetails?.id === bookingId) {
           setActiveBookingDetails(null);
         }
@@ -111,6 +121,7 @@ export default function Bookings() {
         });
       }
       showSuccess('Your review has been submitted to the database.', 'Review Saved');
+      realtimeHub.emit('review_updated');
       setSelectedBookingForReview(null);
       setReviewComment('');
       setReviewRating(5);

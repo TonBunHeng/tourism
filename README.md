@@ -48,29 +48,30 @@ All Docker configurations are centralized inside `tourism-docker/`.
 | **backend** | `tourism-backend` | `9000` (internal) | Laravel API (PHP 8.4 FPM, Composer, Auto-migrations & Database Seeders) |
 | **admin** | `tourism-admin` | `5174` | Admin Management Web App (React 19, Vite, Tailwind CSS v4) |
 | **travel** | `tourism-travel` | `5175` | Tourist Client Web App (React 19, Vite, Tailwind CSS v4) |
-| **mysql** | `tourism-mysql` | `3306` | MySQL 8.0 Database with persistent data volume (`tourism-mysql-data`) |
+| **mysql** | `tourism-mysql` | `3307` (host) / `3306` (container) | MySQL 8.0 Database with persistent data volume (`tourism-mysql-data`) |
 
 ---
 
 ## 🚀 How to Run with Docker
 
-### 1. Start all containers
+Just clone the repository and run one single command from the project root:
 
 ```bash
-# Navigate to the tourism-docker directory:
-cd tourism-docker
+# Clone the repository
+git clone <repository-url>
+cd tourism
 
-# Build and start all services in the background:
+# Start and build all services in one command:
 docker compose up -d --build
 ```
 
-*(Alternatively, run from the root folder without changing directory: `docker compose -f tourism-docker/docker-compose.yml up -d --build`)*
+Everything (MySQL, Laravel backend migrations & seeders, Admin panel, Tourist portal, and AI chatbot microservice) will be automatically installed, built, configured, and started!
+
+*(You can also optionally run `cd tourism-docker && docker compose up -d --build`)*
 
 ### 2. Check container status & logs
 
 ```bash
-cd tourism-docker
-
 # Check status of all containers
 docker compose ps
 
@@ -84,8 +85,6 @@ docker compose logs -f backend
 ### 3. Stop containers
 
 ```bash
-cd tourism-docker
-
 # Stop containers (preserves database data)
 docker compose down
 
@@ -142,18 +141,26 @@ python run.py
 
 ## 🌐 Application Access URLs
 
-Once running, access the services in your browser:
-
+### Localhost Access (On the Host Machine):
 - **Tourist Web Application:** [http://localhost:5175](http://localhost:5175)
+- **Business Owner Hub:** [http://localhost:5175/business/dashboard](http://localhost:5175/business/dashboard)
 - **Admin Management Panel:** [http://localhost:5174](http://localhost:5174)
 - **Backend API Root:** [http://localhost:8000/](http://localhost:8000/)
 - **Backend API Health Check:** [http://localhost:8000/health](http://localhost:8000/health)
 - **AI Chatbot API Docs:** [http://localhost:8001/docs](http://localhost:8001/docs)
 - **AI Chatbot Health Check:** [http://localhost:8001/api/health](http://localhost:8001/api/health)
-- **Direct Database Access:** `localhost:3306`
+- **Direct Database Access:** `localhost:3307` (set `MYSQL_HOST_PORT` in `tourism-docker/.env` to use another available host port)
   - **Database:** `tourism_db`
   - **Username:** `root`
   - **Password:** *(empty / no password)*
+
+### Local LAN Wi-Fi Access (From Other Phones / Laptops on the Same Wi-Fi):
+> Replace `10.10.4.150` with your current Mac's Wi-Fi IP address (found via `ipconfig getifaddr en0` or `ifconfig`):
+
+- **Tourist Web Application:** `http://10.10.4.150:5175`
+- **Business Owner Hub:** `http://10.10.4.150:5175/business/dashboard`
+- **Admin Management Panel:** `http://10.10.4.150:5174`
+- **Backend API:** `http://10.10.4.150:8000/api`
 
 ---
 

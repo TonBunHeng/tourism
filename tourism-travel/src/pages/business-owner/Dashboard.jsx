@@ -22,6 +22,8 @@ import { useAlert } from '../../context/AlertContext';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import Badge from '../../components/common/Badge';
 import EmptyState from '../../components/common/EmptyState';
+import useRealtimeSync from '../../hooks/useRealtimeSync';
+import realtimeHub from '../../utils/realtimeHub';
 
 export default function BusinessDashboard() {
   const { selectedBusiness } = useOutletContext();
@@ -33,8 +35,8 @@ export default function BusinessDashboard() {
   const [businessStats, setBusinessStats] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const loadDashboardData = useCallback(async () => {
-    setIsLoading(true);
+  const loadDashboardData = useCallback(async (isSilent = false) => {
+    if (!isSilent) setIsLoading(true);
     try {
       const [statsRes, bookingsRes] = await Promise.allSettled([
         businessOwnerService.getBookingStatistics(),
@@ -68,7 +70,7 @@ export default function BusinessDashboard() {
     } catch (err) {
       console.warn('Error loading business dashboard data:', err);
     } finally {
-      setIsLoading(false);
+      if (!isSilent) setIsLoading(false);
     }
   }, [selectedBusiness]);
 
@@ -76,12 +78,20 @@ export default function BusinessDashboard() {
     loadDashboardData();
   }, [loadDashboardData]);
 
+  // Real-Time Background Synchronization without page refresh
+  useRealtimeSync(
+    () => loadDashboardData(true),
+    5000,
+    ['booking_updated', 'review_updated', 'business_updated', 'notification_received']
+  );
+
   const handleConfirmBooking = async (id) => {
     try {
       const res = await businessOwnerService.confirmBooking(id);
       if (res?.success) {
         showSuccess('Reservation has been confirmed! Customer notification dispatched.');
-        loadDashboardData();
+        loadDashboardData(true);
+        realtimeHub.emit('booking_updated', { bookingId: id, status: 'confirmed' });
       }
     } catch (err) {
       showError(err.message || 'Failed to confirm booking.');
@@ -101,7 +111,8 @@ export default function BusinessDashboard() {
       const res = await businessOwnerService.rejectBooking(id, 'Service capacity full');
       if (res?.success) {
         showSuccess('Reservation has been declined.');
-        loadDashboardData();
+        loadDashboardData(true);
+        realtimeHub.emit('booking_updated', { bookingId: id, status: 'rejected' });
       }
     } catch (err) {
       showError(err.message || 'Failed to reject booking.');

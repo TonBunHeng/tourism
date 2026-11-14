@@ -9,6 +9,7 @@ import LogoutAlert from './LogoutAlert';
 import notificationService from '../../services/notificationService';
 import { useSearch } from '../../context/SearchContext';
 import { useLanguage } from '../../i18n';
+import realtimeHub from '../../utils/realtimeHub';
 
 export default function Header({ toggleSidebar, isSidebarOpen, isExpanded, toggleExpand }) {
   const navigate = useNavigate();
@@ -108,11 +109,19 @@ export default function Header({ toggleSidebar, isSidebarOpen, isExpanded, toggl
     const handleUpdate = () => fetchHeaderNotifications();
     window.addEventListener('notifications-updated', handleUpdate);
 
-    // Light background poll every 45s
-    const interval = setInterval(fetchHeaderNotifications, 45000);
+    // Subscribe to realtime hub notification and booking events
+    const unsub1 = realtimeHub.subscribe('notification_received', handleUpdate);
+    const unsub2 = realtimeHub.subscribe('booking_updated', handleUpdate);
+
+    // Light background poll every 8s
+    const interval = setInterval(() => {
+      if (!document.hidden) fetchHeaderNotifications();
+    }, 8000);
 
     return () => {
       window.removeEventListener('notifications-updated', handleUpdate);
+      unsub1();
+      unsub2();
       clearInterval(interval);
     };
   }, [fetchHeaderNotifications]);

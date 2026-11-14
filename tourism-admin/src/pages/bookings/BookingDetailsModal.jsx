@@ -6,6 +6,7 @@ import {
   Copy, Check, X, Building2, CreditCard, ExternalLink
 } from 'lucide-react';
 import { useLanguage } from '../../i18n';
+import { getTravelPortalBaseUrl } from '../../services/api';
 import { getStatusColor } from '../../utils/StatusUtils';
 
 export default function BookingDetailsModal({
@@ -269,8 +270,7 @@ export default function BookingDetailsModal({
             )}
             <a
               href={(() => {
-                const isLocal = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
-                const travelBase = isLocal ? 'http://localhost:5175' : '';
+                const travelBase = getTravelPortalBaseUrl();
                 if (booking.business_id) return `${travelBase}/businesses/${booking.business_id}`;
                 if (booking.tour_id) return `${travelBase}/tours`;
                 return `${travelBase}/businesses`;

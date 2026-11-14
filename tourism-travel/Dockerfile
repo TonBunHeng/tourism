@@ -11,8 +11,14 @@ RUN npm install
 # Copy source code
 COPY . .
 
+# Copy entrypoint script and ensure executable
+COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+
 # Expose Vite development port
 EXPOSE 5175
+
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
 
 # Start Vite dev server accessible from host
 CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "5175"]

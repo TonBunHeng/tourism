@@ -19,6 +19,7 @@ import { getInitialTheme, isDarkTheme, toggleTheme, THEME_CHANGE_EVENT } from '.
 import BusinessLogoutAlert from './BusinessLogoutAlert';
 import notificationService from '../../services/notificationService';
 import { useAuth } from '../../context/AuthContext';
+import realtimeHub from '../../utils/realtimeHub';
 
 export default function BusinessHeader({
   toggleSidebar,
@@ -92,10 +93,20 @@ export default function BusinessHeader({
     fetchHeaderNotifications();
     const handleUpdate = () => fetchHeaderNotifications();
     window.addEventListener('notifications-updated', handleUpdate);
-    const interval = setInterval(fetchHeaderNotifications, 45000);
+
+    // Subscribe to realtime hub notification and booking events
+    const unsub1 = realtimeHub.subscribe('notification_received', handleUpdate);
+    const unsub2 = realtimeHub.subscribe('booking_updated', handleUpdate);
+
+    // Fast adaptive sync interval for notifications
+    const interval = setInterval(() => {
+      if (!document.hidden) fetchHeaderNotifications();
+    }, 8000);
 
     return () => {
       window.removeEventListener('notifications-updated', handleUpdate);
+      unsub1();
+      unsub2();
       clearInterval(interval);
     };
   }, [fetchHeaderNotifications]);

@@ -23,9 +23,9 @@ const LIVE_VERCEL_API = 'https://angkorvers.vercel.app/api';
 
 // Direct axios client for the dedicated aichatbot microservice (Port 8001 / Vercel API)
 export const aiBotClient = axios.create({
-  baseURL: AI_CHAT_SERVICE_URL && AI_CHAT_SERVICE_URL !== 'http://127.0.0.1:8001'
+  baseURL: AI_CHAT_SERVICE_URL && !AI_CHAT_SERVICE_URL.includes('127.0.0.1:8001') && !AI_CHAT_SERVICE_URL.includes('localhost:8001')
     ? AI_CHAT_SERVICE_URL 
-    : LIVE_VERCEL_API,
+    : (AI_CHAT_SERVICE_URL || LIVE_VERCEL_API),
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
@@ -140,9 +140,10 @@ export const aiChatService = {
     const history = typeof payload === 'object' ? payload.history || [] : [];
 
     // Base endpoints to attempt streaming
+    const resolvedChatUrl = (AI_CHAT_SERVICE_URL || 'http://127.0.0.1:8001').replace(/\/+$/, '');
     const streamEndpoints = [
+      `${resolvedChatUrl}/api/chat/stream`,
       'https://angkorvers.vercel.app/api/chat/stream',
-      'http://127.0.0.1:8001/api/chat/stream',
       '/api/chat/stream',
     ];
 

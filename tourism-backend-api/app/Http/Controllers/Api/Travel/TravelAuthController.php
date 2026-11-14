@@ -388,13 +388,24 @@ class TravelAuthController extends Controller
         ], 'Google authentication successful.');
     }
 
-    public function redirectToGoogle()
+    public function redirectToGoogle(Request $request)
     {
         try {
             $clientId = config('services.google.client_id');
+            $clientSecret = config('services.google.client_secret');
+
+            // Capture the originating frontend URL (e.g. http://10.10.4.150:5175 or http://localhost:5175)
+            $referer = $request->header('Referer');
+            $frontendUrl = $referer 
+                ? preg_replace('#/(login|register).*$#', '', $referer)
+                : env('FRONTEND_URL', 'http://localhost:5175');
+
             if (empty($clientId) || $clientId === 'your_google_client_id_here') {
-                $frontendUrl = env('FRONTEND_URL', 'http://localhost:5175');
-                return redirect($frontendUrl . '/login?error=' . urlencode('Google OAuth is not configured yet in backend. Please check GOOGLE_CLIENT_ID.'));
+                return redirect($frontendUrl . '/login?error=' . urlencode('Google OAuth is not configured yet. Please set GOOGLE_CLIENT_ID in backend .env.'));
+            }
+
+            if (empty($clientSecret) || $clientSecret === 'your_google_client_secret_here') {
+                return redirect($frontendUrl . '/login?error=' . urlencode('Google OAuth requires GOOGLE_CLIENT_SECRET. Please add your Client Secret in tourism-backend-api/.env (GOOGLE_CLIENT_SECRET=...).'));
             }
 
             return Socialite::driver('google')->stateless()->redirect();
@@ -404,9 +415,12 @@ class TravelAuthController extends Controller
         }
     }
 
-    public function handleGoogleCallback()
+    public function handleGoogleCallback(Request $request)
     {
-        $frontendUrl = env('FRONTEND_URL', 'http://localhost:5175');
+        $referer = $request->header('Referer');
+        $frontendUrl = $referer 
+            ? preg_replace('#/(login|register).*$#', '', $referer)
+            : env('FRONTEND_URL', 'http://localhost:5175');
 
         try {
             $googleUser = Socialite::driver('google')->stateless()->user();

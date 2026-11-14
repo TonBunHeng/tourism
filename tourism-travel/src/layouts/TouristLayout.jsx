@@ -28,6 +28,7 @@ import {
 import { useAuth } from '../context/AuthContext';
 import { toggleTheme, isDarkTheme, getInitialTheme } from '../utils/Theme';
 import notificationService from '../services/notificationService';
+import realtimeHub from '../utils/realtimeHub';
 import logoImg from '../assets/images/tourism_logo.png';
 import AngkorGenieFloatingWidget from '../components/common/AngkorGenieFloatingWidget';
 import { setPageTitle } from '../utils/PagesTitle';
@@ -46,8 +47,7 @@ export default function TouristLayout() {
   const [activeDropdown, setActiveDropdown] = useState(null);
   const dropdownTimeoutRef = useRef(null);
 
-  // Refresh the notification badge when authentication or route changes.
-  // Ignore late responses after navigation/unmount and reset on sign-out.
+  // Refresh the notification badge when authentication or route changes, or via realtime events.
   useEffect(() => {
     let cancelled = false;
 
@@ -56,27 +56,43 @@ export default function TouristLayout() {
       return undefined;
     }
 
-    notificationService
-      .getUnreadCount()
-      .then((res) => {
-        if (cancelled) return;
+    const fetchBadge = () => {
+      notificationService
+        .getUnreadCount()
+        .then((res) => {
+          if (cancelled) return;
 
-        const count = typeof res?.data?.unread_count === 'number'
-          ? res.data.unread_count
-          : typeof res?.unread_count === 'number'
-            ? res.unread_count
-            : null;
+          const count = typeof res?.data?.unread_count === 'number'
+            ? res.data.unread_count
+            : typeof res?.unread_count === 'number'
+              ? res.unread_count
+              : null;
 
-        if (count !== null) {
-          setUnreadCount(count);
-        }
-      })
-      .catch(() => {
-        // Preserve the current badge count if the request temporarily fails.
-      });
+          if (count !== null) {
+            setUnreadCount(count);
+          }
+        })
+        .catch(() => {
+          // Preserve the current badge count if the request temporarily fails.
+        });
+    };
+
+    fetchBadge();
+
+    // Subscribe to realtime notification and booking events
+    const unsub1 = realtimeHub.subscribe('notification_received', fetchBadge);
+    const unsub2 = realtimeHub.subscribe('booking_updated', fetchBadge);
+
+    // Periodic silent sync for tourist header badge
+    const timer = setInterval(() => {
+      if (!document.hidden) fetchBadge();
+    }, 8000);
 
     return () => {
       cancelled = true;
+      unsub1();
+      unsub2();
+      clearInterval(timer);
     };
   }, [isAuthenticated, location.pathname]);
 
