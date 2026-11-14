@@ -19,7 +19,7 @@ export default function WeatherCard({ weather, language = 'en' }) {
     : 'text-slate-400';
 
   return (
-    <div className="mt-2.5 rounded-xl bg-gradient-to-br from-blue-50/70 via-white to-slate-50 dark:from-slate-900 dark:via-slate-900 dark:to-slate-950 border border-blue-100 dark:border-slate-800 p-2.5 shadow-2xs w-full">
+    <div className="mt-2.5 rounded-sm bg-gradient-to-br from-blue-50/70 via-white to-slate-50 dark:from-slate-900 dark:via-slate-900 dark:to-slate-950 border border-blue-100 dark:border-slate-800 p-2.5 shadow-2xs w-full">
       {/* Top row: Icon, Province, Condition, and Temperatures */}
       <div className="flex items-center justify-between gap-2 mb-2">
         <div className="flex items-center space-x-1.5">
@@ -47,7 +47,7 @@ export default function WeatherCard({ weather, language = 'en' }) {
       </div>
 
       {/* Metrics Row: Rain, Humidity, Wind */}
-      <div className="flex items-center justify-around py-1 px-2 rounded-lg bg-white/80 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800/80 mb-2 text-[10px]">
+      <div className="flex items-center justify-around py-1 px-2 rounded-sm bg-white/80 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800/80 mb-2 text-[10px]">
         <div className="flex items-center gap-1 text-slate-600 dark:text-slate-300">
           <CloudRain size={10} className="text-blue-500" />
           <span>
@@ -68,7 +68,7 @@ export default function WeatherCard({ weather, language = 'en' }) {
 
       {/* Travel Advice / Suitability callout */}
       {(weather.travel_suitability || weather.travel_advice_en || weather.travel_advice_km) && (
-        <div className="p-1.5 rounded-lg bg-blue-50/70 dark:bg-blue-950/40 border border-blue-100 dark:border-blue-900/50 flex items-start gap-1.5 text-[11px]">
+        <div className="p-1.5 rounded-sm bg-blue-50/70 dark:bg-blue-950/40 border border-blue-100 dark:border-blue-900/50 flex items-start gap-1.5 text-[11px]">
           <Info size={13} className="text-[#003E83] dark:text-blue-400 shrink-0 mt-0.5" />
           <p className="text-slate-700 dark:text-slate-300 text-[10px] leading-tight">
             <strong className="text-[#003E83] dark:text-blue-300">

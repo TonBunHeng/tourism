@@ -157,7 +157,7 @@ export default function Galleries() {
                 <div
                   key={photo.id}
                   onClick={() => handleOpenPhoto(photo)}
-                  className="group relative h-80 rounded-3xl overflow-hidden bg-slate-100 dark:bg-zinc-800 border border-slate-200/80 dark:border-zinc-800 shadow-xs hover:shadow-2xl transition-all duration-300 cursor-pointer"
+                  className="group relative h-80 rounded-sm overflow-hidden bg-slate-100 dark:bg-zinc-800 border border-slate-200/80 dark:border-zinc-800 shadow-xs hover:shadow-2xl transition-all duration-300 cursor-pointer"
                 >
                   {photoUrl ? (
                     <img
@@ -239,7 +239,7 @@ export default function Galleries() {
       {/* Lightbox Modal */}
       {activePhoto && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md animate-alert-backdrop">
-          <div className="relative max-w-4xl w-full bg-zinc-950 border border-zinc-800 rounded-3xl overflow-hidden shadow-2xl flex flex-col md:flex-row">
+          <div className="relative max-w-4xl w-full bg-zinc-950 border border-zinc-800 rounded-sm overflow-hidden shadow-2xl flex flex-col md:flex-row">
             <button
               onClick={() => setActivePhoto(null)}
               className="absolute top-3 right-3 z-10 p-2 rounded-full bg-black/60 hover:bg-black text-white"
@@ -286,7 +286,7 @@ export default function Galleries() {
                       <p className="text-[11px] text-zinc-500 italic">No comments yet. Share your thoughts!</p>
                     ) : (
                       photoComments.map((c, idx) => (
-                        <div key={c.id || idx} className="p-2.5 rounded-xl bg-zinc-900 border border-zinc-800 text-[11px] space-y-1">
+                        <div key={c.id || idx} className="p-2.5 rounded-sm bg-zinc-900 border border-zinc-800 text-[11px] space-y-1">
                           <div className="flex items-center justify-between text-zinc-400 font-bold">
                             <span>{c.user?.name || c.user_name || 'Traveler'}</span>
                             <span className="text-[10px]">{c.created_at ? new Date(c.created_at).toLocaleDateString() : ''}</span>
@@ -304,12 +304,12 @@ export default function Galleries() {
                       value={newComment}
                       onChange={(e) => setNewComment(e.target.value)}
                       placeholder="Add a comment..."
-                      className="flex-1 px-3 py-1.5 rounded-xl bg-zinc-900 border border-zinc-700 text-xs text-white placeholder-zinc-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                      className="flex-1 px-3 py-1.5 rounded-sm bg-zinc-900 border border-zinc-700 text-xs text-white placeholder-zinc-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                     />
                     <button
                       type="submit"
                       disabled={isSubmittingComment || !newComment.trim()}
-                      className="p-2 rounded-xl bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white transition cursor-pointer"
+                      className="p-2 rounded-sm bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white transition cursor-pointer"
                     >
                       <Send size={14} />
                     </button>
@@ -321,7 +321,7 @@ export default function Galleries() {
                 <button
                   type="button"
                   onClick={(e) => handleToggleLike(activePhoto.id, e)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition cursor-pointer ${
+                  className={`flex items-center gap-2 px-4 py-2 rounded-sm text-xs font-bold transition cursor-pointer ${
                     activePhoto.is_liked
                       ? 'bg-rose-600 text-white'
                       : 'bg-zinc-800 hover:bg-zinc-700 text-white'
@@ -334,7 +334,7 @@ export default function Galleries() {
                 <button
                   type="button"
                   onClick={() => setActivePhoto(null)}
-                  className="px-4 py-2 rounded-xl bg-zinc-800 text-xs font-bold text-zinc-300 hover:text-white"
+                  className="px-4 py-2 rounded-sm bg-zinc-800 text-xs font-bold text-zinc-300 hover:text-white"
                 >
                   Close
                 </button>

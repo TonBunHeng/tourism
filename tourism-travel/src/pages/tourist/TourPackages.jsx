@@ -9,7 +9,8 @@ import {
   Calendar, 
   X, 
   Check, 
-  ShieldCheck
+  ShieldCheck,
+  ChevronDown
 } from 'lucide-react';
 import travelService from '../../services/travelService';
 import { useAlert } from '../../context/AlertContext';
@@ -154,51 +155,62 @@ export default function TourPackages() {
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 rounded-2xl p-4 sm:p-5 shadow-xs space-y-3">
+      <div className="bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 rounded-sm p-4 sm:p-5 shadow-xs space-y-3">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           <div className="relative">
-            <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+            <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
             <input
               type="text"
               value={search}
               onChange={(e) => handleFilterChange('search', e.target.value)}
               placeholder="Search tours..."
-              className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-slate-50 dark:bg-zinc-800 text-xs sm:text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#002D62]"
+              className="w-full pl-9 pr-9 py-2.5 rounded-sm border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800 text-xs sm:text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#002D62] transition-colors"
             />
+            {search && (
+              <button
+                type="button"
+                onClick={() => handleFilterChange('search', '')}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-zinc-200"
+              >
+                <X size={14} />
+              </button>
+            )}
           </div>
 
-          <div>
+          <div className="relative">
             <select
               value={selectedDestination}
               onChange={(e) => handleFilterChange('destination', e.target.value)}
-              className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-zinc-800 text-xs sm:text-sm text-slate-700 dark:text-zinc-200 focus:outline-none focus:ring-2 focus:ring-[#002D62]"
+              className="w-full pl-3.5 pr-9 py-2.5 rounded-sm border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800 text-xs sm:text-sm text-slate-700 dark:text-zinc-200 focus:outline-none focus:ring-2 focus:ring-[#002D62] appearance-none cursor-pointer transition-colors"
             >
               <option value="All">All Tour Destinations</option>
               {destinations.filter(d => d !== 'All').map((d) => (
                 <option key={d} value={d}>{d}</option>
               ))}
             </select>
+            <ChevronDown size={15} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
           </div>
 
-          <div>
+          <div className="relative">
             <select
               value={selectedDuration}
               onChange={(e) => handleFilterChange('duration', e.target.value)}
-              className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-zinc-800 text-xs sm:text-sm text-slate-700 dark:text-zinc-200 focus:outline-none focus:ring-2 focus:ring-[#002D62]"
+              className="w-full pl-3.5 pr-9 py-2.5 rounded-sm border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800 text-xs sm:text-sm text-slate-700 dark:text-zinc-200 focus:outline-none focus:ring-2 focus:ring-[#002D62] appearance-none cursor-pointer transition-colors"
             >
               <option value="All">Any Duration</option>
               <option value="1">1 Day</option>
               <option value="2-3">2-3 Days</option>
               <option value="4+">4+ Days</option>
             </select>
+            <ChevronDown size={15} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
           </div>
         </div>
 
-        <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-zinc-800 text-xs text-slate-500">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-3 border-t border-slate-100 dark:border-zinc-800 text-xs text-slate-500">
           <div>
             Total Tours in Database: <strong className="text-slate-800 dark:text-zinc-200">{tours.length}</strong>
           </div>
-          <div className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-medium">
+          <div className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-medium">
             <ShieldCheck size={14} />
             <span>Ministry Verified Operators</span>
           </div>
@@ -220,7 +232,7 @@ export default function TourPackages() {
             {paginatedTours.map((t) => (
               <div
                 key={t.id}
-                className="group rounded-3xl bg-white dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800 shadow-xs hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col justify-between"
+                className="group rounded-sm bg-white dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800 shadow-xs hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col justify-between"
               >
                 <div>
                   <div className="relative h-52 w-full overflow-hidden bg-slate-100 dark:bg-zinc-800">
@@ -245,7 +257,7 @@ export default function TourPackages() {
                       </div>
                     )}
 
-                    <div className="absolute bottom-3 right-3 px-3 py-1 rounded-xl bg-black/75 backdrop-blur-md text-white font-black text-sm">
+                    <div className="absolute bottom-3 right-3 px-3 py-1 rounded-sm bg-black/75 backdrop-blur-md text-white font-black text-sm">
                       ${t.price} <span className="text-[10px] font-normal text-white/80">/ person</span>
                     </div>
                   </div>
@@ -268,7 +280,7 @@ export default function TourPackages() {
                     </h3>
 
                     <div className="flex items-center gap-2 text-xs">
-                      <div className="flex items-center gap-1 text-amber-500 font-bold bg-amber-50 dark:bg-amber-950/40 px-2 py-0.5 rounded-md">
+                      <div className="flex items-center gap-1 text-amber-500 font-bold bg-amber-50 dark:bg-amber-950/40 px-2 py-0.5 rounded-sm">
                         <Star size={13} className="fill-amber-400 text-amber-400" />
                         <span>{t.rating || 0}</span>
                       </div>
@@ -287,7 +299,7 @@ export default function TourPackages() {
                   <button
                     type="button"
                     onClick={() => setActiveTourDetails(t)}
-                    className="px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-zinc-800 hover:bg-slate-200 dark:hover:bg-zinc-700 text-slate-800 dark:text-zinc-200 font-semibold transition cursor-pointer"
+                    className="px-3.5 py-2 rounded-sm bg-slate-100 dark:bg-zinc-800 hover:bg-slate-200 dark:hover:bg-zinc-700 text-slate-800 dark:text-zinc-200 font-semibold transition cursor-pointer"
                   >
                     Details
                   </button>
@@ -295,7 +307,7 @@ export default function TourPackages() {
                   <button
                     type="button"
                     onClick={() => setActiveTourForBooking(t)}
-                    className="px-4 py-2 rounded-xl bg-[#002D62] hover:bg-[#001f44] text-white font-bold transition shadow-xs flex items-center gap-1.5 cursor-pointer"
+                    className="px-4 py-2 rounded-sm bg-[#002D62] hover:bg-[#001f44] text-white font-bold transition shadow-xs flex items-center gap-1.5 cursor-pointer"
                   >
                     <Calendar size={13} />
                     <span>Book Now</span>
@@ -322,7 +334,7 @@ export default function TourPackages() {
       {/* Book Tour Modal */}
       {activeTourForBooking && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-alert-backdrop">
-          <div className="w-full max-w-lg rounded-3xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 p-6 sm:p-8 shadow-2xl animate-alert-popup space-y-5">
+          <div className="w-full max-w-lg rounded-sm bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 p-6 sm:p-8 shadow-2xl animate-alert-popup space-y-5">
             <div className="flex items-center justify-between border-b border-slate-100 dark:border-zinc-800 pb-3">
               <div>
                 <span className="text-[11px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider">
@@ -348,7 +360,7 @@ export default function TourPackages() {
                   value={bookingDate}
                   min={new Date().toISOString().split('T')[0]}
                   onChange={(e) => setBookingDate(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-slate-900 dark:text-white"
+                  className="w-full px-3.5 py-2.5 rounded-sm bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-slate-900 dark:text-white"
                 />
               </div>
 
@@ -362,7 +374,7 @@ export default function TourPackages() {
                   max={50}
                   value={guestsCount}
                   onChange={(e) => setGuestsCount(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-slate-900 dark:text-white font-bold"
+                  className="w-full px-3.5 py-2.5 rounded-sm bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-slate-900 dark:text-white font-bold"
                 />
               </div>
 
@@ -375,7 +387,7 @@ export default function TourPackages() {
                   value={bookingNotes}
                   onChange={(e) => setBookingNotes(e.target.value)}
                   placeholder="Notes for the tour operator..."
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-slate-900 dark:text-white"
+                  className="w-full px-3.5 py-2.5 rounded-sm bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-slate-900 dark:text-white"
                 />
               </div>
 
@@ -383,14 +395,14 @@ export default function TourPackages() {
                 <button
                   type="button"
                   onClick={() => setActiveTourForBooking(null)}
-                  className="px-4 py-2 rounded-xl text-slate-600 dark:text-zinc-400"
+                  className="px-4 py-2 rounded-sm text-slate-600 dark:text-zinc-400"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmittingBooking}
-                  className="px-5 py-2.5 rounded-xl bg-[#002D62] text-white font-bold disabled:opacity-50"
+                  className="px-5 py-2.5 rounded-sm bg-[#002D62] text-white font-bold disabled:opacity-50"
                 >
                   {isSubmittingBooking ? 'Saving to DB...' : 'Confirm Reservation'}
                 </button>
@@ -403,7 +415,7 @@ export default function TourPackages() {
       {/* Tour Details Modal */}
       {activeTourDetails && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-alert-backdrop">
-          <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-3xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 p-6 sm:p-8 shadow-2xl animate-alert-popup space-y-6">
+          <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-sm bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 p-6 sm:p-8 shadow-2xl animate-alert-popup space-y-6">
             <div className="flex items-start justify-between border-b border-slate-100 dark:border-zinc-800 pb-4">
               <div>
                 <h2 className="text-xl font-extrabold text-slate-900 dark:text-white">
@@ -424,7 +436,7 @@ export default function TourPackages() {
               <img
                 src={activeTourDetails.image}
                 alt={activeTourDetails.title}
-                className="w-full h-56 object-cover rounded-2xl"
+                className="w-full h-56 object-cover rounded-sm"
               />
             )}
 
@@ -456,7 +468,7 @@ export default function TourPackages() {
               <button
                 type="button"
                 onClick={() => setActiveTourDetails(null)}
-                className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-zinc-800 text-slate-800 dark:text-white font-semibold text-xs"
+                className="px-4 py-2 rounded-sm bg-slate-100 dark:bg-zinc-800 text-slate-800 dark:text-white font-semibold text-xs"
               >
                 Close
               </button>

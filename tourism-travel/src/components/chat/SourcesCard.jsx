@@ -24,7 +24,7 @@ export default function SourcesCard({ sources = [], language = 'en' }) {
         {sources.slice(0, 2).map((item, idx) => (
           <div
             key={idx}
-            className="bg-slate-50/80 dark:bg-[#212121] border border-slate-200/90 dark:border-zinc-800 rounded-xl p-2.5 text-xs hover:border-[#003E83] dark:hover:border-blue-500 transition-colors shadow-2xs"
+            className="bg-slate-50/80 dark:bg-[#212121] border border-slate-200/90 dark:border-zinc-800 rounded-sm p-2.5 text-xs hover:border-[#003E83] dark:hover:border-blue-500 transition-colors shadow-2xs"
           >
             <div className="flex items-center justify-between mb-1">
               <h4 className="font-bold text-xs text-slate-800 dark:text-zinc-200 truncate">

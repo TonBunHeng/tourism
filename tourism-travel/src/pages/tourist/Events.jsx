@@ -83,7 +83,7 @@ export default function Events() {
             {paginatedEvents.map((ev) => (
               <div
                 key={ev.id}
-                className="group rounded-3xl bg-white dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800 shadow-xs hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col justify-between"
+                className="group rounded-sm bg-white dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800 shadow-xs hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col justify-between"
               >
                 <div>
                   <div className="relative h-52 w-full overflow-hidden bg-slate-100 dark:bg-zinc-800">
@@ -139,7 +139,7 @@ export default function Events() {
                   <button
                     type="button"
                     onClick={() => setActiveEventDetails(ev)}
-                    className="px-4 py-2 rounded-xl bg-[#002D62] hover:bg-[#001f44] text-white font-bold transition cursor-pointer"
+                    className="px-4 py-2 rounded-sm bg-[#002D62] hover:bg-[#001f44] text-white font-bold transition cursor-pointer"
                   >
                     Event Details
                   </button>
@@ -165,7 +165,7 @@ export default function Events() {
       {/* Event Details Modal */}
       {activeEventDetails && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-alert-backdrop">
-          <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-3xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 p-6 sm:p-8 shadow-2xl animate-alert-popup space-y-6">
+          <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-sm bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 p-6 sm:p-8 shadow-2xl animate-alert-popup space-y-6">
             <div className="flex items-start justify-between border-b border-slate-100 dark:border-zinc-800 pb-4">
               <div>
                 <h2 className="text-xl font-extrabold text-slate-900 dark:text-white">
@@ -184,7 +184,7 @@ export default function Events() {
               <img
                 src={activeEventDetails.image_url}
                 alt={activeEventDetails.title}
-                className="w-full h-56 object-cover rounded-2xl"
+                className="w-full h-56 object-cover rounded-sm"
               />
             )}
 
@@ -199,7 +199,7 @@ export default function Events() {
               <button
                 type="button"
                 onClick={() => setActiveEventDetails(null)}
-                className="px-5 py-2.5 rounded-xl bg-slate-100 dark:bg-zinc-800 text-slate-800 dark:text-white font-semibold text-xs"
+                className="px-5 py-2.5 rounded-sm bg-slate-100 dark:bg-zinc-800 text-slate-800 dark:text-white font-semibold text-xs"
               >
                 Close
               </button>

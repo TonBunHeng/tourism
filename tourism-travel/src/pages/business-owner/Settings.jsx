@@ -171,7 +171,7 @@ export default function BusinessSettings() {
           </div>
 
           {selectedBusiness && (
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 shadow-xs self-start sm:self-auto">
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-sm bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 shadow-xs self-start sm:self-auto">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
               <span className="text-xs font-semibold text-gray-700 dark:text-zinc-200 truncate max-w-[200px]">
                 {selectedBusiness.name}
@@ -188,7 +188,7 @@ export default function BusinessSettings() {
           return (
             <div
               key={index}
-              className="bg-white dark:bg-zinc-900 rounded-md p-4 shadow-xs border border-gray-200 dark:border-zinc-800 flex flex-col justify-between"
+              className="bg-white dark:bg-zinc-900 rounded-sm p-4 shadow-xs border border-gray-200 dark:border-zinc-800 flex flex-col justify-between"
             >
               <div className="flex items-center justify-between gap-2">
                 <div className="min-w-0">
@@ -199,7 +199,7 @@ export default function BusinessSettings() {
                     {stat.value}
                   </p>
                 </div>
-                <div className={`w-9 h-9 rounded-md shrink-0 flex items-center justify-center ${stat.bg}`}>
+                <div className={`w-9 h-9 rounded-sm shrink-0 flex items-center justify-center ${stat.bg}`}>
                   <IconComponent className={`w-5 h-5 ${stat.color}`} />
                 </div>
               </div>
@@ -212,18 +212,18 @@ export default function BusinessSettings() {
       </div>
 
       {/* Main Container Card with Segmented Tabs */}
-      <div className="bg-white dark:bg-zinc-900 rounded-md shadow-xs border border-gray-200 dark:border-zinc-800 overflow-hidden">
+      <div className="bg-white dark:bg-zinc-900 rounded-sm shadow-xs border border-gray-200 dark:border-zinc-800 overflow-hidden">
         {/* Card Header matching SettingsTabs in tourism-admin */}
         <div className="px-4 md:px-6 py-4 border-b border-gray-200 dark:border-zinc-800">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-md bg-blue-50 dark:bg-blue-950/50 text-[#003E83] dark:text-blue-400 border border-blue-100 dark:border-blue-900/40 flex items-center justify-center shrink-0">
+              <div className="w-8 h-8 rounded-sm bg-blue-50 dark:bg-blue-950/50 text-[#003E83] dark:text-blue-400 border border-blue-100 dark:border-blue-900/40 flex items-center justify-center shrink-0">
                 <CurrentIcon className="w-4 h-4" />
               </div>
               <h2 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white">
                 {currentTabObj.label}
               </h2>
-              <span className="text-xs font-semibold px-2 py-0.5 rounded-md bg-blue-50 text-[#003E83] dark:bg-blue-950/50 dark:text-blue-400 border border-blue-100 dark:border-blue-900/40">
+              <span className="text-xs font-semibold px-2 py-0.5 rounded-sm bg-blue-50 text-[#003E83] dark:bg-blue-950/50 dark:text-blue-400 border border-blue-100 dark:border-blue-900/40">
                 Section {currentTabIndex} of {SETTINGS_TABS.length}
               </span>
             </div>
@@ -235,7 +235,7 @@ export default function BusinessSettings() {
                 <select
                   value={activeTab}
                   onChange={(e) => setActiveTab(e.target.value)}
-                  className="appearance-none w-full pl-3.5 pr-8 py-2 border border-gray-200 dark:border-zinc-700 rounded-md focus:outline-none focus:ring-1 focus:ring-[#003E83] bg-white dark:bg-zinc-800 text-gray-900 dark:text-white text-xs sm:text-sm cursor-pointer shadow-xs font-medium"
+                  className="appearance-none w-full pl-3.5 pr-8 py-2 border border-gray-200 dark:border-zinc-700 rounded-sm focus:outline-none focus:ring-1 focus:ring-[#003E83] bg-white dark:bg-zinc-800 text-gray-900 dark:text-white text-xs sm:text-sm cursor-pointer shadow-xs font-medium"
                 >
                   {SETTINGS_TABS.map((tab) => (
                     <option key={tab.id} value={tab.id}>
@@ -247,7 +247,7 @@ export default function BusinessSettings() {
               </div>
 
               {/* Desktop Segmented Buttons (>= md) */}
-              <div className="hidden md:flex items-center gap-1 p-1 bg-gray-100 dark:bg-zinc-800 rounded-md border border-gray-200 dark:border-zinc-700">
+              <div className="hidden md:flex items-center gap-1 p-1 bg-gray-100 dark:bg-zinc-800 rounded-sm border border-gray-200 dark:border-zinc-700">
                 {SETTINGS_TABS.map((tab) => {
                   const TabIcon = tab.icon;
                   const isActive = activeTab === tab.id;
@@ -256,7 +256,7 @@ export default function BusinessSettings() {
                       key={tab.id}
                       type="button"
                       onClick={() => setActiveTab(tab.id)}
-                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors cursor-pointer ${
+                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-sm text-xs font-medium transition-colors cursor-pointer ${
                         isActive
                           ? 'bg-[#003E83] text-white shadow-xs'
                           : 'text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200/50 dark:hover:bg-zinc-700/50'
@@ -297,7 +297,7 @@ export default function BusinessSettings() {
                     value={currentPassword}
                     onChange={(e) => setCurrentPassword(e.target.value)}
                     placeholder="Enter current password"
-                    className="w-full px-3 py-2 rounded-md border border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800 text-xs sm:text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#003E83]"
+                    className="w-full px-3 py-2 rounded-sm border border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800 text-xs sm:text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#003E83]"
                   />
                 </div>
 
@@ -312,7 +312,7 @@ export default function BusinessSettings() {
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
                       placeholder="Minimum 8 characters"
-                      className="w-full px-3 py-2 rounded-md border border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800 text-xs sm:text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#003E83]"
+                      className="w-full px-3 py-2 rounded-sm border border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800 text-xs sm:text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#003E83]"
                     />
                   </div>
 
@@ -326,13 +326,13 @@ export default function BusinessSettings() {
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       placeholder="Repeat new password"
-                      className="w-full px-3 py-2 rounded-md border border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800 text-xs sm:text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#003E83]"
+                      className="w-full px-3 py-2 rounded-sm border border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800 text-xs sm:text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#003E83]"
                     />
                   </div>
                 </div>
 
                 {/* Password guidelines info box */}
-                <div className="p-3.5 rounded-md bg-blue-50/50 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900/40 text-xs text-blue-900 dark:text-blue-300 flex items-start gap-2.5">
+                <div className="p-3.5 rounded-sm bg-blue-50/50 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900/40 text-xs text-blue-900 dark:text-blue-300 flex items-start gap-2.5">
                   <Info className="w-4 h-4 shrink-0 mt-0.5 text-[#003E83] dark:text-blue-400" />
                   <div className="space-y-1">
                     <p className="font-semibold">Password Requirements</p>
@@ -348,7 +348,7 @@ export default function BusinessSettings() {
                   <button
                     type="submit"
                     disabled={isUpdatingPassword}
-                    className="px-5 py-2.5 rounded-md bg-[#003E83] hover:bg-[#002e62] disabled:opacity-50 text-white text-xs sm:text-sm font-medium shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer"
+                    className="px-5 py-2.5 rounded-sm bg-[#003E83] hover:bg-[#002e62] disabled:opacity-50 text-white text-xs sm:text-sm font-medium shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer"
                   >
                     {isUpdatingPassword ? (
                       <Loader2 size={15} className="animate-spin" />
@@ -374,22 +374,22 @@ export default function BusinessSettings() {
                 </p>
               </div>
 
-              <div className="p-5 rounded-md bg-gray-50 dark:bg-zinc-800/60 border border-gray-200 dark:border-zinc-700/80 space-y-4">
+              <div className="p-5 rounded-sm bg-gray-50 dark:bg-zinc-800/60 border border-gray-200 dark:border-zinc-700/80 space-y-4">
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-md bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 flex items-center justify-center shrink-0 shadow-xs">
+                    <div className="w-10 h-10 rounded-sm bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 flex items-center justify-center shrink-0 shadow-xs">
                       <GoogleIcon className="w-5 h-5" />
                     </div>
                     <div>
                       <h4 className="text-sm font-bold text-gray-900 dark:text-white flex items-center gap-2">
                         <span>Google Identity Provider</span>
                         {user?.provider === 'google' ? (
-                          <span className="px-2 py-0.5 rounded-md bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 text-[10px] font-bold flex items-center gap-1">
+                          <span className="px-2 py-0.5 rounded-sm bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 text-[10px] font-bold flex items-center gap-1">
                             <CheckCircle2 size={11} />
                             Connected
                           </span>
                         ) : (
-                          <span className="px-2 py-0.5 rounded-md bg-gray-100 dark:bg-zinc-700 text-gray-500 dark:text-zinc-400 text-[10px] font-medium border border-gray-200 dark:border-zinc-600">
+                          <span className="px-2 py-0.5 rounded-sm bg-gray-100 dark:bg-zinc-700 text-gray-500 dark:text-zinc-400 text-[10px] font-medium border border-gray-200 dark:border-zinc-600">
                             Not Linked
                           </span>
                         )}
@@ -411,7 +411,7 @@ export default function BusinessSettings() {
                     <button
                       type="button"
                       onClick={handleDisconnectGoogle}
-                      className="px-3.5 py-1.5 rounded-md border border-rose-200 dark:border-rose-900/60 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 text-xs font-medium transition cursor-pointer self-start sm:self-auto"
+                      className="px-3.5 py-1.5 rounded-sm border border-rose-200 dark:border-rose-900/60 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 text-xs font-medium transition cursor-pointer self-start sm:self-auto"
                     >
                       Disconnect Google
                     </button>
@@ -438,7 +438,7 @@ export default function BusinessSettings() {
               </div>
 
               <form onSubmit={handleSaveNotificationPreferences} className="space-y-3">
-                <label className="flex items-center justify-between p-3.5 rounded-md bg-gray-50 dark:bg-zinc-800/60 border border-gray-200 dark:border-zinc-700/80 hover:bg-gray-100/60 dark:hover:bg-zinc-800 transition cursor-pointer">
+                <label className="flex items-center justify-between p-3.5 rounded-sm bg-gray-50 dark:bg-zinc-800/60 border border-gray-200 dark:border-zinc-700/80 hover:bg-gray-100/60 dark:hover:bg-zinc-800 transition cursor-pointer">
                   <div>
                     <div className="text-xs sm:text-sm font-semibold text-gray-900 dark:text-white">
                       New Customer Reservations
@@ -451,11 +451,11 @@ export default function BusinessSettings() {
                     type="checkbox"
                     checked={notifyBookings}
                     onChange={(e) => setNotifyBookings(e.target.checked)}
-                    className="w-4 h-4 rounded text-[#003E83] focus:ring-[#003E83] cursor-pointer"
+                    className="w-4 h-4 rounded-sm text-[#003E83] focus:ring-[#003E83] cursor-pointer"
                   />
                 </label>
 
-                <label className="flex items-center justify-between p-3.5 rounded-md bg-gray-50 dark:bg-zinc-800/60 border border-gray-200 dark:border-zinc-700/80 hover:bg-gray-100/60 dark:hover:bg-zinc-800 transition cursor-pointer">
+                <label className="flex items-center justify-between p-3.5 rounded-sm bg-gray-50 dark:bg-zinc-800/60 border border-gray-200 dark:border-zinc-700/80 hover:bg-gray-100/60 dark:hover:bg-zinc-800 transition cursor-pointer">
                   <div>
                     <div className="text-xs sm:text-sm font-semibold text-gray-900 dark:text-white">
                       Guest Reviews & Ratings
@@ -468,11 +468,11 @@ export default function BusinessSettings() {
                     type="checkbox"
                     checked={notifyReviews}
                     onChange={(e) => setNotifyReviews(e.target.checked)}
-                    className="w-4 h-4 rounded text-[#003E83] focus:ring-[#003E83] cursor-pointer"
+                    className="w-4 h-4 rounded-sm text-[#003E83] focus:ring-[#003E83] cursor-pointer"
                   />
                 </label>
 
-                <label className="flex items-center justify-between p-3.5 rounded-md bg-gray-50 dark:bg-zinc-800/60 border border-gray-200 dark:border-zinc-700/80 hover:bg-gray-100/60 dark:hover:bg-zinc-800 transition cursor-pointer">
+                <label className="flex items-center justify-between p-3.5 rounded-sm bg-gray-50 dark:bg-zinc-800/60 border border-gray-200 dark:border-zinc-700/80 hover:bg-gray-100/60 dark:hover:bg-zinc-800 transition cursor-pointer">
                   <div>
                     <div className="text-xs sm:text-sm font-semibold text-gray-900 dark:text-white">
                       Tourism Promotional Campaigns
@@ -485,11 +485,11 @@ export default function BusinessSettings() {
                     type="checkbox"
                     checked={notifyMarketing}
                     onChange={(e) => setNotifyMarketing(e.target.checked)}
-                    className="w-4 h-4 rounded text-[#003E83] focus:ring-[#003E83] cursor-pointer"
+                    className="w-4 h-4 rounded-sm text-[#003E83] focus:ring-[#003E83] cursor-pointer"
                   />
                 </label>
 
-                <label className="flex items-center justify-between p-3.5 rounded-md bg-gray-50 dark:bg-zinc-800/60 border border-gray-200 dark:border-zinc-700/80 hover:bg-gray-100/60 dark:hover:bg-zinc-800 transition cursor-pointer">
+                <label className="flex items-center justify-between p-3.5 rounded-sm bg-gray-50 dark:bg-zinc-800/60 border border-gray-200 dark:border-zinc-700/80 hover:bg-gray-100/60 dark:hover:bg-zinc-800 transition cursor-pointer">
                   <div>
                     <div className="text-xs sm:text-sm font-semibold text-gray-900 dark:text-white">
                       Security & Login Activity
@@ -502,7 +502,7 @@ export default function BusinessSettings() {
                     type="checkbox"
                     checked={notifySecurity}
                     onChange={(e) => setNotifySecurity(e.target.checked)}
-                    className="w-4 h-4 rounded text-[#003E83] focus:ring-[#003E83] cursor-pointer"
+                    className="w-4 h-4 rounded-sm text-[#003E83] focus:ring-[#003E83] cursor-pointer"
                   />
                 </label>
 
@@ -510,7 +510,7 @@ export default function BusinessSettings() {
                   <button
                     type="submit"
                     disabled={isSavingPreferences}
-                    className="px-5 py-2.5 rounded-md bg-[#003E83] hover:bg-[#002e62] disabled:opacity-50 text-white text-xs sm:text-sm font-medium shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer"
+                    className="px-5 py-2.5 rounded-sm bg-[#003E83] hover:bg-[#002e62] disabled:opacity-50 text-white text-xs sm:text-sm font-medium shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer"
                   >
                     {isSavingPreferences ? (
                       <Loader2 size={15} className="animate-spin" />
@@ -539,7 +539,7 @@ export default function BusinessSettings() {
 
                 <Link
                   to="/business/profile"
-                  className="px-3.5 py-1.5 rounded-md bg-[#003E83] hover:bg-[#002e62] text-white text-xs font-medium shrink-0 flex items-center gap-1.5 transition shadow-xs self-start sm:self-auto"
+                  className="px-3.5 py-1.5 rounded-sm bg-[#003E83] hover:bg-[#002e62] text-white text-xs font-medium shrink-0 flex items-center gap-1.5 transition shadow-xs self-start sm:self-auto"
                 >
                   <span>Edit Full Profile</span>
                   <ExternalLink size={13} />
@@ -548,7 +548,7 @@ export default function BusinessSettings() {
 
               {selectedBusiness ? (
                 <div className="space-y-4">
-                  <div className="p-4 rounded-md bg-gray-50 dark:bg-zinc-800/60 border border-gray-200 dark:border-zinc-700/80 grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                  <div className="p-4 rounded-sm bg-gray-50 dark:bg-zinc-800/60 border border-gray-200 dark:border-zinc-700/80 grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
                     <div>
                       <span className="text-gray-400 text-[11px] block">Registered Business Name</span>
                       <span className="font-semibold text-gray-900 dark:text-white text-sm">
@@ -559,12 +559,12 @@ export default function BusinessSettings() {
                     <div>
                       <span className="text-gray-400 text-[11px] block">Accreditation Status</span>
                       {selectedBusiness.verification_status === 'approved' ? (
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-xs font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 mt-0.5">
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-sm text-xs font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 mt-0.5">
                           <CheckCircle2 size={12} />
                           Verified & Approved
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-xs font-semibold bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-200 dark:border-amber-800 mt-0.5">
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-sm text-xs font-semibold bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-200 dark:border-amber-800 mt-0.5">
                           <Clock size={12} />
                           Pending Review
                         </span>
@@ -594,7 +594,7 @@ export default function BusinessSettings() {
                   </div>
                 </div>
               ) : (
-                <div className="p-8 text-center rounded-md border border-dashed border-gray-200 dark:border-zinc-800 text-xs text-gray-400">
+                <div className="p-8 text-center rounded-sm border border-dashed border-gray-200 dark:border-zinc-800 text-xs text-gray-400">
                   No active business selected.
                 </div>
               )}

@@ -262,7 +262,7 @@ export default function BusinessDetails() {
         <Building2 size={48} className="mx-auto text-slate-400" />
         <h2 className="text-xl font-bold text-slate-900 dark:text-white">Business Listing Not Found</h2>
         <p className="text-sm text-slate-500">This business record could not be found or is not approved yet.</p>
-        <Link to="/businesses" className="inline-block px-5 py-2.5 rounded-xl bg-[#002D62] text-white text-xs font-bold">
+        <Link to="/businesses" className="inline-block px-5 py-2.5 rounded-sm bg-[#002D62] text-white text-xs font-bold">
           Back to Directory
         </Link>
       </div>
@@ -287,7 +287,7 @@ export default function BusinessDetails() {
       </div>
 
       {/* Hero Header */}
-      <div className="bg-white dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800 rounded-3xl overflow-hidden shadow-xs">
+      <div className="bg-white dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800 rounded-sm overflow-hidden shadow-xs">
         <div className="relative h-64 sm:h-80 md:h-96 w-full bg-slate-100 dark:bg-zinc-800">
           {coverImage ? (
             <img 
@@ -386,7 +386,7 @@ export default function BusinessDetails() {
             <button
               type="button"
               onClick={() => setIsReviewModalOpen(true)}
-              className="flex-1 sm:flex-initial px-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 hover:bg-slate-50 dark:hover:bg-zinc-800 text-slate-800 dark:text-zinc-200 text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer"
+              className="flex-1 sm:flex-initial px-4 py-2.5 rounded-sm border border-slate-200 dark:border-zinc-700 hover:bg-slate-50 dark:hover:bg-zinc-800 text-slate-800 dark:text-zinc-200 text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer"
             >
               <MessageSquare size={14} />
               <span>Write Review</span>
@@ -395,7 +395,7 @@ export default function BusinessDetails() {
             <button
               type="button"
               onClick={() => handleOpenBooking()}
-              className="flex-1 sm:flex-initial px-6 py-2.5 rounded-xl bg-[#002D62] hover:bg-[#001f44] text-white text-xs font-bold transition shadow-sm flex items-center justify-center gap-1.5 cursor-pointer"
+              className="flex-1 sm:flex-initial px-6 py-2.5 rounded-sm bg-[#002D62] hover:bg-[#001f44] text-white text-xs font-bold transition shadow-sm flex items-center justify-center gap-1.5 cursor-pointer"
             >
               <Calendar size={14} />
               <span>Book / Reserve</span>
@@ -444,7 +444,7 @@ export default function BusinessDetails() {
       <div className="space-y-6">
         {/* About / Description section (always visible above or within tab) */}
         {business.description && (
-          <div className="bg-white dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800 rounded-3xl p-6 sm:p-8 space-y-3">
+          <div className="bg-white dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800 rounded-sm p-6 sm:p-8 space-y-3">
             <h3 className="text-base font-extrabold text-slate-900 dark:text-white">
               About {business.name}
             </h3>
@@ -462,12 +462,12 @@ export default function BusinessDetails() {
             </h3>
 
             {services.length === 0 ? (
-              <div className="p-8 rounded-3xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 text-center text-sm text-slate-500">
+              <div className="p-8 rounded-sm bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 text-center text-sm text-slate-500">
                 No specific services listed yet. You can still make a general reservation.
                 <div className="mt-4">
                   <button
                     onClick={() => handleOpenBooking()}
-                    className="px-4 py-2 rounded-xl bg-[#002D62] text-white text-xs font-bold"
+                    className="px-4 py-2 rounded-sm bg-[#002D62] text-white text-xs font-bold"
                   >
                     General Reservation
                   </button>
@@ -478,7 +478,7 @@ export default function BusinessDetails() {
                 {services.map((svc) => (
                   <div
                     key={svc.id}
-                    className="p-6 rounded-3xl bg-white dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800 shadow-xs hover:shadow-lg transition flex flex-col justify-between"
+                    className="p-6 rounded-sm bg-white dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800 shadow-xs hover:shadow-lg transition flex flex-col justify-between"
                   >
                     <div className="space-y-3">
                       <div className="flex items-center justify-between">
@@ -518,7 +518,7 @@ export default function BusinessDetails() {
                       <button
                         type="button"
                         onClick={() => handleOpenBooking(svc)}
-                        className="w-full py-2.5 rounded-xl bg-[#002D62] hover:bg-[#001f44] text-white text-xs font-bold transition shadow-xs flex items-center justify-center gap-1.5 cursor-pointer"
+                        className="w-full py-2.5 rounded-sm bg-[#002D62] hover:bg-[#001f44] text-white text-xs font-bold transition shadow-xs flex items-center justify-center gap-1.5 cursor-pointer"
                       >
                         <Calendar size={14} />
                         <span>Book This Experience</span>
@@ -533,7 +533,7 @@ export default function BusinessDetails() {
 
         {/* 2. Hours Tab */}
         {activeTab === 'hours' && (
-          <div className="bg-white dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800 rounded-3xl p-6 sm:p-8 space-y-4 max-w-2xl">
+          <div className="bg-white dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800 rounded-sm p-6 sm:p-8 space-y-4 max-w-2xl">
             <h3 className="text-lg font-black text-slate-900 dark:text-white">
               Weekly Operating Schedule
             </h3>
@@ -547,7 +547,7 @@ export default function BusinessDetails() {
                     <span className="font-bold text-slate-800 dark:text-zinc-200">{h.day}</span>
                     <div>
                       {h.is_closed ? (
-                        <span className="px-2.5 py-1 rounded-md bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 font-bold text-xs">
+                        <span className="px-2.5 py-1 rounded-sm bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 font-bold text-xs">
                           Closed
                         </span>
                       ) : (
@@ -571,7 +571,7 @@ export default function BusinessDetails() {
             </h3>
 
             {promotions.length === 0 ? (
-              <div className="p-8 rounded-3xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 text-center text-sm text-slate-500">
+              <div className="p-8 rounded-sm bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 text-center text-sm text-slate-500">
                 No active promotional discount codes currently published. Check back soon!
               </div>
             ) : (
@@ -579,14 +579,14 @@ export default function BusinessDetails() {
                 {promotions.map((p) => (
                   <div
                     key={p.id}
-                    className="p-6 rounded-3xl bg-gradient-to-br from-amber-500/10 via-white to-amber-500/5 dark:from-amber-950/30 dark:via-zinc-900 dark:to-zinc-900 border border-amber-200 dark:border-amber-900/60 shadow-xs space-y-3"
+                    className="p-6 rounded-sm bg-gradient-to-br from-amber-500/10 via-white to-amber-500/5 dark:from-amber-950/30 dark:via-zinc-900 dark:to-zinc-900 border border-amber-200 dark:border-amber-900/60 shadow-xs space-y-3"
                   >
                     <div className="flex items-center justify-between">
                       <span className="px-2.5 py-1 rounded-full bg-amber-500 text-white text-[11px] font-black uppercase">
                         {p.discount_percentage ? `${p.discount_percentage}% OFF` : 'Special Promo'}
                       </span>
                       {p.promo_code && (
-                        <span className="font-mono text-xs font-bold px-2 py-0.5 rounded bg-slate-100 dark:bg-zinc-800 text-slate-800 dark:text-white border border-slate-300 dark:border-zinc-700">
+                        <span className="font-mono text-xs font-bold px-2 py-0.5 rounded-sm bg-slate-100 dark:bg-zinc-800 text-slate-800 dark:text-white border border-slate-300 dark:border-zinc-700">
                           {p.promo_code}
                         </span>
                       )}
@@ -620,7 +620,7 @@ export default function BusinessDetails() {
             </h3>
 
             {events.length === 0 ? (
-              <div className="p-8 rounded-3xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 text-center text-sm text-slate-500">
+              <div className="p-8 rounded-sm bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 text-center text-sm text-slate-500">
                 No events currently scheduled by this establishment.
               </div>
             ) : (
@@ -628,7 +628,7 @@ export default function BusinessDetails() {
                 {events.map((ev) => (
                   <div
                     key={ev.id}
-                    className="p-6 rounded-3xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 shadow-xs space-y-3"
+                    className="p-6 rounded-sm bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 shadow-xs space-y-3"
                   >
                     <div className="text-xs font-bold text-[#002D62] dark:text-blue-400 flex items-center gap-1">
                       <Calendar size={13} />
@@ -657,7 +657,7 @@ export default function BusinessDetails() {
             </h3>
 
             {gallery.length === 0 ? (
-              <div className="p-8 rounded-3xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 text-center text-sm text-slate-500">
+              <div className="p-8 rounded-sm bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 text-center text-sm text-slate-500">
                 No gallery photos uploaded yet.
               </div>
             ) : (
@@ -666,7 +666,7 @@ export default function BusinessDetails() {
                   <div
                     key={img.id}
                     onClick={() => setActivePhoto(img.image_url)}
-                    className="relative h-44 rounded-2xl overflow-hidden bg-slate-100 dark:bg-zinc-800 cursor-pointer group"
+                    className="relative h-44 rounded-sm overflow-hidden bg-slate-100 dark:bg-zinc-800 cursor-pointer group"
                   >
                     <img 
                       src={img.image_url} 
@@ -705,7 +705,7 @@ export default function BusinessDetails() {
               <button
                 type="button"
                 onClick={() => setIsReviewModalOpen(true)}
-                className="px-5 py-2.5 rounded-xl bg-[#002D62] text-white text-xs font-bold transition flex items-center gap-1.5 cursor-pointer self-start sm:self-auto"
+                className="px-5 py-2.5 rounded-sm bg-[#002D62] text-white text-xs font-bold transition flex items-center gap-1.5 cursor-pointer self-start sm:self-auto"
               >
                 <MessageSquare size={14} />
                 <span>Submit Your Review</span>
@@ -713,7 +713,7 @@ export default function BusinessDetails() {
             </div>
 
             {reviews.length === 0 ? (
-              <div className="p-8 rounded-3xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 text-center text-sm text-slate-500">
+              <div className="p-8 rounded-sm bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 text-center text-sm text-slate-500">
                 No reviews yet. Be the first traveler to share your experience!
               </div>
             ) : (
@@ -721,7 +721,7 @@ export default function BusinessDetails() {
                 {reviews.map((rev) => (
                   <div
                     key={rev.id}
-                    className="p-6 rounded-3xl bg-white dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800 shadow-xs space-y-3"
+                    className="p-6 rounded-sm bg-white dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800 shadow-xs space-y-3"
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2.5">
@@ -755,7 +755,7 @@ export default function BusinessDetails() {
 
                     {/* Business Owner Reply */}
                     {(rev.owner_reply || rev.reply) && (
-                      <div className="mt-3 p-4 rounded-2xl bg-slate-50 dark:bg-zinc-800/80 border-l-4 border-[#002D62] dark:border-blue-400 space-y-1">
+                      <div className="mt-3 p-4 rounded-sm bg-slate-50 dark:bg-zinc-800/80 border-l-4 border-[#002D62] dark:border-blue-400 space-y-1">
                         <div className="flex items-center gap-1.5 text-xs font-bold text-[#002D62] dark:text-blue-400">
                           <CheckCircle2 size={13} />
                           <span>Response from {business.name} Owner</span>
@@ -776,7 +776,7 @@ export default function BusinessDetails() {
       {/* Booking Modal */}
       {isBookingModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-alert-backdrop">
-          <div className="w-full max-w-lg rounded-3xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 p-6 sm:p-8 shadow-2xl animate-alert-popup space-y-5 max-h-[90vh] overflow-y-auto">
+          <div className="w-full max-w-lg rounded-sm bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 p-6 sm:p-8 shadow-2xl animate-alert-popup space-y-5 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b border-slate-100 dark:border-zinc-800 pb-3">
               <div>
                 <span className="text-[11px] font-bold text-[#002D62] dark:text-blue-400 uppercase tracking-wider">
@@ -804,7 +804,7 @@ export default function BusinessDetails() {
                       const svc = services.find((s) => String(s.id) === e.target.value);
                       setSelectedService(svc || null);
                     }}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-xs font-medium text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#002D62]"
+                    className="w-full px-3.5 py-2.5 rounded-sm bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-xs font-medium text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#002D62]"
                   >
                     <option value="">General Visit / Standard Reservation</option>
                     {services.map((s) => (
@@ -828,7 +828,7 @@ export default function BusinessDetails() {
                     value={customerName}
                     onChange={(e) => setCustomerName(e.target.value)}
                     placeholder="Full Name"
-                    className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#002D62]"
+                    className="w-full px-3 py-2 rounded-sm bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#002D62]"
                   />
                 </div>
                 <div>
@@ -841,7 +841,7 @@ export default function BusinessDetails() {
                     value={customerPhone}
                     onChange={(e) => setCustomerPhone(e.target.value)}
                     placeholder="+855 12 345 678"
-                    className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#002D62]"
+                    className="w-full px-3 py-2 rounded-sm bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#002D62]"
                   />
                 </div>
               </div>
@@ -855,7 +855,7 @@ export default function BusinessDetails() {
                   value={customerEmail}
                   onChange={(e) => setCustomerEmail(e.target.value)}
                   placeholder="your.email@example.com"
-                  className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#002D62]"
+                  className="w-full px-3 py-2 rounded-sm bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#002D62]"
                 />
               </div>
 
@@ -871,7 +871,7 @@ export default function BusinessDetails() {
                     min={new Date().toISOString().split('T')[0]}
                     value={bookingDate}
                     onChange={(e) => setBookingDate(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#002D62]"
+                    className="w-full px-3 py-2 rounded-sm bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#002D62]"
                   />
                 </div>
 
@@ -883,7 +883,7 @@ export default function BusinessDetails() {
                     type="time"
                     value={bookingTime}
                     onChange={(e) => setBookingTime(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#002D62]"
+                    className="w-full px-3 py-2 rounded-sm bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#002D62]"
                   />
                 </div>
 
@@ -897,7 +897,7 @@ export default function BusinessDetails() {
                     max="50"
                     value={guestsCount}
                     onChange={(e) => setGuestsCount(Math.max(1, parseInt(e.target.value, 10) || 1))}
-                    className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#002D62]"
+                    className="w-full px-3 py-2 rounded-sm bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#002D62]"
                   />
                 </div>
               </div>
@@ -912,13 +912,13 @@ export default function BusinessDetails() {
                   value={specialRequests}
                   onChange={(e) => setSpecialRequests(e.target.value)}
                   placeholder="Seating preferences, allergies, celebrations, pickup notes..."
-                  className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#002D62]"
+                  className="w-full px-3 py-2 rounded-sm bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#002D62]"
                 />
               </div>
 
               {/* Price Calculation Box */}
               {selectedService?.price && (
-                <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-zinc-800 flex items-center justify-between text-xs">
+                <div className="p-3.5 rounded-sm bg-slate-50 dark:bg-zinc-800 flex items-center justify-between text-xs">
                   <span className="text-slate-600 dark:text-zinc-400">
                     ${Number(selectedService.price).toFixed(2)} × {guestsCount} guest{guestsCount > 1 ? 's' : ''}
                   </span>
@@ -932,14 +932,14 @@ export default function BusinessDetails() {
                 <button
                   type="button"
                   onClick={() => setIsBookingModalOpen(false)}
-                  className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 dark:text-zinc-400 hover:bg-slate-100 dark:hover:bg-zinc-800"
+                  className="px-4 py-2 rounded-sm text-xs font-semibold text-slate-600 dark:text-zinc-400 hover:bg-slate-100 dark:hover:bg-zinc-800"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmittingBooking}
-                  className="px-5 py-2 rounded-xl bg-[#002D62] hover:bg-[#001f44] text-white text-xs font-bold transition shadow-sm disabled:opacity-50"
+                  className="px-5 py-2 rounded-sm bg-[#002D62] hover:bg-[#001f44] text-white text-xs font-bold transition shadow-sm disabled:opacity-50"
                 >
                   {isSubmittingBooking ? 'Submitting to Database...' : 'Confirm Reservation'}
                 </button>
@@ -952,7 +952,7 @@ export default function BusinessDetails() {
       {/* Review Modal */}
       {isReviewModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-alert-backdrop">
-          <div className="w-full max-w-lg rounded-3xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 p-6 sm:p-8 shadow-2xl animate-alert-popup space-y-5">
+          <div className="w-full max-w-lg rounded-sm bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 p-6 sm:p-8 shadow-2xl animate-alert-popup space-y-5">
             <div className="flex items-center justify-between border-b border-slate-100 dark:border-zinc-800 pb-3">
               <div>
                 <span className="text-[11px] font-bold text-[#002D62] dark:text-blue-400 uppercase tracking-wider">
@@ -1002,7 +1002,7 @@ export default function BusinessDetails() {
                   value={reviewComment}
                   onChange={(e) => setReviewComment(e.target.value)}
                   placeholder="Describe your dining, stay, or tour experience with this establishment..."
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#002D62]"
+                  className="w-full px-3.5 py-2.5 rounded-sm bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#002D62]"
                 />
               </div>
 
@@ -1010,14 +1010,14 @@ export default function BusinessDetails() {
                 <button
                   type="button"
                   onClick={() => setIsReviewModalOpen(false)}
-                  className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 dark:text-zinc-400 hover:bg-slate-100 dark:hover:bg-zinc-800"
+                  className="px-4 py-2 rounded-sm text-xs font-semibold text-slate-600 dark:text-zinc-400 hover:bg-slate-100 dark:hover:bg-zinc-800"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmittingReview}
-                  className="px-5 py-2 rounded-xl bg-[#002D62] hover:bg-[#001f44] text-white text-xs font-bold transition shadow-sm disabled:opacity-50"
+                  className="px-5 py-2 rounded-sm bg-[#002D62] hover:bg-[#001f44] text-white text-xs font-bold transition shadow-sm disabled:opacity-50"
                 >
                   {isSubmittingReview ? 'Posting to DB...' : 'Submit Review'}
                 </button>
@@ -1034,7 +1034,7 @@ export default function BusinessDetails() {
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md cursor-pointer"
         >
           <div className="relative max-w-4xl max-h-[90vh]">
-            <img src={activePhoto} alt="Photo" className="max-w-full max-h-[85vh] object-contain rounded-2xl" />
+            <img src={activePhoto} alt="Photo" className="max-w-full max-h-[85vh] object-contain rounded-sm" />
             <button
               onClick={() => setActivePhoto(null)}
               className="absolute -top-10 right-0 p-2 text-white hover:text-slate-300"

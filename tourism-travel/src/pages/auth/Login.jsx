@@ -81,9 +81,9 @@ export default function Login() {
       </div>
 
       <div className="mt-7 sm:mx-auto sm:w-full sm:max-w-md px-4 sm:px-0">
-        <div className="bg-white dark:bg-zinc-900 py-8 px-6 sm:px-8 shadow-xl border border-slate-200/80 dark:border-zinc-800 rounded-3xl">
+        <div className="bg-white dark:bg-zinc-900 py-8 px-6 sm:px-8 shadow-xl border border-slate-200/80 dark:border-zinc-800 rounded-sm">
           {errorMessage && (
-            <div className="mb-5 p-3.5 rounded-2xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800/60 flex items-start gap-3 text-rose-700 dark:text-rose-300 text-xs">
+            <div className="mb-5 p-3.5 rounded-sm bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800/60 flex items-start gap-3 text-rose-700 dark:text-rose-300 text-xs">
               <AlertCircle size={18} className="shrink-0 mt-0.5 text-rose-500" />
               <div className="flex-1 leading-relaxed">{errorMessage}</div>
             </div>
@@ -117,7 +117,7 @@ export default function Login() {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="name@example.com"
                   required
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800/80 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#002D62] dark:focus:ring-blue-500 transition"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-sm border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800/80 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#002D62] dark:focus:ring-blue-500 transition"
                 />
               </div>
             </div>
@@ -136,7 +136,7 @@ export default function Login() {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
                   required
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800/80 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#002D62] dark:focus:ring-blue-500 transition"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-sm border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800/80 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#002D62] dark:focus:ring-blue-500 transition"
                 />
               </div>
             </div>
@@ -144,7 +144,7 @@ export default function Login() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full mt-2 py-3 px-4 rounded-xl bg-[#002D62] hover:bg-[#001f44] disabled:opacity-50 text-white font-semibold text-sm shadow-md shadow-blue-900/10 transition flex items-center justify-center gap-2 cursor-pointer"
+              className="w-full mt-2 py-3 px-4 rounded-sm bg-[#002D62] hover:bg-[#001f44] disabled:opacity-50 text-white font-semibold text-sm shadow-md shadow-blue-900/10 transition flex items-center justify-center gap-2 cursor-pointer"
             >
               {isLoading ? (
                 <>

@@ -59,7 +59,7 @@ export default function Pagination({
           type="button"
           onClick={() => handlePageClick(currentPage - 1)}
           disabled={currentPage <= 1}
-          className="flex items-center gap-1 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-slate-700 dark:text-zinc-300 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50 dark:hover:bg-zinc-800 transition font-semibold"
+          className="flex items-center gap-1 px-3 py-1.5 rounded-sm border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-slate-700 dark:text-zinc-300 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50 dark:hover:bg-zinc-800 transition font-semibold"
           aria-label="Previous Page"
         >
           <ChevronLeft size={15} />
@@ -81,7 +81,7 @@ export default function Pagination({
                 key={page}
                 type="button"
                 onClick={() => handlePageClick(page)}
-                className={`min-w-8 h-8 px-2 rounded-xl text-xs font-bold transition flex items-center justify-center cursor-pointer ${
+                className={`min-w-8 h-8 px-2 rounded-sm text-xs font-bold transition flex items-center justify-center cursor-pointer ${
                   isActive
                     ? 'bg-[#002D62] text-white shadow-xs'
                     : 'border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-slate-700 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-zinc-800'
@@ -99,7 +99,7 @@ export default function Pagination({
           type="button"
           onClick={() => handlePageClick(currentPage + 1)}
           disabled={currentPage >= lastPage}
-          className="flex items-center gap-1 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-slate-700 dark:text-zinc-300 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50 dark:hover:bg-zinc-800 transition font-semibold"
+          className="flex items-center gap-1 px-3 py-1.5 rounded-sm border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-slate-700 dark:text-zinc-300 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50 dark:hover:bg-zinc-800 transition font-semibold"
           aria-label="Next Page"
         >
           <span className="hidden sm:inline">Next</span>

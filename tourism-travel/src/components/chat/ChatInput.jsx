@@ -89,7 +89,7 @@ export default function ChatInput({
   return (
     <div className={`w-full ${isCentered ? 'px-2 py-0' : 'bg-transparent py-2.5 px-3 sm:px-4 sticky bottom-0 z-20'}`}>
       <form onSubmit={handleSubmit} className="max-w-3xl mx-auto">
-        <div className="relative bg-white dark:bg-[#212121] border border-zinc-300/90 dark:border-zinc-700/80 hover:border-zinc-400 dark:hover:border-zinc-600 focus-within:border-zinc-600 dark:focus-within:border-zinc-400 focus-within:ring-2 focus-within:ring-zinc-400/20 dark:focus-within:ring-zinc-600/30 rounded-3xl px-3.5 py-1.5 sm:py-2 transition-all duration-200 shadow-xs">
+        <div className="relative bg-white dark:bg-[#212121] border border-zinc-300/90 dark:border-zinc-700/80 hover:border-zinc-400 dark:hover:border-zinc-600 focus-within:border-zinc-600 dark:focus-within:border-zinc-400 focus-within:ring-2 focus-within:ring-zinc-400/20 dark:focus-within:ring-zinc-600/30 rounded-sm px-3.5 py-1.5 sm:py-2 transition-all duration-200 shadow-xs">
           {/* File Attachment Badges */}
           {attachments.length > 0 && (
             <div className="flex flex-wrap gap-2 mb-2 px-1 pt-1">

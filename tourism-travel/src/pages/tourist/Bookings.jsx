@@ -170,14 +170,14 @@ export default function Bookings() {
 
         <Link
           to="/tours"
-          className="px-4 py-2.5 rounded-xl bg-[#002D62] hover:bg-[#001f44] text-white text-xs font-bold shadow-sm transition self-start sm:self-auto"
+          className="px-4 py-2.5 rounded-sm bg-[#002D62] hover:bg-[#001f44] text-white text-xs font-bold shadow-sm transition self-start sm:self-auto"
         >
           Book New Experience
         </Link>
       </div>
 
       {/* Filter Tabs */}
-      <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 text-xs font-semibold overflow-x-auto">
+      <div className="flex items-center gap-1.5 p-1 rounded-sm bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 text-xs font-semibold overflow-x-auto">
         {[
           { key: 'all', label: `All (${bookingStats.total ?? pagination.total})` },
           { key: 'pending', label: `Pending (${bookingStats.pending ?? 0})` },
@@ -192,7 +192,7 @@ export default function Bookings() {
               setCurrentPage(1);
               setSelectedFilter(tab.key);
             }}
-            className={`px-4 py-2 rounded-xl transition cursor-pointer whitespace-nowrap ${
+            className={`px-4 py-2 rounded-sm transition cursor-pointer whitespace-nowrap ${
               selectedFilter === tab.key
                 ? 'bg-[#002D62] text-white shadow-xs'
                 : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-zinc-800'
@@ -214,7 +214,7 @@ export default function Bookings() {
           action={
             <Link
               to="/tours"
-              className="px-4 py-2 rounded-xl bg-[#002D62] text-white text-xs font-bold shadow-sm"
+              className="px-4 py-2 rounded-sm bg-[#002D62] text-white text-xs font-bold shadow-sm"
             >
               Browse Tour Packages
             </Link>
@@ -226,7 +226,7 @@ export default function Bookings() {
             {paginatedBookings.map((b) => (
               <div
                 key={b.id}
-                className="p-6 rounded-3xl bg-white dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800 shadow-xs hover:shadow-md transition-all flex flex-col justify-between"
+                className="p-6 rounded-sm bg-white dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800 shadow-xs hover:shadow-md transition-all flex flex-col justify-between"
               >
                 <div>
                   <div className="flex items-center justify-between mb-3">
@@ -260,7 +260,7 @@ export default function Bookings() {
                   </div>
 
                   {b.special_requests && (
-                    <div className="mt-3.5 p-3 rounded-xl bg-slate-50 dark:bg-zinc-800/60 text-[11px] text-slate-600 dark:text-zinc-400">
+                    <div className="mt-3.5 p-3 rounded-sm bg-slate-50 dark:bg-zinc-800/60 text-[11px] text-slate-600 dark:text-zinc-400">
                       <span className="font-bold text-slate-700 dark:text-zinc-300 block mb-0.5">Special Requests:</span>
                       <p className="line-clamp-2">{b.special_requests}</p>
                     </div>
@@ -280,7 +280,7 @@ export default function Bookings() {
                       <button
                         type="button"
                         onClick={() => setSelectedBookingForReview(b)}
-                        className="px-3 py-1.5 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 hover:bg-amber-500/20 font-bold flex items-center gap-1 transition cursor-pointer text-xs"
+                        className="px-3 py-1.5 rounded-sm bg-amber-500/10 text-amber-600 dark:text-amber-400 hover:bg-amber-500/20 font-bold flex items-center gap-1 transition cursor-pointer text-xs"
                       >
                         <Star size={12} className="fill-amber-400 text-amber-400" />
                         <span>Review</span>
@@ -291,7 +291,7 @@ export default function Bookings() {
                       <button
                         type="button"
                         onClick={() => handleCancelBooking(b.id)}
-                        className="px-3 py-1.5 rounded-xl border border-rose-200 dark:border-rose-900/60 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 font-semibold transition cursor-pointer text-xs"
+                        className="px-3 py-1.5 rounded-sm border border-rose-200 dark:border-rose-900/60 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 font-semibold transition cursor-pointer text-xs"
                       >
                         Cancel
                       </button>
@@ -300,7 +300,7 @@ export default function Bookings() {
                     <button
                       type="button"
                       onClick={() => setActiveBookingDetails(b)}
-                      className="px-3.5 py-1.5 rounded-xl bg-[#002D62] hover:bg-[#001f44] text-white font-bold transition shadow-xs text-xs cursor-pointer"
+                      className="px-3.5 py-1.5 rounded-sm bg-[#002D62] hover:bg-[#001f44] text-white font-bold transition shadow-xs text-xs cursor-pointer"
                     >
                       Details
                     </button>
@@ -327,7 +327,7 @@ export default function Bookings() {
       {/* Write Experience Review Modal */}
       {selectedBookingForReview && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-alert-backdrop">
-          <div className="w-full max-w-lg rounded-3xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 p-6 sm:p-8 shadow-2xl animate-alert-popup space-y-4">
+          <div className="w-full max-w-lg rounded-sm bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 p-6 sm:p-8 shadow-2xl animate-alert-popup space-y-4">
             <div className="flex items-center justify-between border-b border-slate-100 dark:border-zinc-800 pb-3">
               <div>
                 <span className="text-[10px] font-bold text-amber-500 uppercase tracking-wider">
@@ -370,7 +370,7 @@ export default function Bookings() {
                   value={reviewComment}
                   onChange={(e) => setReviewComment(e.target.value)}
                   placeholder="Share details to store in database..."
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-slate-900 dark:text-white"
+                  className="w-full px-3.5 py-2.5 rounded-sm bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-slate-900 dark:text-white"
                 />
               </div>
 
@@ -378,14 +378,14 @@ export default function Bookings() {
                 <button
                   type="button"
                   onClick={() => setSelectedBookingForReview(null)}
-                  className="px-4 py-2 rounded-xl text-slate-600 dark:text-zinc-400"
+                  className="px-4 py-2 rounded-sm text-slate-600 dark:text-zinc-400"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmittingReview}
-                  className="px-5 py-2.5 rounded-xl bg-[#002D62] text-white font-bold disabled:opacity-50"
+                  className="px-5 py-2.5 rounded-sm bg-[#002D62] text-white font-bold disabled:opacity-50"
                 >
                   {isSubmittingReview ? 'Submitting to DB...' : 'Post Review'}
                 </button>
@@ -398,7 +398,7 @@ export default function Bookings() {
       {/* Booking Details Modal */}
       {activeBookingDetails && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-alert-backdrop">
-          <div className="w-full max-w-lg rounded-3xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 p-6 sm:p-8 shadow-2xl animate-alert-popup space-y-5">
+          <div className="w-full max-w-lg rounded-sm bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 p-6 sm:p-8 shadow-2xl animate-alert-popup space-y-5">
             <div className="flex items-center justify-between border-b border-slate-100 dark:border-zinc-800 pb-3">
               <div>
                 <span className="text-[11px] font-mono font-bold text-slate-400">
@@ -427,7 +427,7 @@ export default function Bookings() {
               <div><strong>Party Size:</strong> {activeBookingDetails.guests_count || activeBookingDetails.number_of_guests || 1} Person(s)</div>
               <div><strong>Payment Status:</strong> {activeBookingDetails.payment_status || 'Unpaid / At Venue'}</div>
               {activeBookingDetails.special_requests && (
-                <div className="p-3 rounded-xl bg-slate-50 dark:bg-zinc-800">
+                <div className="p-3 rounded-sm bg-slate-50 dark:bg-zinc-800">
                   <strong>Notes:</strong> {activeBookingDetails.special_requests}
                 </div>
               )}
@@ -437,7 +437,7 @@ export default function Bookings() {
               <button
                 type="button"
                 onClick={() => setActiveBookingDetails(null)}
-                className="px-5 py-2.5 rounded-xl bg-slate-100 dark:bg-zinc-800 text-slate-800 dark:text-white font-semibold text-xs"
+                className="px-5 py-2.5 rounded-sm bg-slate-100 dark:bg-zinc-800 text-slate-800 dark:text-white font-semibold text-xs"
               >
                 Close
               </button>

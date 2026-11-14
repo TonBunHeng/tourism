@@ -360,7 +360,7 @@ export default function SalesAnalyticsChart({
         {/* ========================================================================= */}
         {/* CHART 1: Record Ingestion Velocity (Identical to Admin ReportsAnalytics)  */}
         {/* ========================================================================= */}
-        <div className="bg-white dark:bg-zinc-900 rounded-md shadow-xs border border-gray-200 dark:border-zinc-800 p-4 sm:p-5 flex flex-col justify-between">
+        <div className="bg-white dark:bg-zinc-900 rounded-sm shadow-xs border border-gray-200 dark:border-zinc-800 p-4 sm:p-5 flex flex-col justify-between">
           <div>
             {/* Header: Title + Volume Badge */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3 pb-3 border-b border-gray-100 dark:border-zinc-800">
@@ -373,7 +373,7 @@ export default function SalesAnalyticsChart({
                   {velocitySubtitle}
                 </p>
               </div>
-              <span className="text-[11px] font-semibold px-2.5 py-1 rounded-md border border-blue-100 dark:border-blue-900/50 bg-blue-50 dark:bg-blue-950/40 text-[#003E83] dark:text-blue-400 shrink-0 self-start sm:self-center">
+              <span className="text-[11px] font-semibold px-2.5 py-1 rounded-sm border border-blue-100 dark:border-blue-900/50 bg-blue-50 dark:bg-blue-950/40 text-[#003E83] dark:text-blue-400 shrink-0 self-start sm:self-center">
                 Total: {stats.totalRecords.toLocaleString()} Records
               </span>
             </div>
@@ -381,11 +381,11 @@ export default function SalesAnalyticsChart({
             {/* Clean Non-Wrapped Legend Under Title */}
             <div className="flex items-center gap-3 sm:gap-4 flex-wrap mb-3 text-xs text-gray-600 dark:text-zinc-300">
               <span className="inline-flex items-center gap-1.5 font-medium">
-                <span className="w-2.5 h-2.5 rounded-xs bg-[#10b981]" />
+                <span className="w-2.5 h-2.5 rounded-sm bg-[#10b981]" />
                 <span>Active / Published</span>
               </span>
               <span className="inline-flex items-center gap-1.5 font-medium">
-                <span className="w-2.5 h-2.5 rounded-xs bg-[#003E83]" />
+                <span className="w-2.5 h-2.5 rounded-sm bg-[#003E83]" />
                 <span>Pending / Review</span>
               </span>
             </div>
@@ -497,7 +497,7 @@ export default function SalesAnalyticsChart({
               {/* Tooltip Card for Column Bar */}
               {hoveredBarIndex !== null && monthlyData[hoveredBarIndex] && (
                 <div
-                  className="absolute z-20 pointer-events-none bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 p-2.5 rounded-md shadow-md text-xs space-y-1.5 min-w-[170px]"
+                  className="absolute z-20 pointer-events-none bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 p-2.5 rounded-sm shadow-md text-xs space-y-1.5 min-w-[170px]"
                   style={{
                     left: `${Math.min(75, Math.max(10, (hoveredBarIndex / barCount) * 100))}%`,
                     top: '15px',
@@ -514,7 +514,7 @@ export default function SalesAnalyticsChart({
                   <div className="space-y-1 text-gray-600 dark:text-zinc-300">
                     <div className="flex items-center justify-between gap-3">
                       <span className="flex items-center gap-1.5">
-                        <span className="w-2 h-2 rounded-xs bg-[#10b981]" />
+                        <span className="w-2 h-2 rounded-sm bg-[#10b981]" />
                         <span>Active:</span>
                       </span>
                       <span className="font-bold text-[#10b981]">
@@ -523,7 +523,7 @@ export default function SalesAnalyticsChart({
                     </div>
                     <div className="flex items-center justify-between gap-3">
                       <span className="flex items-center gap-1.5">
-                        <span className="w-2 h-2 rounded-xs bg-[#003E83]" />
+                        <span className="w-2 h-2 rounded-sm bg-[#003E83]" />
                         <span>Pending / Other:</span>
                       </span>
                       <span className="font-bold text-[#003E83] dark:text-blue-400">
@@ -538,17 +538,17 @@ export default function SalesAnalyticsChart({
 
           {/* Symmetrical 3-Card Metrics Footer */}
           <div className="mt-3 pt-2.5 border-t border-gray-100 dark:border-zinc-800 grid grid-cols-3 gap-2 text-center">
-            <div className="p-1.5 sm:p-2 rounded-md bg-gray-50 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-800">
+            <div className="p-1.5 sm:p-2 rounded-sm bg-gray-50 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-800">
               <p className="text-xs sm:text-sm font-bold text-gray-900 dark:text-white">{timeframeLabel}</p>
               <p className="text-[10px] sm:text-[11px] text-gray-500 dark:text-zinc-400 truncate">Timeframe</p>
             </div>
-            <div className="p-1.5 sm:p-2 rounded-md bg-gray-50 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-800">
+            <div className="p-1.5 sm:p-2 rounded-sm bg-gray-50 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-800">
               <p className="text-xs sm:text-sm font-bold text-[#003E83] dark:text-blue-400">
                 {stats.totalRecords.toLocaleString()}
               </p>
               <p className="text-[10px] sm:text-[11px] text-gray-500 dark:text-zinc-400 truncate">Total Ingested</p>
             </div>
-            <div className="p-1.5 sm:p-2 rounded-md bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60">
+            <div className="p-1.5 sm:p-2 rounded-sm bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60">
               <p className="text-xs sm:text-sm font-bold text-emerald-700 dark:text-emerald-400 truncate">
                 {peakPeriod.name} ({peakPeriod.count})
               </p>
@@ -562,7 +562,7 @@ export default function SalesAnalyticsChart({
         {/* ========================================================================= */}
         {/* CHART 2: System Health & Dataset Hub (Identical to Admin ReportsAnalytics)*/}
         {/* ========================================================================= */}
-        <div className="bg-white dark:bg-zinc-900 rounded-md shadow-xs border border-gray-200 dark:border-zinc-800 p-4 sm:p-5 flex flex-col justify-between h-full">
+        <div className="bg-white dark:bg-zinc-900 rounded-sm shadow-xs border border-gray-200 dark:border-zinc-800 p-4 sm:p-5 flex flex-col justify-between h-full">
           <div>
             {/* Header: Title + Switch Tabs */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3 pb-3 border-b border-gray-100 dark:border-zinc-800">
@@ -577,7 +577,7 @@ export default function SalesAnalyticsChart({
               </div>
 
               {/* Tab Switcher Pills (Dataset Mix vs Health Status) */}
-              <div className="flex items-center gap-1 bg-gray-100 dark:bg-zinc-800/80 p-0.5 rounded-md border border-gray-200/50 dark:border-zinc-700/50 self-start sm:self-auto">
+              <div className="flex items-center gap-1 bg-gray-100 dark:bg-zinc-800/80 p-0.5 rounded-sm border border-gray-200/50 dark:border-zinc-700/50 self-start sm:self-auto">
                 <button
                   type="button"
                   onClick={() => setReportsChartTab('dataset')}
@@ -635,7 +635,7 @@ export default function SalesAnalyticsChart({
 
               {/* Floating Tooltip for Donut Slice */}
               {hoveredSliceIndex !== null && donutSlices[hoveredSliceIndex] && (
-                <div className="absolute top-2 right-2 z-20 pointer-events-none bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 p-2.5 rounded-md shadow-md text-xs space-y-1">
+                <div className="absolute top-2 right-2 z-20 pointer-events-none bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 p-2.5 rounded-sm shadow-md text-xs space-y-1">
                   <p className="font-semibold text-gray-900 dark:text-zinc-100 flex items-center gap-1.5">
                     <span
                       className="w-2.5 h-2.5 rounded-full"

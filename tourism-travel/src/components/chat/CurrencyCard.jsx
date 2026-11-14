@@ -10,7 +10,7 @@ export default function CurrencyCard({ currency, language = 'en' }) {
   const amountKhr = currency.amount_khr || Math.round(amountUsd * rate);
 
   return (
-    <div className="mt-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-3 shadow-2xs w-full">
+    <div className="mt-2.5 rounded-sm bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-3 shadow-2xs w-full">
       <div className="flex items-center justify-between gap-2 mb-2">
         <div className="flex items-center space-x-1.5">
           <DollarSign size={16} className="text-emerald-500" />
@@ -25,7 +25,7 @@ export default function CurrencyCard({ currency, language = 'en' }) {
         )}
       </div>
 
-      <div className="flex items-center justify-around py-2 px-3 rounded-lg bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
+      <div className="flex items-center justify-around py-2 px-3 rounded-sm bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
         <div className="text-center">
           <span className="text-xs text-slate-500 block">USD</span>
           <span className="text-sm font-bold text-slate-900 dark:text-white">

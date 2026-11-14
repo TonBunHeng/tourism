@@ -307,7 +307,7 @@ export default function BusinessNotifications() {
               <button
                 type="button"
                 onClick={handleMarkAllRead}
-                className="py-2 px-3.5 rounded-md bg-[#003E83] hover:bg-[#002e62] text-xs font-medium text-white flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs"
+                className="py-2 px-3.5 rounded-sm bg-[#003E83] hover:bg-[#002e62] text-xs font-medium text-white flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs"
               >
                 <CheckCheck className="w-4 h-4 text-white" />
                 <span>Mark All Read</span>
@@ -318,7 +318,7 @@ export default function BusinessNotifications() {
               type="button"
               onClick={() => fetchNotifications(false)}
               disabled={isRefreshing}
-              className="py-2 px-3.5 rounded-md border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-700/60 text-xs font-medium text-gray-700 dark:text-zinc-200 flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs"
+              className="py-2 px-3.5 rounded-sm border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-700/60 text-xs font-medium text-gray-700 dark:text-zinc-200 flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs"
               title="Refresh alerts"
             >
               <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin text-blue-600' : ''}`} />
@@ -335,7 +335,7 @@ export default function BusinessNotifications() {
           return (
             <div
               key={index}
-              className="bg-white dark:bg-zinc-900 rounded-md p-4 shadow-xs border border-gray-200 dark:border-zinc-800 flex flex-col justify-between"
+              className="bg-white dark:bg-zinc-900 rounded-sm p-4 shadow-xs border border-gray-200 dark:border-zinc-800 flex flex-col justify-between"
             >
               <div className="flex items-center justify-between gap-2">
                 <div className="min-w-0">
@@ -346,7 +346,7 @@ export default function BusinessNotifications() {
                     {stat.value}
                   </p>
                 </div>
-                <div className={`w-9 h-9 rounded-md shrink-0 flex items-center justify-center ${stat.bg}`}>
+                <div className={`w-9 h-9 rounded-sm shrink-0 flex items-center justify-center ${stat.bg}`}>
                   <IconComponent className={`w-5 h-5 ${stat.color}`} />
                 </div>
               </div>
@@ -359,18 +359,18 @@ export default function BusinessNotifications() {
       </div>
 
       {/* Main Container Card */}
-      <div className="bg-white dark:bg-zinc-900 rounded-md shadow-xs border border-gray-200 dark:border-zinc-800">
+      <div className="bg-white dark:bg-zinc-900 rounded-sm shadow-xs border border-gray-200 dark:border-zinc-800">
         {/* Table/List Filter Bar */}
         <div className="px-4 md:px-6 py-4 border-b border-gray-200 dark:border-zinc-800">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-md bg-blue-50 dark:bg-blue-950/50 text-[#003E83] dark:text-blue-400 border border-blue-100 dark:border-blue-900/40 flex items-center justify-center shrink-0">
+              <div className="w-8 h-8 rounded-sm bg-blue-50 dark:bg-blue-950/50 text-[#003E83] dark:text-blue-400 border border-blue-100 dark:border-blue-900/40 flex items-center justify-center shrink-0">
                 <Bell className="w-4 h-4" />
               </div>
               <h2 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white">
                 Recent Alerts
               </h2>
-              <span className="text-xs font-semibold px-2 py-0.5 rounded-md bg-blue-50 text-[#003E83] dark:bg-blue-950/50 dark:text-blue-400 border border-blue-100 dark:border-blue-900/40">
+              <span className="text-xs font-semibold px-2 py-0.5 rounded-sm bg-blue-50 text-[#003E83] dark:bg-blue-950/50 dark:text-blue-400 border border-blue-100 dark:border-blue-900/40">
                 {filteredNotifications.length} {filteredNotifications.length === 1 ? 'Alert' : 'Alerts'}
               </span>
             </div>
@@ -381,7 +381,7 @@ export default function BusinessNotifications() {
                 <select
                   value={filterCategory}
                   onChange={(e) => setFilterCategory(e.target.value)}
-                  className="appearance-none w-full sm:w-auto pl-3.5 pr-8 py-1.5 border border-gray-200 dark:border-zinc-700 rounded-md focus:outline-none focus:ring-1 focus:ring-[#003E83] bg-white dark:bg-zinc-800 text-gray-900 dark:text-white text-xs sm:text-sm cursor-pointer shadow-xs font-medium"
+                  className="appearance-none w-full sm:w-auto pl-3.5 pr-8 py-1.5 border border-gray-200 dark:border-zinc-700 rounded-sm focus:outline-none focus:ring-1 focus:ring-[#003E83] bg-white dark:bg-zinc-800 text-gray-900 dark:text-white text-xs sm:text-sm cursor-pointer shadow-xs font-medium"
                 >
                   {NOTIFICATION_CATEGORIES.map((cat) => (
                     <option key={cat} value={cat}>
@@ -397,7 +397,7 @@ export default function BusinessNotifications() {
                 <select
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}
-                  className="appearance-none w-full sm:w-auto pl-3.5 pr-8 py-1.5 border border-gray-200 dark:border-zinc-700 rounded-md focus:outline-none focus:ring-1 focus:ring-[#003E83] bg-white dark:bg-zinc-800 text-gray-900 dark:text-white text-xs sm:text-sm cursor-pointer shadow-xs font-medium"
+                  className="appearance-none w-full sm:w-auto pl-3.5 pr-8 py-1.5 border border-gray-200 dark:border-zinc-700 rounded-sm focus:outline-none focus:ring-1 focus:ring-[#003E83] bg-white dark:bg-zinc-800 text-gray-900 dark:text-white text-xs sm:text-sm cursor-pointer shadow-xs font-medium"
                 >
                   <option value="all">All Status</option>
                   <option value="unread">Unread Only</option>
@@ -443,17 +443,17 @@ export default function BusinessNotifications() {
                     }`}
                   >
                     <div className="flex items-start gap-3">
-                      <div className={`w-9 h-9 rounded-md flex items-center justify-center shrink-0 border ${iconBg}`}>
+                      <div className={`w-9 h-9 rounded-sm flex items-center justify-center shrink-0 border ${iconBg}`}>
                         <Icon className="w-4 h-4" />
                       </div>
 
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between gap-2">
-                          <span className="text-[10px] font-bold uppercase tracking-wider text-gray-600 dark:text-zinc-400 bg-gray-100 dark:bg-zinc-800 px-2 py-0.5 rounded-md border border-gray-200 dark:border-zinc-700">
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-gray-600 dark:text-zinc-400 bg-gray-100 dark:bg-zinc-800 px-2 py-0.5 rounded-sm border border-gray-200 dark:border-zinc-700">
                             {n.category || 'General'}
                           </span>
                           <span
-                            className={`inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-semibold rounded-md border shrink-0 ${
+                            className={`inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-semibold rounded-sm border shrink-0 ${
                               !n.read
                                 ? 'bg-blue-50 dark:bg-blue-950/40 text-[#003E83] dark:text-blue-400 border-blue-200 dark:border-blue-900/40'
                                 : 'bg-gray-100 dark:bg-zinc-800 text-gray-500 dark:text-zinc-400 border-gray-200 dark:border-zinc-700'
@@ -486,7 +486,7 @@ export default function BusinessNotifications() {
                             <button
                               type="button"
                               onClick={(e) => handleOpenDetails(n, e)}
-                              className="p-1.5 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/30 rounded-md transition-all cursor-pointer"
+                              className="p-1.5 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/30 rounded-sm transition-all cursor-pointer"
                               title="View details"
                             >
                               <Eye className="w-3.5 h-3.5" />
@@ -495,7 +495,7 @@ export default function BusinessNotifications() {
                               <button
                                 type="button"
                                 onClick={(e) => handleMarkAsRead(n.id, e)}
-                                className="p-1.5 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 rounded-md transition-all cursor-pointer"
+                                className="p-1.5 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 rounded-sm transition-all cursor-pointer"
                                 title="Mark read"
                               >
                                 <Check className="w-3.5 h-3.5" />
@@ -504,7 +504,7 @@ export default function BusinessNotifications() {
                             <button
                               type="button"
                               onClick={(e) => handleDelete(n.id, e)}
-                              className="p-1.5 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded-md transition-all cursor-pointer"
+                              className="p-1.5 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded-sm transition-all cursor-pointer"
                               title="Delete"
                             >
                               <Trash2 className="w-3.5 h-3.5" />
@@ -562,7 +562,7 @@ export default function BusinessNotifications() {
 
                         <td className="px-4 py-3.5">
                           <div className="flex items-center gap-3">
-                            <div className={`w-8 h-8 rounded-md flex items-center justify-center shrink-0 border ${iconBg}`}>
+                            <div className={`w-8 h-8 rounded-sm flex items-center justify-center shrink-0 border ${iconBg}`}>
                               <Icon className="w-4 h-4" />
                             </div>
                             <div className="min-w-0 flex-1">
@@ -577,7 +577,7 @@ export default function BusinessNotifications() {
                         </td>
 
                         <td className="px-3 py-3.5 whitespace-nowrap">
-                          <span className="text-[10px] font-bold uppercase tracking-wider text-gray-600 dark:text-zinc-400 bg-gray-100 dark:bg-zinc-800 px-2 py-0.5 rounded-md border border-gray-200 dark:border-zinc-700">
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-gray-600 dark:text-zinc-400 bg-gray-100 dark:bg-zinc-800 px-2 py-0.5 rounded-sm border border-gray-200 dark:border-zinc-700">
                             {n.category || 'General'}
                           </span>
                         </td>
@@ -591,7 +591,7 @@ export default function BusinessNotifications() {
 
                         <td className="px-3 py-3.5 whitespace-nowrap">
                           <span
-                            className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 text-xs font-semibold rounded-md border ${
+                            className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 text-xs font-semibold rounded-sm border ${
                               !n.read
                                 ? 'bg-blue-50 dark:bg-blue-950/40 text-[#003E83] dark:text-blue-400 border-blue-200 dark:border-blue-900/40'
                                 : 'bg-gray-100 dark:bg-zinc-800 text-gray-500 dark:text-zinc-400 border-gray-200 dark:border-zinc-700'
@@ -612,7 +612,7 @@ export default function BusinessNotifications() {
                             <button
                               type="button"
                               onClick={(e) => handleOpenDetails(n, e)}
-                              className="p-1.5 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/30 rounded-md transition-all active:scale-95 cursor-pointer"
+                              className="p-1.5 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/30 rounded-sm transition-all active:scale-95 cursor-pointer"
                               title="View details"
                             >
                               <Eye className="w-4 h-4" />
@@ -621,7 +621,7 @@ export default function BusinessNotifications() {
                               <button
                                 type="button"
                                 onClick={(e) => handleMarkAsRead(n.id, e)}
-                                className="p-1.5 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 rounded-md transition-all active:scale-95 cursor-pointer"
+                                className="p-1.5 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 rounded-sm transition-all active:scale-95 cursor-pointer"
                                 title="Mark read"
                               >
                                 <Check className="w-4 h-4" />
@@ -630,7 +630,7 @@ export default function BusinessNotifications() {
                             <button
                               type="button"
                               onClick={(e) => handleDelete(n.id, e)}
-                              className="p-1.5 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded-md transition-all active:scale-95 cursor-pointer"
+                              className="p-1.5 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded-sm transition-all active:scale-95 cursor-pointer"
                               title="Delete alert"
                             >
                               <Trash2 className="w-4 h-4" />
@@ -664,7 +664,7 @@ export default function BusinessNotifications() {
                     type="button"
                     disabled={currentPage <= 1}
                     onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                    className="p-1.5 rounded-md border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-600 dark:text-zinc-300 disabled:opacity-30 hover:bg-gray-50 dark:hover:bg-zinc-700 transition cursor-pointer"
+                    className="p-1.5 rounded-sm border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-600 dark:text-zinc-300 disabled:opacity-30 hover:bg-gray-50 dark:hover:bg-zinc-700 transition cursor-pointer"
                     title="Previous page"
                   >
                     <ChevronLeft className="w-4 h-4" />
@@ -678,7 +678,7 @@ export default function BusinessNotifications() {
                     type="button"
                     disabled={currentPage >= totalPages}
                     onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                    className="p-1.5 rounded-md border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-600 dark:text-zinc-300 disabled:opacity-30 hover:bg-gray-50 dark:hover:bg-zinc-700 transition cursor-pointer"
+                    className="p-1.5 rounded-sm border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-600 dark:text-zinc-300 disabled:opacity-30 hover:bg-gray-50 dark:hover:bg-zinc-700 transition cursor-pointer"
                     title="Next page"
                   >
                     <ChevronRight className="w-4 h-4" />

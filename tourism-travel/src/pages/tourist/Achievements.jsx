@@ -71,7 +71,7 @@ export default function Achievements() {
       </div>
 
       {/* Progress Banner */}
-      <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-[#002D62] to-[#001733] text-white shadow-xl flex flex-col md:flex-row items-center justify-between gap-6">
+      <div className="p-6 sm:p-8 rounded-sm bg-gradient-to-r from-[#002D62] to-[#001733] text-white shadow-xl flex flex-col md:flex-row items-center justify-between gap-6">
         <div className="space-y-2 text-center md:text-left">
           <span className="px-3 py-1 rounded-full bg-white/10 backdrop-blur-md text-[11px] font-bold tracking-wide uppercase">
             Explorer Level
@@ -111,7 +111,7 @@ export default function Achievements() {
             return (
               <div
                 key={b.id || name}
-                className={`p-6 rounded-3xl border transition-all duration-300 flex flex-col justify-between ${
+                className={`p-6 rounded-sm border transition-all duration-300 flex flex-col justify-between ${
                   isUnlocked
                     ? 'bg-white dark:bg-zinc-900 border-amber-300 dark:border-amber-900/60 shadow-md hover:shadow-xl'
                     : 'bg-slate-50/80 dark:bg-zinc-900/40 border-slate-200 dark:border-zinc-800 opacity-75'
@@ -119,7 +119,7 @@ export default function Achievements() {
               >
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${
+                    <div className={`w-12 h-12 rounded-sm flex items-center justify-center ${
                       isUnlocked 
                         ? 'bg-amber-100 text-amber-600 dark:bg-amber-950/60 dark:text-amber-400 shadow-xs' 
                         : 'bg-slate-200 text-slate-400 dark:bg-zinc-800'

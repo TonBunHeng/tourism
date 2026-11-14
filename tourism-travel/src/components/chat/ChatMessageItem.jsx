@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { 
   Copy, 
   Check, 
@@ -16,7 +16,8 @@ import ItineraryCard from './ItineraryCard';
 import RecommendationsCard from './RecommendationsCard';
 import CurrencyCard from './CurrencyCard';
 import SourcesCard from './SourcesCard';
-import { formatSuggestedTopic } from '../../utils/chatUtils';
+import { formatSuggestedTopic, TOPICS_EN, TOPICS_KM } from '../../utils/chatUtils';
+import aiChatService from '../../services/aiChatService';
 
 export default function ChatMessageItem({
   message,
@@ -25,18 +26,31 @@ export default function ChatMessageItem({
   onRegenerate,
   onSelectSuggestion,
   onEditMessage,
+  onRefreshSuggestions,
 }) {
   const [copied, setCopied] = useState(false);
   const [feedback, setFeedback] = useState(null); // 'like' | 'dislike'
   const [isEditing, setIsEditing] = useState(false);
   const [editText, setEditText] = useState('');
   const [isRefreshingSuggestions, setIsRefreshingSuggestions] = useState(false);
+  const [localSuggestions, setLocalSuggestions] = useState(message.suggestions || []);
+  const [localTopic, setLocalTopic] = useState(message.topic || '');
+  const [rotationIndex, setRotationIndex] = useState(0);
   const editTextareaRef = useRef(null);
 
   const isKm = language === 'km';
   const isUser = message.sender === 'user' || message.role === 'user';
   const textContent = message.content || message.message || '';
   const isKhmerText = isKm || /[\u1780-\u17FF]/.test(textContent);
+
+  useEffect(() => {
+    if (message.suggestions && message.suggestions.length > 0) {
+      setLocalSuggestions(message.suggestions);
+    }
+    if (message.topic) {
+      setLocalTopic(message.topic);
+    }
+  }, [message.suggestions, message.topic]);
 
   const hasCards = !!(
     message.weather ||
@@ -90,12 +104,64 @@ export default function ChatMessageItem({
     setIsEditing(false);
   };
 
-  const handleRefreshSuggestions = (e) => {
+  const handleRefreshSuggestions = async (e) => {
     e.stopPropagation();
+    if (isRefreshingSuggestions) return;
     setIsRefreshingSuggestions(true);
-    setTimeout(() => {
-      setIsRefreshingSuggestions(false);
-    }, 500);
+
+    try {
+      if (onRefreshSuggestions) {
+        await onRefreshSuggestions(message.id, message);
+      } else {
+        const nextRotation = rotationIndex + 1;
+        setRotationIndex(nextRotation);
+
+        const currentTexts = (localSuggestions || []).map((s) => (typeof s === 'string' ? s : s.title || s.text || s.query || ''));
+        const isMsgKhmer = isKhmerText || /[\u1780-\u17FF]/.test(textContent) || isKm;
+        const currentLang = isMsgKhmer ? 'km' : (language || 'en');
+
+        const res = await aiChatService.getSuggestions({
+          message: textContent,
+          answer: textContent,
+          language: currentLang,
+          refresh: true,
+          currentSuggestions: currentTexts,
+        });
+
+        if (res?.suggestions && res.suggestions.length > 0) {
+          setLocalSuggestions(res.suggestions);
+          if (res.topic) setLocalTopic(res.topic);
+        } else {
+          // Robust local rotation from the topics pool
+          const pool = isMsgKhmer ? TOPICS_KM : TOPICS_EN;
+          const start = (nextRotation * 4) % pool.length;
+          const rotated = [];
+          for (let i = 0; i < 4; i++) {
+            rotated.push(pool[(start + i) % pool.length]);
+          }
+          const formatted = rotated.map((item) => formatSuggestedTopic(item, currentLang)).filter(Boolean);
+          setLocalSuggestions(formatted);
+        }
+      }
+    } catch (err) {
+      console.error('Failed to refresh suggestions:', err);
+      // Fallback rotation from pool on error
+      const isMsgKhmer = isKhmerText || /[\u1780-\u17FF]/.test(textContent) || isKm;
+      const currentLang = isMsgKhmer ? 'km' : (language || 'en');
+      const pool = isMsgKhmer ? TOPICS_KM : TOPICS_EN;
+      const nextRotation = rotationIndex + 1;
+      setRotationIndex(nextRotation);
+      const start = (nextRotation * 4) % pool.length;
+      const rotated = [];
+      for (let i = 0; i < 4; i++) {
+        rotated.push(pool[(start + i) % pool.length]);
+      }
+      setLocalSuggestions(rotated.map((item) => formatSuggestedTopic(item, currentLang)).filter(Boolean));
+    } finally {
+      setTimeout(() => {
+        setIsRefreshingSuggestions(false);
+      }, 350);
+    }
   };
 
   return (
@@ -120,19 +186,19 @@ export default function ChatMessageItem({
         {/* Message Bubble Container */}
         {(isUser || textContent.trim() || hasCards) && (
           <div
-            className={`px-4 py-3 rounded-2xl text-[14.5px] sm:text-[15px] ${
+            className={`px-4 py-3 rounded-sm text-[14.5px] sm:text-[15px] ${
               isKhmerText ? 'leading-[1.75]' : 'leading-relaxed'
             } ${
               isUser
-                ? 'bg-zinc-800 dark:bg-zinc-700 text-white rounded-2xl font-normal sm:font-medium shadow-xs'
-                : 'bg-white dark:bg-[#18181b] text-zinc-900 dark:text-zinc-100 border border-zinc-200/80 dark:border-zinc-800 rounded-2xl rounded-tl-xs w-full shadow-2xs'
+                ? 'bg-zinc-800 dark:bg-zinc-700 text-white rounded-sm font-normal sm:font-medium shadow-xs'
+                : 'bg-white dark:bg-[#18181b] text-zinc-900 dark:text-zinc-100 border border-zinc-200/80 dark:border-zinc-800 rounded-sm w-full shadow-2xs'
             }`}
           >
             {/* User Attachments Preview */}
             {isUser && message.attachments && message.attachments.length > 0 && (
               <div className="mb-2 flex flex-wrap gap-1.5">
                 {message.attachments.map((file, idx) => (
-                  <div key={idx} className="flex items-center space-x-1 bg-white/15 px-2 py-0.5 rounded-md text-xs text-white">
+                  <div key={idx} className="flex items-center space-x-1 bg-white/15 px-2 py-0.5 rounded-sm text-xs text-white">
                     <Paperclip size={12} />
                     <span className="truncate max-w-[120px]">{file.name}</span>
                   </div>
@@ -201,18 +267,19 @@ export default function ChatMessageItem({
             )}
 
             {/* Dynamic Suggested Topics under Latest Assistant Message */}
-            {!isUser && isLatest && message.suggestions && message.suggestions.length > 0 && (
+            {!isUser && isLatest && localSuggestions && localSuggestions.length > 0 && (
               <div className="mt-3.5 pt-3 border-t border-zinc-100 dark:border-zinc-800 space-y-2">
                 <div className="flex items-center justify-between px-0.5">
                   <span className="inline-flex items-center gap-1.5 text-[11px] font-bold text-zinc-600 dark:text-zinc-300">
                     <Sparkles size={12} className="text-amber-500" />
-                    <span>{message.topic || (isKm ? 'ប្រធានបទណែនាំបន្ត' : 'Suggested Topics')}</span>
+                    <span>{localTopic || message.topic || (isKm ? 'ប្រធានបទណែនាំបន្ត' : 'Suggested Topics')}</span>
                   </span>
 
                   <button
                     type="button"
                     onClick={handleRefreshSuggestions}
-                    className="inline-flex items-center gap-1.5 text-[11px] font-medium text-slate-500 dark:text-zinc-400 hover:text-[#003E83] dark:hover:text-blue-400 px-2 py-0.5 rounded-full hover:bg-slate-100 dark:hover:bg-zinc-800 transition-all cursor-pointer group active:scale-95"
+                    disabled={isRefreshingSuggestions}
+                    className="inline-flex items-center gap-1.5 text-[11px] font-medium text-slate-500 dark:text-zinc-400 hover:text-[#003E83] dark:hover:text-blue-400 px-2 py-0.5 rounded-full hover:bg-slate-100 dark:hover:bg-zinc-800 transition-all cursor-pointer group active:scale-95 disabled:opacity-60"
                     title={isKm ? 'ប្តូរសំណួរថ្មី' : 'Refresh questions'}
                   >
                     <RefreshCw
@@ -226,19 +293,19 @@ export default function ChatMessageItem({
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  {message.suggestions.map((item, sIdx) => {
-                    const formatted = formatSuggestedTopic(item, language);
+                  {localSuggestions.map((item, sIdx) => {
+                    const formatted = formatSuggestedTopic(item, isKhmerText ? 'km' : language);
                     if (!formatted) return null;
                     const IconComp = formatted.icon;
 
                     return (
                       <button
-                        key={sIdx}
+                        key={item.id || sIdx}
                         type="button"
                         onClick={() => onSelectSuggestion && onSelectSuggestion(formatted.prompt || formatted.title)}
-                        className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl bg-white dark:bg-[#212121] border border-slate-200/90 dark:border-zinc-800 text-xs sm:text-[13px] text-slate-700 dark:text-slate-300 hover:border-[#003E83] dark:hover:border-blue-500 hover:text-[#003E83] dark:hover:text-blue-400 shadow-2xs hover:shadow-xs transition-all duration-200 active:scale-95 cursor-pointer text-left group"
+                        className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-sm bg-white dark:bg-[#212121] border border-slate-200/90 dark:border-zinc-800 text-xs sm:text-[13px] text-slate-700 dark:text-slate-300 hover:border-[#003E83] dark:hover:border-blue-500 hover:text-[#003E83] dark:hover:text-blue-400 shadow-2xs hover:shadow-xs transition-all duration-200 active:scale-95 cursor-pointer text-left group"
                       >
-                        <div className="w-6 h-6 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center shrink-0 text-zinc-600 dark:text-zinc-400 group-hover:text-[#003E83] dark:group-hover:text-blue-400 transition-colors">
+                        <div className="w-6 h-6 rounded-sm bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center shrink-0 text-zinc-600 dark:text-zinc-400 group-hover:text-[#003E83] dark:group-hover:text-blue-400 transition-colors">
                           <IconComp size={14} className="group-hover:scale-110 transition-transform duration-200" />
                         </div>
                         <span className="font-medium line-clamp-2 leading-snug">
@@ -259,7 +326,7 @@ export default function ChatMessageItem({
             <button
               type="button"
               onClick={handleCopy}
-              className="flex items-center p-1 rounded-md hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer text-xs"
+              className="flex items-center p-1 rounded-sm hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer text-xs"
               title={copied ? (isKm ? 'បានចម្លង!' : 'Copied!') : (isKm ? 'ចម្លង' : 'Copy')}
             >
               {copied ? (
@@ -276,7 +343,7 @@ export default function ChatMessageItem({
             <button
               type="button"
               onClick={startEdit}
-              className="p-1 rounded-md hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer text-xs"
+              className="p-1 rounded-sm hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer text-xs"
               title={isKm ? 'កែប្រែសារ' : 'Edit message'}
             >
               <Pencil size={13} />
@@ -287,7 +354,7 @@ export default function ChatMessageItem({
             <button
               type="button"
               onClick={handleCopy}
-              className="flex items-center space-x-1 p-1 rounded-md hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer text-xs"
+              className="flex items-center space-x-1 p-1 rounded-sm hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer text-xs"
               title={copied ? 'Copied!' : 'Copy response'}
             >
               {copied ? (
@@ -305,7 +372,7 @@ export default function ChatMessageItem({
             <button
               type="button"
               onClick={onRegenerate}
-              className="p-1 rounded-md hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer text-xs"
+              className="p-1 rounded-sm hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer text-xs"
               title={isKm ? 'បង្កើតចម្លើយឡើងវិញ' : 'Regenerate response'}
             >
               <RotateCcw size={12} />
@@ -314,7 +381,7 @@ export default function ChatMessageItem({
             <button
               type="button"
               onClick={() => setFeedback(feedback === 'like' ? null : 'like')}
-              className={`p-1 rounded-md transition-colors cursor-pointer ${
+              className={`p-1 rounded-sm transition-colors cursor-pointer ${
                 feedback === 'like'
                   ? 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/40'
                   : 'hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800'
@@ -327,7 +394,7 @@ export default function ChatMessageItem({
             <button
               type="button"
               onClick={() => setFeedback(feedback === 'dislike' ? null : 'dislike')}
-              className={`p-1 rounded-md transition-colors cursor-pointer ${
+              className={`p-1 rounded-sm transition-colors cursor-pointer ${
                 feedback === 'dislike'
                   ? 'text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40'
                   : 'hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800'

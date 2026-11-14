@@ -270,12 +270,12 @@ export default function BusinessProfile() {
 
           <div className="flex items-center gap-2.5 flex-wrap sm:flex-nowrap self-start sm:self-auto">
             {verificationStatus === 'approved' ? (
-              <span className="inline-flex items-center gap-1.5 px-4 py-2 rounded-md text-xs sm:text-sm font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 shadow-xs">
+              <span className="inline-flex items-center gap-1.5 px-4 py-2 rounded-sm text-xs sm:text-sm font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 shadow-xs">
                 <CheckCircle2 size={14} />
                 <span>Verified Enterprise</span>
               </span>
             ) : (
-              <span className="inline-flex items-center gap-1.5 px-4 py-2 rounded-md text-xs sm:text-sm font-semibold bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-200 dark:border-amber-800 shadow-xs">
+              <span className="inline-flex items-center gap-1.5 px-4 py-2 rounded-sm text-xs sm:text-sm font-semibold bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-200 dark:border-amber-800 shadow-xs">
                 <Clock size={14} />
                 <span>Status: {verificationStatus || 'Pending Review'}</span>
               </span>
@@ -285,7 +285,7 @@ export default function BusinessProfile() {
               type="button"
               onClick={handleSubmit}
               disabled={isSaving}
-              className="px-4 py-2 rounded-md bg-[#003E83] hover:bg-[#002e62] disabled:opacity-50 text-white text-xs sm:text-sm font-medium shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer"
+              className="px-4 py-2 rounded-sm bg-[#003E83] hover:bg-[#002e62] disabled:opacity-50 text-white text-xs sm:text-sm font-medium shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer"
             >
               {isSaving ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
               <span>Save Changes</span>
@@ -301,7 +301,7 @@ export default function BusinessProfile() {
           return (
             <div
               key={index}
-              className="bg-white dark:bg-zinc-900 rounded-md p-4 shadow-xs border border-gray-200 dark:border-zinc-800 flex flex-col justify-between"
+              className="bg-white dark:bg-zinc-900 rounded-sm p-4 shadow-xs border border-gray-200 dark:border-zinc-800 flex flex-col justify-between"
             >
               <div className="flex items-center justify-between gap-2">
                 <div className="min-w-0">
@@ -312,7 +312,7 @@ export default function BusinessProfile() {
                     {stat.value}
                   </p>
                 </div>
-                <div className={`w-9 h-9 rounded-md shrink-0 flex items-center justify-center ${stat.bg}`}>
+                <div className={`w-9 h-9 rounded-sm shrink-0 flex items-center justify-center ${stat.bg}`}>
                   <IconComponent className={`w-5 h-5 ${stat.color}`} />
                 </div>
               </div>
@@ -325,7 +325,7 @@ export default function BusinessProfile() {
       </div>
 
       {isLoading ? (
-        <div className="p-16 text-center bg-white dark:bg-zinc-900 rounded-md border border-gray-200 dark:border-zinc-800">
+        <div className="p-16 text-center bg-white dark:bg-zinc-900 rounded-sm border border-gray-200 dark:border-zinc-800">
           <LoadingSpinner text="Retrieving business profile..." />
         </div>
       ) : (
@@ -334,9 +334,9 @@ export default function BusinessProfile() {
             {/* Left 2 Columns: Main Details Form */}
             <div className="lg:col-span-2 space-y-6">
               {/* Card 1: General Establishment Information */}
-              <div className="p-5 sm:p-6 rounded-md bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 shadow-xs space-y-4">
+              <div className="p-5 sm:p-6 rounded-sm bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 shadow-xs space-y-4">
                 <div className="flex items-center gap-2 pb-3 border-b border-gray-100 dark:border-zinc-800">
-                  <div className="w-8 h-8 rounded-md bg-blue-50 dark:bg-blue-950/50 text-[#003E83] dark:text-blue-400 border border-blue-100 dark:border-blue-900/40 flex items-center justify-center shrink-0">
+                  <div className="w-8 h-8 rounded-sm bg-blue-50 dark:bg-blue-950/50 text-[#003E83] dark:text-blue-400 border border-blue-100 dark:border-blue-900/40 flex items-center justify-center shrink-0">
                     <Store className="w-4 h-4" />
                   </div>
                   <div>
@@ -359,7 +359,7 @@ export default function BusinessProfile() {
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="e.g. Angkor Heritage Boutique Hotel & Restaurant"
-                    className="w-full px-3 py-2 rounded-md border border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800 text-xs sm:text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#003E83]"
+                    className="w-full px-3 py-2 rounded-sm border border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800 text-xs sm:text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#003E83]"
                   />
                 </div>
 
@@ -371,7 +371,7 @@ export default function BusinessProfile() {
                     <select
                       value={categoryId}
                       onChange={(e) => setCategoryId(e.target.value)}
-                      className="w-full px-3 py-2 rounded-md border border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800 text-xs sm:text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#003E83] cursor-pointer"
+                      className="w-full px-3 py-2 rounded-sm border border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800 text-xs sm:text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#003E83] cursor-pointer"
                     >
                       <option value="">Select Category</option>
                       {categories.map((c) => (
@@ -389,7 +389,7 @@ export default function BusinessProfile() {
                     <select
                       value={provinceId}
                       onChange={(e) => setProvinceId(e.target.value)}
-                      className="w-full px-3 py-2 rounded-md border border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800 text-xs sm:text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#003E83] cursor-pointer"
+                      className="w-full px-3 py-2 rounded-sm border border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800 text-xs sm:text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#003E83] cursor-pointer"
                     >
                       <option value="">Select Province</option>
                       {provinces.map((p) => (
@@ -410,7 +410,7 @@ export default function BusinessProfile() {
                     value={address}
                     onChange={(e) => setAddress(e.target.value)}
                     placeholder="e.g. Street 08, Krong Siem Reap, Cambodia"
-                    className="w-full px-3 py-2 rounded-md border border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800 text-xs sm:text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#003E83]"
+                    className="w-full px-3 py-2 rounded-sm border border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800 text-xs sm:text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#003E83]"
                   />
                 </div>
 
@@ -423,15 +423,15 @@ export default function BusinessProfile() {
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                     placeholder="Describe your tourism offerings, dining specialties, hotel amenities, or excursion packages in detail..."
-                    className="w-full px-3 py-2.5 rounded-md border border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800 text-xs sm:text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#003E83]"
+                    className="w-full px-3 py-2.5 rounded-sm border border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800 text-xs sm:text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#003E83]"
                   />
                 </div>
               </div>
 
               {/* Card 2: Contact & Communication Channels */}
-              <div className="p-5 sm:p-6 rounded-md bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 shadow-xs space-y-4">
+              <div className="p-5 sm:p-6 rounded-sm bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 shadow-xs space-y-4">
                 <div className="flex items-center gap-2 pb-3 border-b border-gray-100 dark:border-zinc-800">
-                  <div className="w-8 h-8 rounded-md bg-blue-50 dark:bg-blue-950/50 text-[#003E83] dark:text-blue-400 border border-blue-100 dark:border-blue-900/40 flex items-center justify-center shrink-0">
+                  <div className="w-8 h-8 rounded-sm bg-blue-50 dark:bg-blue-950/50 text-[#003E83] dark:text-blue-400 border border-blue-100 dark:border-blue-900/40 flex items-center justify-center shrink-0">
                     <Phone className="w-4 h-4" />
                   </div>
                   <div>
@@ -454,7 +454,7 @@ export default function BusinessProfile() {
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
                       placeholder="+855 63 963 888"
-                      className="w-full px-3 py-2 rounded-md border border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800 text-xs sm:text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#003E83]"
+                      className="w-full px-3 py-2 rounded-sm border border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800 text-xs sm:text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#003E83]"
                     />
                   </div>
 
@@ -467,7 +467,7 @@ export default function BusinessProfile() {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="bookings@example.com"
-                      className="w-full px-3 py-2 rounded-md border border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800 text-xs sm:text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#003E83]"
+                      className="w-full px-3 py-2 rounded-sm border border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800 text-xs sm:text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#003E83]"
                     />
                   </div>
 
@@ -481,7 +481,7 @@ export default function BusinessProfile() {
                       value={website}
                       onChange={(e) => setWebsite(e.target.value)}
                       placeholder="e.g. Google Maps link, coordinates, or location link"
-                      className="w-full px-3 py-2 rounded-md border border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800 text-xs sm:text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#003E83]"
+                      className="w-full px-3 py-2 rounded-sm border border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800 text-xs sm:text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#003E83]"
                     />
                   </div>
                 </div>
@@ -491,10 +491,10 @@ export default function BusinessProfile() {
             {/* Right 1 Column: Gallery & Verification Guidelines */}
             <div className="lg:col-span-1 space-y-6">
               {/* Card 3: Photo Showcase & Media */}
-              <div className="p-5 sm:p-6 rounded-md bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 shadow-xs space-y-4">
+              <div className="p-5 sm:p-6 rounded-sm bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 shadow-xs space-y-4">
                 <div className="flex items-center justify-between pb-3 border-b border-gray-100 dark:border-zinc-800">
                   <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-md bg-blue-50 dark:bg-blue-950/50 text-[#003E83] dark:text-blue-400 border border-blue-100 dark:border-blue-900/40 flex items-center justify-center shrink-0">
+                    <div className="w-8 h-8 rounded-sm bg-blue-50 dark:bg-blue-950/50 text-[#003E83] dark:text-blue-400 border border-blue-100 dark:border-blue-900/40 flex items-center justify-center shrink-0">
                       <Camera className="w-4 h-4" />
                     </div>
                     <div>
@@ -508,7 +508,7 @@ export default function BusinessProfile() {
                   </div>
 
                   {activeBusinessId && (
-                    <label className="px-3 py-1.5 rounded-md bg-[#003E83] hover:bg-[#002e62] text-white text-xs font-medium transition flex items-center gap-1.5 cursor-pointer shadow-xs">
+                    <label className="px-3 py-1.5 rounded-sm bg-[#003E83] hover:bg-[#002e62] text-white text-xs font-medium transition flex items-center gap-1.5 cursor-pointer shadow-xs">
                       {isUploadingImage ? (
                         <Loader2 size={13} className="animate-spin" />
                       ) : (
@@ -527,7 +527,7 @@ export default function BusinessProfile() {
                 </div>
 
                 {images.length === 0 ? (
-                  <div className="p-8 text-center rounded-md border border-dashed border-gray-200 dark:border-zinc-800 text-xs text-gray-400 dark:text-zinc-500">
+                  <div className="p-8 text-center rounded-sm border border-dashed border-gray-200 dark:border-zinc-800 text-xs text-gray-400 dark:text-zinc-500">
                     <Camera className="w-8 h-8 mx-auto mb-2 text-gray-300 dark:text-zinc-600" />
                     <p className="font-medium text-gray-600 dark:text-zinc-400">No photos yet</p>
                     <p className="text-[11px] mt-1">Upload restaurant dishes, room interiors, or tour attractions.</p>
@@ -537,7 +537,7 @@ export default function BusinessProfile() {
                     {images.map((img) => (
                       <div
                         key={img.id}
-                        className="group relative h-24 rounded-md overflow-hidden bg-gray-100 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700"
+                        className="group relative h-24 rounded-sm overflow-hidden bg-gray-100 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700"
                       >
                         <img
                           src={img.image_url || img.url || img.image}
@@ -547,7 +547,7 @@ export default function BusinessProfile() {
                         <button
                           type="button"
                           onClick={() => handleDeleteImage(img.id)}
-                          className="absolute top-1.5 right-1.5 p-1 rounded-md bg-black/60 hover:bg-rose-600 text-white transition opacity-0 group-hover:opacity-100 cursor-pointer shadow-xs"
+                          className="absolute top-1.5 right-1.5 p-1 rounded-sm bg-black/60 hover:bg-rose-600 text-white transition opacity-0 group-hover:opacity-100 cursor-pointer shadow-xs"
                           title="Delete photo"
                         >
                           <Trash2 size={12} />
@@ -559,7 +559,7 @@ export default function BusinessProfile() {
               </div>
 
               {/* Card 4: Regulatory & Compliance Guidelines */}
-              <div className="p-5 rounded-md bg-gray-50/70 dark:bg-zinc-800/40 border border-gray-200 dark:border-zinc-800 space-y-3">
+              <div className="p-5 rounded-sm bg-gray-50/70 dark:bg-zinc-800/40 border border-gray-200 dark:border-zinc-800 space-y-3">
                 <div className="flex items-center gap-2 text-xs font-bold text-gray-900 dark:text-white">
                   <ShieldCheck className="w-4 h-4 text-[#003E83] dark:text-blue-400" />
                   <span>Ministry Verification Standards</span>

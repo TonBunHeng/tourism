@@ -102,7 +102,7 @@ export default function ChatSidebar({
                 onNewChat && onNewChat();
                 if (isMobile) onClose && onClose();
               }}
-              className="w-full flex items-center justify-between px-3 h-9 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 text-zinc-800 dark:text-zinc-200 text-xs sm:text-[13px] font-semibold transition-all duration-150 shadow-2xs hover:shadow-xs active:scale-98 cursor-pointer group"
+              className="w-full flex items-center justify-between px-3 h-9 rounded-sm bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 text-zinc-800 dark:text-zinc-200 text-xs sm:text-[13px] font-semibold transition-all duration-150 shadow-2xs hover:shadow-xs active:scale-98 cursor-pointer group"
               title={isKm ? 'កិច្ចសន្ទនាថ្មី' : 'New Chat'}
             >
               <div className="flex items-center gap-2">
@@ -120,7 +120,7 @@ export default function ChatSidebar({
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder={isKm ? 'ស្វែងរកកិច្ចសន្ទនា...' : 'Search chats...'}
-                className="w-full h-8 pl-8 pr-7 rounded-lg bg-zinc-100/90 dark:bg-zinc-900 border border-transparent focus:border-zinc-300 dark:focus:border-zinc-700 focus:bg-white dark:focus:bg-black text-xs text-zinc-800 dark:text-zinc-200 placeholder-zinc-400 focus:outline-none transition-all"
+                className="w-full h-8 pl-8 pr-7 rounded-sm bg-zinc-100/90 dark:bg-zinc-900 border border-transparent focus:border-zinc-300 dark:focus:border-zinc-700 focus:bg-white dark:focus:bg-black text-xs text-zinc-800 dark:text-zinc-200 placeholder-zinc-400 focus:outline-none transition-all"
               />
               {searchQuery && (
                 <button
@@ -141,7 +141,7 @@ export default function ChatSidebar({
                 onNewChat && onNewChat();
                 if (isMobile) onClose && onClose();
               }}
-              className="w-10 h-10 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 text-zinc-800 dark:text-zinc-200 flex items-center justify-center shadow-2xs hover:shadow-xs active:scale-95 cursor-pointer transition-all"
+              className="w-10 h-10 rounded-sm bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 text-zinc-800 dark:text-zinc-200 flex items-center justify-center shadow-2xs hover:shadow-xs active:scale-95 cursor-pointer transition-all"
               title={isKm ? 'កិច្ចសន្ទនាថ្មី (⌘N)' : 'New Chat (⌘N)'}
             >
               <Plus size={18} className="text-zinc-600 dark:text-zinc-400" />
@@ -169,7 +169,7 @@ export default function ChatSidebar({
                       onSelectSession && onSelectSession(session.session_id);
                       if (isMobile) onClose && onClose();
                     }}
-                    className={`group relative flex items-center justify-between w-full h-9 px-2.5 rounded-lg text-xs font-medium transition-all duration-150 cursor-pointer ${
+                    className={`group relative flex items-center justify-between w-full h-9 px-2.5 rounded-sm text-xs font-medium transition-all duration-150 cursor-pointer ${
                       isSelected
                         ? 'bg-zinc-200/80 dark:bg-zinc-800 text-zinc-900 dark:text-white font-semibold'
                         : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-200'
@@ -195,7 +195,7 @@ export default function ChatSidebar({
                             onKeyDown={(e) => {
                               if (e.key === 'Escape') handleCancelRename();
                             }}
-                            className="w-full h-6 px-1.5 rounded bg-white dark:bg-zinc-900 border border-zinc-400 dark:border-zinc-600 text-xs text-zinc-900 dark:text-white focus:outline-none"
+                            className="w-full h-6 px-1.5 rounded-sm bg-white dark:bg-zinc-900 border border-zinc-400 dark:border-zinc-600 text-xs text-zinc-900 dark:text-white focus:outline-none"
                             autoFocus
                           />
                           <button
@@ -225,7 +225,7 @@ export default function ChatSidebar({
                         <button
                           type="button"
                           onClick={(e) => handleStartRename(e, session)}
-                          className="p-1 rounded text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors"
+                          className="p-1 rounded-sm text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors"
                           title={isKm ? 'ប្តូរឈ្មោះ' : 'Rename'}
                         >
                           <Pencil size={11} />
@@ -239,7 +239,7 @@ export default function ChatSidebar({
                               onDeleteSession && onDeleteSession(session.session_id);
                             }
                           }}
-                          className="p-1 rounded text-zinc-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors"
+                          className="p-1 rounded-sm text-zinc-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors"
                           title={isKm ? 'លុបកិច្ចសន្ទនា' : 'Delete'}
                         >
                           <Trash2 size={11} />
@@ -270,7 +270,7 @@ export default function ChatSidebar({
                       onSelectSession && onSelectSession(session.session_id);
                       if (isMobile) onClose && onClose();
                     }}
-                    className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-150 cursor-pointer relative group shrink-0 ${
+                    className={`w-10 h-10 rounded-sm flex items-center justify-center transition-all duration-150 cursor-pointer relative group shrink-0 ${
                       isSelected
                         ? 'bg-zinc-200 dark:bg-zinc-800 text-blue-600 dark:text-blue-400 font-semibold ring-1 ring-zinc-300 dark:ring-zinc-700 shadow-2xs'
                         : 'text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100'
@@ -327,7 +327,7 @@ export default function ChatSidebar({
               <button
                 type="button"
                 onClick={onOpenSettings}
-                className="w-7 h-7 flex items-center justify-center rounded-lg text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white hover:bg-zinc-200/70 dark:hover:bg-zinc-700/60 transition-colors cursor-pointer shrink-0"
+                className="w-7 h-7 flex items-center justify-center rounded-sm text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white hover:bg-zinc-200/70 dark:hover:bg-zinc-700/60 transition-colors cursor-pointer shrink-0"
                 title={isKm ? 'ការកំណត់' : 'Settings'}
               >
                 <Settings size={14} />
@@ -361,7 +361,7 @@ export default function ChatSidebar({
             <button
               type="button"
               onClick={onOpenSettings}
-              className="w-9 h-9 flex items-center justify-center rounded-xl text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white hover:bg-zinc-200/70 dark:hover:bg-zinc-700/60 transition-colors cursor-pointer shrink-0"
+              className="w-9 h-9 flex items-center justify-center rounded-sm text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white hover:bg-zinc-200/70 dark:hover:bg-zinc-700/60 transition-colors cursor-pointer shrink-0"
               title={isKm ? 'ការកំណត់' : 'Settings'}
             >
               <Settings size={15} />

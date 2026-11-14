@@ -8,8 +8,8 @@ export default function EmptyState({
   className = '',
 }) {
   return (
-    <div className={`p-8 sm:p-12 text-center rounded-2xl border border-dashed border-slate-200 dark:border-zinc-800 bg-white/50 dark:bg-zinc-900/40 flex flex-col items-center justify-center ${className}`}>
-      <div className="w-14 h-14 rounded-2xl bg-slate-100 dark:bg-zinc-800 text-slate-400 dark:text-zinc-500 flex items-center justify-center mb-3.5">
+    <div className={`p-8 sm:p-12 text-center rounded-sm border border-dashed border-slate-200 dark:border-zinc-800 bg-white/50 dark:bg-zinc-900/40 flex flex-col items-center justify-center ${className}`}>
+      <div className="w-14 h-14 rounded-sm bg-slate-100 dark:bg-zinc-800 text-slate-400 dark:text-zinc-500 flex items-center justify-center mb-3.5">
         <Icon size={26} />
       </div>
       <h4 className="text-base font-semibold text-slate-800 dark:text-white mb-1">

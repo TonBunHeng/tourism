@@ -9,8 +9,8 @@ export default function NotFound() {
   }, []);
   return (
     <div className="min-h-screen flex items-center justify-center p-6 bg-slate-50 dark:bg-zinc-950 text-slate-800 dark:text-zinc-100">
-      <div className="w-full max-w-md p-8 rounded-3xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 shadow-xl text-center">
-        <div className="w-16 h-16 rounded-2xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mx-auto mb-5">
+      <div className="w-full max-w-md p-8 rounded-sm bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 shadow-xl text-center">
+        <div className="w-16 h-16 rounded-sm bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mx-auto mb-5">
           <Compass size={36} />
         </div>
 
@@ -24,7 +24,7 @@ export default function NotFound() {
 
         <Link
           to="/"
-          className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-[#002D62] hover:bg-[#001f44] text-white text-xs font-semibold shadow-sm transition"
+          className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-sm bg-[#002D62] hover:bg-[#001f44] text-white text-xs font-semibold shadow-sm transition"
         >
           <Home size={16} />
           <span>Return to Homepage</span>

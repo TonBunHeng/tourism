@@ -107,13 +107,13 @@ export default function AlertModal({
   return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-alert-backdrop">
       <div 
-        className="w-full max-w-sm rounded-2xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 p-6 shadow-2xl animate-alert-popup flex flex-col items-center text-center relative"
+        className="w-full max-w-sm rounded-sm bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 p-6 shadow-2xl animate-alert-popup flex flex-col items-center text-center relative"
         role="dialog"
         aria-modal="true"
       >
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-zinc-800 transition"
+          className="absolute top-4 right-4 p-1.5 rounded-sm text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-zinc-800 transition"
         >
           <X size={18} />
         </button>
@@ -135,7 +135,7 @@ export default function AlertModal({
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-zinc-700 text-sm font-medium transition cursor-pointer"
+              className="flex-1 px-4 py-2.5 rounded-sm border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-zinc-700 text-sm font-medium transition cursor-pointer"
             >
               {cancelText}
             </button>
@@ -144,7 +144,7 @@ export default function AlertModal({
           <button
             type="button"
             onClick={handleConfirm}
-            className={`flex-1 px-4 py-2.5 rounded-xl text-sm font-medium transition cursor-pointer shadow-sm ${getConfirmButtonClass()}`}
+            className={`flex-1 px-4 py-2.5 rounded-sm text-sm font-medium transition cursor-pointer shadow-sm ${getConfirmButtonClass()}`}
           >
             {finalConfirmText}
           </button>

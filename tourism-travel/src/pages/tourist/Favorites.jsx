@@ -113,14 +113,14 @@ export default function Favorites() {
 
         <Link
           to="/destinations"
-          className="px-4 py-2.5 rounded-xl bg-[#002D62] hover:bg-[#001f44] text-white text-xs font-bold shadow-sm transition self-start sm:self-auto"
+          className="px-4 py-2.5 rounded-sm bg-[#002D62] hover:bg-[#001f44] text-white text-xs font-bold shadow-sm transition self-start sm:self-auto"
         >
           Discover More Places
         </Link>
       </div>
 
       {/* Filter Tabs */}
-      <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 text-xs font-semibold overflow-x-auto w-fit">
+      <div className="flex items-center gap-1.5 p-1 rounded-sm bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 text-xs font-semibold overflow-x-auto w-fit">
         {[
           { key: 'all', label: `All (${favorites.length})` },
           { key: 'unvisited', label: 'Wishlist (To Visit)' },
@@ -130,7 +130,7 @@ export default function Favorites() {
             key={tab.key}
             type="button"
             onClick={() => setFilterVisited(tab.key)}
-            className={`px-4 py-2 rounded-xl transition cursor-pointer flex items-center gap-1.5 whitespace-nowrap ${
+            className={`px-4 py-2 rounded-sm transition cursor-pointer flex items-center gap-1.5 whitespace-nowrap ${
               filterVisited === tab.key
                 ? 'bg-[#002D62] text-white shadow-xs'
                 : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-zinc-800'
@@ -153,7 +153,7 @@ export default function Favorites() {
           action={
             <Link
               to="/destinations"
-              className="px-4 py-2 rounded-xl bg-[#002D62] hover:bg-[#001f44] text-white text-xs font-bold shadow-sm"
+              className="px-4 py-2 rounded-sm bg-[#002D62] hover:bg-[#001f44] text-white text-xs font-bold shadow-sm"
             >
               Browse Destinations
             </Link>
@@ -169,7 +169,7 @@ export default function Favorites() {
               return (
                 <div
                   key={fav.id || placeId}
-                  className="group rounded-3xl bg-white dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800 overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col justify-between"
+                  className="group rounded-sm bg-white dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800 overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col justify-between"
                 >
                   <div className="relative h-52 w-full bg-slate-100 dark:bg-zinc-800 overflow-hidden">
                     <img
@@ -192,7 +192,7 @@ export default function Favorites() {
                       <button
                         type="button"
                         onClick={(e) => handleToggleVisited(e, fav.id || placeId)}
-                        className={`px-2.5 py-1 rounded-lg backdrop-blur-md text-xs font-bold flex items-center gap-1.5 transition cursor-pointer ${
+                        className={`px-2.5 py-1 rounded-sm backdrop-blur-md text-xs font-bold flex items-center gap-1.5 transition cursor-pointer ${
                           fav.visited
                             ? 'bg-emerald-600/90 text-white shadow-sm'
                             : 'bg-black/60 text-white/90 hover:bg-black/80'
@@ -224,7 +224,7 @@ export default function Favorites() {
                       </span>
                       <Link
                         to={`/destinations/${placeId}`}
-                        className="px-4 py-2 rounded-xl bg-[#002D62] hover:bg-[#001f44] text-white text-xs font-bold transition shadow-xs"
+                        className="px-4 py-2 rounded-sm bg-[#002D62] hover:bg-[#001f44] text-white text-xs font-bold transition shadow-xs"
                       >
                         Details
                       </Link>

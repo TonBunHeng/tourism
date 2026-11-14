@@ -155,7 +155,7 @@ function Flyout({ enabled, panel, className = '', children }) {
 }
 
 const TooltipBubble = ({ children }) => (
-  <div className="px-2.5 py-1 text-xs font-medium rounded-md whitespace-nowrap shadow-md bg-gray-900 dark:bg-zinc-950 border border-gray-800 dark:border-zinc-800 text-white">
+  <div className="px-2.5 py-1 text-xs font-medium rounded-sm whitespace-nowrap shadow-md bg-gray-900 dark:bg-zinc-950 border border-gray-800 dark:border-zinc-800 text-white">
     {children}
   </div>
 );
@@ -217,7 +217,7 @@ export default function BusinessSidebar({
           type="button"
           onClick={() => setShowLogoutAlert(true)}
           aria-label={item.name}
-          className="flex items-center w-full px-3 py-1.5 rounded-md cursor-pointer transition-colors duration-150 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 hover:text-red-700 dark:hover:text-red-300"
+          className="flex items-center w-full px-3 py-1.5 rounded-sm cursor-pointer transition-colors duration-150 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 hover:text-red-700 dark:hover:text-red-300"
         >
           <div className="flex items-center w-full min-w-0">
             <div className="flex items-center justify-center w-5 h-5 shrink-0">
@@ -252,7 +252,7 @@ export default function BusinessSidebar({
         to={item.path || '#'}
         aria-label={item.name}
         aria-current={active ? 'page' : undefined}
-        className={`flex items-center px-3 py-1.5 rounded-md cursor-pointer transition-colors duration-150 ${
+        className={`flex items-center px-3 py-1.5 rounded-sm cursor-pointer transition-colors duration-150 ${
           active
             ? 'bg-blue-50 dark:bg-blue-600/15 text-[#003E83] dark:text-blue-400 font-semibold shadow-xs'
             : 'text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-zinc-800/70'
@@ -304,7 +304,7 @@ export default function BusinessSidebar({
         {/* Brand Header */}
         <div className="h-16 flex items-center justify-between px-3.5 overflow-hidden shrink-0 border-b border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 transition-colors">
           <Link to="/business/dashboard" className="flex items-center gap-2.5 w-full min-w-0">
-            <div className="w-8 h-8 rounded-md flex items-center justify-center shrink-0 bg-blue-50 dark:bg-zinc-800 border border-blue-100 dark:border-zinc-700 transition-colors">
+            <div className="w-8 h-8 rounded-sm flex items-center justify-center shrink-0 bg-blue-50 dark:bg-zinc-800 border border-blue-100 dark:border-zinc-700 transition-colors">
               <img src={tourism_app_icon} alt="AngkorVerses" className="w-7 h-7 object-contain" />
             </div>
             <div
@@ -324,7 +324,7 @@ export default function BusinessSidebar({
           <button
             type="button"
             onClick={() => setIsOpen(false)}
-            className="md:hidden p-1 rounded-md transition-colors shrink-0 text-gray-500 dark:text-zinc-400 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-gray-900 dark:hover:text-white"
+            className="md:hidden p-1 rounded-sm transition-colors shrink-0 text-gray-500 dark:text-zinc-400 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-gray-900 dark:hover:text-white"
             aria-label="Close navigation"
           >
             <X size={18} aria-hidden="true" />
@@ -356,7 +356,7 @@ export default function BusinessSidebar({
             <button
               type="button"
               onClick={() => setShowManageModal(true)}
-              className="w-full flex items-center gap-2 px-3 py-2 rounded-md text-xs font-semibold bg-blue-50 dark:bg-blue-950/40 text-[#003E83] dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/60 border border-blue-200/80 dark:border-blue-900/60 shadow-2xs transition-colors cursor-pointer"
+              className="w-full flex items-center gap-2 px-3 py-2 rounded-sm text-xs font-semibold bg-blue-50 dark:bg-blue-950/40 text-[#003E83] dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/60 border border-blue-200/80 dark:border-blue-900/60 shadow-2xs transition-colors cursor-pointer"
               title="Manage / Add Profile"
             >
               <Plus size={16} className="shrink-0 text-[#003E83] dark:text-blue-400" />
@@ -370,7 +370,7 @@ export default function BusinessSidebar({
               <button
                 type="button"
                 onClick={() => setShowManageModal(true)}
-                className="flex items-center justify-center w-full py-2 rounded-md text-[#003E83] dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40 transition cursor-pointer"
+                className="flex items-center justify-center w-full py-2 rounded-sm text-[#003E83] dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40 transition cursor-pointer"
                 aria-label="Manage / Add Profile"
               >
                 <Plus size={18} />
@@ -385,9 +385,9 @@ export default function BusinessSidebar({
             <Link
               to="/business/profile"
               aria-label="Business Owner Profile"
-              className="w-full flex items-center gap-2 p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-zinc-800/60 transition-colors overflow-hidden"
+              className="w-full flex items-center gap-2 p-1.5 rounded-sm hover:bg-gray-100 dark:hover:bg-zinc-800/60 transition-colors overflow-hidden"
             >
-              <div className="w-7 h-7 rounded-md flex items-center justify-center font-bold text-xs shrink-0 overflow-hidden bg-blue-50 dark:bg-zinc-800 text-[#003E83] dark:text-blue-400 border border-blue-100 dark:border-zinc-700">
+              <div className="w-7 h-7 rounded-sm flex items-center justify-center font-bold text-xs shrink-0 overflow-hidden bg-blue-50 dark:bg-zinc-800 text-[#003E83] dark:text-blue-400 border border-blue-100 dark:border-zinc-700">
                 {userAvatar ? (
                   <img src={userAvatar} alt="" className="w-full h-full object-cover" />
                 ) : (
@@ -416,9 +416,9 @@ export default function BusinessSidebar({
               <Link
                 to="/business/profile"
                 aria-label="Business Owner Profile"
-                className="w-full flex items-center justify-center p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-zinc-800/60 transition-colors overflow-hidden"
+                className="w-full flex items-center justify-center p-1.5 rounded-sm hover:bg-gray-100 dark:hover:bg-zinc-800/60 transition-colors overflow-hidden"
               >
-                <div className="w-7 h-7 rounded-md flex items-center justify-center font-bold text-xs shrink-0 overflow-hidden bg-blue-50 dark:bg-zinc-800 text-[#003E83] dark:text-blue-400 border border-blue-100 dark:border-zinc-700">
+                <div className="w-7 h-7 rounded-sm flex items-center justify-center font-bold text-xs shrink-0 overflow-hidden bg-blue-50 dark:bg-zinc-800 text-[#003E83] dark:text-blue-400 border border-blue-100 dark:border-zinc-700">
                   {userAvatar ? (
                     <img src={userAvatar} alt="" className="w-full h-full object-cover" />
                   ) : (

@@ -352,7 +352,7 @@ export default function TouristLayout() {
                   aria-label="Toggle destinations and exploration menu"
                   aria-expanded={activeDropdown === 'destinations'}
                   aria-controls="destinations-dropdown-menu"
-                  className="p-1 rounded text-current hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+                  className="p-1 rounded-sm text-current hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
                 >
                   <ChevronDown
                     size={14}
@@ -387,7 +387,7 @@ export default function TouristLayout() {
                   aria-label="Toggle tours and bookings menu"
                   aria-expanded={activeDropdown === 'tours'}
                   aria-controls="tours-dropdown-menu"
-                  className="p-1 rounded text-current hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+                  className="p-1 rounded-sm text-current hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
                 >
                   <ChevronDown
                     size={14}
@@ -423,7 +423,7 @@ export default function TouristLayout() {
             <button
               type="button"
               onClick={handleToggleTheme}
-              className="p-2 rounded-xl text-slate-500 hover:text-slate-800 dark:text-zinc-400 dark:hover:text-zinc-100 hover:bg-slate-100 dark:hover:bg-zinc-800 transition cursor-pointer"
+              className="p-2 rounded-sm text-slate-500 hover:text-slate-800 dark:text-zinc-400 dark:hover:text-zinc-100 hover:bg-slate-100 dark:hover:bg-zinc-800 transition cursor-pointer"
               aria-label="Toggle theme"
             >
               {isDarkTheme(theme) ? <Sun size={17} className="text-amber-400" /> : <Moon size={17} />}
@@ -433,7 +433,7 @@ export default function TouristLayout() {
               <>
                 <Link
                   to="/notifications"
-                  className="relative p-2 rounded-xl text-slate-500 hover:text-slate-800 dark:text-zinc-400 dark:hover:text-zinc-100 hover:bg-slate-100 dark:hover:bg-zinc-800 transition"
+                  className="relative p-2 rounded-sm text-slate-500 hover:text-slate-800 dark:text-zinc-400 dark:hover:text-zinc-100 hover:bg-slate-100 dark:hover:bg-zinc-800 transition"
                   title="Notifications"
                   aria-label={`Notifications${unreadCount > 0 ? `, ${unreadCount} unread` : ''}`}
                 >
@@ -453,7 +453,7 @@ export default function TouristLayout() {
                     aria-label="Open account menu"
                     aria-expanded={isProfileMenuOpen}
                     aria-controls="tourist-profile-menu"
-                    className={`flex items-center gap-2 p-1 rounded-xl hover:bg-slate-100 dark:hover:bg-zinc-800 transition cursor-pointer ${
+                    className={`flex items-center gap-2 p-1 rounded-sm hover:bg-slate-100 dark:hover:bg-zinc-800 transition cursor-pointer ${
                       location.pathname === '/profile' ? 'ring-2 ring-red-500/80 bg-red-50/30 dark:bg-red-950/20' : ''
                     }`}
                   >
@@ -470,7 +470,7 @@ export default function TouristLayout() {
                   {isProfileMenuOpen && (
                     <div
                       id="tourist-profile-menu"
-                      className="absolute right-0 mt-2 w-56 rounded-2xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 shadow-xl py-2 z-50 animate-dropdown"
+                      className="absolute right-0 mt-2 w-56 rounded-sm bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 shadow-xl py-2 z-50 animate-dropdown"
                       onMouseLeave={() => setIsProfileMenuOpen(false)}
                     >
                       <div className="px-4 py-2 border-b border-slate-100 dark:border-zinc-800">
@@ -577,13 +577,13 @@ export default function TouristLayout() {
               <div className="flex items-center gap-2">
                 <Link
                   to="/login"
-                  className="px-3 py-1.5 rounded-lg text-xs font-bold text-[#002D62] dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-zinc-800 transition"
+                  className="px-3 py-1.5 rounded-sm text-xs font-bold text-[#002D62] dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-zinc-800 transition"
                 >
                   Sign In
                 </Link>
                 <Link
                   to="/register"
-                  className="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-[#002D62] hover:bg-[#001f44] text-white shadow-xs transition"
+                  className="px-3.5 py-1.5 rounded-sm text-xs font-bold bg-[#002D62] hover:bg-[#001f44] text-white shadow-xs transition"
                 >
                   Register
                 </Link>
@@ -594,7 +594,7 @@ export default function TouristLayout() {
             <button
               type="button"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="lg:hidden p-2 rounded-xl text-slate-600 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-zinc-800 transition cursor-pointer"
+              className="lg:hidden p-2 rounded-sm text-slate-600 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-zinc-800 transition cursor-pointer"
               aria-label={isMobileMenuOpen ? 'Close mobile menu' : 'Open mobile menu'}
               aria-expanded={isMobileMenuOpen}
               aria-controls="tourist-mobile-navigation"
@@ -615,7 +615,7 @@ export default function TouristLayout() {
             onMouseLeave={handleCloseDropdown}
           >
             <div className="max-w-4xl mx-auto px-4">
-              <div className="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl border border-slate-200/80 dark:border-zinc-800 p-6 animate-dropdown">
+              <div className="bg-white dark:bg-zinc-900 rounded-sm shadow-2xl border border-slate-200/80 dark:border-zinc-800 p-6 animate-dropdown">
                 <div className="flex items-center justify-between border-b border-slate-100 dark:border-zinc-800 pb-3 mb-4">
                   <div>
                     <h3 className="text-base font-extrabold text-[#002D62] dark:text-blue-400 tracking-wide">
@@ -628,7 +628,7 @@ export default function TouristLayout() {
                   <Link
                     to="/destinations"
                     onClick={() => setActiveDropdown(null)}
-                    className="px-3.5 py-1.5 rounded-xl bg-[#002D62] hover:bg-[#001f44] text-white text-xs font-bold transition shadow-xs"
+                    className="px-3.5 py-1.5 rounded-sm bg-[#002D62] hover:bg-[#001f44] text-white text-xs font-bold transition shadow-xs"
                   >
                     View All
                   </Link>
@@ -644,14 +644,14 @@ export default function TouristLayout() {
                         key={item.to}
                         to={item.to}
                         onClick={() => setActiveDropdown(null)}
-                        className={`group flex items-start gap-3 p-3 rounded-xl transition ${
+                        className={`group flex items-start gap-3 p-3 rounded-sm transition ${
                           active
                             ? 'bg-red-50/80 dark:bg-red-950/40 ring-1 ring-red-200 dark:ring-red-900/60 shadow-xs'
                             : 'hover:bg-slate-50 dark:hover:bg-zinc-800'
                         }`}
                       >
                         <div
-                          className={`p-2 rounded-xl transition-all ${
+                          className={`p-2 rounded-sm transition-all ${
                             active
                               ? 'bg-red-600 text-white shadow-xs scale-105'
                               : `${item.iconClass} group-hover:scale-105`
@@ -699,7 +699,7 @@ export default function TouristLayout() {
             onMouseLeave={handleCloseDropdown}
           >
             <div className="max-w-4xl mx-auto px-4">
-              <div className="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl border border-slate-200/80 dark:border-zinc-800 p-6 animate-dropdown">
+              <div className="bg-white dark:bg-zinc-900 rounded-sm shadow-2xl border border-slate-200/80 dark:border-zinc-800 p-6 animate-dropdown">
                 <div className="flex items-center justify-between border-b border-slate-100 dark:border-zinc-800 pb-3 mb-4">
                   <div>
                     <h3 className="text-base font-extrabold text-[#002D62] dark:text-blue-400 tracking-wide">
@@ -712,7 +712,7 @@ export default function TouristLayout() {
                   <Link
                     to="/tours"
                     onClick={() => setActiveDropdown(null)}
-                    className="px-3.5 py-1.5 rounded-xl bg-[#002D62] hover:bg-[#001f44] text-white text-xs font-bold transition shadow-xs"
+                    className="px-3.5 py-1.5 rounded-sm bg-[#002D62] hover:bg-[#001f44] text-white text-xs font-bold transition shadow-xs"
                   >
                     View All
                   </Link>
@@ -728,14 +728,14 @@ export default function TouristLayout() {
                         key={item.to}
                         to={item.to}
                         onClick={() => setActiveDropdown(null)}
-                        className={`group flex items-start gap-3 p-3 rounded-xl transition ${
+                        className={`group flex items-start gap-3 p-3 rounded-sm transition ${
                           active
                             ? 'bg-red-50/80 dark:bg-red-950/40 ring-1 ring-red-200 dark:ring-red-900/60 shadow-xs'
                             : 'hover:bg-slate-50 dark:hover:bg-zinc-800'
                         }`}
                       >
                         <div
-                          className={`p-2 rounded-xl transition-all ${
+                          className={`p-2 rounded-sm transition-all ${
                             active
                               ? 'bg-red-600 text-white shadow-xs scale-105'
                               : `${item.iconClass} group-hover:scale-105`
@@ -781,7 +781,7 @@ export default function TouristLayout() {
             <Link
               to="/"
               onClick={() => setIsMobileMenuOpen(false)}
-              className={`flex items-center justify-between px-3 py-2 rounded-xl text-sm font-bold transition ${
+              className={`flex items-center justify-between px-3 py-2 rounded-sm text-sm font-bold transition ${
                 isExploreActive
                   ? 'bg-red-50 dark:bg-red-950/50 text-red-600 dark:text-red-400'
                   : 'text-slate-800 dark:text-white hover:bg-slate-100 dark:hover:bg-zinc-800'
@@ -804,7 +804,7 @@ export default function TouristLayout() {
                     key={item.to}
                     to={item.to}
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className={`flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition ${
+                    className={`flex items-center gap-3 px-3 py-2 rounded-sm text-xs font-semibold transition ${
                       active
                         ? 'bg-red-50 dark:bg-red-950/50 text-red-600 dark:text-red-400 font-bold'
                         : 'text-slate-700 dark:text-zinc-200 hover:bg-slate-100 dark:hover:bg-zinc-800'
@@ -830,7 +830,7 @@ export default function TouristLayout() {
                     key={item.to}
                     to={item.to}
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className={`flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition ${
+                    className={`flex items-center gap-3 px-3 py-2 rounded-sm text-xs font-semibold transition ${
                       active
                         ? 'bg-red-50 dark:bg-red-950/50 text-red-600 dark:text-red-400 font-bold'
                         : 'text-slate-700 dark:text-zinc-200 hover:bg-slate-100 dark:hover:bg-zinc-800'
@@ -847,7 +847,7 @@ export default function TouristLayout() {
               <Link
                 to="/support"
                 onClick={() => setIsMobileMenuOpen(false)}
-                className={`block px-3 py-2 rounded-xl text-xs font-semibold transition ${
+                className={`block px-3 py-2 rounded-sm text-xs font-semibold transition ${
                   isSupportActive
                     ? 'bg-red-50 dark:bg-red-950/50 text-red-600 dark:text-red-400 font-bold'
                     : 'text-slate-600 dark:text-zinc-400 hover:bg-slate-100 dark:hover:bg-zinc-800'
@@ -920,13 +920,13 @@ export default function TouristLayout() {
                 Emergency & Safe Travel
               </h4>
               <div className="space-y-2 text-xs text-slate-600 dark:text-zinc-400">
-                <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-zinc-900 border border-slate-200/60 dark:border-zinc-800">
+                <div className="p-2.5 rounded-sm bg-slate-50 dark:bg-zinc-900 border border-slate-200/60 dark:border-zinc-800">
                   <div className="font-semibold text-slate-800 dark:text-zinc-200 flex items-center justify-between">
                     <span>Tourist Police Helpline</span>
                     <span className="font-mono text-[#002D62] dark:text-blue-400 font-bold">117</span>
                   </div>
                 </div>
-                <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-zinc-900 border border-slate-200/60 dark:border-zinc-800">
+                <div className="p-2.5 rounded-sm bg-slate-50 dark:bg-zinc-900 border border-slate-200/60 dark:border-zinc-800">
                   <div className="font-semibold text-slate-800 dark:text-zinc-200 flex items-center justify-between">
                     <span>Emergency Ambulance</span>
                     <span className="font-mono text-emerald-600 dark:text-emerald-400 font-bold">119</span>

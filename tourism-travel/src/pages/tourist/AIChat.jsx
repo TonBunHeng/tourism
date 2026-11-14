@@ -15,6 +15,9 @@ import {
   generateSessionId, 
   createChatMessage, 
   getTopicsForLanguage,
+  formatSuggestedTopic,
+  TOPICS_EN,
+  TOPICS_KM,
   DEFAULT_USER_PROFILE 
 } from '../../utils/chatUtils';
 import { setPageTitle } from '../../utils/PagesTitle';
@@ -256,6 +259,43 @@ export default function AIChat() {
     setTimeout(() => {
       setIsRefreshingTopics(false);
     }, 400);
+  };
+
+  // Refresh dynamic suggestions for a specific assistant message
+  const handleRefreshMessageSuggestions = async (messageId, msg) => {
+    try {
+      const msgText = msg?.content || '';
+      const isMsgKm = isKm || /[\u1780-\u17FF]/.test(msgText);
+      const currentTexts = (msg?.suggestions || []).map((s) => (typeof s === 'string' ? s : s.title || s.text || s.query || ''));
+
+      const res = await aiChatService.getSuggestions({
+        message: msgText,
+        answer: msgText,
+        sessionId,
+        language: isMsgKm ? 'km' : language,
+        refresh: true,
+        currentSuggestions: currentTexts,
+      });
+
+      if (res?.suggestions?.length > 0) {
+        setMessages((prev) =>
+          prev.map((m) =>
+            m.id === messageId ? { ...m, suggestions: res.suggestions, topic: res.topic || m.topic } : m
+          )
+        );
+      } else {
+        const pool = isMsgKm ? TOPICS_KM : TOPICS_EN;
+        const shuffled = [...pool].sort(() => Math.random() - 0.5).slice(0, 4);
+        const formatted = shuffled.map((item) => formatSuggestedTopic(item, isMsgKm ? 'km' : language));
+        setMessages((prev) =>
+          prev.map((m) =>
+            m.id === messageId ? { ...m, suggestions: formatted } : m
+          )
+        );
+      }
+    } catch (err) {
+      console.error('Error refreshing message suggestions:', err);
+    }
   };
 
   // Send a message (Streaming SSE with full fallback)
@@ -556,9 +596,9 @@ export default function AIChat() {
                           key={item.id || idx}
                           type="button"
                           onClick={() => handleSendMessage(item.prompt || item.title)}
-                          className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl bg-white dark:bg-[#212121] border border-zinc-200/90 dark:border-zinc-800 text-xs sm:text-[13px] text-zinc-700 dark:text-zinc-300 hover:border-zinc-400 dark:hover:border-zinc-600 hover:text-zinc-900 dark:hover:text-white shadow-2xs hover:shadow-xs transition-all duration-200 active:scale-95 cursor-pointer text-left group"
+                          className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-sm bg-white dark:bg-[#212121] border border-zinc-200/90 dark:border-zinc-800 text-xs sm:text-[13px] text-zinc-700 dark:text-zinc-300 hover:border-zinc-400 dark:hover:border-zinc-600 hover:text-zinc-900 dark:hover:text-white shadow-2xs hover:shadow-xs transition-all duration-200 active:scale-95 cursor-pointer text-left group"
                         >
-                          <div className="w-7 h-7 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center shrink-0 text-zinc-600 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-white transition-colors">
+                          <div className="w-7 h-7 rounded-sm bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center shrink-0 text-zinc-600 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-white transition-colors">
                             <IconComponent size={14} className="group-hover:scale-110 transition-transform duration-200" />
                           </div>
                           <span className="font-medium line-clamp-2 leading-snug">
@@ -589,6 +629,7 @@ export default function AIChat() {
                       onRegenerate={handleRegenerate}
                       onSelectSuggestion={handleSendMessage}
                       onEditMessage={handleEditMessage}
+                      onRefreshSuggestions={handleRefreshMessageSuggestions}
                     />
                   ))}
 
@@ -599,7 +640,7 @@ export default function AIChat() {
 
                   {/* Error Notification Banner */}
                   {errorWarning && (
-                    <div className="p-3 mb-4 rounded-xl bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900/40 flex items-start gap-2 text-xs text-rose-700 dark:text-rose-300 animate-in fade-in">
+                    <div className="p-3 mb-4 rounded-sm bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900/40 flex items-start gap-2 text-xs text-rose-700 dark:text-rose-300 animate-in fade-in">
                       <AlertCircle size={15} className="text-rose-500 shrink-0 mt-0.5" />
                       <div>
                         <p className="font-bold">{isKm ? 'មានបញ្ហាក្នុងការតភ្ជាប់' : 'Connection Warning'}</p>

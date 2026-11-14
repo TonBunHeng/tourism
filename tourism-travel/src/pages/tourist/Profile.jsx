@@ -191,7 +191,7 @@ export default function Profile() {
         <button
           type="button"
           onClick={() => logout()}
-          className="px-4 py-2.5 rounded-xl border border-rose-200 dark:border-rose-900/60 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 text-xs font-bold transition flex items-center gap-1.5 cursor-pointer self-start sm:self-auto"
+          className="px-4 py-2.5 rounded-sm border border-rose-200 dark:border-rose-900/60 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 text-xs font-bold transition flex items-center gap-1.5 cursor-pointer self-start sm:self-auto"
         >
           <LogOut size={14} />
           <span>Sign Out</span>
@@ -199,7 +199,7 @@ export default function Profile() {
       </div>
 
       {/* Profile Overview Card (Hero Banner) */}
-      <div className="p-6 sm:p-8 rounded-3xl bg-white dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800 shadow-xs hover:shadow-md transition-all flex flex-col md:flex-row items-center justify-between gap-6">
+      <div className="p-6 sm:p-8 rounded-sm bg-white dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800 shadow-xs hover:shadow-md transition-all flex flex-col md:flex-row items-center justify-between gap-6">
         <div className="flex flex-col sm:flex-row items-center gap-5 text-center sm:text-left">
           <div className="relative group">
             <div className="w-20 h-20 rounded-full bg-gradient-to-tr from-[#002D62] to-blue-600 text-white flex items-center justify-center text-2xl font-black ring-4 ring-blue-500/20 overflow-hidden shadow-md">
@@ -252,28 +252,28 @@ export default function Profile() {
         <div className="flex flex-wrap items-center gap-2.5 w-full md:w-auto justify-center">
           <Link
             to="/trips"
-            className="px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-zinc-800 hover:bg-slate-200 dark:hover:bg-zinc-700 text-slate-700 dark:text-zinc-200 text-xs font-bold transition flex items-center gap-1.5"
+            className="px-3.5 py-2 rounded-sm bg-slate-100 dark:bg-zinc-800 hover:bg-slate-200 dark:hover:bg-zinc-700 text-slate-700 dark:text-zinc-200 text-xs font-bold transition flex items-center gap-1.5"
           >
             <Compass size={14} className="text-[#002D62] dark:text-blue-400" />
             <span>Trip Planner</span>
           </Link>
           <Link
             to="/bookings"
-            className="px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-zinc-800 hover:bg-slate-200 dark:hover:bg-zinc-700 text-slate-700 dark:text-zinc-200 text-xs font-bold transition flex items-center gap-1.5"
+            className="px-3.5 py-2 rounded-sm bg-slate-100 dark:bg-zinc-800 hover:bg-slate-200 dark:hover:bg-zinc-700 text-slate-700 dark:text-zinc-200 text-xs font-bold transition flex items-center gap-1.5"
           >
             <CalendarCheck size={14} className="text-[#002D62] dark:text-blue-400" />
             <span>My Bookings</span>
           </Link>
           <Link
             to="/achievements"
-            className="px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-zinc-800 hover:bg-slate-200 dark:hover:bg-zinc-700 text-slate-700 dark:text-zinc-200 text-xs font-bold transition flex items-center gap-1.5"
+            className="px-3.5 py-2 rounded-sm bg-slate-100 dark:bg-zinc-800 hover:bg-slate-200 dark:hover:bg-zinc-700 text-slate-700 dark:text-zinc-200 text-xs font-bold transition flex items-center gap-1.5"
           >
             <Award size={14} className="text-amber-500" />
             <span>Badges</span>
           </Link>
           <Link
             to="/favorites"
-            className="px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-zinc-800 hover:bg-slate-200 dark:hover:bg-zinc-700 text-slate-700 dark:text-zinc-200 text-xs font-bold transition flex items-center gap-1.5"
+            className="px-3.5 py-2 rounded-sm bg-slate-100 dark:bg-zinc-800 hover:bg-slate-200 dark:hover:bg-zinc-700 text-slate-700 dark:text-zinc-200 text-xs font-bold transition flex items-center gap-1.5"
           >
             <Heart size={14} className="text-rose-500" />
             <span>Saved Wishlist</span>
@@ -284,7 +284,7 @@ export default function Profile() {
       {/* 3 Main Settings Cards (Top 3 Grid matching Festivals & Events / Destinations) */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch">
         {/* Card 1: Profile Details & Preferences */}
-        <div className="flex flex-col justify-between rounded-3xl bg-white dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800 shadow-xs hover:shadow-md transition-all overflow-hidden">
+        <div className="flex flex-col justify-between rounded-sm bg-white dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800 shadow-xs hover:shadow-md transition-all overflow-hidden">
           <form onSubmit={handleProfileSubmit} className="flex flex-col h-full justify-between">
             <div>
               {/* Card Header */}
@@ -312,7 +312,7 @@ export default function Profile() {
                     required
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800 text-xs sm:text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#002D62]"
+                    className="w-full px-4 py-2.5 rounded-sm border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800 text-xs sm:text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#002D62]"
                   />
                 </div>
 
@@ -325,7 +325,7 @@ export default function Profile() {
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     placeholder="+855 12 345 678"
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800 text-xs sm:text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#002D62]"
+                    className="w-full px-4 py-2.5 rounded-sm border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800 text-xs sm:text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#002D62]"
                   />
                 </div>
 
@@ -336,7 +336,7 @@ export default function Profile() {
                   <select
                     value={location}
                     onChange={(e) => setLocation(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800 text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#002D62]"
+                    className="w-full px-4 py-2.5 rounded-sm border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800 text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#002D62]"
                   >
                     <option value="Siem Reap">Siem Reap</option>
                     <option value="Phnom Penh">Phnom Penh</option>
@@ -356,7 +356,7 @@ export default function Profile() {
                   </label>
                   <select
                     defaultValue="en"
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800 text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#002D62]"
+                    className="w-full px-4 py-2.5 rounded-sm border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800 text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#002D62]"
                   >
                     <option value="en">English (Official)</option>
                     <option value="km">ខ្មែរ (Khmer)</option>
@@ -374,7 +374,7 @@ export default function Profile() {
                     value={bio}
                     onChange={(e) => setBio(e.target.value)}
                     placeholder="e.g. Passionate explorer fascinated by ancient Khmer temples..."
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800 text-xs sm:text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#002D62]"
+                    className="w-full px-4 py-2.5 rounded-sm border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800 text-xs sm:text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#002D62]"
                   />
                 </div>
               </div>
@@ -385,7 +385,7 @@ export default function Profile() {
               <button
                 type="submit"
                 disabled={isUpdatingProfile}
-                className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-[#002D62] hover:bg-[#001f44] disabled:opacity-50 text-white text-xs font-bold shadow-sm transition flex items-center justify-center gap-2 cursor-pointer"
+                className="w-full sm:w-auto px-6 py-2.5 rounded-sm bg-[#002D62] hover:bg-[#001f44] disabled:opacity-50 text-white text-xs font-bold shadow-sm transition flex items-center justify-center gap-2 cursor-pointer"
               >
                 {isUpdatingProfile ? <Loader2 size={15} className="animate-spin" /> : <Save size={15} />}
                 <span>Save Changes</span>
@@ -395,7 +395,7 @@ export default function Profile() {
         </div>
 
         {/* Card 2: Password & Security */}
-        <div className="flex flex-col justify-between rounded-3xl bg-white dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800 shadow-xs hover:shadow-md transition-all overflow-hidden">
+        <div className="flex flex-col justify-between rounded-sm bg-white dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800 shadow-xs hover:shadow-md transition-all overflow-hidden">
           <form onSubmit={handlePasswordSubmit} className="flex flex-col h-full justify-between">
             <div>
               {/* Card Header */}
@@ -415,10 +415,10 @@ export default function Profile() {
               {/* Card Body */}
               <div className="p-6 space-y-4">
                 {/* Google OAuth Section */}
-                <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-zinc-800/60 border border-slate-200/80 dark:border-zinc-700/60 space-y-2.5">
+                <div className="p-3.5 rounded-sm bg-slate-50 dark:bg-zinc-800/60 border border-slate-200/80 dark:border-zinc-700/60 space-y-2.5">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2.5">
-                      <div className="w-8 h-8 rounded-xl bg-white dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 flex items-center justify-center shadow-xs">
+                      <div className="w-8 h-8 rounded-sm bg-white dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 flex items-center justify-center shadow-xs">
                         <GoogleIcon className="w-4 h-4" />
                       </div>
                       <div>
@@ -440,7 +440,7 @@ export default function Profile() {
                     <button
                       type="button"
                       onClick={handleDisconnectGoogle}
-                      className="w-full py-1.5 rounded-xl border border-rose-200 dark:border-rose-900/60 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 text-[11px] font-bold transition cursor-pointer"
+                      className="w-full py-1.5 rounded-sm border border-rose-200 dark:border-rose-900/60 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 text-[11px] font-bold transition cursor-pointer"
                     >
                       Disconnect Google
                     </button>
@@ -464,7 +464,7 @@ export default function Profile() {
                       value={currentPassword}
                       onChange={(e) => setCurrentPassword(e.target.value)}
                       placeholder="Enter current password"
-                      className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800 text-xs sm:text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#002D62] transition"
+                      className="w-full px-4 py-2.5 rounded-sm border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800 text-xs sm:text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#002D62] transition"
                     />
                   </div>
 
@@ -478,7 +478,7 @@ export default function Profile() {
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
                       placeholder="At least 8 characters"
-                      className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800 text-xs sm:text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#002D62] transition"
+                      className="w-full px-4 py-2.5 rounded-sm border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800 text-xs sm:text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#002D62] transition"
                     />
                   </div>
 
@@ -492,7 +492,7 @@ export default function Profile() {
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       placeholder="Re-enter new password"
-                      className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800 text-xs sm:text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#002D62] transition"
+                      className="w-full px-4 py-2.5 rounded-sm border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800 text-xs sm:text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#002D62] transition"
                     />
                   </div>
                 </div>
@@ -504,7 +504,7 @@ export default function Profile() {
               <button
                 type="submit"
                 disabled={isUpdatingPassword}
-                className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-[#002D62] hover:bg-[#001f44] disabled:opacity-50 text-white text-xs font-bold shadow-sm transition flex items-center justify-center gap-2 cursor-pointer"
+                className="w-full sm:w-auto px-6 py-2.5 rounded-sm bg-[#002D62] hover:bg-[#001f44] disabled:opacity-50 text-white text-xs font-bold shadow-sm transition flex items-center justify-center gap-2 cursor-pointer"
               >
                 {isUpdatingPassword ? <Loader2 size={15} className="animate-spin" /> : <Lock size={15} />}
                 <span>Update Password</span>
@@ -514,7 +514,7 @@ export default function Profile() {
         </div>
 
         {/* Card 3: Privacy & Erasure */}
-        <div className="flex flex-col justify-between rounded-3xl bg-white dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800 shadow-xs hover:shadow-md transition-all overflow-hidden">
+        <div className="flex flex-col justify-between rounded-sm bg-white dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800 shadow-xs hover:shadow-md transition-all overflow-hidden">
           <form onSubmit={handleDeleteAccountRequest} className="flex flex-col h-full justify-between">
             <div>
               {/* Card Header */}
@@ -533,7 +533,7 @@ export default function Profile() {
 
               {/* Card Body */}
               <div className="p-6 space-y-4">
-                <div className="p-4 rounded-2xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 text-xs text-rose-800 dark:text-rose-200 leading-relaxed">
+                <div className="p-4 rounded-sm bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 text-xs text-rose-800 dark:text-rose-200 leading-relaxed">
                   <strong className="block mb-1 font-bold">Important Notice:</strong>
                   Account deletion requests are reviewed and fulfilled by the Ministry Super Administrator. Upon processing, all your personal details, tour bookings history, reviews, and activity records will be irreversibly removed.
                 </div>
@@ -547,7 +547,7 @@ export default function Profile() {
                     value={deletionReason}
                     onChange={(e) => setDeletionReason(e.target.value)}
                     placeholder="Please specify why you want to delete your account (e.g. data privacy preference, travel completed)..."
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800 text-xs sm:text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-500 transition"
+                    className="w-full px-4 py-2.5 rounded-sm border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800 text-xs sm:text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-500 transition"
                   />
                 </div>
               </div>
@@ -558,7 +558,7 @@ export default function Profile() {
               <button
                 type="submit"
                 disabled={isSubmittingDeletion}
-                className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 disabled:opacity-50 text-white text-xs font-bold shadow-sm transition flex items-center justify-center gap-2 cursor-pointer"
+                className="w-full sm:w-auto px-6 py-2.5 rounded-sm bg-rose-600 hover:bg-rose-700 disabled:opacity-50 text-white text-xs font-bold shadow-sm transition flex items-center justify-center gap-2 cursor-pointer"
               >
                 {isSubmittingDeletion ? <Loader2 size={15} className="animate-spin" /> : <ShieldAlert size={15} />}
                 <span>{isSubmittingDeletion ? 'Submitting...' : 'Submit Request'}</span>

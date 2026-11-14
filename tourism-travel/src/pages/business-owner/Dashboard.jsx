@@ -223,14 +223,14 @@ export default function BusinessDashboard() {
           <div className="flex items-center gap-2.5 self-start sm:self-auto">
             <Link
               to="/business/listings"
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-md bg-[#003E83] hover:bg-[#002e62] text-white text-xs sm:text-sm font-medium shadow-xs transition-colors cursor-pointer"
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-sm bg-[#003E83] hover:bg-[#002e62] text-white text-xs sm:text-sm font-medium shadow-xs transition-colors cursor-pointer"
             >
               <Plus size={16} />
               <span>Add Service</span>
             </Link>
             <Link
               to="/business/profile"
-              className="flex items-center gap-1.5 px-3.5 py-2 border border-gray-200 dark:border-zinc-700 rounded-md bg-white dark:bg-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-700/60 text-gray-700 dark:text-zinc-200 text-xs sm:text-sm font-medium shadow-xs transition-colors cursor-pointer"
+              className="flex items-center gap-1.5 px-3.5 py-2 border border-gray-200 dark:border-zinc-700 rounded-sm bg-white dark:bg-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-700/60 text-gray-700 dark:text-zinc-200 text-xs sm:text-sm font-medium shadow-xs transition-colors cursor-pointer"
             >
               <span>Edit Profile</span>
             </Link>
@@ -245,7 +245,7 @@ export default function BusinessDashboard() {
           return (
             <div
               key={idx}
-              className="bg-white dark:bg-zinc-900 rounded-md p-4 shadow-xs border border-gray-200 dark:border-zinc-800 flex flex-col justify-between"
+              className="bg-white dark:bg-zinc-900 rounded-sm p-4 shadow-xs border border-gray-200 dark:border-zinc-800 flex flex-col justify-between"
             >
               <div className="flex items-center justify-between gap-2">
                 <div className="min-w-0">
@@ -256,7 +256,7 @@ export default function BusinessDashboard() {
                     {stat.value}
                   </p>
                 </div>
-                <div className={`p-2 rounded-md shrink-0 ${stat.bg}`}>
+                <div className={`p-2 rounded-sm shrink-0 ${stat.bg}`}>
                   <Icon className={`w-4 h-4 md:w-5 md:h-5 ${stat.color}`} />
                 </div>
               </div>
@@ -290,9 +290,9 @@ export default function BusinessDashboard() {
               <Link
                 key={index}
                 to={sc.path}
-                className="bg-white dark:bg-zinc-900 rounded-md p-3.5 border border-gray-200 dark:border-zinc-800 shadow-xs hover:border-blue-400 dark:hover:border-blue-500 transition-all flex flex-col items-start group"
+                className="bg-white dark:bg-zinc-900 rounded-sm p-3.5 border border-gray-200 dark:border-zinc-800 shadow-xs hover:border-blue-400 dark:hover:border-blue-500 transition-all flex flex-col items-start group"
               >
-                <div className={`p-2 rounded-md ${sc.bg} mb-2.5 transition-transform group-hover:scale-105`}>
+                <div className={`p-2 rounded-sm ${sc.bg} mb-2.5 transition-transform group-hover:scale-105`}>
                   <Icon className={`w-4 h-4 ${sc.color}`} />
                 </div>
                 <span className="text-xs font-bold text-gray-900 dark:text-white group-hover:text-[#003E83] dark:group-hover:text-blue-400 transition-colors">
@@ -310,7 +310,7 @@ export default function BusinessDashboard() {
       {/* Main Operations Split: Recent Bookings & Reviews */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Recent Customer Bookings Table */}
-        <div className="lg:col-span-2 bg-white dark:bg-zinc-900 rounded-md border border-gray-200 dark:border-zinc-800 shadow-xs p-4 sm:p-5 flex flex-col justify-between">
+        <div className="lg:col-span-2 bg-white dark:bg-zinc-900 rounded-sm border border-gray-200 dark:border-zinc-800 shadow-xs p-4 sm:p-5 flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between pb-3.5 border-b border-gray-100 dark:border-zinc-800 mb-3">
               <div>
@@ -384,14 +384,14 @@ export default function BusinessDashboard() {
                           <button
                             type="button"
                             onClick={() => handleConfirmBooking(b.id)}
-                            className="px-2.5 py-1.5 rounded-md bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold transition cursor-pointer"
+                            className="px-2.5 py-1.5 rounded-sm bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold transition cursor-pointer"
                           >
                             Confirm
                           </button>
                           <button
                             type="button"
                             onClick={() => handleRejectBooking(b.id)}
-                            className="px-2.5 py-1.5 rounded-md border border-rose-200 dark:border-rose-900 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 text-xs font-semibold transition cursor-pointer"
+                            className="px-2.5 py-1.5 rounded-sm border border-rose-200 dark:border-rose-900 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 text-xs font-semibold transition cursor-pointer"
                           >
                             Decline
                           </button>
@@ -399,7 +399,7 @@ export default function BusinessDashboard() {
                       ) : (
                         <Link
                           to="/business/bookings"
-                          className="px-2.5 py-1.5 rounded-md border border-gray-200 dark:border-zinc-700 text-gray-700 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-800 text-xs font-semibold transition"
+                          className="px-2.5 py-1.5 rounded-sm border border-gray-200 dark:border-zinc-700 text-gray-700 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-800 text-xs font-semibold transition"
                         >
                           Details
                         </Link>
@@ -413,7 +413,7 @@ export default function BusinessDashboard() {
         </div>
 
         {/* Customer Feedback & Performance Summary */}
-        <div className="bg-white dark:bg-zinc-900 rounded-md border border-gray-200 dark:border-zinc-800 shadow-xs p-4 sm:p-5 flex flex-col justify-between space-y-4">
+        <div className="bg-white dark:bg-zinc-900 rounded-sm border border-gray-200 dark:border-zinc-800 shadow-xs p-4 sm:p-5 flex flex-col justify-between space-y-4">
           <div>
             <div className="flex items-center justify-between pb-3.5 border-b border-gray-100 dark:border-zinc-800 mb-3">
               <h3 className="text-sm sm:text-base font-bold text-gray-900 dark:text-white">
@@ -428,7 +428,7 @@ export default function BusinessDashboard() {
             </div>
 
             {recentReviews.length === 0 ? (
-              <div className="p-6 text-center rounded-md border border-dashed border-gray-200 dark:border-zinc-800 text-xs text-gray-400 dark:text-zinc-500">
+              <div className="p-6 text-center rounded-sm border border-dashed border-gray-200 dark:border-zinc-800 text-xs text-gray-400 dark:text-zinc-500">
                 No customer reviews recorded yet.
               </div>
             ) : (
@@ -436,7 +436,7 @@ export default function BusinessDashboard() {
                 {recentReviews.map((r) => (
                   <div
                     key={r.id}
-                    className="p-3 rounded-md bg-gray-50 dark:bg-zinc-800/60 border border-gray-200 dark:border-zinc-700/60 text-xs space-y-1"
+                    className="p-3 rounded-sm bg-gray-50 dark:bg-zinc-800/60 border border-gray-200 dark:border-zinc-700/60 text-xs space-y-1"
                   >
                     <div className="flex items-center justify-between">
                       <span className="font-semibold text-gray-800 dark:text-zinc-200">
@@ -457,7 +457,7 @@ export default function BusinessDashboard() {
           </div>
 
           {/* Quick Action Box */}
-          <div className="p-3.5 rounded-md bg-blue-50/70 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-900/60 text-xs space-y-1.5">
+          <div className="p-3.5 rounded-sm bg-blue-50/70 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-900/60 text-xs space-y-1.5">
             <span className="font-bold text-[#003E83] dark:text-blue-300 block">
               Financial Statements
             </span>

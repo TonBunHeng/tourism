@@ -36,6 +36,8 @@ import {
   createChatMessage,
   formatSuggestedTopic,
   getTopicsForLanguage,
+  TOPICS_EN,
+  TOPICS_KM,
   CAMBODIA_PROVINCES
 } from '../../utils/chatUtils';
 
@@ -157,18 +159,26 @@ export default function AngkorGenieFloatingWidget() {
         }
       }
 
-      const currentTexts = (msg.suggestions || []).map((s) => (typeof s === 'string' ? s : s.text || s.query || ''));
+      const isMsgKm = isKm || /[\u1780-\u17FF]/.test(msg?.content || '');
+      const currentTexts = (msg.suggestions || []).map((s) => (typeof s === 'string' ? s : s.text || s.query || s.title || ''));
       const res = await aiChatService.getSuggestions({
         message: userPrompt,
         answer: msg.content,
         sessionId,
         refresh: true,
         currentSuggestions: currentTexts,
-        language: 'en',
+        language: isMsgKm ? 'km' : (language || 'en'),
       });
 
       if (res?.suggestions?.length > 0) {
-        const formatted = res.suggestions.map(formatSuggestedTopic).filter(Boolean);
+        const formatted = res.suggestions.map((s) => formatSuggestedTopic(s, isMsgKm ? 'km' : language)).filter(Boolean);
+        setMessages((prev) =>
+          prev.map((m, idx) => (idx === msgIndex ? { ...m, suggestions: formatted } : m))
+        );
+      } else {
+        const pool = isMsgKm ? TOPICS_KM : TOPICS_EN;
+        const shuffled = [...pool].sort(() => Math.random() - 0.5).slice(0, 4);
+        const formatted = shuffled.map((s) => formatSuggestedTopic(s, isMsgKm ? 'km' : language)).filter(Boolean);
         setMessages((prev) =>
           prev.map((m, idx) => (idx === msgIndex ? { ...m, suggestions: formatted } : m))
         );
@@ -455,7 +465,7 @@ export default function AngkorGenieFloatingWidget() {
             </div>
 
             {/* Hover Tooltip */}
-            <span className="absolute right-full mr-3 px-3 py-1.5 rounded-xl bg-slate-900/90 text-white text-xs font-semibold whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-lg backdrop-blur-xs">
+            <span className="absolute right-full mr-3 px-3 py-1.5 rounded-sm bg-slate-900/90 text-white text-xs font-semibold whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-lg backdrop-blur-xs">
               Chat with AngkorVers AI
             </span>
           </button>
@@ -465,12 +475,12 @@ export default function AngkorGenieFloatingWidget() {
       {/* Floating Drawer / Card Widget */}
       {isOpen && (
         <div 
-          className="fixed bottom-5 right-5 z-50 w-[94vw] sm:w-[460px] md:w-[480px] h-[640px] max-h-[88vh] bg-[#f8fafc] dark:bg-[#18181b] rounded-3xl shadow-[0_25px_60px_-15px_rgba(0,0,0,0.35)] border border-slate-200 dark:border-zinc-800 flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200 font-sans text-zinc-900 dark:text-zinc-100"
+          className="fixed bottom-5 right-5 z-50 w-[94vw] sm:w-[460px] md:w-[480px] h-[640px] max-h-[88vh] bg-[#f8fafc] dark:bg-[#18181b] rounded-sm shadow-[0_25px_60px_-15px_rgba(0,0,0,0.35)] border border-slate-200 dark:border-zinc-800 flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200 font-sans text-zinc-900 dark:text-zinc-100"
         >
           {/* Header */}
           <div className="px-5 py-3.5 border-b border-slate-200/80 dark:border-zinc-800 flex items-center justify-between bg-white dark:bg-zinc-900 shrink-0">
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-zinc-100 dark:bg-zinc-800 border border-zinc-200/80 dark:border-zinc-700/80 flex items-center justify-center shrink-0 overflow-hidden shadow-2xs">
+              <div className="w-8 h-8 rounded-sm bg-zinc-100 dark:bg-zinc-800 border border-zinc-200/80 dark:border-zinc-700/80 flex items-center justify-center shrink-0 overflow-hidden shadow-2xs">
                 <img
                   src={logoImg}
                   alt="AngkorVers Logo"
@@ -499,7 +509,7 @@ export default function AngkorGenieFloatingWidget() {
               <button
                 type="button"
                 onClick={handleOpenFullScreen}
-                className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-zinc-200 hover:bg-slate-100 dark:hover:bg-zinc-800 transition cursor-pointer"
+                className="p-2 rounded-sm text-slate-400 hover:text-slate-700 dark:hover:text-zinc-200 hover:bg-slate-100 dark:hover:bg-zinc-800 transition cursor-pointer"
                 title="Full Screen"
               >
                 <Maximize2 size={16} />
@@ -510,14 +520,14 @@ export default function AngkorGenieFloatingWidget() {
                 <button
                   type="button"
                   onClick={() => setIsMenuOpen(!isMenuOpen)}
-                  className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-zinc-200 hover:bg-slate-100 dark:hover:bg-zinc-800 transition cursor-pointer"
+                  className="p-2 rounded-sm text-slate-400 hover:text-slate-700 dark:hover:text-zinc-200 hover:bg-slate-100 dark:hover:bg-zinc-800 transition cursor-pointer"
                   title="More Options"
                 >
                   <MoreHorizontal size={18} />
                 </button>
 
                 {isMenuOpen && (
-                  <div className="absolute right-0 mt-2 w-48 rounded-2xl bg-white dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 shadow-xl py-1.5 z-20 text-xs">
+                  <div className="absolute right-0 mt-2 w-48 rounded-sm bg-white dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 shadow-xl py-1.5 z-20 text-xs">
                     <button
                       type="button"
                       onClick={handleResetSession}
@@ -554,7 +564,7 @@ export default function AngkorGenieFloatingWidget() {
               <button
                 type="button"
                 onClick={() => setIsOpen(false)}
-                className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-zinc-200 hover:bg-slate-100 dark:hover:bg-zinc-800 transition cursor-pointer ml-0.5"
+                className="p-2 rounded-sm text-slate-400 hover:text-slate-700 dark:hover:text-zinc-200 hover:bg-slate-100 dark:hover:bg-zinc-800 transition cursor-pointer ml-0.5"
                 title="Close"
               >
                 <X size={18} />
@@ -665,9 +675,9 @@ export default function AngkorGenieFloatingWidget() {
                           key={item.id || idx}
                           type="button"
                           onClick={() => handleSendMessage(item.prompt || item.query || item.title)}
-                          className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl bg-white dark:bg-[#212121] border border-zinc-200/90 dark:border-zinc-800 text-xs sm:text-[13px] text-zinc-700 dark:text-zinc-300 hover:border-zinc-400 dark:hover:border-zinc-600 hover:text-zinc-900 dark:hover:text-white shadow-2xs hover:shadow-xs transition-all duration-200 active:scale-95 cursor-pointer text-left group"
+                          className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-sm bg-white dark:bg-[#212121] border border-zinc-200/90 dark:border-zinc-800 text-xs sm:text-[13px] text-zinc-700 dark:text-zinc-300 hover:border-zinc-400 dark:hover:border-zinc-600 hover:text-zinc-900 dark:hover:text-white shadow-2xs hover:shadow-xs transition-all duration-200 active:scale-95 cursor-pointer text-left group"
                         >
-                          <div className="w-7 h-7 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center shrink-0 text-zinc-600 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-white transition-colors">
+                          <div className="w-7 h-7 rounded-sm bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center shrink-0 text-zinc-600 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-white transition-colors">
                             <IconComponent size={14} className="group-hover:scale-110 transition-transform duration-200" />
                           </div>
                           <span className="font-medium line-clamp-2 leading-snug">
@@ -687,7 +697,7 @@ export default function AngkorGenieFloatingWidget() {
                   return isUser ? (
                     /* User Message: Right-Aligned Dark Bubble with action icons beneath */
                     <div key={msg.id} className="flex flex-col items-end space-y-1">
-                      <div className="bg-[#1e232a] text-white px-4 py-2.5 rounded-2xl rounded-tr-sm text-xs sm:text-sm font-normal leading-relaxed shadow-xs max-w-[85%] whitespace-pre-wrap">
+                      <div className="bg-[#1e232a] text-white px-4 py-2.5 rounded-sm text-xs sm:text-sm font-normal leading-relaxed shadow-xs max-w-[85%] whitespace-pre-wrap">
                         {msg.content}
                       </div>
                       {/* Copy & Edit icons */}
@@ -717,7 +727,7 @@ export default function AngkorGenieFloatingWidget() {
                     /* Assistant Message: Clean natural canvas flow with embedded topics & toolbar */
                     <div key={msg.id} className="w-full space-y-3 text-xs sm:text-sm">
                       {msg.isError ? (
-                        <div className="p-3.5 rounded-2xl bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900 text-rose-800 dark:text-rose-200 space-y-2">
+                        <div className="p-3.5 rounded-sm bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900 text-rose-800 dark:text-rose-200 space-y-2">
                           <div className="flex items-start gap-2">
                             <AlertCircle size={15} className="shrink-0 mt-0.5 text-rose-600 dark:text-rose-400" />
                             <span className="leading-relaxed">{msg.content}</span>
@@ -725,7 +735,7 @@ export default function AngkorGenieFloatingWidget() {
                           <button
                             type="button"
                             onClick={handleRetry}
-                            className="px-2.5 py-1 rounded-xl bg-rose-100 dark:bg-rose-900/40 text-rose-800 dark:text-rose-200 hover:bg-rose-200 text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer"
+                            className="px-2.5 py-1 rounded-sm bg-rose-100 dark:bg-rose-900/40 text-rose-800 dark:text-rose-200 hover:bg-rose-200 text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer"
                           >
                             <RotateCcw size={11} />
                             <span>Retry Question</span>
@@ -735,7 +745,7 @@ export default function AngkorGenieFloatingWidget() {
                         <div className="space-y-3">
                           {/* Assistant Persona Header */}
                           <div className="flex items-center gap-2 mb-1.5 text-xs text-zinc-500 dark:text-zinc-400">
-                            <div className="w-5 h-5 rounded-md bg-zinc-100 dark:bg-zinc-800 border border-zinc-200/80 dark:border-zinc-700/80 flex items-center justify-center overflow-hidden shrink-0">
+                            <div className="w-5 h-5 rounded-sm bg-zinc-100 dark:bg-zinc-800 border border-zinc-200/80 dark:border-zinc-700/80 flex items-center justify-center overflow-hidden shrink-0">
                               <img src={logoImg} alt="" className="w-3.5 h-3.5 object-contain" />
                             </div>
                             <span className="font-semibold text-zinc-800 dark:text-zinc-200 text-xs">AngkorVers AI</span>
@@ -766,7 +776,7 @@ export default function AngkorGenieFloatingWidget() {
                             const isThisRefreshing = refreshingMsgIndex === idx;
 
                             return (
-                              <div className="rounded-2xl border border-zinc-200/90 dark:border-zinc-800 bg-zinc-50/60 dark:bg-zinc-900/40 p-3 mt-3 space-y-2.5">
+                              <div className="rounded-sm border border-zinc-200/90 dark:border-zinc-800 bg-zinc-50/60 dark:bg-zinc-900/40 p-3 mt-3 space-y-2.5">
                                 <div className="flex items-center justify-between text-xs px-0.5">
                                   <div className="flex items-center gap-1 font-bold tracking-wider text-amber-500 uppercase text-[10px]">
                                     <Sparkles size={12} className="fill-amber-500" />
@@ -793,9 +803,9 @@ export default function AngkorGenieFloatingWidget() {
                                         key={item.id || tIdx}
                                         type="button"
                                         onClick={() => handleSendMessage(actionQuery)}
-                                        className="p-2.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:border-zinc-300 dark:hover:border-zinc-700 hover:shadow-xs flex items-center gap-2 transition-all cursor-pointer text-left group"
+                                        className="p-2.5 rounded-sm border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:border-zinc-300 dark:hover:border-zinc-700 hover:shadow-xs flex items-center gap-2 transition-all cursor-pointer text-left group"
                                       >
-                                        <div className="w-7 h-7 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-500 group-hover:text-zinc-800 dark:group-hover:text-white transition shrink-0">
+                                        <div className="w-7 h-7 rounded-sm bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-500 group-hover:text-zinc-800 dark:group-hover:text-white transition shrink-0">
                                           <IconComponent size={14} />
                                         </div>
                                         <span className="text-xs font-semibold text-zinc-800 dark:text-zinc-200 group-hover:text-zinc-900 dark:group-hover:text-white transition line-clamp-2 leading-snug">
@@ -830,7 +840,7 @@ export default function AngkorGenieFloatingWidget() {
                             <button
                               type="button"
                               onClick={() => handleFeedback(idx, 'up')}
-                              className={`p-1 rounded-md transition cursor-pointer ${
+                              className={`p-1 rounded-sm transition cursor-pointer ${
                                 feedbackMap[idx] === 'up' ? 'text-blue-600' : 'hover:text-zinc-700 dark:hover:text-zinc-200'
                               }`}
                               title="Good response"
@@ -840,7 +850,7 @@ export default function AngkorGenieFloatingWidget() {
                             <button
                               type="button"
                               onClick={() => handleFeedback(idx, 'down')}
-                              className={`p-1 rounded-md transition cursor-pointer ${
+                              className={`p-1 rounded-sm transition cursor-pointer ${
                                 feedbackMap[idx] === 'down' ? 'text-rose-600' : 'hover:text-zinc-700 dark:hover:text-zinc-200'
                               }`}
                               title="Bad response"
@@ -938,7 +948,7 @@ export default function AngkorGenieFloatingWidget() {
       {/* Weather & Currency Tools Modal */}
       {showToolsModal && (
         <div className="fixed inset-0 z-60 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="w-full max-w-sm rounded-3xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 shadow-2xl p-5 space-y-4">
+          <div className="w-full max-w-sm rounded-sm bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 shadow-2xl p-5 space-y-4">
             <div className="flex items-center justify-between">
               <div className="font-bold text-sm text-slate-900 dark:text-white flex items-center gap-2">
                 <CloudSun size={18} className="text-amber-500" />
@@ -947,7 +957,7 @@ export default function AngkorGenieFloatingWidget() {
               <button
                 type="button"
                 onClick={() => setShowToolsModal(false)}
-                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-zinc-200 cursor-pointer"
+                className="p-1.5 rounded-sm text-slate-400 hover:text-slate-700 dark:hover:text-zinc-200 cursor-pointer"
               >
                 <X size={16} />
               </button>
@@ -979,7 +989,7 @@ export default function AngkorGenieFloatingWidget() {
                     }}
                     onFocus={() => setShowWeatherSuggestions(true)}
                     placeholder="Search province or city..."
-                    className="w-full pl-8 pr-7 py-1.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-xs font-medium text-slate-800 dark:text-white placeholder-slate-400 focus:outline-none focus:border-blue-500"
+                    className="w-full pl-8 pr-7 py-1.5 rounded-sm border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-xs font-medium text-slate-800 dark:text-white placeholder-slate-400 focus:outline-none focus:border-blue-500"
                   />
                   {weatherSearchQuery && (
                     <button
@@ -996,7 +1006,7 @@ export default function AngkorGenieFloatingWidget() {
                 </div>
                 <button
                   type="submit"
-                  className="px-2.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition cursor-pointer shrink-0"
+                  className="px-2.5 py-1.5 rounded-sm bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition cursor-pointer shrink-0"
                 >
                   <Search size={13} />
                 </button>
@@ -1005,7 +1015,7 @@ export default function AngkorGenieFloatingWidget() {
               {/* Autocomplete dropdown for widget */}
               {showWeatherSuggestions && filteredProvinces.length > 0 && weatherSearchQuery.trim() && (
                 <div className="relative z-20">
-                  <div className="absolute top-0.5 left-0 right-0 bg-white dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 rounded-xl shadow-lg max-h-36 overflow-y-auto divide-y divide-slate-100 dark:divide-zinc-700">
+                  <div className="absolute top-0.5 left-0 right-0 bg-white dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 rounded-sm shadow-lg max-h-36 overflow-y-auto divide-y divide-slate-100 dark:divide-zinc-700">
                     {filteredProvinces.map((prov) => (
                       <button
                         key={prov}
@@ -1047,7 +1057,7 @@ export default function AngkorGenieFloatingWidget() {
                 ))}
               </div>
               {weatherInfo && (
-                <div className="p-3 rounded-2xl bg-slate-50 dark:bg-zinc-800 border border-slate-100 dark:border-zinc-700 flex items-center justify-between text-xs">
+                <div className="p-3 rounded-sm bg-slate-50 dark:bg-zinc-800 border border-slate-100 dark:border-zinc-700 flex items-center justify-between text-xs">
                   <div>
                     <span className="font-bold text-slate-900 dark:text-white">{weatherInfo.province}</span>
                     <span className="block text-slate-500 dark:text-zinc-400">{weatherInfo.condition}</span>
@@ -1073,11 +1083,11 @@ export default function AngkorGenieFloatingWidget() {
                     type="number"
                     value={usdVal}
                     onChange={(e) => handleConvertCurrency(Number(e.target.value) || 0)}
-                    className="w-full pl-6 pr-2 py-1.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-xs font-bold text-slate-800 dark:text-white focus:outline-none"
+                    className="w-full pl-6 pr-2 py-1.5 rounded-sm border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-xs font-bold text-slate-800 dark:text-white focus:outline-none"
                   />
                 </div>
                 <span className="text-xs font-bold text-slate-400">=</span>
-                <div className="flex-1 py-1.5 px-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-right text-xs font-black text-emerald-600 dark:text-emerald-400">
+                <div className="flex-1 py-1.5 px-2.5 rounded-sm bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-right text-xs font-black text-emerald-600 dark:text-emerald-400">
                   {khrVal.toLocaleString()} ៛
                 </div>
               </div>

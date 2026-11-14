@@ -83,7 +83,7 @@ export default function GoogleButton({
       type="button"
       onClick={handleClick}
       disabled={loading || disabled}
-      className={`w-full rounded-2xl font-bold transition-all duration-200 flex items-center justify-center cursor-pointer select-none active:scale-[0.99] disabled:opacity-60 disabled:cursor-not-allowed ${sizeClasses} ${variantClasses} ${className}`}
+      className={`w-full rounded-sm font-bold transition-all duration-200 flex items-center justify-center cursor-pointer select-none active:scale-[0.99] disabled:opacity-60 disabled:cursor-not-allowed ${sizeClasses} ${variantClasses} ${className}`}
     >
       {loading ? (
         <Loader2 size={18} className="animate-spin text-slate-500 dark:text-zinc-400" />

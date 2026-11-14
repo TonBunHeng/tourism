@@ -117,7 +117,7 @@ export default function Availability() {
               type="button"
               onClick={handleSave}
               disabled={isSaving}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-md bg-[#003E83] hover:bg-[#002e62] disabled:opacity-50 text-white text-xs sm:text-sm font-medium shadow-xs transition-colors cursor-pointer"
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-sm bg-[#003E83] hover:bg-[#002e62] disabled:opacity-50 text-white text-xs sm:text-sm font-medium shadow-xs transition-colors cursor-pointer"
             >
               {isSaving ? <Loader2 size={15} className="animate-spin" /> : <Save size={15} />}
               <span>Save Schedule</span>
@@ -131,7 +131,7 @@ export default function Availability() {
           <LoadingSpinner text="Loading schedule..." />
         </div>
       ) : (
-        <form onSubmit={handleSave} className="bg-white dark:bg-zinc-900 rounded-md border border-gray-200 dark:border-zinc-800 shadow-xs p-4 sm:p-6 space-y-5">
+        <form onSubmit={handleSave} className="bg-white dark:bg-zinc-900 rounded-sm border border-gray-200 dark:border-zinc-800 shadow-xs p-4 sm:p-6 space-y-5">
           <div className="flex items-center gap-2 pb-3 border-b border-gray-100 dark:border-zinc-800 text-xs font-semibold text-gray-500 dark:text-zinc-400">
             <Clock size={16} className="text-[#003E83] dark:text-blue-400" />
             <span>Weekly Operating Schedule</span>
@@ -141,7 +141,7 @@ export default function Availability() {
             {hours.map((item, idx) => (
               <div
                 key={item.day}
-                className={`p-3 rounded-md border transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
+                className={`p-3 rounded-sm border transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
                   item.is_closed
                     ? 'bg-gray-50 dark:bg-zinc-800/40 border-gray-200/60 dark:border-zinc-800 opacity-60'
                     : 'bg-white dark:bg-zinc-900 border-gray-200 dark:border-zinc-700/80 shadow-2xs'
@@ -159,7 +159,7 @@ export default function Availability() {
                       disabled={item.is_closed}
                       value={item.open_time || '08:00'}
                       onChange={(e) => handleHourChange(idx, 'open_time', e.target.value)}
-                      className="px-2.5 py-1.5 rounded-md border border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800 text-xs text-gray-800 dark:text-white disabled:opacity-40 focus:outline-none focus:ring-1 focus:ring-[#003E83]"
+                      className="px-2.5 py-1.5 rounded-sm border border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800 text-xs text-gray-800 dark:text-white disabled:opacity-40 focus:outline-none focus:ring-1 focus:ring-[#003E83]"
                     />
                   </div>
 
@@ -172,7 +172,7 @@ export default function Availability() {
                       disabled={item.is_closed}
                       value={item.close_time || '21:00'}
                       onChange={(e) => handleHourChange(idx, 'close_time', e.target.value)}
-                      className="px-2.5 py-1.5 rounded-md border border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800 text-xs text-gray-800 dark:text-white disabled:opacity-40 focus:outline-none focus:ring-1 focus:ring-[#003E83]"
+                      className="px-2.5 py-1.5 rounded-sm border border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800 text-xs text-gray-800 dark:text-white disabled:opacity-40 focus:outline-none focus:ring-1 focus:ring-[#003E83]"
                     />
                   </div>
                 </div>
@@ -182,7 +182,7 @@ export default function Availability() {
                     type="checkbox"
                     checked={Boolean(item.is_closed)}
                     onChange={(e) => handleHourChange(idx, 'is_closed', e.target.checked)}
-                    className="w-4 h-4 rounded text-[#003E83] focus:ring-[#003E83]"
+                    className="w-4 h-4 rounded-sm text-[#003E83] focus:ring-[#003E83]"
                   />
                   <span>Closed</span>
                 </label>

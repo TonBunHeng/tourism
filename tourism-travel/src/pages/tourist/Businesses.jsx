@@ -7,7 +7,8 @@ import {
   MapPin, 
   X, 
   CheckCircle2, 
-  MessageSquare
+  MessageSquare,
+  ChevronDown
 } from 'lucide-react';
 import travelService from '../../services/travelService';
 import { useAlert } from '../../context/AlertContext';
@@ -163,22 +164,23 @@ export default function Businesses() {
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 rounded-2xl p-4 sm:p-5 shadow-xs space-y-4">
+      <div className="bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 rounded-sm p-4 sm:p-5 shadow-xs space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
           {/* Search */}
           <div className="relative md:col-span-2">
-            <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+            <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
             <input
               type="text"
               value={search}
               onChange={(e) => handleFilterChange('search', e.target.value)}
               placeholder="Search business name, address, services..."
-              className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-slate-50 dark:bg-zinc-800 text-xs sm:text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#002D62]"
+              className="w-full pl-9 pr-9 py-2.5 rounded-sm border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800 text-xs sm:text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#002D62] transition-colors"
             />
             {search && (
               <button 
+                type="button"
                 onClick={() => handleFilterChange('search', '')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-zinc-200"
               >
                 <X size={14} />
               </button>
@@ -186,31 +188,33 @@ export default function Businesses() {
           </div>
 
           {/* Category Filter */}
-          <div>
+          <div className="relative">
             <select
               value={selectedCategory}
               onChange={(e) => handleFilterChange('category', e.target.value)}
-              className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-zinc-800 text-xs sm:text-sm text-slate-700 dark:text-zinc-200 focus:outline-none focus:ring-2 focus:ring-[#002D62]"
+              className="w-full pl-3.5 pr-9 py-2.5 rounded-sm border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800 text-xs sm:text-sm text-slate-700 dark:text-zinc-200 focus:outline-none focus:ring-2 focus:ring-[#002D62] appearance-none cursor-pointer transition-colors"
             >
               <option value="All">All Categories</option>
               {categories.map((c) => (
                 <option key={c.id} value={c.name}>{c.name}</option>
               ))}
             </select>
+            <ChevronDown size={15} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
           </div>
 
           {/* Province Filter */}
-          <div>
+          <div className="relative">
             <select
               value={selectedProvince}
               onChange={(e) => handleFilterChange('province', e.target.value)}
-              className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-zinc-800 text-xs sm:text-sm text-slate-700 dark:text-zinc-200 focus:outline-none focus:ring-2 focus:ring-[#002D62]"
+              className="w-full pl-3.5 pr-9 py-2.5 rounded-sm border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800 text-xs sm:text-sm text-slate-700 dark:text-zinc-200 focus:outline-none focus:ring-2 focus:ring-[#002D62] appearance-none cursor-pointer transition-colors"
             >
               <option value="All">All Provinces</option>
               {provinces.map((p) => (
                 <option key={p.id} value={p.name}>{p.name}</option>
               ))}
             </select>
+            <ChevronDown size={15} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
           </div>
         </div>
 
@@ -223,7 +227,7 @@ export default function Businesses() {
                 key={starVal}
                 type="button"
                 onClick={() => handleFilterChange('rating', starVal === minRating ? 0 : starVal)}
-                className={`px-2.5 py-1 rounded-lg font-medium transition cursor-pointer flex items-center gap-1 ${
+                className={`px-2.5 py-1 rounded-sm font-medium transition cursor-pointer flex items-center gap-1 ${
                   minRating === starVal
                     ? 'bg-[#002D62] text-white shadow-xs'
                     : 'bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-300 hover:bg-slate-200'
@@ -256,7 +260,7 @@ export default function Businesses() {
           action={
             <button
               onClick={() => setSearchParams(new URLSearchParams())}
-              className="px-4 py-2 rounded-xl bg-[#002D62] text-white text-xs font-bold"
+              className="px-4 py-2 rounded-sm bg-[#002D62] text-white text-xs font-bold"
             >
               Reset Filters
             </button>
@@ -275,7 +279,7 @@ export default function Businesses() {
                 return (
                   <div
                     key={b.id}
-                    className="group rounded-3xl bg-white dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800 shadow-xs hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col justify-between"
+                    className="group rounded-sm bg-white dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800 shadow-xs hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col justify-between"
                   >
                     <div>
                       {/* Photo & Badges */}
@@ -322,7 +326,7 @@ export default function Businesses() {
 
                         {/* Rating & Reviews */}
                         <div className="flex items-center gap-2 text-xs">
-                          <div className="flex items-center gap-1 text-amber-500 font-bold bg-amber-50 dark:bg-amber-950/40 px-2 py-0.5 rounded-md">
+                          <div className="flex items-center gap-1 text-amber-500 font-bold bg-amber-50 dark:bg-amber-950/40 px-2 py-0.5 rounded-sm">
                             <Star size={13} className="fill-amber-400 text-amber-400" />
                             <span>{Number(b.rating || 0).toFixed(1)}</span>
                           </div>
@@ -347,7 +351,7 @@ export default function Businesses() {
                         {b.services && Array.isArray(b.services) && b.services.length > 0 && (
                           <div className="flex flex-wrap gap-1 pt-1">
                             {b.services.slice(0, 3).map((s, idx) => (
-                              <span key={idx} className="text-[10px] font-medium px-2 py-0.5 rounded-md bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-300">
+                              <span key={idx} className="text-[10px] font-medium px-2 py-0.5 rounded-sm bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-300">
                                 {typeof s === 'string' ? s : s.name}
                               </span>
                             ))}
@@ -360,7 +364,7 @@ export default function Businesses() {
                     <div className="px-6 py-4 border-t border-slate-100 dark:border-zinc-800/80 flex items-center justify-between gap-2 text-xs">
                       <Link
                         to={`/businesses/${b.id}`}
-                        className="px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-zinc-800 hover:bg-slate-200 dark:hover:bg-zinc-700 text-slate-800 dark:text-zinc-200 font-semibold transition cursor-pointer"
+                        className="px-3.5 py-2 rounded-sm bg-slate-100 dark:bg-zinc-800 hover:bg-slate-200 dark:hover:bg-zinc-700 text-slate-800 dark:text-zinc-200 font-semibold transition cursor-pointer"
                       >
                         View Details
                       </Link>
@@ -368,7 +372,7 @@ export default function Businesses() {
                       <button
                         type="button"
                         onClick={() => setSelectedBusinessForReview(b)}
-                        className="px-3.5 py-2 rounded-xl bg-[#002D62] hover:bg-[#001f44] text-white font-semibold flex items-center gap-1.5 transition cursor-pointer shadow-xs"
+                        className="px-3.5 py-2 rounded-sm bg-[#002D62] hover:bg-[#001f44] text-white font-semibold flex items-center gap-1.5 transition cursor-pointer shadow-xs"
                       >
                         <MessageSquare size={13} />
                         <span>Review</span>
@@ -396,7 +400,7 @@ export default function Businesses() {
       {/* Review Modal */}
       {selectedBusinessForReview && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-alert-backdrop">
-          <div className="w-full max-w-lg rounded-3xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 p-6 sm:p-8 shadow-2xl animate-alert-popup space-y-5">
+          <div className="w-full max-w-lg rounded-sm bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 p-6 sm:p-8 shadow-2xl animate-alert-popup space-y-5">
             <div className="flex items-center justify-between border-b border-slate-100 dark:border-zinc-800 pb-3">
               <div>
                 <span className="text-[11px] font-bold text-[#002D62] dark:text-blue-400 uppercase tracking-wider">
@@ -446,7 +450,7 @@ export default function Businesses() {
                   value={reviewComment}
                   onChange={(e) => setReviewComment(e.target.value)}
                   placeholder="Write your feedback to store into database..."
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#002D62]"
+                  className="w-full px-3.5 py-2.5 rounded-sm bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#002D62]"
                 />
               </div>
 
@@ -454,14 +458,14 @@ export default function Businesses() {
                 <button
                   type="button"
                   onClick={() => setSelectedBusinessForReview(null)}
-                  className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 dark:text-zinc-400 hover:bg-slate-100 dark:hover:bg-zinc-800"
+                  className="px-4 py-2 rounded-sm text-xs font-semibold text-slate-600 dark:text-zinc-400 hover:bg-slate-100 dark:hover:bg-zinc-800"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmittingReview}
-                  className="px-5 py-2 rounded-xl bg-[#002D62] hover:bg-[#001f44] text-white text-xs font-bold transition shadow-sm disabled:opacity-50"
+                  className="px-5 py-2 rounded-sm bg-[#002D62] hover:bg-[#001f44] text-white text-xs font-bold transition shadow-sm disabled:opacity-50"
                 >
                   {isSubmittingReview ? 'Submitting to DB...' : 'Submit Review'}
                 </button>
@@ -474,7 +478,7 @@ export default function Businesses() {
       {/* Business Details Modal */}
       {activeBusinessDetails && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-alert-backdrop">
-          <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-3xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 p-6 sm:p-8 shadow-2xl animate-alert-popup space-y-6">
+          <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-sm bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 p-6 sm:p-8 shadow-2xl animate-alert-popup space-y-6">
             <div className="flex items-start justify-between gap-4 border-b border-slate-100 dark:border-zinc-800 pb-4">
               <div>
                 <h2 className="text-xl font-extrabold text-slate-900 dark:text-white">
@@ -487,13 +491,13 @@ export default function Businesses() {
               </div>
               <button
                 onClick={() => setActiveBusinessDetails(null)}
-                className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-white"
+                className="p-1.5 rounded-sm text-slate-400 hover:text-slate-700 dark:hover:text-white"
               >
                 <X size={20} />
               </button>
             </div>
 
-            <div className="p-4 rounded-2xl bg-slate-50 dark:bg-zinc-800/60 space-y-2 text-xs text-slate-600 dark:text-zinc-300">
+            <div className="p-4 rounded-sm bg-slate-50 dark:bg-zinc-800/60 space-y-2 text-xs text-slate-600 dark:text-zinc-300">
               <div><strong>Rating:</strong> {activeBusinessDetails.rating || 0} / 5 ({activeBusinessDetails.review_count || 0} reviews)</div>
               {activeBusinessDetails.phone && <div><strong>Phone:</strong> {activeBusinessDetails.phone}</div>}
               {activeBusinessDetails.email && <div><strong>Email:</strong> {activeBusinessDetails.email}</div>}
@@ -511,7 +515,7 @@ export default function Businesses() {
               <button
                 type="button"
                 onClick={() => setActiveBusinessDetails(null)}
-                className="px-5 py-2.5 rounded-xl bg-slate-100 dark:bg-zinc-800 text-slate-800 dark:text-white font-semibold text-xs"
+                className="px-5 py-2.5 rounded-sm bg-slate-100 dark:bg-zinc-800 text-slate-800 dark:text-white font-semibold text-xs"
               >
                 Close
               </button>

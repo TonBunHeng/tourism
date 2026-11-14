@@ -14,7 +14,8 @@ import {
   MessageSquare,
   Sparkles,
   Compass,
-  X
+  X,
+  ChevronDown
 } from 'lucide-react';
 import travelService from '../../services/travelService';
 import { useAuth } from '../../context/AuthContext';
@@ -258,7 +259,7 @@ export default function DestinationDetails() {
       <div className="max-w-3xl mx-auto px-4 py-16 text-center">
         <h2 className="text-xl font-bold text-slate-800 dark:text-white mb-2">Destination Not Found</h2>
         <p className="text-xs text-slate-500 dark:text-zinc-400 mb-6">The requested destination could not be retrieved from the catalog.</p>
-        <Link to="/destinations" className="px-5 py-2.5 rounded-xl bg-[#002D62] hover:bg-[#001f44] text-white text-xs font-semibold">
+        <Link to="/destinations" className="px-5 py-2.5 rounded-sm bg-[#002D62] hover:bg-[#001f44] text-white text-xs font-semibold">
           Back to Destinations
         </Link>
       </div>
@@ -281,7 +282,7 @@ export default function DestinationDetails() {
           <button
             type="button"
             onClick={handleShare}
-            className="p-2 rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-slate-600 dark:text-zinc-300 hover:bg-slate-50 dark:hover:bg-zinc-700 transition cursor-pointer text-xs flex items-center gap-1.5 font-medium"
+            className="p-2 rounded-sm border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-slate-600 dark:text-zinc-300 hover:bg-slate-50 dark:hover:bg-zinc-700 transition cursor-pointer text-xs flex items-center gap-1.5 font-medium"
             title="Share destination"
           >
             <Share2 size={15} />
@@ -291,7 +292,7 @@ export default function DestinationDetails() {
           <button
             type="button"
             onClick={handleToggleFavorite}
-            className={`p-2 rounded-xl border transition cursor-pointer text-xs flex items-center gap-1.5 font-medium ${
+            className={`p-2 rounded-sm border transition cursor-pointer text-xs flex items-center gap-1.5 font-medium ${
               isFavorite
                 ? 'border-rose-200 dark:border-rose-800 bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400'
                 : 'border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-slate-600 dark:text-zinc-300 hover:bg-slate-50'
@@ -307,7 +308,7 @@ export default function DestinationDetails() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Main Photo & Badges */}
         <div className="lg:col-span-2 space-y-4">
-          <div className="relative h-[340px] sm:h-[440px] w-full rounded-3xl overflow-hidden bg-slate-100 dark:bg-zinc-800 shadow-lg">
+          <div className="relative h-[340px] sm:h-[440px] w-full rounded-sm overflow-hidden bg-slate-100 dark:bg-zinc-800 shadow-lg">
             <img
               src={place.image_url || place.image || 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80'}
               alt={place.name}
@@ -323,7 +324,7 @@ export default function DestinationDetails() {
             </div>
 
             {place.rating && (
-              <div className="absolute bottom-4 left-4 px-3 py-1.5 rounded-xl bg-black/70 backdrop-blur-md text-amber-300 text-xs font-bold flex items-center gap-1.5 shadow-md">
+              <div className="absolute bottom-4 left-4 px-3 py-1.5 rounded-sm bg-black/70 backdrop-blur-md text-amber-300 text-xs font-bold flex items-center gap-1.5 shadow-md">
                 <Star size={14} className="fill-amber-300" />
                 <span>{Number(place.rating).toFixed(1)} / 5.0</span>
                 <span className="text-white/70 font-normal">({reviews.length} reviews)</span>
@@ -344,8 +345,8 @@ export default function DestinationDetails() {
 
           {/* Quick Specifications Strip */}
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-2">
-            <div className="p-3.5 rounded-2xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 flex items-center gap-3">
-              <div className="p-2.5 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-[#002D62] dark:text-blue-400">
+            <div className="p-3.5 rounded-sm bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 flex items-center gap-3">
+              <div className="p-2.5 rounded-sm bg-blue-50 dark:bg-blue-950/60 text-[#002D62] dark:text-blue-400">
                 <Clock size={18} />
               </div>
               <div>
@@ -356,8 +357,8 @@ export default function DestinationDetails() {
               </div>
             </div>
 
-            <div className="p-3.5 rounded-2xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 flex items-center gap-3">
-              <div className="p-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400">
+            <div className="p-3.5 rounded-sm bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 flex items-center gap-3">
+              <div className="p-2.5 rounded-sm bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400">
                 <DollarSign size={18} />
               </div>
               <div>
@@ -368,8 +369,8 @@ export default function DestinationDetails() {
               </div>
             </div>
 
-            <div className="p-3.5 rounded-2xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 flex items-center gap-3 col-span-2 sm:col-span-1">
-              <div className="p-2.5 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400">
+            <div className="p-3.5 rounded-sm bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 flex items-center gap-3 col-span-2 sm:col-span-1">
+              <div className="p-2.5 rounded-sm bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400">
                 <ShieldCheck size={18} />
               </div>
               <div>
@@ -382,14 +383,14 @@ export default function DestinationDetails() {
           </div>
 
           {/* Description Section */}
-          <div className="p-6 rounded-3xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 shadow-xs space-y-4">
+          <div className="p-6 rounded-sm bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 shadow-xs space-y-4">
             <h3 className="text-base font-bold text-slate-900 dark:text-white">
               About this Cambodian Destination
             </h3>
             <div className="text-xs sm:text-sm text-slate-600 dark:text-zinc-300 leading-relaxed space-y-3 font-normal">
               <p>{place.description || 'A timeless destination showcasing the cultural heritage, religious history, and architecture of Cambodia.'}</p>
               {place.history && (
-                <div className="p-4 rounded-2xl bg-slate-50 dark:bg-zinc-800/60 border border-slate-200/60 dark:border-zinc-700/60 text-xs">
+                <div className="p-4 rounded-sm bg-slate-50 dark:bg-zinc-800/60 border border-slate-200/60 dark:border-zinc-700/60 text-xs">
                   <span className="font-bold block text-slate-800 dark:text-zinc-200 mb-1">Historical Background</span>
                   <p>{place.history}</p>
                 </div>
@@ -401,7 +402,7 @@ export default function DestinationDetails() {
         {/* Right Sidebar: Booking & AI Recommendation */}
         <div className="space-y-6">
           {/* Booking Card */}
-          <div className="p-6 rounded-3xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 shadow-md space-y-5 sticky top-24">
+          <div className="p-6 rounded-sm bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 shadow-md space-y-5 sticky top-24">
             <div>
               <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">
                 Plan Your Experience
@@ -425,7 +426,7 @@ export default function DestinationDetails() {
                     setIsBookingModalOpen(true);
                   }
                 }}
-                className="w-full py-3.5 px-4 rounded-xl bg-[#002D62] hover:bg-[#001f44] text-white text-xs sm:text-sm font-bold shadow-md transition flex items-center justify-center gap-2 cursor-pointer"
+                className="w-full py-3.5 px-4 rounded-sm bg-[#002D62] hover:bg-[#001f44] text-white text-xs sm:text-sm font-bold shadow-md transition flex items-center justify-center gap-2 cursor-pointer"
               >
                 <Calendar size={16} />
                 <span>Book Guided Tour / Visit</span>
@@ -434,7 +435,7 @@ export default function DestinationDetails() {
               <button
                 type="button"
                 onClick={handleOpenAddToTrip}
-                className="w-full py-3 px-4 rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-850 hover:bg-slate-50 dark:hover:bg-zinc-800 text-slate-800 dark:text-zinc-200 text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer shadow-xs"
+                className="w-full py-3 px-4 rounded-sm border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-850 hover:bg-slate-50 dark:hover:bg-zinc-800 text-slate-800 dark:text-zinc-200 text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer shadow-xs"
               >
                 <Compass size={15} className="text-[#002D62] dark:text-blue-400" />
                 <span>Add to Trip Itinerary</span>
@@ -442,7 +443,7 @@ export default function DestinationDetails() {
 
               <Link
                 to={`/ai-chat?province=${encodeURIComponent(place.province?.name || (typeof place.province === 'string' ? place.province : place.province_name) || 'Siem Reap')}&prompt=${encodeURIComponent(`Tell me practical travel advice, best sunrise photo spot, and dress code for ${place.name}.`)}`}
-                className="w-full py-3 px-4 rounded-xl border border-indigo-200 dark:border-indigo-900/60 bg-indigo-50/50 dark:bg-indigo-950/30 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100/50 text-xs font-semibold transition flex items-center justify-center gap-2"
+                className="w-full py-3 px-4 rounded-sm border border-indigo-200 dark:border-indigo-900/60 bg-indigo-50/50 dark:bg-indigo-950/30 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100/50 text-xs font-semibold transition flex items-center justify-center gap-2"
               >
                 <Sparkles size={15} />
                 <span>Ask AI Assistant About This Place</span>
@@ -484,7 +485,7 @@ export default function DestinationDetails() {
                 setIsReviewModalOpen(true);
               }
             }}
-            className="px-4 py-2.5 rounded-xl border border-[#002D62] dark:border-blue-500 text-[#002D62] dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-zinc-800 text-xs font-bold transition flex items-center gap-2 cursor-pointer self-start sm:self-auto"
+            className="px-4 py-2.5 rounded-sm border border-[#002D62] dark:border-blue-500 text-[#002D62] dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-zinc-800 text-xs font-bold transition flex items-center gap-2 cursor-pointer self-start sm:self-auto"
           >
             <MessageSquare size={15} />
             <span>Write a Review</span>
@@ -492,14 +493,14 @@ export default function DestinationDetails() {
         </div>
 
         {reviews.length === 0 ? (
-          <div className="p-8 text-center rounded-2xl border border-dashed border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/50">
+          <div className="p-8 text-center rounded-sm border border-dashed border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/50">
             <Star size={28} className="mx-auto mb-2 text-slate-400" />
             <h4 className="text-sm font-semibold text-slate-800 dark:text-white">No reviews yet</h4>
             <p className="text-xs text-slate-500 dark:text-zinc-400 mt-1 mb-4">Be the first traveler to review {place.name}!</p>
             <button
               type="button"
               onClick={() => setIsReviewModalOpen(true)}
-              className="px-4 py-2 rounded-xl bg-[#002D62] hover:bg-[#001f44] text-white text-xs font-semibold"
+              className="px-4 py-2 rounded-sm bg-[#002D62] hover:bg-[#001f44] text-white text-xs font-semibold"
             >
               Share Your Experience
             </button>
@@ -509,7 +510,7 @@ export default function DestinationDetails() {
             {reviews.map((rev) => (
               <div
                 key={rev.id}
-                className="p-5 rounded-2xl bg-white dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800 shadow-xs flex flex-col justify-between"
+                className="p-5 rounded-sm bg-white dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800 shadow-xs flex flex-col justify-between"
               >
                 <div>
                   <div className="flex items-center justify-between mb-2">
@@ -549,16 +550,27 @@ export default function DestinationDetails() {
       {/* Booking Modal */}
       {isBookingModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-alert-backdrop">
-          <div className="w-full max-w-lg rounded-3xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 p-6 sm:p-8 shadow-2xl animate-alert-popup">
-            <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-1">
-              Book Experience at {place.name}
-            </h3>
-            <p className="text-xs text-slate-500 dark:text-zinc-400 mb-5">
-              Submit your preferred dates and reservation preferences.
-            </p>
+          <div className="w-full max-w-lg rounded-sm bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 p-6 sm:p-8 shadow-2xl animate-alert-popup">
+            <div className="flex items-start justify-between mb-4 pb-3 border-b border-slate-100 dark:border-zinc-800">
+              <div>
+                <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+                  Book Experience at {place.name}
+                </h3>
+                <p className="text-xs text-slate-500 dark:text-zinc-400 mt-0.5">
+                  Submit your preferred dates and reservation preferences.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsBookingModalOpen(false)}
+                className="text-slate-400 hover:text-slate-600 dark:hover:text-zinc-200 p-1 rounded-sm hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+              >
+                <X size={18} />
+              </button>
+            </div>
 
             <form onSubmit={handleBookingSubmit} className="space-y-4">
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 dark:text-zinc-300 mb-1">
                     Visit Date
@@ -569,7 +581,7 @@ export default function DestinationDetails() {
                     value={bookingDate}
                     onChange={(e) => setBookingDate(e.target.value)}
                     min={new Date().toISOString().split('T')[0]}
-                    className="w-full px-3 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800 text-xs text-slate-900 dark:text-white"
+                    className="w-full px-3 py-2.5 rounded-sm border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#002D62] transition-colors"
                   />
                 </div>
 
@@ -577,17 +589,20 @@ export default function DestinationDetails() {
                   <label className="block text-xs font-semibold text-slate-700 dark:text-zinc-300 mb-1">
                     Time Slot
                   </label>
-                  <select
-                    value={bookingTime}
-                    onChange={(e) => setBookingTime(e.target.value)}
-                    className="w-full px-3 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800 text-xs text-slate-900 dark:text-white"
-                  >
-                    <option value="05:30">05:30 AM (Sunrise)</option>
-                    <option value="08:00">08:00 AM (Morning Tour)</option>
-                    <option value="10:30">10:30 AM (Mid-Day)</option>
-                    <option value="14:00">02:00 PM (Afternoon)</option>
-                    <option value="16:30">04:30 PM (Sunset)</option>
-                  </select>
+                  <div className="relative">
+                    <select
+                      value={bookingTime}
+                      onChange={(e) => setBookingTime(e.target.value)}
+                      className="w-full pl-3 pr-9 py-2.5 rounded-sm border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#002D62] appearance-none cursor-pointer transition-colors"
+                    >
+                      <option value="05:30">05:30 AM (Sunrise)</option>
+                      <option value="08:00">08:00 AM (Morning Tour)</option>
+                      <option value="10:30">10:30 AM (Mid-Day)</option>
+                      <option value="14:00">02:00 PM (Afternoon)</option>
+                      <option value="16:30">04:30 PM (Sunset)</option>
+                    </select>
+                    <ChevronDown size={15} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                  </div>
                 </div>
               </div>
 
@@ -601,7 +616,7 @@ export default function DestinationDetails() {
                   max="50"
                   value={guestsCount}
                   onChange={(e) => setGuestsCount(e.target.value)}
-                  className="w-full px-3 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800 text-xs text-slate-900 dark:text-white"
+                  className="w-full px-3 py-2.5 rounded-sm border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#002D62] transition-colors"
                 />
               </div>
 
@@ -614,7 +629,7 @@ export default function DestinationDetails() {
                   value={specialRequests}
                   onChange={(e) => setSpecialRequests(e.target.value)}
                   placeholder="e.g. English-speaking tour guide, hotel pickup, vegetarian lunch options..."
-                  className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800 text-xs text-slate-900 dark:text-white placeholder-slate-400"
+                  className="w-full px-3.5 py-2.5 rounded-sm border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800 text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#002D62] resize-none transition-colors"
                 />
               </div>
 
@@ -622,14 +637,14 @@ export default function DestinationDetails() {
                 <button
                   type="button"
                   onClick={() => setIsBookingModalOpen(false)}
-                  className="flex-1 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 text-xs font-semibold text-slate-700 dark:text-zinc-300 hover:bg-slate-50"
+                  className="flex-1 py-2.5 rounded-sm border border-slate-200 dark:border-zinc-700 text-xs font-semibold text-slate-700 dark:text-zinc-300 hover:bg-slate-50 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmittingBooking}
-                  className="flex-1 py-2.5 rounded-xl bg-[#002D62] hover:bg-[#001f44] disabled:opacity-50 text-white text-xs font-bold"
+                  className="flex-1 py-2.5 rounded-sm bg-[#002D62] hover:bg-[#001f44] disabled:opacity-50 text-white text-xs font-bold transition-colors shadow-xs cursor-pointer"
                 >
                   {isSubmittingBooking ? 'Submitting...' : 'Confirm Inquiry'}
                 </button>
@@ -642,13 +657,24 @@ export default function DestinationDetails() {
       {/* Write Review Modal */}
       {isReviewModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-alert-backdrop">
-          <div className="w-full max-w-lg rounded-3xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 p-6 sm:p-8 shadow-2xl animate-alert-popup">
-            <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-1">
-              Review {place.name}
-            </h3>
-            <p className="text-xs text-slate-500 dark:text-zinc-400 mb-5">
-              Rate your visit and provide advice for other tourists.
-            </p>
+          <div className="w-full max-w-lg rounded-sm bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 p-6 sm:p-8 shadow-2xl animate-alert-popup">
+            <div className="flex items-start justify-between mb-4 pb-3 border-b border-slate-100 dark:border-zinc-800">
+              <div>
+                <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+                  Review {place.name}
+                </h3>
+                <p className="text-xs text-slate-500 dark:text-zinc-400 mt-0.5">
+                  Rate your visit and provide advice for other tourists.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsReviewModalOpen(false)}
+                className="text-slate-400 hover:text-slate-600 dark:hover:text-zinc-200 p-1 rounded-sm hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+              >
+                <X size={18} />
+              </button>
+            </div>
 
             <form onSubmit={handleReviewSubmit} className="space-y-4">
               <div>
@@ -684,7 +710,7 @@ export default function DestinationDetails() {
                   value={reviewTitle}
                   onChange={(e) => setReviewTitle(e.target.value)}
                   placeholder="e.g. Unforgettable sunrise experience!"
-                  className="w-full px-3 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800 text-xs text-slate-900 dark:text-white"
+                  className="w-full px-3.5 py-2.5 rounded-sm border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#002D62] transition-colors"
                 />
               </div>
 
@@ -698,7 +724,7 @@ export default function DestinationDetails() {
                   value={reviewComment}
                   onChange={(e) => setReviewComment(e.target.value)}
                   placeholder="Share details on crowd levels, photography advice, admission tips, or guides..."
-                  className="w-full px-3 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800 text-xs text-slate-900 dark:text-white placeholder-slate-400"
+                  className="w-full px-3.5 py-2.5 rounded-sm border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800 text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#002D62] resize-none transition-colors"
                 />
               </div>
 
@@ -706,14 +732,14 @@ export default function DestinationDetails() {
                 <button
                   type="button"
                   onClick={() => setIsReviewModalOpen(false)}
-                  className="flex-1 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 text-xs font-semibold text-slate-700 dark:text-zinc-300 hover:bg-slate-50"
+                  className="flex-1 py-2.5 rounded-sm border border-slate-200 dark:border-zinc-700 text-xs font-semibold text-slate-700 dark:text-zinc-300 hover:bg-slate-50 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmittingReview}
-                  className="flex-1 py-2.5 rounded-xl bg-[#002D62] hover:bg-[#001f44] disabled:opacity-50 text-white text-xs font-bold"
+                  className="flex-1 py-2.5 rounded-sm bg-[#002D62] hover:bg-[#001f44] disabled:opacity-50 text-white text-xs font-bold transition-colors shadow-xs cursor-pointer"
                 >
                   {isSubmittingReview ? 'Posting Review...' : 'Submit Review'}
                 </button>
@@ -726,7 +752,7 @@ export default function DestinationDetails() {
       {/* Add to Trip Modal */}
       {isAddToTripModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-alert-backdrop">
-          <div className="w-full max-w-md rounded-3xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 p-6 shadow-2xl animate-alert-popup space-y-5">
+          <div className="w-full max-w-md rounded-sm bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 p-6 shadow-2xl animate-alert-popup space-y-5">
             <div className="flex items-center justify-between border-b border-slate-100 dark:border-zinc-800 pb-3">
               <div>
                 <span className="text-[11px] font-bold text-[#002D62] dark:text-blue-400 uppercase tracking-wider">
@@ -746,7 +772,7 @@ export default function DestinationDetails() {
                 <p className="text-xs text-slate-500">You don't have any planned trips yet.</p>
                 <Link
                   to="/trips"
-                  className="inline-block px-4 py-2 rounded-xl bg-[#002D62] text-white text-xs font-bold"
+                  className="inline-block px-4 py-2 rounded-sm bg-[#002D62] text-white text-xs font-bold"
                 >
                   Create a Trip First
                 </Link>
@@ -761,7 +787,7 @@ export default function DestinationDetails() {
                     value={selectedTripId}
                     onChange={(e) => setSelectedTripId(e.target.value)}
                     required
-                    className="w-full px-3 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800 text-xs font-medium text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#002D62]"
+                    className="w-full px-3 py-2.5 rounded-sm border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800 text-xs font-medium text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#002D62]"
                   >
                     {userTrips.map((t) => (
                       <option key={t.id} value={t.id}>
@@ -782,7 +808,7 @@ export default function DestinationDetails() {
                     required
                     value={tripDayNumber}
                     onChange={(e) => setTripDayNumber(Math.max(1, parseInt(e.target.value, 10) || 1))}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#002D62]"
+                    className="w-full px-3 py-2 rounded-sm border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#002D62]"
                   />
                   <span className="text-[10px] text-slate-400 mt-0.5 block">
                     e.g. Day 1, Day 2 of your trip itinerary
@@ -793,14 +819,14 @@ export default function DestinationDetails() {
                   <button
                     type="button"
                     onClick={() => setIsAddToTripModalOpen(false)}
-                    className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 dark:text-zinc-400 hover:bg-slate-100 dark:hover:bg-zinc-800"
+                    className="px-4 py-2 rounded-sm text-xs font-semibold text-slate-600 dark:text-zinc-400 hover:bg-slate-100 dark:hover:bg-zinc-800"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
                     disabled={isAddingToTrip}
-                    className="px-5 py-2 rounded-xl bg-[#002D62] hover:bg-[#001f44] text-white text-xs font-bold transition shadow-sm disabled:opacity-50"
+                    className="px-5 py-2 rounded-sm bg-[#002D62] hover:bg-[#001f44] text-white text-xs font-bold transition shadow-sm disabled:opacity-50"
                   >
                     {isAddingToTrip ? 'Adding to Trip...' : 'Add to Day Itinerary'}
                   </button>

@@ -149,7 +149,7 @@ export default function BusinessReports() {
               <select
                 value={timeframe}
                 onChange={(e) => setTimeframe(e.target.value)}
-                className="appearance-none pl-3 pr-8 py-2 border border-gray-200 dark:border-zinc-700 rounded-md bg-white dark:bg-zinc-800 text-gray-900 dark:text-white text-xs sm:text-sm font-medium shadow-xs focus:outline-none focus:ring-1 focus:ring-[#003E83] cursor-pointer"
+                className="appearance-none pl-3 pr-8 py-2 border border-gray-200 dark:border-zinc-700 rounded-sm bg-white dark:bg-zinc-800 text-gray-900 dark:text-white text-xs sm:text-sm font-medium shadow-xs focus:outline-none focus:ring-1 focus:ring-[#003E83] cursor-pointer"
               >
                 <option value="today">Today</option>
                 <option value="this_week">This Week</option>
@@ -165,7 +165,7 @@ export default function BusinessReports() {
               type="button"
               onClick={handleExportExcel}
               disabled={isExportingExcel}
-              className="flex items-center gap-2 px-4 py-2 rounded-md bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white text-xs sm:text-sm font-semibold shadow-xs transition-colors cursor-pointer"
+              className="flex items-center gap-2 px-4 py-2 rounded-sm bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white text-xs sm:text-sm font-semibold shadow-xs transition-colors cursor-pointer"
               title="Download full multi-sheet Excel spreadsheet (.xlsx)"
             >
               {isExportingExcel ? (
@@ -192,7 +192,7 @@ export default function BusinessReports() {
               return (
                 <div
                   key={idx}
-                  className="bg-white dark:bg-zinc-900 rounded-md p-4 shadow-xs border border-gray-200 dark:border-zinc-800 flex flex-col justify-between"
+                  className="bg-white dark:bg-zinc-900 rounded-sm p-4 shadow-xs border border-gray-200 dark:border-zinc-800 flex flex-col justify-between"
                 >
                   <div className="flex items-center justify-between gap-2">
                     <div className="min-w-0">
@@ -203,7 +203,7 @@ export default function BusinessReports() {
                         {stat.value}
                       </p>
                     </div>
-                    <div className={`p-2 rounded-md shrink-0 ${stat.bg}`}>
+                    <div className={`p-2 rounded-sm shrink-0 ${stat.bg}`}>
                       <Icon className={`w-4 h-4 md:w-5 md:h-5 ${stat.color}`} />
                     </div>
                   </div>
@@ -234,7 +234,7 @@ export default function BusinessReports() {
           {/* Breakdown & Popular Services Cards */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Booking Status Breakdown */}
-            <div className="bg-white dark:bg-zinc-900 rounded-md border border-gray-200 dark:border-zinc-800 shadow-xs p-4 sm:p-5 space-y-4">
+            <div className="bg-white dark:bg-zinc-900 rounded-sm border border-gray-200 dark:border-zinc-800 shadow-xs p-4 sm:p-5 space-y-4">
               <div className="flex items-center gap-2 pb-3 border-b border-gray-100 dark:border-zinc-800">
                 <PieChart size={16} className="text-[#003E83] dark:text-blue-400" />
                 <h3 className="text-sm sm:text-base font-bold text-gray-900 dark:text-white">
@@ -272,7 +272,7 @@ export default function BusinessReports() {
             </div>
 
             {/* Top Performing Services */}
-            <div className="bg-white dark:bg-zinc-900 rounded-md border border-gray-200 dark:border-zinc-800 shadow-xs p-4 sm:p-5 space-y-4">
+            <div className="bg-white dark:bg-zinc-900 rounded-sm border border-gray-200 dark:border-zinc-800 shadow-xs p-4 sm:p-5 space-y-4">
               <div className="flex items-center gap-2 pb-3 border-b border-gray-100 dark:border-zinc-800">
                 <BarChart3 size={16} className="text-[#003E83] dark:text-blue-400" />
                 <h3 className="text-sm sm:text-base font-bold text-gray-900 dark:text-white">

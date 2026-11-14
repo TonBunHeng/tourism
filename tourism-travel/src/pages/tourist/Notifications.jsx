@@ -199,7 +199,7 @@ export default function Notifications() {
           <button
             type="button"
             onClick={handleMarkAllRead}
-            className="px-4 py-2.5 rounded-xl bg-[#002D62] hover:bg-[#001f44] text-white text-xs font-bold shadow-sm transition self-start sm:self-auto flex items-center gap-1.5 cursor-pointer"
+            className="px-4 py-2.5 rounded-sm bg-[#002D62] hover:bg-[#001f44] text-white text-xs font-bold shadow-sm transition self-start sm:self-auto flex items-center gap-1.5 cursor-pointer"
           >
             <CheckCheck size={14} />
             <span>Mark All as Read</span>
@@ -208,7 +208,7 @@ export default function Notifications() {
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 rounded-2xl p-4 sm:p-5 shadow-xs space-y-3">
+      <div className="bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 rounded-sm p-4 sm:p-5 shadow-xs space-y-3">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           {/* Search Input */}
           <div className="relative">
@@ -218,7 +218,7 @@ export default function Notifications() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search notifications, alerts, or bookings..."
-              className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-slate-50 dark:bg-zinc-800 text-xs sm:text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#002D62]"
+              className="w-full pl-9 pr-3 py-2.5 rounded-sm bg-slate-50 dark:bg-zinc-800 text-xs sm:text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#002D62]"
             />
           </div>
 
@@ -227,7 +227,7 @@ export default function Notifications() {
             <select
               value={selectedStatus}
               onChange={(e) => setSelectedStatus(e.target.value)}
-              className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-zinc-800 text-xs sm:text-sm text-slate-700 dark:text-zinc-200 focus:outline-none focus:ring-2 focus:ring-[#002D62]"
+              className="w-full px-3 py-2.5 rounded-sm bg-slate-50 dark:bg-zinc-800 text-xs sm:text-sm text-slate-700 dark:text-zinc-200 focus:outline-none focus:ring-2 focus:ring-[#002D62]"
             >
               <option value="all">All Statuses ({notifications.length})</option>
               <option value="unread">Unread Only ({unreadCount})</option>
@@ -240,7 +240,7 @@ export default function Notifications() {
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-zinc-800 text-xs sm:text-sm text-slate-700 dark:text-zinc-200 focus:outline-none focus:ring-2 focus:ring-[#002D62]"
+              className="w-full px-3 py-2.5 rounded-sm bg-slate-50 dark:bg-zinc-800 text-xs sm:text-sm text-slate-700 dark:text-zinc-200 focus:outline-none focus:ring-2 focus:ring-[#002D62]"
             >
               <option value="All">All Categories</option>
               <option value="Bookings">Tour & Travel Bookings</option>
@@ -302,7 +302,7 @@ export default function Notifications() {
           <LoadingSpinner text="Retrieving live notifications from database..." />
         </div>
       ) : filteredNotifications.length === 0 ? (
-        <div className="rounded-3xl bg-white dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800 p-12 text-center shadow-xs">
+        <div className="rounded-sm bg-white dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800 p-12 text-center shadow-xs">
           <EmptyState
             icon={Inbox}
             title="No Notifications Found"
@@ -320,7 +320,7 @@ export default function Notifications() {
             return (
               <div
                 key={n.id}
-                className={`group rounded-2xl border transition-all duration-200 p-5 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 ${
+                className={`group rounded-sm border transition-all duration-200 p-5 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 ${
                   isUnread
                     ? 'bg-blue-50/50 dark:bg-zinc-800/90 border-blue-200 dark:border-blue-900/60 shadow-xs ring-1 ring-blue-500/15'
                     : 'bg-white dark:bg-zinc-900 border-slate-200/80 dark:border-zinc-800 shadow-xs hover:border-slate-300 dark:hover:border-zinc-700'
@@ -328,7 +328,7 @@ export default function Notifications() {
               >
                 {/* Left: Icon & Notification Info */}
                 <div className="flex items-start gap-4 min-w-0 flex-1">
-                  <div className={`w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 shadow-xs ${
+                  <div className={`w-11 h-11 rounded-sm flex items-center justify-center shrink-0 shadow-xs ${
                     isUnread 
                       ? 'bg-blue-100 dark:bg-blue-950/80 ring-2 ring-blue-500/30' 
                       : 'bg-slate-100 dark:bg-zinc-800'
@@ -386,7 +386,7 @@ export default function Notifications() {
                     <button
                       type="button"
                       onClick={() => handleMarkAsRead(n.id)}
-                      className="px-3.5 py-2 rounded-xl bg-white dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 hover:bg-slate-50 dark:hover:bg-zinc-700 text-slate-700 dark:text-zinc-200 text-xs font-semibold transition flex items-center gap-1.5 shadow-2xs cursor-pointer"
+                      className="px-3.5 py-2 rounded-sm bg-white dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 hover:bg-slate-50 dark:hover:bg-zinc-700 text-slate-700 dark:text-zinc-200 text-xs font-semibold transition flex items-center gap-1.5 shadow-2xs cursor-pointer"
                     >
                       <CheckCircle2 size={13} className="text-emerald-500" />
                       <span>Mark as Read</span>
@@ -396,7 +396,7 @@ export default function Notifications() {
                   <button
                     type="button"
                     onClick={() => handleDelete(n.id)}
-                    className="p-2 rounded-xl text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition cursor-pointer"
+                    className="p-2 rounded-sm text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition cursor-pointer"
                     title="Delete notification"
                   >
                     <Trash2 size={15} />

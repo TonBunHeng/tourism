@@ -23,7 +23,7 @@ export default function RecommendationsCard({ recommendations = [], language = '
           return (
             <div
               key={item.id || idx}
-              className="rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-2.5 shadow-2xs hover:border-blue-300 dark:hover:border-blue-700 transition-all flex flex-col justify-between"
+              className="rounded-sm bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-2.5 shadow-2xs hover:border-blue-300 dark:hover:border-blue-700 transition-all flex flex-col justify-between"
             >
               <div>
                 <div className="flex items-center justify-between gap-1 mb-1">

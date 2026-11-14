@@ -22,7 +22,7 @@ export default function ChatHeader({
         <button
           type="button"
           onClick={onToggleSidebar}
-          className="w-8 h-8 rounded-lg flex items-center justify-center text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer shrink-0"
+          className="w-8 h-8 rounded-sm flex items-center justify-center text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer shrink-0"
           title={
             sidebarOpen
               ? isKm ? 'បិទរបារចំហៀង' : 'Close Sidebar'
@@ -33,7 +33,7 @@ export default function ChatHeader({
         </button>
 
         <div className="flex items-center space-x-2 min-w-0">
-          <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-zinc-100 dark:bg-zinc-800 border border-zinc-200/80 dark:border-zinc-700/80 flex items-center justify-center shrink-0 overflow-hidden shadow-2xs">
+          <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-sm bg-zinc-100 dark:bg-zinc-800 border border-zinc-200/80 dark:border-zinc-700/80 flex items-center justify-center shrink-0 overflow-hidden shadow-2xs">
             <img
               src={logoImg}
               alt="AngkorVers AI"
@@ -77,7 +77,7 @@ export default function ChatHeader({
 
         {/* Mobile Online Status Icon */}
         <div
-          className="flex sm:hidden items-center justify-center w-8 h-8 rounded-lg bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 shrink-0"
+          className="flex sm:hidden items-center justify-center w-8 h-8 rounded-sm bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 shrink-0"
           title={isOnline ? 'Online' : 'Disconnected'}
         >
           {isOnline ? (
@@ -95,7 +95,7 @@ export default function ChatHeader({
           <button
             type="button"
             onClick={onExit}
-            className="w-8 h-8 rounded-lg flex items-center justify-center bg-zinc-100 hover:bg-zinc-200/80 dark:bg-zinc-800 dark:hover:bg-zinc-700 border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white transition-colors cursor-pointer shrink-0"
+            className="w-8 h-8 rounded-sm flex items-center justify-center bg-zinc-100 hover:bg-zinc-200/80 dark:bg-zinc-800 dark:hover:bg-zinc-700 border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white transition-colors cursor-pointer shrink-0"
             title={isKm ? 'ត្រឡប់ទៅគេហទំព័រដើម' : 'Back to Portal'}
           >
             <X size={16} />

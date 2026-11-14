@@ -74,7 +74,7 @@ export default function Categories() {
               <Link
                 key={c.id}
                 to={`/destinations?category_id=${encodeURIComponent(c.id)}`}
-                className="group rounded-3xl bg-white dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800 shadow-xs hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col justify-between"
+                className="group rounded-sm bg-white dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800 shadow-xs hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col justify-between"
               >
                 <div>
                   <div className="relative h-52 w-full overflow-hidden bg-slate-100 dark:bg-zinc-800">
@@ -111,7 +111,7 @@ export default function Categories() {
 
                 <div className="px-6 py-4 border-t border-slate-100 dark:border-zinc-800 flex items-center justify-between text-xs">
                   <span className="text-slate-500 font-medium">Explore Category</span>
-                  <span className="px-4 py-2 rounded-xl bg-[#002D62] group-hover:bg-[#001f44] text-white font-bold transition shadow-xs text-xs">
+                  <span className="px-4 py-2 rounded-sm bg-[#002D62] group-hover:bg-[#001f44] text-white font-bold transition shadow-xs text-xs">
                     View Places
                   </span>
                 </div>

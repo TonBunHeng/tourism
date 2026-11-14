@@ -116,7 +116,7 @@ export default function SettingsModal({
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="bg-white dark:bg-[#18181b] rounded-2xl shadow-2xl border border-slate-200/80 dark:border-[#27272a] w-full max-w-[680px] h-[520px] max-h-[88vh] flex flex-col sm:flex-row overflow-hidden"
+        className="bg-white dark:bg-[#18181b] rounded-sm shadow-2xl border border-slate-200/80 dark:border-[#27272a] w-full max-w-[680px] h-[520px] max-h-[88vh] flex flex-col sm:flex-row overflow-hidden"
       >
         {/* Left Tabs Column */}
         <div className="w-full sm:w-[220px] bg-slate-50 dark:bg-[#141416] border-b sm:border-b-0 sm:border-r border-slate-200 dark:border-[#27272a] p-3 flex flex-col shrink-0">
@@ -124,7 +124,7 @@ export default function SettingsModal({
             <button
               type="button"
               onClick={onClose}
-              className="p-1.5 rounded-lg text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white hover:bg-slate-200/70 dark:hover:bg-[#27272a] transition-colors cursor-pointer"
+              className="p-1.5 rounded-sm text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white hover:bg-slate-200/70 dark:hover:bg-[#27272a] transition-colors cursor-pointer"
               title="Close"
             >
               <X size={18} />
@@ -142,7 +142,7 @@ export default function SettingsModal({
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={isKm ? 'ស្វែងរក...' : 'Search settings'}
-              className="w-full pl-8 pr-2.5 py-1.5 bg-white dark:bg-[#1f1f23] border border-slate-200 dark:border-[#27272a] rounded-lg text-xs text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-400 dark:focus:ring-slate-600 transition-all"
+              className="w-full pl-8 pr-2.5 py-1.5 bg-white dark:bg-[#1f1f23] border border-slate-200 dark:border-[#27272a] rounded-sm text-xs text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-400 dark:focus:ring-slate-600 transition-all"
             />
           </div>
 
@@ -157,7 +157,7 @@ export default function SettingsModal({
                   key={tab.id}
                   type="button"
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center space-x-2.5 px-3 py-2 rounded-lg text-xs font-medium transition-all text-left cursor-pointer shrink-0 sm:w-full ${
+                  className={`flex items-center space-x-2.5 px-3 py-2 rounded-sm text-xs font-medium transition-all text-left cursor-pointer shrink-0 sm:w-full ${
                     isSelected
                       ? 'bg-slate-200/80 dark:bg-[#27272a] text-slate-900 dark:text-white font-semibold'
                       : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-200/40 dark:hover:bg-[#27272a]/50'
@@ -191,7 +191,7 @@ export default function SettingsModal({
                     onClick={() => {
                       if (isDarkMode && onToggleTheme) onToggleTheme();
                     }}
-                    className={`flex items-center justify-center space-x-2 p-2.5 rounded-xl border text-xs font-semibold transition-all cursor-pointer ${
+                    className={`flex items-center justify-center space-x-2 p-2.5 rounded-sm border text-xs font-semibold transition-all cursor-pointer ${
                       !isDarkMode
                         ? 'border-[#002D62] dark:border-blue-500 bg-blue-50/50 dark:bg-blue-950/20 text-[#002D62] dark:text-blue-400 shadow-2xs'
                         : 'border-slate-200 dark:border-slate-800 hover:border-slate-300'
@@ -206,7 +206,7 @@ export default function SettingsModal({
                     onClick={() => {
                       if (!isDarkMode && onToggleTheme) onToggleTheme();
                     }}
-                    className={`flex items-center justify-center space-x-2 p-2.5 rounded-xl border text-xs font-semibold transition-all cursor-pointer ${
+                    className={`flex items-center justify-center space-x-2 p-2.5 rounded-sm border text-xs font-semibold transition-all cursor-pointer ${
                       isDarkMode
                         ? 'border-[#002D62] dark:border-blue-500 bg-blue-50/50 dark:bg-blue-950/20 text-[#002D62] dark:text-blue-400 shadow-2xs'
                         : 'border-slate-200 dark:border-slate-800 hover:border-slate-300'
@@ -230,7 +230,7 @@ export default function SettingsModal({
                   <button
                     type="button"
                     onClick={() => onUpdateLanguage && onUpdateLanguage('en')}
-                    className={`flex items-center justify-between p-2.5 rounded-xl border text-xs font-semibold transition-all cursor-pointer ${
+                    className={`flex items-center justify-between p-2.5 rounded-sm border text-xs font-semibold transition-all cursor-pointer ${
                       language === 'en'
                         ? 'border-[#002D62] dark:border-blue-500 bg-blue-50/50 dark:bg-blue-950/20 text-[#002D62] dark:text-blue-400'
                         : 'border-slate-200 dark:border-slate-800 hover:border-slate-300'
@@ -243,7 +243,7 @@ export default function SettingsModal({
                   <button
                     type="button"
                     onClick={() => onUpdateLanguage && onUpdateLanguage('km')}
-                    className={`flex items-center justify-between p-2.5 rounded-xl border text-xs font-semibold transition-all cursor-pointer ${
+                    className={`flex items-center justify-between p-2.5 rounded-sm border text-xs font-semibold transition-all cursor-pointer ${
                       language === 'km'
                         ? 'border-[#002D62] dark:border-blue-500 bg-blue-50/50 dark:bg-blue-950/20 text-[#002D62] dark:text-blue-400'
                         : 'border-slate-200 dark:border-slate-800 hover:border-slate-300'
@@ -296,7 +296,7 @@ export default function SettingsModal({
                     value={userProfile.name || ''}
                     onChange={(e) => handleUpdate('name', e.target.value)}
                     placeholder="e.g. Bunheng"
-                    className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-blue-500"
+                    className="w-full px-3 py-2 rounded-sm bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-blue-500"
                   />
                 </div>
 
@@ -309,13 +309,13 @@ export default function SettingsModal({
                     value={userProfile.email || ''}
                     onChange={(e) => handleUpdate('email', e.target.value)}
                     placeholder="user@example.com"
-                    className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-blue-500"
+                    className="w-full px-3 py-2 rounded-sm bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-blue-500"
                   />
                 </div>
 
                 {/* Own Business Details Section */}
                 {isBiz && (
-                  <div className="p-3.5 rounded-xl bg-amber-50/50 dark:bg-amber-950/20 border border-amber-200/80 dark:border-amber-800/60 space-y-3">
+                  <div className="p-3.5 rounded-sm bg-amber-50/50 dark:bg-amber-950/20 border border-amber-200/80 dark:border-amber-800/60 space-y-3">
                     <div className="flex items-center gap-2 text-xs font-bold text-amber-900 dark:text-amber-300">
                       <Building2 size={15} />
                       <span>{isKm ? 'ព័ត៌មានអាជីវកម្មផ្ទាល់ខ្លួន' : 'Own Business Details'}</span>
@@ -330,7 +330,7 @@ export default function SettingsModal({
                         value={userProfile.businessName || ''}
                         onChange={(e) => handleUpdate('businessName', e.target.value)}
                         placeholder="e.g. Angkor Boutique Hotel"
-                        className="w-full px-3 py-1.5 rounded-lg bg-white dark:bg-zinc-900 border border-amber-200 dark:border-amber-800/80 text-xs text-slate-900 dark:text-white focus:outline-none"
+                        className="w-full px-3 py-1.5 rounded-sm bg-white dark:bg-zinc-900 border border-amber-200 dark:border-amber-800/80 text-xs text-slate-900 dark:text-white focus:outline-none"
                       />
                     </div>
 
@@ -344,7 +344,7 @@ export default function SettingsModal({
                           value={userProfile.businessCategory || ''}
                           onChange={(e) => handleUpdate('businessCategory', e.target.value)}
                           placeholder="e.g. Hotel / Restaurant"
-                          className="w-full px-3 py-1.5 rounded-lg bg-white dark:bg-zinc-900 border border-amber-200 dark:border-amber-800/80 text-xs text-slate-900 dark:text-white focus:outline-none"
+                          className="w-full px-3 py-1.5 rounded-sm bg-white dark:bg-zinc-900 border border-amber-200 dark:border-amber-800/80 text-xs text-slate-900 dark:text-white focus:outline-none"
                         />
                       </div>
                       <div>
@@ -356,7 +356,7 @@ export default function SettingsModal({
                           value={userProfile.businessProvince || ''}
                           onChange={(e) => handleUpdate('businessProvince', e.target.value)}
                           placeholder="e.g. Siem Reap"
-                          className="w-full px-3 py-1.5 rounded-lg bg-white dark:bg-zinc-900 border border-amber-200 dark:border-amber-800/80 text-xs text-slate-900 dark:text-white focus:outline-none"
+                          className="w-full px-3 py-1.5 rounded-sm bg-white dark:bg-zinc-900 border border-amber-200 dark:border-amber-800/80 text-xs text-slate-900 dark:text-white focus:outline-none"
                         />
                       </div>
                     </div>
@@ -365,7 +365,7 @@ export default function SettingsModal({
 
                 {/* History & Privacy Protection Box */}
                 <div className="pt-2 border-t border-slate-100 dark:border-zinc-800">
-                  <div className="p-3 rounded-xl bg-slate-50 dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800 space-y-2">
+                  <div className="p-3 rounded-sm bg-slate-50 dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800 space-y-2">
                     <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-800 dark:text-slate-200">
                       <Shield size={14} className="text-emerald-500" />
                       <span>{isKm ? 'ភាពឯកជន និងការបំបែកប្រវត្តិជជែក' : 'Isolated Chat History & Privacy'}</span>
@@ -384,7 +384,7 @@ export default function SettingsModal({
                             onClearHistory();
                           }
                         }}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 border border-rose-200 dark:border-rose-900/50 transition-colors cursor-pointer mt-1"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-sm text-xs font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 border border-rose-200 dark:border-rose-900/50 transition-colors cursor-pointer mt-1"
                       >
                         <Trash2 size={13} />
                         <span>{isKm ? 'លុបប្រវត្តិជជែកគណនីនេះ' : 'Clear My Account History'}</span>
@@ -413,7 +413,7 @@ export default function SettingsModal({
                       key={style.id}
                       type="button"
                       onClick={() => handleUpdate('travelStyle', style.id)}
-                      className={`p-2.5 rounded-xl border text-xs font-semibold text-left transition-all cursor-pointer ${
+                      className={`p-2.5 rounded-sm border text-xs font-semibold text-left transition-all cursor-pointer ${
                         userProfile.travelStyle === style.id
                           ? 'border-[#002D62] dark:border-blue-500 bg-blue-50/50 dark:bg-blue-950/20 text-[#002D62] dark:text-blue-400'
                           : 'border-slate-200 dark:border-slate-800 hover:border-slate-300'
@@ -441,7 +441,7 @@ export default function SettingsModal({
                         key={dest.id}
                         type="button"
                         onClick={() => toggleDestination(dest.id)}
-                        className={`flex items-center justify-between p-2.5 rounded-xl border text-xs font-semibold text-left transition-all cursor-pointer ${
+                        className={`flex items-center justify-between p-2.5 rounded-sm border text-xs font-semibold text-left transition-all cursor-pointer ${
                           isSelected
                             ? 'border-[#002D62] dark:border-blue-500 bg-blue-50/50 dark:bg-blue-950/20 text-[#002D62] dark:text-blue-400'
                             : 'border-slate-200 dark:border-slate-800 hover:border-slate-300'
@@ -461,7 +461,7 @@ export default function SettingsModal({
           {activeTab === 'about' && (
             <div className="space-y-4 text-xs">
               <div className="flex items-center space-x-3 pb-3 border-b border-slate-100 dark:border-slate-800">
-                <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-zinc-800 border border-blue-200 dark:border-zinc-700 flex items-center justify-center text-blue-600 dark:text-blue-400 font-bold text-sm">
+                <div className="w-10 h-10 rounded-sm bg-blue-50 dark:bg-zinc-800 border border-blue-200 dark:border-zinc-700 flex items-center justify-center text-blue-600 dark:text-blue-400 font-bold text-sm">
                   AV
                 </div>
                 <div>
@@ -479,7 +479,7 @@ export default function SettingsModal({
                     : "Cambodia's Advanced AI Assistant for Tourism, Code, Knowledge & Culture."}
                 </p>
 
-                <div className="p-3 rounded-xl bg-slate-50 dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800 space-y-2">
+                <div className="p-3 rounded-sm bg-slate-50 dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800 space-y-2">
                   <div className="flex items-center space-x-2 font-semibold text-slate-800 dark:text-zinc-200">
                     <Database size={13} className="text-[#003E83] dark:text-blue-400" />
                     <span>Cambodia Tourism Official Database</span>
@@ -489,7 +489,7 @@ export default function SettingsModal({
                   </p>
                 </div>
 
-                <div className="p-3 rounded-xl bg-slate-50 dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800 space-y-2">
+                <div className="p-3 rounded-sm bg-slate-50 dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800 space-y-2">
                   <div className="flex items-center space-x-2 font-semibold text-slate-800 dark:text-zinc-200">
                     <ShieldCheck size={13} className="text-emerald-500" />
                     <span>Powered by Cloud AI models (Online Only)</span>

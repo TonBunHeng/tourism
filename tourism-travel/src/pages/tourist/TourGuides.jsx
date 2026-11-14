@@ -7,7 +7,8 @@ import {
   MapPin, 
   CheckCircle2, 
   Calendar, 
-  X
+  X,
+  ChevronDown
 } from 'lucide-react';
 import travelService from '../../services/travelService';
 import { useAlert } from '../../context/AlertContext';
@@ -147,24 +148,33 @@ export default function TourGuides() {
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 rounded-2xl p-4 sm:p-5 shadow-xs space-y-3">
+      <div className="bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 rounded-sm p-4 sm:p-5 shadow-xs space-y-3">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           <div className="relative">
-            <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+            <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
             <input
               type="text"
               value={search}
               onChange={(e) => handleFilterChange('search', e.target.value)}
               placeholder="Search guide name, location..."
-              className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-slate-50 dark:bg-zinc-800 text-xs sm:text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#002D62]"
+              className="w-full pl-9 pr-9 py-2.5 rounded-sm border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800 text-xs sm:text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#002D62] transition-colors"
             />
+            {search && (
+              <button
+                type="button"
+                onClick={() => handleFilterChange('search', '')}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-zinc-200"
+              >
+                <X size={14} />
+              </button>
+            )}
           </div>
 
-          <div>
+          <div className="relative">
             <select
               value={selectedProvince}
               onChange={(e) => handleFilterChange('province', e.target.value)}
-              className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-zinc-800 text-xs sm:text-sm text-slate-700 dark:text-zinc-200 focus:outline-none focus:ring-2 focus:ring-[#002D62]"
+              className="w-full pl-3.5 pr-9 py-2.5 rounded-sm border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800 text-xs sm:text-sm text-slate-700 dark:text-zinc-200 focus:outline-none focus:ring-2 focus:ring-[#002D62] appearance-none cursor-pointer transition-colors"
             >
               <option value="All">All Locations</option>
               <option value="Siem Reap">Siem Reap</option>
@@ -174,22 +184,24 @@ export default function TourGuides() {
               <option value="Kampot">Kampot</option>
               <option value="Koh Kong">Koh Kong</option>
             </select>
+            <ChevronDown size={15} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
           </div>
 
-          <div>
+          <div className="relative">
             <select
               value={selectedLanguage}
               onChange={(e) => handleFilterChange('lang', e.target.value)}
-              className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-zinc-800 text-xs sm:text-sm text-slate-700 dark:text-zinc-200 focus:outline-none focus:ring-2 focus:ring-[#002D62]"
+              className="w-full pl-3.5 pr-9 py-2.5 rounded-sm border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800 text-xs sm:text-sm text-slate-700 dark:text-zinc-200 focus:outline-none focus:ring-2 focus:ring-[#002D62] appearance-none cursor-pointer transition-colors"
             >
               {availableLanguages.map((l) => (
                 <option key={l} value={l}>{l === 'All' ? 'All Languages' : l}</option>
               ))}
             </select>
+            <ChevronDown size={15} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
           </div>
         </div>
 
-        <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-zinc-800 text-xs text-slate-500">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-3 border-t border-slate-100 dark:border-zinc-800 text-xs text-slate-500">
           <div>
             Active Guides in Database: <strong className="text-slate-800 dark:text-zinc-200">{guides.length}</strong>
           </div>
@@ -211,7 +223,7 @@ export default function TourGuides() {
             {paginatedGuides.map((g) => (
               <div
                 key={g.id}
-                className="group rounded-3xl bg-white dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800 shadow-xs hover:shadow-xl transition-all duration-300 p-6 flex flex-col justify-between space-y-4"
+                className="group rounded-sm bg-white dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800 shadow-xs hover:shadow-xl transition-all duration-300 p-6 flex flex-col justify-between space-y-4"
               >
                 <div className="space-y-4">
                   <div className="flex items-start gap-4">
@@ -220,10 +232,10 @@ export default function TourGuides() {
                         <img
                           src={g.avatar}
                           alt={g.name}
-                          className="w-16 h-16 rounded-2xl object-cover ring-2 ring-emerald-500/30"
+                          className="w-16 h-16 rounded-sm object-cover ring-2 ring-emerald-500/30"
                         />
                       ) : (
-                        <div className="w-16 h-16 rounded-2xl bg-[#002D62] text-white flex items-center justify-center font-bold text-lg">
+                        <div className="w-16 h-16 rounded-sm bg-[#002D62] text-white flex items-center justify-center font-bold text-lg">
                           {g.name?.charAt(0) || 'G'}
                         </div>
                       )}
@@ -264,7 +276,7 @@ export default function TourGuides() {
                       <span>{g.location || g.province || 'Cambodia'}</span>
                     </div>
                     {g.license_no && (
-                      <span className="font-mono text-[10px] bg-slate-100 dark:bg-zinc-800 px-2 py-0.5 rounded text-slate-600 dark:text-zinc-300">
+                      <span className="font-mono text-[10px] bg-slate-100 dark:bg-zinc-800 px-2 py-0.5 rounded-sm text-slate-600 dark:text-zinc-300">
                         {g.license_no}
                       </span>
                     )}
@@ -275,7 +287,7 @@ export default function TourGuides() {
                       <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Languages</span>
                       <div className="flex flex-wrap gap-1">
                         {g.languages.map((l, i) => (
-                          <span key={i} className="text-[10px] font-medium px-2 py-0.5 rounded-md bg-blue-50 dark:bg-blue-950/40 text-[#002D62] dark:text-blue-300">
+                          <span key={i} className="text-[10px] font-medium px-2 py-0.5 rounded-sm bg-blue-50 dark:bg-blue-950/40 text-[#002D62] dark:text-blue-300">
                             {l}
                           </span>
                         ))}
@@ -292,7 +304,7 @@ export default function TourGuides() {
                   <button
                     type="button"
                     onClick={() => setActiveGuideDetails(g)}
-                    className="px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-zinc-800 hover:bg-slate-200 dark:hover:bg-zinc-700 text-slate-800 dark:text-zinc-200 font-semibold transition cursor-pointer"
+                    className="px-3.5 py-2 rounded-sm bg-slate-100 dark:bg-zinc-800 hover:bg-slate-200 dark:hover:bg-zinc-700 text-slate-800 dark:text-zinc-200 font-semibold transition cursor-pointer"
                   >
                     View Profile
                   </button>
@@ -300,7 +312,7 @@ export default function TourGuides() {
                   <button
                     type="button"
                     onClick={() => setSelectedGuideForHire(g)}
-                    className="px-4 py-2 rounded-xl bg-[#002D62] hover:bg-[#001f44] text-white font-bold transition shadow-xs flex items-center gap-1.5 cursor-pointer"
+                    className="px-4 py-2 rounded-sm bg-[#002D62] hover:bg-[#001f44] text-white font-bold transition shadow-xs flex items-center gap-1.5 cursor-pointer"
                   >
                     <Calendar size={13} />
                     <span>Hire Guide</span>
@@ -327,7 +339,7 @@ export default function TourGuides() {
       {/* Hire Guide Modal */}
       {selectedGuideForHire && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-alert-backdrop">
-          <div className="w-full max-w-lg rounded-3xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 p-6 sm:p-8 shadow-2xl animate-alert-popup space-y-4">
+          <div className="w-full max-w-lg rounded-sm bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 p-6 sm:p-8 shadow-2xl animate-alert-popup space-y-4">
             <div className="flex items-center justify-between border-b border-slate-100 dark:border-zinc-800 pb-3">
               <div>
                 <span className="text-[11px] font-bold text-emerald-600 uppercase">Book Certified Guide</span>
@@ -351,7 +363,7 @@ export default function TourGuides() {
                   min={new Date().toISOString().split('T')[0]}
                   value={hireDate}
                   onChange={(e) => setHireDate(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-slate-900 dark:text-white"
+                  className="w-full px-3.5 py-2.5 rounded-sm bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-slate-900 dark:text-white"
                 />
               </div>
 
@@ -363,7 +375,7 @@ export default function TourGuides() {
                   max={30}
                   value={groupSize}
                   onChange={(e) => setGroupSize(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-slate-900 dark:text-white font-bold"
+                  className="w-full px-3.5 py-2.5 rounded-sm bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-slate-900 dark:text-white font-bold"
                 />
               </div>
 
@@ -376,7 +388,7 @@ export default function TourGuides() {
                   value={inquiryNotes}
                   onChange={(e) => setInquiryNotes(e.target.value)}
                   placeholder="Tell the guide about your preferred destinations and languages..."
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-slate-900 dark:text-white"
+                  className="w-full px-3.5 py-2.5 rounded-sm bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-slate-900 dark:text-white"
                 />
               </div>
 
@@ -384,14 +396,14 @@ export default function TourGuides() {
                 <button
                   type="button"
                   onClick={() => setSelectedGuideForHire(null)}
-                  className="px-4 py-2 rounded-xl text-slate-600 dark:text-zinc-400"
+                  className="px-4 py-2 rounded-sm text-slate-600 dark:text-zinc-400"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmittingInquiry}
-                  className="px-5 py-2.5 rounded-xl bg-[#002D62] text-white font-bold disabled:opacity-50"
+                  className="px-5 py-2.5 rounded-sm bg-[#002D62] text-white font-bold disabled:opacity-50"
                 >
                   {isSubmittingInquiry ? 'Saving to DB...' : 'Save Guide Reservation'}
                 </button>
@@ -404,7 +416,7 @@ export default function TourGuides() {
       {/* Guide Details Modal */}
       {activeGuideDetails && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-alert-backdrop">
-          <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-3xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 p-6 sm:p-8 shadow-2xl animate-alert-popup space-y-6">
+          <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-sm bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 p-6 sm:p-8 shadow-2xl animate-alert-popup space-y-6">
             <div className="flex items-start justify-between border-b border-slate-100 dark:border-zinc-800 pb-4">
               <div>
                 <h2 className="text-xl font-extrabold text-slate-900 dark:text-white">
@@ -433,7 +445,7 @@ export default function TourGuides() {
               <button
                 type="button"
                 onClick={() => setActiveGuideDetails(null)}
-                className="px-5 py-2.5 rounded-xl bg-slate-100 dark:bg-zinc-800 text-slate-800 dark:text-white font-semibold text-xs"
+                className="px-5 py-2.5 rounded-sm bg-slate-100 dark:bg-zinc-800 text-slate-800 dark:text-white font-semibold text-xs"
               >
                 Close
               </button>

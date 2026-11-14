@@ -39,7 +39,7 @@ export default function ItineraryCard({ itinerary, language = 'en' }) {
   };
 
   return (
-    <div className="mt-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xs overflow-hidden text-slate-800 dark:text-slate-100 w-full">
+    <div className="mt-2.5 rounded-sm bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xs overflow-hidden text-slate-800 dark:text-slate-100 w-full">
       {/* Top Header with title and copy button */}
       <div className="px-3 py-2 bg-gradient-to-r from-blue-500/10 via-sky-500/5 to-transparent border-b border-slate-200 dark:border-slate-800 flex items-center justify-between gap-2">
         <div className="flex items-center space-x-1.5 min-w-0">
@@ -55,7 +55,7 @@ export default function ItineraryCard({ itinerary, language = 'en' }) {
         <button
           type="button"
           onClick={handleCopy}
-          className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-[10px] font-semibold text-slate-700 dark:text-slate-300 transition-colors cursor-pointer shrink-0"
+          className="inline-flex items-center gap-1 px-2 py-0.5 rounded-sm bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-[10px] font-semibold text-slate-700 dark:text-slate-300 transition-colors cursor-pointer shrink-0"
         >
           {copied ? (
             <>
@@ -86,7 +86,7 @@ export default function ItineraryCard({ itinerary, language = 'en' }) {
             key={day.day}
             type="button"
             onClick={() => setActiveDay(day.day)}
-            className={`px-2.5 py-0.5 rounded-lg text-[11px] font-bold transition-all cursor-pointer shrink-0 ${
+            className={`px-2.5 py-0.5 rounded-sm text-[11px] font-bold transition-all cursor-pointer shrink-0 ${
               activeDay === day.day
                 ? 'bg-[#003E83] text-white shadow-xs'
                 : 'text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800'
@@ -110,14 +110,14 @@ export default function ItineraryCard({ itinerary, language = 'en' }) {
           {(currentDayData.activities || []).slice(0, 5).map((act, idx) => (
             <div
               key={idx}
-              className="p-2 rounded-lg bg-slate-50/60 dark:bg-slate-800/30 border border-slate-100 dark:border-slate-800/60 text-xs"
+              className="p-2 rounded-sm bg-slate-50/60 dark:bg-slate-800/30 border border-slate-100 dark:border-slate-800/60 text-xs"
             >
               <div className="flex items-center justify-between gap-1 font-semibold text-slate-800 dark:text-slate-200 mb-0.5">
                 <span className="truncate">
                   {act.time} — {act.title}
                 </span>
                 {act.transport && (
-                  <span className="text-[10px] font-normal px-1.5 py-0.2 bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-300 rounded border border-blue-200/60 dark:border-blue-800/60 shrink-0">
+                  <span className="text-[10px] font-normal px-1.5 py-0.2 bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-300 rounded-sm border border-blue-200/60 dark:border-blue-800/60 shrink-0">
                     {act.transport}
                   </span>
                 )}

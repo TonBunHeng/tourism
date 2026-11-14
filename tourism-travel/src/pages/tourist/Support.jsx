@@ -13,7 +13,8 @@ import {
   Copy, 
   ChevronDown, 
   ChevronUp, 
-  Headphones
+  Headphones,
+  X
 } from 'lucide-react';
 import travelService from '../../services/travelService';
 import { useAlert } from '../../context/AlertContext';
@@ -234,24 +235,33 @@ export default function Support() {
       </div>
 
       {/* Filter and Search Bar matching screenshot design */}
-      <div className="bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 rounded-2xl p-4 sm:p-5 shadow-xs space-y-3">
+      <div className="bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 rounded-sm p-4 sm:p-5 shadow-xs space-y-3">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           <div className="relative">
-            <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+            <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search hotlines, FAQs, or topics..."
-              className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-slate-50 dark:bg-zinc-800 text-xs sm:text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#002D62]"
+              className="w-full pl-9 pr-9 py-2.5 rounded-sm border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800 text-xs sm:text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#002D62] transition-colors"
             />
+            {search && (
+              <button
+                type="button"
+                onClick={() => setSearch('')}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-zinc-200"
+              >
+                <X size={14} />
+              </button>
+            )}
           </div>
 
-          <div>
+          <div className="relative">
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-zinc-800 text-xs sm:text-sm text-slate-700 dark:text-zinc-200 focus:outline-none focus:ring-2 focus:ring-[#002D62]"
+              className="w-full pl-3.5 pr-9 py-2.5 rounded-sm border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800 text-xs sm:text-sm text-slate-700 dark:text-zinc-200 focus:outline-none focus:ring-2 focus:ring-[#002D62] appearance-none cursor-pointer transition-colors"
             >
               <option value="All">All Support Categories</option>
               <option value="Emergency">Emergency & Police Hotlines</option>
@@ -260,27 +270,29 @@ export default function Support() {
               <option value="Currency & Payments">Currency & Payments</option>
               <option value="Safety & Guides">Licensed Guides & Safety</option>
             </select>
+            <ChevronDown size={15} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
           </div>
 
-          <div>
+          <div className="relative">
             <select
               value={selectedSection}
               onChange={(e) => setSelectedSection(e.target.value)}
-              className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-zinc-800 text-xs sm:text-sm text-slate-700 dark:text-zinc-200 focus:outline-none focus:ring-2 focus:ring-[#002D62]"
+              className="w-full pl-3.5 pr-9 py-2.5 rounded-sm border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800 text-xs sm:text-sm text-slate-700 dark:text-zinc-200 focus:outline-none focus:ring-2 focus:ring-[#002D62] appearance-none cursor-pointer transition-colors"
             >
               <option value="All">All Resources</option>
               <option value="hotlines">Emergency Hotlines (24/7)</option>
               <option value="faqs">Knowledge Base (FAQs)</option>
               <option value="inquiry">Direct Ministry Inquiry</option>
             </select>
+            <ChevronDown size={15} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
           </div>
         </div>
 
-        <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-zinc-800 text-xs text-slate-500">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-3 border-t border-slate-100 dark:border-zinc-800 text-xs text-slate-500">
           <div>
             Support Resources Available: <strong className="text-slate-800 dark:text-zinc-200">{totalCount} items</strong>
           </div>
-          <div className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-medium">
+          <div className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-medium">
             <ShieldCheck size={14} />
             <span>Ministry Verified Official Support</span>
           </div>
@@ -309,7 +321,7 @@ export default function Support() {
             {filteredHotlines.map((item) => (
               <div
                 key={item.id}
-                className="group rounded-3xl bg-white dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800 shadow-xs hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col justify-between"
+                className="group rounded-sm bg-white dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800 shadow-xs hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col justify-between"
               >
                 <div>
                   <div className="relative h-52 w-full overflow-hidden bg-slate-100 dark:bg-zinc-800">
@@ -327,7 +339,7 @@ export default function Support() {
                     </div>
 
                     {/* Dial Number Badge */}
-                    <div className="absolute bottom-3 right-3 px-3 py-1 rounded-xl bg-black/75 backdrop-blur-md text-white font-black text-sm">
+                    <div className="absolute bottom-3 right-3 px-3 py-1 rounded-sm bg-black/75 backdrop-blur-md text-white font-black text-sm">
                       Dial {item.dialNumber}
                     </div>
                   </div>
@@ -350,7 +362,7 @@ export default function Support() {
                     </h3>
 
                     <div className="flex items-center gap-2 text-xs">
-                      <div className="flex items-center gap-1 text-emerald-600 font-bold bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-md">
+                      <div className="flex items-center gap-1 text-emerald-600 font-bold bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-sm">
                         <ShieldCheck size={13} />
                         <span>Ministry Verified</span>
                       </div>
@@ -369,7 +381,7 @@ export default function Support() {
                   <button
                     type="button"
                     onClick={() => handleCopyNumber(item.fullNumber, item.id)}
-                    className="px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-zinc-800 hover:bg-slate-200 dark:hover:bg-zinc-700 text-slate-800 dark:text-zinc-200 font-semibold transition flex items-center gap-1.5 cursor-pointer"
+                    className="px-3.5 py-2 rounded-sm bg-slate-100 dark:bg-zinc-800 hover:bg-slate-200 dark:hover:bg-zinc-700 text-slate-800 dark:text-zinc-200 font-semibold transition flex items-center gap-1.5 cursor-pointer"
                   >
                     {copiedNumber === item.id ? (
                       <>
@@ -386,7 +398,7 @@ export default function Support() {
 
                   <a
                     href={`tel:${item.dialNumber}`}
-                    className="px-4 py-2 rounded-xl bg-[#002D62] hover:bg-[#001f44] text-white font-bold transition shadow-xs flex items-center gap-1.5 cursor-pointer"
+                    className="px-4 py-2 rounded-sm bg-[#002D62] hover:bg-[#001f44] text-white font-bold transition shadow-xs flex items-center gap-1.5 cursor-pointer"
                   >
                     <PhoneCall size={13} />
                     <span>Call {item.dialNumber}</span>
@@ -422,17 +434,17 @@ export default function Support() {
               return (
                 <div
                   key={faq.id}
-                  className="rounded-2xl bg-white dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800 shadow-xs p-5 transition-all duration-200 flex flex-col justify-between"
+                  className="rounded-sm bg-white dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800 shadow-xs p-5 transition-all duration-200 flex flex-col justify-between"
                 >
                   <div>
                     <div className="flex items-center justify-between gap-2 mb-2">
-                      <span className="px-2.5 py-0.5 rounded-md bg-blue-50 dark:bg-blue-950/60 text-[#002D62] dark:text-blue-300 text-[11px] font-semibold">
+                      <span className="px-2.5 py-0.5 rounded-sm bg-blue-50 dark:bg-blue-950/60 text-[#002D62] dark:text-blue-300 text-[11px] font-semibold">
                         {faq.tag}
                       </span>
                       <button
                         type="button"
                         onClick={() => toggleFaq(faq.id)}
-                        className="text-slate-400 hover:text-slate-600 dark:hover:text-zinc-200 p-1 rounded-lg transition"
+                        className="text-slate-400 hover:text-slate-600 dark:hover:text-zinc-200 p-1 rounded-sm transition"
                       >
                         {isOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                       </button>
@@ -461,7 +473,7 @@ export default function Support() {
       {/* SECTION 3: Official Inquiry Form & Ministry Office Info */}
       {showInquiry && (
         <div className="pt-4">
-          <div className="rounded-3xl bg-white dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800 shadow-sm overflow-hidden">
+          <div className="rounded-sm bg-white dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800 shadow-sm overflow-hidden">
             <div className="grid grid-cols-1 lg:grid-cols-12">
               {/* Left Column: Office info & Contact channels */}
               <div className="lg:col-span-5 bg-slate-50/70 dark:bg-zinc-800/40 p-6 sm:p-8 border-b lg:border-b-0 lg:border-r border-slate-200 dark:border-zinc-800 space-y-6">
@@ -479,8 +491,8 @@ export default function Support() {
                 </div>
 
                 <div className="space-y-4 text-xs">
-                  <div className="p-4 rounded-2xl bg-white dark:bg-zinc-900 border border-slate-200/70 dark:border-zinc-700/60 shadow-xs flex items-start gap-3">
-                    <div className="w-9 h-9 rounded-xl bg-[#002D62]/10 dark:bg-blue-900/40 text-[#002D62] dark:text-blue-400 flex items-center justify-center shrink-0">
+                  <div className="p-4 rounded-sm bg-white dark:bg-zinc-900 border border-slate-200/70 dark:border-zinc-700/60 shadow-xs flex items-start gap-3">
+                    <div className="w-9 h-9 rounded-sm bg-[#002D62]/10 dark:bg-blue-900/40 text-[#002D62] dark:text-blue-400 flex items-center justify-center shrink-0">
                       <Mail size={16} />
                     </div>
                     <div>
@@ -492,8 +504,8 @@ export default function Support() {
                     </div>
                   </div>
 
-                  <div className="p-4 rounded-2xl bg-white dark:bg-zinc-900 border border-slate-200/70 dark:border-zinc-700/60 shadow-xs flex items-start gap-3">
-                    <div className="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+                  <div className="p-4 rounded-sm bg-white dark:bg-zinc-900 border border-slate-200/70 dark:border-zinc-700/60 shadow-xs flex items-start gap-3">
+                    <div className="w-9 h-9 rounded-sm bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
                       <Headphones size={16} />
                     </div>
                     <div>
@@ -505,8 +517,8 @@ export default function Support() {
                     </div>
                   </div>
 
-                  <div className="p-4 rounded-2xl bg-white dark:bg-zinc-900 border border-slate-200/70 dark:border-zinc-700/60 shadow-xs flex items-start gap-3">
-                    <div className="w-9 h-9 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
+                  <div className="p-4 rounded-sm bg-white dark:bg-zinc-900 border border-slate-200/70 dark:border-zinc-700/60 shadow-xs flex items-start gap-3">
+                    <div className="w-9 h-9 rounded-sm bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
                       <MapPin size={16} />
                     </div>
                     <div>
@@ -520,7 +532,7 @@ export default function Support() {
                 </div>
 
                 {submittedTicket && (
-                  <div className="p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-xs text-emerald-800 dark:text-emerald-300 space-y-1">
+                  <div className="p-4 rounded-sm bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-xs text-emerald-800 dark:text-emerald-300 space-y-1">
                     <div className="font-bold flex items-center gap-1.5">
                       <Check size={14} className="text-emerald-600" />
                       <span>Inquiry Logged Successfully!</span>
@@ -549,7 +561,7 @@ export default function Support() {
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                         placeholder="e.g. Alex Morgan"
-                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800 text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#002D62]"
+                        className="w-full px-3.5 py-2.5 rounded-sm border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800 text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#002D62]"
                       />
                     </div>
 
@@ -563,7 +575,7 @@ export default function Support() {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder="name@example.com"
-                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800 text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#002D62]"
+                        className="w-full px-3.5 py-2.5 rounded-sm border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800 text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#002D62]"
                       />
                     </div>
                   </div>
@@ -578,7 +590,7 @@ export default function Support() {
                         value={phone}
                         onChange={(e) => setPhone(e.target.value)}
                         placeholder="+855 12 345 678"
-                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800 text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#002D62]"
+                        className="w-full px-3.5 py-2.5 rounded-sm border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800 text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#002D62]"
                       />
                     </div>
 
@@ -591,7 +603,7 @@ export default function Support() {
                         value={subject}
                         onChange={(e) => setSubject(e.target.value)}
                         placeholder="e.g. Private Angkor Sunrise Tour Guide"
-                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800 text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#002D62]"
+                        className="w-full px-3.5 py-2.5 rounded-sm border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800 text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#002D62]"
                       />
                     </div>
                   </div>
@@ -606,7 +618,7 @@ export default function Support() {
                       value={message}
                       onChange={(e) => setMessage(e.target.value)}
                       placeholder="Specify your travel dates, preferred destinations, group size, or questions for the support team..."
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800 text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#002D62]"
+                      className="w-full px-3.5 py-2.5 rounded-sm border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800 text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#002D62]"
                     />
                   </div>
 
@@ -614,7 +626,7 @@ export default function Support() {
                     <button
                       type="submit"
                       disabled={isSubmitting}
-                      className="w-full sm:w-auto px-6 py-3 rounded-xl bg-[#002D62] hover:bg-[#001f44] disabled:opacity-50 text-white font-bold text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer"
+                      className="w-full sm:w-auto px-6 py-3 rounded-sm bg-[#002D62] hover:bg-[#001f44] disabled:opacity-50 text-white font-bold text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer"
                     >
                       {isSubmitting ? (
                         <>

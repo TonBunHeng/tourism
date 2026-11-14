@@ -267,7 +267,7 @@ export default function Trips() {
         <button
           type="button"
           onClick={() => setIsCreateModalOpen(true)}
-          className="px-5 py-2.5 rounded-xl bg-[#002D62] hover:bg-[#001f44] text-white text-xs font-bold transition shadow-sm flex items-center gap-1.5 cursor-pointer self-start sm:self-auto"
+          className="px-5 py-2.5 rounded-sm bg-[#002D62] hover:bg-[#001f44] text-white text-xs font-bold transition shadow-sm flex items-center gap-1.5 cursor-pointer self-start sm:self-auto"
         >
           <Plus size={16} />
           <span>Create New Trip</span>
@@ -280,7 +280,7 @@ export default function Trips() {
           <button
             key={tab}
             onClick={() => setSelectedFilter(tab)}
-            className={`px-3.5 py-1.5 rounded-xl capitalize transition cursor-pointer ${
+            className={`px-3.5 py-1.5 rounded-sm capitalize transition cursor-pointer ${
               selectedFilter === tab
                 ? 'bg-[#002D62] text-white shadow-xs'
                 : 'text-slate-600 dark:text-zinc-400 hover:bg-slate-100 dark:hover:bg-zinc-800'
@@ -302,7 +302,7 @@ export default function Trips() {
           action={
             <button
               onClick={() => setIsCreateModalOpen(true)}
-              className="px-5 py-2.5 rounded-xl bg-[#002D62] text-white text-xs font-bold shadow-sm"
+              className="px-5 py-2.5 rounded-sm bg-[#002D62] text-white text-xs font-bold shadow-sm"
             >
               Start Planning a Trip
             </button>
@@ -316,7 +316,7 @@ export default function Trips() {
               <div
                 key={trip.id}
                 onClick={() => loadTripDetails(trip.id)}
-                className="group rounded-3xl bg-white dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800 p-6 shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col justify-between cursor-pointer"
+                className="group rounded-sm bg-white dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800 p-6 shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col justify-between cursor-pointer"
               >
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
@@ -374,7 +374,7 @@ export default function Trips() {
                       type="button"
                       title="Clone Trip"
                       onClick={(e) => handleDuplicate(trip.id, e)}
-                      className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-zinc-200 transition"
+                      className="p-1.5 rounded-sm text-slate-400 hover:text-slate-700 dark:hover:text-zinc-200 transition"
                     >
                       <Copy size={14} />
                     </button>
@@ -382,7 +382,7 @@ export default function Trips() {
                       type="button"
                       title="Delete Trip"
                       onClick={(e) => handleDeleteTrip(trip.id, e)}
-                      className="p-1.5 rounded-lg text-rose-400 hover:text-rose-600 transition"
+                      className="p-1.5 rounded-sm text-rose-400 hover:text-rose-600 transition"
                     >
                       <Trash2 size={14} />
                     </button>
@@ -397,7 +397,7 @@ export default function Trips() {
       {/* Active Trip Detail Modal (Day-by-Day Timeline) */}
       {activeTrip && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-alert-backdrop">
-          <div className="w-full max-w-3xl rounded-3xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 p-6 sm:p-8 shadow-2xl animate-alert-popup space-y-6 max-h-[90vh] overflow-y-auto">
+          <div className="w-full max-w-3xl rounded-sm bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 p-6 sm:p-8 shadow-2xl animate-alert-popup space-y-6 max-h-[90vh] overflow-y-auto">
             <div className="flex items-start justify-between gap-4 border-b border-slate-100 dark:border-zinc-800 pb-4">
               <div>
                 <div className="flex items-center gap-2">
@@ -425,7 +425,7 @@ export default function Trips() {
 
               <button
                 onClick={() => setActiveTrip(null)}
-                className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-white"
+                className="p-1.5 rounded-sm text-slate-400 hover:text-slate-700 dark:hover:text-white"
               >
                 <X size={20} />
               </button>
@@ -438,11 +438,11 @@ export default function Trips() {
                 return (
                   <div
                     key={dayNum}
-                    className="p-5 rounded-2xl bg-slate-50 dark:bg-zinc-800/60 border border-slate-200/70 dark:border-zinc-700/60 space-y-3"
+                    className="p-5 rounded-sm bg-slate-50 dark:bg-zinc-800/60 border border-slate-200/70 dark:border-zinc-700/60 space-y-3"
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <span className="w-7 h-7 rounded-lg bg-[#002D62] text-white flex items-center justify-center font-bold text-xs">
+                        <span className="w-7 h-7 rounded-sm bg-[#002D62] text-white flex items-center justify-center font-bold text-xs">
                           {dayNum}
                         </span>
                         <h4 className="text-sm font-black text-slate-900 dark:text-white">
@@ -453,7 +453,7 @@ export default function Trips() {
                       <button
                         type="button"
                         onClick={() => handleOpenAddActivity(dayNum)}
-                        className="px-3 py-1 rounded-xl bg-white dark:bg-zinc-800 hover:bg-slate-100 text-[#002D62] dark:text-blue-400 text-xs font-bold border border-slate-200 dark:border-zinc-700 shadow-xs flex items-center gap-1 cursor-pointer"
+                        className="px-3 py-1 rounded-sm bg-white dark:bg-zinc-800 hover:bg-slate-100 text-[#002D62] dark:text-blue-400 text-xs font-bold border border-slate-200 dark:border-zinc-700 shadow-xs flex items-center gap-1 cursor-pointer"
                       >
                         <Plus size={13} />
                         <span>Add Activity</span>
@@ -469,11 +469,11 @@ export default function Trips() {
                         {dayStops.map((stop) => (
                           <div
                             key={stop.id}
-                            className="p-3.5 rounded-xl bg-white dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800 shadow-xs flex items-center justify-between gap-3 text-xs"
+                            className="p-3.5 rounded-sm bg-white dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800 shadow-xs flex items-center justify-between gap-3 text-xs"
                           >
                             <div className="space-y-1">
                               <div className="flex items-center gap-2">
-                                <span className="font-mono text-[11px] font-bold text-[#002D62] dark:text-blue-400 px-2 py-0.5 rounded bg-blue-50 dark:bg-blue-950/40">
+                                <span className="font-mono text-[11px] font-bold text-[#002D62] dark:text-blue-400 px-2 py-0.5 rounded-sm bg-blue-50 dark:bg-blue-950/40">
                                   {stop.time_slot || 'Anytime'}
                                 </span>
                                 <span className="font-extrabold text-slate-900 dark:text-white">
@@ -522,7 +522,7 @@ export default function Trips() {
               <button
                 type="button"
                 onClick={() => setActiveTrip(null)}
-                className="px-5 py-2.5 rounded-xl bg-slate-100 dark:bg-zinc-800 text-slate-800 dark:text-white font-semibold text-xs"
+                className="px-5 py-2.5 rounded-sm bg-slate-100 dark:bg-zinc-800 text-slate-800 dark:text-white font-semibold text-xs"
               >
                 Close Planner
               </button>
@@ -534,7 +534,7 @@ export default function Trips() {
       {/* Create Trip Modal */}
       {isCreateModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-alert-backdrop">
-          <div className="w-full max-w-lg rounded-3xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 p-6 sm:p-8 shadow-2xl animate-alert-popup space-y-5">
+          <div className="w-full max-w-lg rounded-sm bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 p-6 sm:p-8 shadow-2xl animate-alert-popup space-y-5">
             <div className="flex items-center justify-between border-b border-slate-100 dark:border-zinc-800 pb-3">
               <div>
                 <span className="text-[11px] font-bold text-[#002D62] dark:text-blue-400 uppercase tracking-wider">
@@ -560,7 +560,7 @@ export default function Trips() {
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder="e.g. 3-Day Angkor Sunrise & Floating Village Expedition"
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#002D62]"
+                  className="w-full px-3.5 py-2.5 rounded-sm bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#002D62]"
                 />
               </div>
 
@@ -574,7 +574,7 @@ export default function Trips() {
                     value={destination}
                     onChange={(e) => setDestination(e.target.value)}
                     placeholder="Siem Reap, Phnom Penh, Kampot..."
-                    className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#002D62]"
+                    className="w-full px-3 py-2 rounded-sm bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#002D62]"
                   />
                 </div>
                 <div>
@@ -587,7 +587,7 @@ export default function Trips() {
                     max="50"
                     value={travelers}
                     onChange={(e) => setTravelers(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#002D62]"
+                    className="w-full px-3 py-2 rounded-sm bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#002D62]"
                   />
                 </div>
               </div>
@@ -601,7 +601,7 @@ export default function Trips() {
                     type="date"
                     value={startDate}
                     onChange={(e) => setStartDate(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#002D62]"
+                    className="w-full px-3 py-2 rounded-sm bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#002D62]"
                   />
                 </div>
                 <div>
@@ -613,7 +613,7 @@ export default function Trips() {
                     value={endDate}
                     min={startDate}
                     onChange={(e) => setEndDate(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#002D62]"
+                    className="w-full px-3 py-2 rounded-sm bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#002D62]"
                   />
                 </div>
               </div>
@@ -628,7 +628,7 @@ export default function Trips() {
                     min="0"
                     value={budget}
                     onChange={(e) => setBudget(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#002D62]"
+                    className="w-full px-3 py-2 rounded-sm bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#002D62]"
                   />
                 </div>
                 <div>
@@ -638,7 +638,7 @@ export default function Trips() {
                   <select
                     value={status}
                     onChange={(e) => setStatus(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#002D62]"
+                    className="w-full px-3 py-2 rounded-sm bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#002D62]"
                   >
                     <option value="planning">Planning (Draft)</option>
                     <option value="confirmed">Confirmed</option>
@@ -656,7 +656,7 @@ export default function Trips() {
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                   placeholder="Temple passes, sunscreen, camera lenses, local guide contacts..."
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#002D62]"
+                  className="w-full px-3.5 py-2.5 rounded-sm bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#002D62]"
                 />
               </div>
 
@@ -664,14 +664,14 @@ export default function Trips() {
                 <button
                   type="button"
                   onClick={() => setIsCreateModalOpen(false)}
-                  className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 dark:text-zinc-400 hover:bg-slate-100 dark:hover:bg-zinc-800"
+                  className="px-4 py-2 rounded-sm text-xs font-semibold text-slate-600 dark:text-zinc-400 hover:bg-slate-100 dark:hover:bg-zinc-800"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="px-5 py-2 rounded-xl bg-[#002D62] hover:bg-[#001f44] text-white text-xs font-bold transition shadow-sm disabled:opacity-50"
+                  className="px-5 py-2 rounded-sm bg-[#002D62] hover:bg-[#001f44] text-white text-xs font-bold transition shadow-sm disabled:opacity-50"
                 >
                   {isSubmitting ? 'Saving to DB...' : 'Create Trip Plan'}
                 </button>
@@ -684,7 +684,7 @@ export default function Trips() {
       {/* Add Itinerary Activity Modal */}
       {isAddActivityModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-alert-backdrop">
-          <div className="w-full max-w-md rounded-3xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 p-6 shadow-2xl animate-alert-popup space-y-4">
+          <div className="w-full max-w-md rounded-sm bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 p-6 shadow-2xl animate-alert-popup space-y-4">
             <div className="flex items-center justify-between border-b border-slate-100 dark:border-zinc-800 pb-3">
               <div>
                 <span className="text-[11px] font-bold text-[#002D62] dark:text-blue-400 uppercase tracking-wider">
@@ -710,7 +710,7 @@ export default function Trips() {
                   value={activityTitle}
                   onChange={(e) => setActivityTitle(e.target.value)}
                   placeholder="e.g. Sunrise by Northern Reflecting Pond"
-                  className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#002D62]"
+                  className="w-full px-3 py-2 rounded-sm bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#002D62]"
                 />
               </div>
 
@@ -722,7 +722,7 @@ export default function Trips() {
                   <select
                     value={activityPlaceId}
                     onChange={(e) => setActivityPlaceId(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#002D62]"
+                    className="w-full px-3 py-2 rounded-sm bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#002D62]"
                   >
                     <option value="">No specific place linked</option>
                     {places.map((p) => (
@@ -744,7 +744,7 @@ export default function Trips() {
                     value={activityTimeSlot}
                     onChange={(e) => setActivityTimeSlot(e.target.value)}
                     placeholder="05:30 AM"
-                    className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#002D62]"
+                    className="w-full px-3 py-2 rounded-sm bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#002D62]"
                   />
                 </div>
                 <div>
@@ -757,7 +757,7 @@ export default function Trips() {
                     step="15"
                     value={activityDuration}
                     onChange={(e) => setActivityDuration(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#002D62]"
+                    className="w-full px-3 py-2 rounded-sm bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#002D62]"
                   />
                 </div>
               </div>
@@ -771,7 +771,7 @@ export default function Trips() {
                   min="0"
                   value={activityCost}
                   onChange={(e) => setActivityCost(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#002D62]"
+                  className="w-full px-3 py-2 rounded-sm bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#002D62]"
                 />
               </div>
 
@@ -779,14 +779,14 @@ export default function Trips() {
                 <button
                   type="button"
                   onClick={() => setIsAddActivityModalOpen(false)}
-                  className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 dark:text-zinc-400 hover:bg-slate-100 dark:hover:bg-zinc-800"
+                  className="px-4 py-2 rounded-sm text-xs font-semibold text-slate-600 dark:text-zinc-400 hover:bg-slate-100 dark:hover:bg-zinc-800"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmittingActivity}
-                  className="px-5 py-2 rounded-xl bg-[#002D62] hover:bg-[#001f44] text-white text-xs font-bold transition shadow-sm disabled:opacity-50"
+                  className="px-5 py-2 rounded-sm bg-[#002D62] hover:bg-[#001f44] text-white text-xs font-bold transition shadow-sm disabled:opacity-50"
                 >
                   {isSubmittingActivity ? 'Saving...' : 'Add Stop'}
                 </button>

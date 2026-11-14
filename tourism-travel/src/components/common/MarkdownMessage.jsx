@@ -27,7 +27,7 @@ function parseInline(text) {
       tokens.push(
         <code 
           key={keyIndex++} 
-          className="px-1.5 py-0.5 rounded-md bg-zinc-100 dark:bg-zinc-800 text-blue-600 dark:text-blue-400 font-mono text-xs border border-zinc-200 dark:border-zinc-700"
+          className="px-1.5 py-0.5 rounded-sm bg-zinc-100 dark:bg-zinc-800 text-blue-600 dark:text-blue-400 font-mono text-xs border border-zinc-200 dark:border-zinc-700"
         >
           {codeMatch[1]}
         </code>
@@ -160,7 +160,7 @@ export default function MarkdownMessage({ content = '', isKhmer = false }) {
       elements.push(
         <blockquote
           key={blockKey++}
-          className="my-3 border-l-2 border-zinc-400 dark:border-zinc-600 pl-4 py-1 text-zinc-600 dark:text-zinc-300 text-[14px] italic bg-zinc-50 dark:bg-zinc-900/50 rounded-r-xl"
+          className="my-3 border-l-2 border-zinc-400 dark:border-zinc-600 pl-4 py-1 text-zinc-600 dark:text-zinc-300 text-[14px] italic bg-zinc-50 dark:bg-zinc-900/50 rounded-r-sm"
         >
           {parseInline(trimmed.slice(2))}
         </blockquote>
@@ -190,7 +190,7 @@ export default function MarkdownMessage({ content = '', isKhmer = false }) {
         const bodyRows = tableRows.slice(1);
 
         elements.push(
-          <div key={blockKey++} className="my-3 overflow-x-auto rounded-xl border border-zinc-200 dark:border-zinc-800">
+          <div key={blockKey++} className="my-3 overflow-x-auto rounded-sm border border-zinc-200 dark:border-zinc-800">
             <table className="min-w-full text-xs text-left">
               <thead className="bg-zinc-50 dark:bg-zinc-800/80 border-b border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-300 font-bold uppercase tracking-wider text-[10px]">
                 <tr>
@@ -254,7 +254,7 @@ export default function MarkdownMessage({ content = '', isKhmer = false }) {
         <ol key={blockKey++} className="my-2.5 space-y-2 pl-0.5">
           {listItems.map((item, lIdx) => (
             <li key={lIdx} className="flex items-start gap-2.5 text-[15px] text-zinc-800 dark:text-zinc-200 leading-relaxed">
-              <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300 bg-zinc-100 dark:bg-zinc-800 rounded-md px-1.5 py-0.5 mt-0.5 shrink-0 border border-zinc-200 dark:border-zinc-700">
+              <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300 bg-zinc-100 dark:bg-zinc-800 rounded-sm px-1.5 py-0.5 mt-0.5 shrink-0 border border-zinc-200 dark:border-zinc-700">
                 {lIdx + 1}
               </span>
               <div className="flex-1">{parseInline(item)}</div>

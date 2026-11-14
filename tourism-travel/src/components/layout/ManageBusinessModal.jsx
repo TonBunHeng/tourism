@@ -166,14 +166,14 @@ export default function ManageBusinessModal({
       aria-labelledby="manage-business-modal-title"
     >
       <div
-        className="bg-white dark:bg-zinc-900 rounded-xl shadow-2xl max-w-2xl w-full p-5 sm:p-7 relative border border-gray-200 dark:border-zinc-800 animate-alert-popup my-auto overflow-hidden text-gray-900 dark:text-zinc-100"
+        className="bg-white dark:bg-zinc-900 rounded-sm shadow-2xl max-w-2xl w-full p-5 sm:p-7 relative border border-gray-200 dark:border-zinc-800 animate-alert-popup my-auto overflow-hidden text-gray-900 dark:text-zinc-100"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close Button */}
         <button
           type="button"
           onClick={onClose}
-          className="absolute top-4 right-4 p-1.5 rounded-lg text-gray-400 hover:text-gray-700 dark:hover:text-zinc-200 hover:bg-gray-100 dark:hover:bg-zinc-800 transition cursor-pointer"
+          className="absolute top-4 right-4 p-1.5 rounded-sm text-gray-400 hover:text-gray-700 dark:hover:text-zinc-200 hover:bg-gray-100 dark:hover:bg-zinc-800 transition cursor-pointer"
           aria-label="Close modal"
         >
           <X size={18} />
@@ -181,7 +181,7 @@ export default function ManageBusinessModal({
 
         {/* Modal Header */}
         <div className="flex items-center gap-3 pb-4 border-b border-gray-100 dark:border-zinc-800">
-          <div className="w-10 h-10 rounded-lg bg-blue-50 dark:bg-blue-950/50 text-[#003E83] dark:text-blue-400 border border-blue-100 dark:border-blue-900/40 flex items-center justify-center shrink-0">
+          <div className="w-10 h-10 rounded-sm bg-blue-50 dark:bg-blue-950/50 text-[#003E83] dark:text-blue-400 border border-blue-100 dark:border-blue-900/40 flex items-center justify-center shrink-0">
             <Building2 className="w-5 h-5" />
           </div>
           <div>
@@ -196,11 +196,11 @@ export default function ManageBusinessModal({
 
         {/* Tab Switcher if businesses exist */}
         {businesses.length > 0 && (
-          <div className="flex items-center gap-2 mt-4 p-1 bg-gray-100 dark:bg-zinc-800/80 rounded-lg text-xs font-semibold">
+          <div className="flex items-center gap-2 mt-4 p-1 bg-gray-100 dark:bg-zinc-800/80 rounded-sm text-xs font-semibold">
             <button
               type="button"
               onClick={() => setActiveTab('add')}
-              className={`flex-1 py-1.5 rounded-md transition flex items-center justify-center gap-1.5 cursor-pointer ${
+              className={`flex-1 py-1.5 rounded-sm transition flex items-center justify-center gap-1.5 cursor-pointer ${
                 activeTab === 'add'
                   ? 'bg-white dark:bg-zinc-900 text-[#003E83] dark:text-blue-400 shadow-2xs'
                   : 'text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white'
@@ -212,7 +212,7 @@ export default function ManageBusinessModal({
             <button
               type="button"
               onClick={() => setActiveTab('manage')}
-              className={`flex-1 py-1.5 rounded-md transition flex items-center justify-center gap-1.5 cursor-pointer ${
+              className={`flex-1 py-1.5 rounded-sm transition flex items-center justify-center gap-1.5 cursor-pointer ${
                 activeTab === 'manage'
                   ? 'bg-white dark:bg-zinc-900 text-[#003E83] dark:text-blue-400 shadow-2xs'
                   : 'text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white'
@@ -238,7 +238,7 @@ export default function ManageBusinessModal({
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="e.g. Angkor Heritage Boutique Hotel & Restaurant"
-                className="w-full px-3 py-2 rounded-md border border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800/80 text-xs sm:text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#003E83]"
+                className="w-full px-3 py-2 rounded-sm border border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800/80 text-xs sm:text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#003E83]"
               />
             </div>
 
@@ -253,7 +253,7 @@ export default function ManageBusinessModal({
                   value={categoryId}
                   onChange={(e) => setCategoryId(e.target.value)}
                   disabled={isLoadingMetadata}
-                  className="w-full px-3 py-2 rounded-md border border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800/80 text-xs sm:text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#003E83] cursor-pointer disabled:opacity-60"
+                  className="w-full px-3 py-2 rounded-sm border border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800/80 text-xs sm:text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#003E83] cursor-pointer disabled:opacity-60"
                 >
                   <option value="">Select Category</option>
                   {categories.map((c) => (
@@ -273,7 +273,7 @@ export default function ManageBusinessModal({
                   value={provinceId}
                   onChange={(e) => setProvinceId(e.target.value)}
                   disabled={isLoadingMetadata}
-                  className="w-full px-3 py-2 rounded-md border border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800/80 text-xs sm:text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#003E83] cursor-pointer disabled:opacity-60"
+                  className="w-full px-3 py-2 rounded-sm border border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800/80 text-xs sm:text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#003E83] cursor-pointer disabled:opacity-60"
                 >
                   <option value="">Select Province</option>
                   {provinces.map((p) => (
@@ -296,7 +296,7 @@ export default function ManageBusinessModal({
                 value={locationUrl}
                 onChange={(e) => setLocationUrl(e.target.value)}
                 placeholder="e.g. Google Maps link, coordinates, or location link"
-                className="w-full px-3 py-2 rounded-md border border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800/80 text-xs sm:text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#003E83]"
+                className="w-full px-3 py-2 rounded-sm border border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800/80 text-xs sm:text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#003E83]"
               />
               <p className="text-[11px] text-gray-400 dark:text-zinc-500 mt-1">
                 Enter your Google Maps place URL, GPS coordinate pin, or location landmark.
@@ -313,7 +313,7 @@ export default function ManageBusinessModal({
                 value={address}
                 onChange={(e) => setAddress(e.target.value)}
                 placeholder="e.g. Street 08, Krong Siem Reap, Cambodia"
-                className="w-full px-3 py-2 rounded-md border border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800/80 text-xs sm:text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#003E83]"
+                className="w-full px-3 py-2 rounded-sm border border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800/80 text-xs sm:text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#003E83]"
               />
             </div>
 
@@ -329,7 +329,7 @@ export default function ManageBusinessModal({
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   placeholder="+855 63 963 888"
-                  className="w-full px-3 py-2 rounded-md border border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800/80 text-xs sm:text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#003E83]"
+                  className="w-full px-3 py-2 rounded-sm border border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800/80 text-xs sm:text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#003E83]"
                 />
               </div>
 
@@ -343,7 +343,7 @@ export default function ManageBusinessModal({
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="bookings@example.com"
-                  className="w-full px-3 py-2 rounded-md border border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800/80 text-xs sm:text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#003E83]"
+                  className="w-full px-3 py-2 rounded-sm border border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800/80 text-xs sm:text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#003E83]"
                 />
               </div>
             </div>
@@ -358,7 +358,7 @@ export default function ManageBusinessModal({
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Describe your tourism offerings, hospitality services, dining specialties, or amenities..."
-                className="w-full px-3 py-2 rounded-md border border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800/80 text-xs sm:text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#003E83]"
+                className="w-full px-3 py-2 rounded-sm border border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800/80 text-xs sm:text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#003E83]"
               />
             </div>
 
@@ -368,14 +368,14 @@ export default function ManageBusinessModal({
                 type="button"
                 onClick={onClose}
                 disabled={isSubmitting}
-                className="px-4 py-2 rounded-md border border-gray-200 dark:border-zinc-700 hover:bg-gray-100 dark:hover:bg-zinc-800 text-xs sm:text-sm font-medium transition cursor-pointer"
+                className="px-4 py-2 rounded-sm border border-gray-200 dark:border-zinc-700 hover:bg-gray-100 dark:hover:bg-zinc-800 text-xs sm:text-sm font-medium transition cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="px-5 py-2 rounded-md bg-[#003E83] hover:bg-[#002e62] disabled:opacity-50 text-white text-xs sm:text-sm font-semibold shadow-xs transition flex items-center gap-2 cursor-pointer"
+                className="px-5 py-2 rounded-sm bg-[#003E83] hover:bg-[#002e62] disabled:opacity-50 text-white text-xs sm:text-sm font-semibold shadow-xs transition flex items-center gap-2 cursor-pointer"
               >
                 {isSubmitting ? (
                   <>
@@ -401,7 +401,7 @@ export default function ManageBusinessModal({
               return (
                 <div
                   key={biz.id}
-                  className={`p-3 rounded-lg border transition flex items-center justify-between gap-3 ${
+                  className={`p-3 rounded-sm border transition flex items-center justify-between gap-3 ${
                     isSelected
                       ? 'bg-blue-50/70 dark:bg-blue-950/30 border-blue-200 dark:border-blue-900/60'
                       : 'bg-gray-50/50 dark:bg-zinc-800/40 border-gray-200 dark:border-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-800'
@@ -411,12 +411,12 @@ export default function ManageBusinessModal({
                     <div className="flex items-center gap-2">
                       <span className="font-semibold text-xs sm:text-sm truncate">{biz.name}</span>
                       {biz.verification_status === 'approved' ? (
-                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-sm text-[10px] font-bold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
                           <CheckCircle2 size={10} />
                           <span>Verified</span>
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
+                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-sm text-[10px] font-bold bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
                           <Clock size={10} />
                           <span>Pending</span>
                         </span>
@@ -430,7 +430,7 @@ export default function ManageBusinessModal({
 
                   <div className="flex items-center gap-2 shrink-0">
                     {isSelected ? (
-                      <span className="px-3 py-1.5 rounded-md text-xs font-semibold text-[#003E83] dark:text-blue-400 bg-white dark:bg-zinc-900 border border-blue-200 dark:border-blue-900/60 shadow-2xs">
+                      <span className="px-3 py-1.5 rounded-sm text-xs font-semibold text-[#003E83] dark:text-blue-400 bg-white dark:bg-zinc-900 border border-blue-200 dark:border-blue-900/60 shadow-2xs">
                         Active
                       </span>
                     ) : (
@@ -440,7 +440,7 @@ export default function ManageBusinessModal({
                           onSelectBusiness?.(biz);
                           onClose();
                         }}
-                        className="px-3 py-1.5 rounded-md text-xs font-semibold text-gray-700 dark:text-zinc-200 bg-white dark:bg-zinc-800 hover:bg-gray-100 dark:hover:bg-zinc-700 border border-gray-200 dark:border-zinc-700 transition cursor-pointer"
+                        className="px-3 py-1.5 rounded-sm text-xs font-semibold text-gray-700 dark:text-zinc-200 bg-white dark:bg-zinc-800 hover:bg-gray-100 dark:hover:bg-zinc-700 border border-gray-200 dark:border-zinc-700 transition cursor-pointer"
                       >
                         Switch
                       </button>
